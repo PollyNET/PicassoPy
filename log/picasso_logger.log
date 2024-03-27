@@ -1,0 +1,704 @@
+2024-03-22 09:23:26,864 - CRITICAL - readPollyRawData - /ollyhome/Bildermacher2/todo_filelist/pollyxt_lacros/data_zip/2023_09_11_Mon_LACROS_00_00_01.nc does not exist.
+2024-03-22 09:29:34,851 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/lib/config/pollynet_processing_chain_config.json
+2024-03-22 09:29:34,859 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 09:29:35,213 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 09:29:35,214 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 09:29:35,214 - CRITICAL - readPollyRawData - /ollyhome/Bildermacher2/todo_filelist/pollyxt_lacros/data_zip/2023_09_11_Mon_LACROS_00_00_01.nc does not exist.
+2024-03-22 09:54:38,182 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/lib/config/pollynet_processing_chain_config.json
+2024-03-22 09:54:38,193 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 09:54:39,945 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 09:54:39,956 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 09:54:40,007 - CRITICAL - readPollyRawData - /ollyhome/Bildermacher2/todo_filelist/pollyxt_lacros/data_zip/2023_09_11_Mon_LACROS_00_00_01.nc does not exist.
+2024-03-22 09:57:32,452 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/lib/config/pollynet_processing_chain_config.json
+2024-03-22 09:57:32,464 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 09:57:33,553 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 09:57:33,554 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 09:57:33,554 - CRITICAL - readPollyRawData - /ollyhome/Bildermacher2/todo_filelist/pollyxt_lacros/data_zip/2023_09_11_Mon_LACROS_00_00_01.nc does not exist.
+2024-03-22 09:57:42,307 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/lib/config/pollynet_processing_chain_config.json
+2024-03-22 09:57:42,307 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 09:57:42,621 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 09:57:42,621 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 09:57:42,622 - CRITICAL - readPollyRawData - /ollyhome/Bildermacher2/todo_filelist/pollyxt_lacros/data_zip/2023_09_11_Mon_LACROS_00_00_01.nc does not exist.
+2024-03-22 09:59:13,429 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/lib/config/pollynet_processing_chain_config.json
+2024-03-22 09:59:13,438 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 09:59:15,033 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 09:59:15,057 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 09:59:15,071 - CRITICAL - readPollyRawData - /ollyhome/Bildermacher2/todo_filelist/pollyxt_lacros/data_zip/2023_09_11_Mon_LACROS_00_00_01.nc does not exist.
+2024-03-22 09:59:31,861 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/lib/config/pollynet_processing_chain_config.json
+2024-03-22 09:59:31,862 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 09:59:32,259 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 09:59:32,260 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 09:59:32,261 - CRITICAL - readPollyRawData - /ollyhome/Bildermacher2/todo_filelist/pollyxt_lacros/data_zip/2023_09_11_Mon_LACROS_00_00_01.nc does not exist.
+2024-03-22 10:00:33,085 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/lib/config/pollynet_processing_chain_config.json
+2024-03-22 10:00:33,109 - WARNING - loadConfigs - picasso config file: pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+does not exist
+2024-03-22 10:00:33,109 - WARNING - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/lib/config/pollynet_processing_chain_config.json
+will be used
+2024-03-22 10:00:33,110 - WARNING - loadConfigs - polly_config_table_file:  
+can not be found.
+2024-03-22 10:06:23,891 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/lib/config/pollynet_processing_chain_config.json
+2024-03-22 10:06:23,892 - WARNING - loadConfigs - picasso config file: pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+does not exist
+2024-03-22 10:06:23,892 - WARNING - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/lib/config/pollynet_processing_chain_config.json
+will be used
+2024-03-22 10:06:23,892 - WARNING - loadConfigs - polly_config_table_file:  
+can not be found.
+2024-03-22 10:07:03,591 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/lib/config/pollynet_processing_chain_config.json
+2024-03-22 10:07:03,602 - WARNING - loadConfigs - picasso config file: pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+does not exist
+2024-03-22 10:07:03,602 - WARNING - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/lib/config/pollynet_processing_chain_config.json
+will be used
+2024-03-22 10:07:03,602 - WARNING - loadConfigs - polly_config_table_file:  
+can not be found.
+2024-03-22 10:18:40,716 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 10:18:40,732 - WARNING - loadConfigs - picasso config file: pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+does not exist
+2024-03-22 10:18:40,733 - WARNING - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+will be used
+2024-03-22 10:18:42,461 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 10:18:42,481 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 10:18:42,498 - CRITICAL - readPollyRawData - /ollyhome/Bildermacher2/todo_filelist/pollyxt_lacros/data_zip/2023_09_11_Mon_LACROS_00_00_01.nc does not exist.
+2024-03-22 10:23:38,906 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 10:23:38,907 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 10:23:39,273 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 10:23:39,274 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 10:23:39,274 - CRITICAL - readPollyRawData - /ollyhome/Bildermacher2/todo_filelist/pollyxt_lacros/data_zip/2023_09_11_Mon_LACROS_00_00_01.nc does not exist.
+2024-03-22 10:25:25,939 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 10:25:25,939 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 10:25:26,249 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 10:25:26,250 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 10:25:26,250 - CRITICAL - readPollyRawData - /ollyhome/Bildermacher2/todo_filelist/pollyxt_lacros/data_zip/2023_09_11_Mon_LACROS_00_00_01.nc does not exist.
+2024-03-22 10:54:13,444 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 10:54:13,457 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 10:54:15,470 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 10:54:15,496 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 10:56:11,923 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 10:56:11,924 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 10:56:12,468 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 10:56:12,469 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 10:58:26,382 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 10:58:26,383 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 10:58:26,758 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 10:58:26,759 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:07:43,584 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:07:43,606 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:07:44,857 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:07:44,858 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:08:30,089 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:08:30,090 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:08:30,417 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:08:30,417 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:09:11,596 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:09:11,596 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:09:11,941 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:09:11,941 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:09:55,873 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:09:55,873 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:09:56,191 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:09:56,192 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:10:05,934 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:10:05,935 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:10:06,280 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:10:06,281 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:10:40,860 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:10:40,860 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:10:41,241 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:10:41,242 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:10:59,959 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:10:59,959 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:11:00,269 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:11:00,269 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:11:40,258 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:11:40,258 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:11:40,596 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:11:40,597 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:21:30,175 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:21:30,176 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:21:30,861 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:21:30,862 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:21:54,982 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:21:54,982 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:21:55,303 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:21:55,304 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:23:07,793 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:23:07,794 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:23:08,132 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:23:08,132 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:23:15,014 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:23:15,014 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:23:15,323 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:23:15,323 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:35:22,128 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:35:22,142 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:35:23,448 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:35:23,448 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:35:36,499 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:35:36,499 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:35:36,817 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:35:36,818 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:39:39,698 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:39:39,698 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:39:40,309 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:39:40,318 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:40:10,901 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:40:10,901 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:40:11,232 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:40:11,232 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:40:34,444 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:40:34,444 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:40:34,758 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:40:34,758 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:41:58,332 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:41:58,332 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:41:58,638 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:41:58,639 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:42:06,314 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:42:06,314 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:42:06,631 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:42:06,632 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:44:44,477 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:44:44,478 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:44:44,789 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:44:44,790 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:51:23,256 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:51:23,256 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:51:23,568 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:51:23,569 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:51:55,573 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:51:55,573 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:51:55,941 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:51:55,942 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:52:44,839 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:52:44,839 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:52:45,146 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:52:45,147 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:53:08,533 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:53:08,533 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:53:08,848 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:53:08,848 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 11:53:51,103 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 11:53:51,103 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 11:53:51,426 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 11:53:51,427 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 12:00:45,724 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 12:00:45,725 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 12:00:46,038 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 12:00:46,038 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 12:00:48,009 - INFO - picassoProc - date in nc-file equals date of filename
+2024-03-22 13:01:16,555 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:01:16,583 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:01:18,552 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:01:18,565 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:01:21,190 - INFO - picassoProc - date in nc-file equals date of filename
+2024-03-22 13:03:43,396 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:03:43,425 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:03:45,019 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:03:45,032 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:03:51,900 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:03:51,900 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:04:59,682 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:04:59,683 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:05:00,107 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:05:00,107 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:05:05,699 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:05:05,700 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:18:01,585 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:18:01,585 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:18:01,951 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:18:01,952 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:18:08,188 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:18:08,188 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:19:28,902 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:19:28,903 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:19:29,298 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:19:29,299 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:19:31,911 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:19:31,911 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:22:22,115 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:22:22,115 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:22:22,432 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:22:22,432 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:22:27,905 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:22:27,905 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:22:58,951 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:22:58,951 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:22:59,280 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:22:59,280 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:23:01,582 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:23:01,583 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:33:07,490 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:33:07,496 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:33:08,123 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:33:08,123 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:33:10,503 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:33:10,503 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:37:30,249 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:37:30,250 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:37:30,596 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:37:30,596 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:37:33,251 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:37:33,252 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:38:24,189 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:38:24,190 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:38:24,532 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:38:24,532 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:38:27,888 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:38:27,889 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:41:33,936 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:41:33,937 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:41:34,262 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:41:34,262 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:41:36,289 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:41:36,290 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:43:29,732 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:43:29,733 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:43:30,105 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:43:30,106 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:43:33,134 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:43:33,134 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:43:47,622 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:43:47,623 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:43:47,939 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:43:47,940 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:43:50,559 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:43:50,559 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:44:22,428 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:44:22,429 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:44:22,755 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:44:22,756 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:44:25,115 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:44:25,115 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:44:45,497 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:44:45,497 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:44:45,868 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:44:45,868 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:44:48,122 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:44:48,122 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:44:58,787 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:44:58,787 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:44:59,179 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:44:59,180 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:45:01,403 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:45:01,403 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:47:47,699 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:47:47,700 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:47:48,015 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:47:48,016 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:47:52,185 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:47:52,185 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:50:15,778 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:50:15,779 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:50:16,152 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:50:16,152 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:50:22,403 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:50:22,403 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:52:37,020 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:52:37,021 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:52:37,342 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:52:37,343 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:52:40,822 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:52:40,823 - INFO - picassoProc - date infile will be replaced with date of filename.
+2024-03-22 13:55:11,468 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:55:11,469 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:55:11,792 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:55:11,793 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:55:13,696 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:55:13,696 - INFO - picassoProc - date in nc-file will be replaced with date of filename.
+2024-03-22 13:59:52,354 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 13:59:52,354 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 13:59:52,682 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 13:59:52,683 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 13:59:55,329 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 13:59:55,329 - INFO - picassoProc - date in nc-file will be replaced with date of filename.
+2024-03-22 14:00:04,875 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 14:00:04,876 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 14:00:06,080 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 14:00:06,081 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 14:00:11,227 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 14:00:11,227 - INFO - picassoProc - date in nc-file will be replaced with date of filename.
+2024-03-22 14:01:38,951 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 14:01:38,952 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 14:01:39,311 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 14:01:39,312 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 14:01:41,696 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 14:01:41,696 - INFO - picassoProc - date in nc-file will be replaced with date of filename.
+2024-03-22 14:03:42,639 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 14:03:42,640 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 14:03:42,965 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 14:03:42,966 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 14:03:44,875 - WARNING - picassoProc - date in nc-file differs from date of filename
+2024-03-22 14:03:44,875 - INFO - picassoProc - date in nc-file will be replaced with date of filename.
+2024-03-22 14:04:01,455 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-22 14:04:01,455 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-22 14:04:01,900 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-22 14:04:01,901 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-22 14:04:05,371 - INFO - picassoProc - date in nc-file equals date of filename
+2024-03-25 09:13:30,123 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:13:30,153 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:13:32,646 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:13:32,676 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:13:36,120 - INFO - picassoProc - date in nc-file equals date of filename
+2024-03-25 09:23:01,542 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:23:01,552 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:23:03,668 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:23:03,677 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:23:59,339 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:23:59,339 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:23:59,651 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:23:59,652 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:34:28,772 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:34:28,786 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:34:29,119 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:34:29,120 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:35:09,923 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:35:09,924 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:35:10,248 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:35:10,248 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:37:07,050 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:37:07,051 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:37:07,434 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:37:07,435 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:38:56,752 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:38:56,757 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:38:57,593 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:38:57,594 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:49:53,243 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:49:53,266 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:49:55,748 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:49:55,758 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:50:26,776 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:50:26,777 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:50:27,099 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:50:27,100 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:50:39,474 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:50:39,474 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:50:39,794 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:50:39,794 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:50:56,136 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:50:56,136 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:50:56,444 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:50:56,444 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:51:47,322 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:51:47,323 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:51:47,633 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:51:47,633 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:52:02,172 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:52:02,173 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:52:02,562 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:52:02,562 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:52:15,026 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:52:15,026 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:52:15,337 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:52:15,338 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:52:33,689 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:52:33,689 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:52:34,003 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:52:34,004 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 09:58:30,276 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 09:58:30,290 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 09:58:32,236 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 09:58:32,250 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:13:46,799 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:13:46,829 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:13:49,529 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:13:49,538 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:14:20,544 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:14:20,544 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:14:20,861 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:14:20,861 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:15:10,148 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:15:10,148 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:15:10,461 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:15:10,461 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:16:56,153 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:16:56,153 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:16:56,467 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:16:56,467 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:17:27,897 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:17:27,897 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:17:28,210 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:17:28,211 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:18:17,988 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:18:17,988 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:18:18,299 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:18:18,299 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:18:55,971 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:18:55,971 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:18:56,324 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:18:56,324 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:31:19,545 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:31:19,577 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:31:21,510 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:31:21,526 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:31:51,416 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:31:51,416 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:31:51,726 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:31:51,726 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:32:23,496 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:32:23,496 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:32:23,837 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:32:23,837 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:32:50,104 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:32:50,104 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:32:50,436 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:32:50,437 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:34:01,704 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:34:01,704 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:34:02,023 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:34:02,024 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:36:05,080 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:36:05,084 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:36:05,405 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:36:05,406 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:38:01,610 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:38:01,611 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:38:01,985 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:38:01,985 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:40:24,883 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:40:24,884 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:40:25,221 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:40:25,222 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:41:11,577 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:41:11,578 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:41:11,890 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:41:11,890 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:41:52,037 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:41:52,038 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:41:52,370 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:41:52,371 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:42:12,734 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:42:12,734 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:42:13,049 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:42:13,049 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:42:39,524 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:42:39,524 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:42:39,834 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:42:39,835 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:43:15,646 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:43:15,646 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:43:15,955 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:43:15,956 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:43:26,928 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:43:26,929 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:43:27,290 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:43:27,291 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:43:43,871 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:43:43,871 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:43:44,186 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:43:44,186 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:50:25,748 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:50:25,767 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:50:27,951 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:50:27,957 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:50:32,427 - INFO - picassoProc - False
+2024-03-25 13:50:32,427 - INFO - picassoProc - True
+2024-03-25 13:50:32,427 - INFO - picassoProc - correcting false mshots
+2024-03-25 13:51:35,266 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:51:35,278 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:51:37,246 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:51:37,259 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:51:40,954 - INFO - picassoProc - flagFilterFalseMShots: self.polly_config_dict['flagFilterFalseMShots']
+2024-03-25 13:51:40,955 - INFO - picassoProc - flagCorrectFalseMShots: self.polly_config_dict['flagCorrectFalseMShots']
+2024-03-25 13:51:40,955 - INFO - picassoProc - correcting false mshots
+2024-03-25 13:52:10,760 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:52:10,766 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:52:12,553 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:52:12,565 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:52:17,487 - INFO - picassoProc - flagFilterFalseMShots: self.polly_config_dict["flagFilterFalseMShots"]
+2024-03-25 13:52:17,494 - INFO - picassoProc - flagCorrectFalseMShots: self.polly_config_dict["flagCorrectFalseMShots"]
+2024-03-25 13:52:17,494 - INFO - picassoProc - correcting false mshots
+2024-03-25 13:52:45,866 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:52:45,883 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:52:47,587 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:52:47,600 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:52:51,487 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-03-25 13:52:51,487 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-03-25 13:52:51,487 - INFO - picassoProc - correcting false mshots
+2024-03-25 13:53:19,467 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-25 13:53:19,475 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-25 13:53:21,252 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-25 13:53:21,258 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-25 13:53:25,036 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-03-25 13:53:25,036 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-03-25 13:53:25,037 - INFO - picassoProc - correcting false mshots
+2024-03-27 10:39:58,526 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 10:39:58,559 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 10:40:00,732 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 10:40:00,742 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 10:41:36,610 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 10:41:36,611 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 10:41:37,061 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 10:41:37,062 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 11:11:24,259 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 11:11:24,272 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 11:11:25,661 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 11:11:25,668 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 11:11:51,943 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 11:11:51,943 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 11:11:52,270 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 11:11:52,271 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 11:12:00,379 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 11:12:00,380 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 11:12:00,693 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 11:12:00,693 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 11:12:45,801 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 11:12:45,802 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 11:12:46,207 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 11:12:46,207 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 11:14:27,556 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 11:14:27,556 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 11:14:27,880 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 11:14:27,881 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 11:16:12,161 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 11:16:12,161 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 11:16:12,526 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 11:16:12,527 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 11:31:52,207 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 11:31:52,208 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 11:31:52,606 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 11:31:52,606 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 11:33:59,381 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 11:33:59,381 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 11:33:59,694 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 11:33:59,695 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 11:34:01,593 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 11:39:12,221 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 11:39:12,222 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 11:39:12,549 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 11:39:12,550 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 11:39:14,440 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 11:40:29,321 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 11:40:29,321 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 11:40:29,685 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 11:40:29,686 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 11:40:31,949 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 13:00:54,258 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 13:00:54,294 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 13:00:56,088 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 13:00:56,122 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 13:01:03,230 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 13:02:09,026 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 13:02:09,026 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 13:02:09,338 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 13:02:09,339 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 13:02:12,573 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 13:31:49,173 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 13:31:49,197 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 13:31:50,842 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 13:31:50,859 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 13:31:53,545 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 13:33:24,719 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 13:33:24,720 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 13:33:25,034 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 13:33:25,035 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 13:33:26,990 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 13:34:03,131 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 13:34:03,132 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 13:34:03,451 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 13:34:03,452 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 13:34:06,045 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 13:36:36,041 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 13:36:36,042 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 13:36:36,374 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 13:36:36,374 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 13:36:39,913 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 13:40:29,926 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 13:40:29,927 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 13:40:30,356 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 13:40:30,357 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 13:40:32,192 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 13:43:08,473 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 13:43:08,473 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 13:43:08,788 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 13:43:08,788 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 13:43:10,648 - INFO - picassoProc - date in nc-file equals date of filename
+2024-03-27 13:43:10,648 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 13:50:50,885 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 13:50:50,885 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 13:50:51,581 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 13:50:51,582 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 13:50:51,583 - INFO - readPollyRawData - reading nc-file: /pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc
+2024-03-27 13:50:54,640 - INFO - picassoProc - date in nc-file equals date of filename
+2024-03-27 13:50:54,640 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 13:53:22,065 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 13:53:22,066 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 13:53:22,572 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 13:53:22,572 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 13:53:22,573 - INFO - readPollyRawData - reading nc-file: /pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc
+2024-03-27 13:53:28,610 - INFO - picassoProc - Leipzig
+2024-03-27 13:53:28,611 - INFO - picassoProc - date in nc-file equals date of filename
+2024-03-27 13:53:28,611 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 13:54:24,376 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 13:54:24,376 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 13:54:24,682 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 13:54:24,683 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 13:54:24,683 - INFO - readPollyRawData - reading nc-file: /pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc
+2024-03-27 13:54:27,790 - INFO - picassoProc - measurement site: Leipzig
+2024-03-27 13:54:27,790 - INFO - picassoProc - date in nc-file equals date of filename
+2024-03-27 13:54:27,791 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 13:56:08,692 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 13:56:08,702 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 13:56:10,268 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 13:56:10,281 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 13:56:10,290 - INFO - readPollyRawData - reading nc-file: /pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc
+2024-03-27 13:56:13,900 - INFO - picassoProc - measurement site: Leipzig
+2024-03-27 13:56:13,901 - INFO - picassoProc - date in nc-file equals date of filename
+2024-03-27 13:56:13,901 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 13:56:29,631 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 13:56:29,632 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 13:56:30,010 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 13:56:30,011 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 13:56:30,012 - INFO - readPollyRawData - reading nc-file: /pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc
+2024-03-27 13:56:32,879 - INFO - picassoProc - measurement site: Leipzig
+2024-03-27 13:56:32,879 - INFO - picassoProc - measuremnt date: 20230911
+2024-03-27 13:56:32,879 - INFO - picassoProc - date in nc-file equals date of filename
+2024-03-27 13:56:32,880 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 15:13:37,939 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 15:13:37,977 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 15:13:40,230 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 15:13:40,246 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 15:13:40,261 - INFO - readPollyRawData - reading nc-file: /pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc
+2024-03-27 15:13:43,363 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 15:19:34,515 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 15:19:34,534 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 15:19:36,397 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 15:19:36,413 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 15:19:36,414 - INFO - readPollyRawData - reading nc-file: /pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc
+2024-03-27 15:34:40,677 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 15:34:40,691 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 15:34:42,166 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 15:34:42,166 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 15:34:42,209 - INFO - readPollyRawData - reading nc-file: /pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc
+2024-03-27 15:34:45,549 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 15:40:44,965 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 15:40:44,966 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 15:40:45,306 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 15:40:45,306 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 15:40:45,307 - INFO - readPollyRawData - reading nc-file: /pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc
+2024-03-27 15:40:48,782 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 15:41:18,461 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 15:41:18,462 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 15:41:18,775 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 15:41:18,775 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 15:41:18,776 - INFO - readPollyRawData - reading nc-file: /pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc
+2024-03-27 15:41:21,326 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 15:41:57,752 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 15:41:57,753 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 15:41:58,061 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 15:41:58,061 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 15:41:58,062 - INFO - readPollyRawData - reading nc-file: /pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc
+2024-03-27 15:42:00,011 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 15:42:37,954 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 15:42:37,954 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 15:42:38,269 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 15:42:38,270 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 15:42:38,271 - INFO - readPollyRawData - reading nc-file: /pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc
+2024-03-27 15:42:40,087 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 15:57:05,410 - INFO - loadConfigs - picasso_default_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json
+2024-03-27 15:57:05,421 - INFO - loadConfigs - picasso_config_file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-03-27 15:57:07,114 - INFO - loadConfigs - polly_default_config_file: /pollyhome/Bildermacher2/experimental/akl/Pollynet_Processing_Chain/lib/config/polly_global_config.json
+2024-03-27 15:57:07,134 - INFO - loadConfigs - polly_config_file: /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs/pollyxt_lacros_config_leipzig_long_depol_cali.json
+2024-03-27 15:57:07,173 - INFO - readPollyRawData - reading nc-file: /pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc
+2024-03-27 15:57:11,962 - INFO - pollyChannelTags - ChannelTags: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'unknown']
+2024-03-27 15:57:11,963 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130}
+2024-03-27 15:57:11,963 - INFO - pollyChannelTags - ChannelLabels: {0: 'far-range total 355 nm', 1: 'far-range cross 355 nm', 2: 'far-range 387 nm', 3: 'far-range 407 nm', 4: 'far-range total 532 nm', 5: 'far-range cross 532 nm', 6: 'far-range 607 nm', 7: 'far-range total 1064 nm', 8: 'near-range total 532 nm', 9: 'near-range 607 nm', 10: 'near-range 355 nm', 11: 'near-range 387 nm'}
