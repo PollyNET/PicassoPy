@@ -13,7 +13,7 @@ def loadPicassoConfig(picasso_config_file, picasso_default_config_file):
             picasso_default_config_file_json = open(picasso_default_config_file, "r")
             picasso_default_config_file_dict = json.load(picasso_default_config_file_json)
         except Exception:
-            logging.warning('picasso_default_config_file: {picasso_default_config_file}\n can not be read.')
+            logging.warning('picasso_default_config_file: {picasso_default_config_file} can not be read.')
         if picasso_config_file_path.is_file():
             logging.info(f'picasso_config_file: {picasso_config_file}')
             try:
@@ -32,14 +32,14 @@ def loadPicassoConfig(picasso_config_file, picasso_default_config_file):
                         picasso_config_dict[key] = picasso_config_file_dict[key]
                 return picasso_config_dict
             except Exception:
-                logging.critical('picasso_default_config_file: {picasso_default_config_file}\n can not be read.')
+                logging.critical('picasso_default_config_file: {picasso_default_config_file} can not be read.')
 
         else:
-            logging.warning(f'picasso config file: {picasso_config_file}\ndoes not exist')
-            logging.warning(f'picasso_default_config_file: {picasso_default_config_file}\nwill be used')
+            logging.warning(f'picasso config file: {picasso_config_file} does not exist')
+            logging.info(f'picasso_default_config_file: {picasso_default_config_file} will be used')
             return picasso_default_config_file_dict
     else:
-        logging.critical(f'picasso_default_config_file:  {picasso_default_config_file}\ncan not be found. Aborting')
+        logging.critical(f'picasso_default_config_file:  {picasso_default_config_file} ncan not be found. Aborting')
         return None
 
 
@@ -62,9 +62,9 @@ def readPollyNetConfigLinkTable(polly_config_table_file, timestamp, device):
             return polly_config_file
         else:
             logging.warning(f'no polly-config file could be found for {device}@{timestamp}.')
-            return None
+            return None 
     else:
-        logging.warning(f'polly_config_table_file:  {polly_config_table_file}\ncan not be found.')
+        logging.warning(f'polly_config_table_file:  {polly_config_table_file} can not be found.')
         return None
 
 
@@ -79,7 +79,7 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
             polly_default_config_file_json = open(polly_default_config_file, "r")
             polly_default_config_file_dict = json.load(polly_default_config_file_json)
         except Exception:
-            logging.critical('polly_default_config_file: {polly_default_config_file}\n can not be read.')
+            logging.critical('polly_default_config_file: {polly_default_config_file} can not be read.')
         if polly_config_file_path.is_file():
             logging.info(f'polly_config_file: {polly_config_file}')
             try:
@@ -98,13 +98,13 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                         polly_config_dict[key] = polly_config_file_dict[key]
                 return polly_config_dict
             except Exception:
-                logging.warning('polly_default_config_file: {polly_default_config_file}\n can not be read.')
+                logging.warning('polly_default_config_file: {polly_default_config_file} can not be read.')
 
         else:
-            logging.warning(f'polly config file: {polly_config_file}\n does not exist')
-            logging.warning(f'polly_default_config_file: {polly_default_config_file}\n will be used')
+            logging.warning(f'polly config file: {polly_config_file} does not exist')
+            logging.warning(f'polly_default_config_file: {polly_default_config_file} will be used')
             return polly_default_config_file_dict
     else:
-        logging.critical(f'polly_default_config_file:  {polly_default_config_file}\n can not be found. Aborting')
+        logging.critical(f'polly_default_config_file:  {polly_default_config_file} can not be found. Aborting')
         return None
 

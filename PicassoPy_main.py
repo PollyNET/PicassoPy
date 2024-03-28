@@ -3,10 +3,19 @@ from lib.io.loadConfigs import *
 from lib.io.readPollyRawData import *
 from lib.interface.picassoProc import *
 from log import logger
+import lib.misc.helper
 
+## getting root dir of PicassoPy
+root_dir = Path(__file__).resolve().parent
+
+root_dir_Path = lib.misc.helper.detect_path_type(root_dir)
+print(root_dir_Path)
+exit()
 ## setting config files
-picasso_default_config_file="/pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config.json"
+picasso_default_config_file = f"{root_dir}/config/pollynet_processing_chain_config.json"
+polly_default_config_file = f"{root_dir}/config/polly_global_config.json"
 picasso_config_file = "/pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json"
+
 
 ## loading configs as dicts
 picasso_config_dict = loadPicassoConfig(picasso_config_file,picasso_default_config_file)
@@ -15,10 +24,12 @@ if polly_config_file:
     polly_config_file_fullname = Path(picasso_config_dict['polly_config_folder'],polly_config_file)
 else:
     polly_config_file_fullname = polly_default_config_file
-polly_config_dict = loadPollyConfig(polly_config_file_fullname, picasso_config_dict['polly_global_config'])
+polly_config_dict = loadPollyConfig(polly_config_file_fullname, polly_default_config_file)
 
 ## reading level0 polly-nc-file and output as dict
-rawfile = '/pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc'
+rawfile_fullname = 'C:\_data\Picasso_IO\input\2024_03_20_Wed_ARI_12_00_01.nc'
+rawfile = fr'{rawfile_fullname}'
+#rawfile = '/pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc'
 rawdata_dict = readPollyRawData(filename=rawfile)
 
 ## initate picasso-object from class PicassoProc
