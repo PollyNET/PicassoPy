@@ -25,7 +25,8 @@ else:
 polly_config_dict = loadPollyConfig(polly_config_file_fullname, polly_default_config_file)
 
 ## reading level0 polly-nc-file and output as dict
-rawfile_fullname = 'C:\\_data\\Picasso_IO\\input\\2024_03_20_Wed_ARI_12_00_01.nc'
+#rawfile_fullname = 'C:\\_data\\Picasso_IO\\input\\2024_03_20_Wed_ARI_12_00_01.nc'
+rawfile_fullname = 'H:\\picasso_io\\pollyxt_cpv\\data_zip\\202403\\2024_03_08_Fri_CPV_00_00_01.nc'
 rawfile = lib.misc.helper.detect_path_type(rawfile_fullname)
 #rawfile = '/pollyhome/Bildermacher2/experimental/2023_09_11_Mon_LACROS_00_00_01.nc'
 rawdata_dict = readPollyRawData(filename=rawfile)

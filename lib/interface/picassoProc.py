@@ -77,7 +77,7 @@ class PicassoProc:
             pass
 
     def setChannelTags(self):
-        pollyChannelTags.pollyChannelTags(self.polly_config_dict['channelTag'],flagFarRangeChannel=self.polly_config_dict['isFR'],
+        ChannelTags = pollyChannelTags.pollyChannelTags(self.polly_config_dict['channelTag'],flagFarRangeChannel=self.polly_config_dict['isFR'], ##TODO key: channelTags vs channelTag???
                                                                                flagNearRangeChannel=self.polly_config_dict['isNR'],
                                                                                flagRotRamanChannel=self.polly_config_dict['isRR'],
                                                                                flagTotalChannel=self.polly_config_dict['isTot'],
@@ -90,6 +90,8 @@ class PicassoProc:
                                                                                flag607nmChannel=self.polly_config_dict['is607nm'],
                                                                                flag1064nmChannel=self.polly_config_dict['is1064nm']
                                                                                )
+        self.polly_config_dict['channelTags'] = ChannelTags
+        return self
 
 #    def __str__(self):
 #        return f"{self.rawdata_dict}"
