@@ -11,6 +11,7 @@ class PicassoProc:
         self.polly_config_dict = polly_config_dict
         self.picasso_config_dict = picasso_config_dict
         self.num_of_channels = len(self.rawdata_dict['measurement_shots']['var_data'][0])
+        self.data
 
     def msite(self):
         msite = f"measurement site: {self.rawdata_dict['global_attributes']['location']}"
@@ -77,7 +78,7 @@ class PicassoProc:
             pass
 
     def setChannelTags(self):
-        ChannelTags = pollyChannelTags.pollyChannelTags(self.polly_config_dict['channelTag'],flagFarRangeChannel=self.polly_config_dict['isFR'], ##TODO key: channelTags vs channelTag???
+        ChannelTags = pollyChannelTags.pollyChannelTags(self.polly_config_dict['channelTags'],flagFarRangeChannel=self.polly_config_dict['isFR'], ##TODO key: channelTags vs channelTag???
                                                                                flagNearRangeChannel=self.polly_config_dict['isNR'],
                                                                                flagRotRamanChannel=self.polly_config_dict['isRR'],
                                                                                flagTotalChannel=self.polly_config_dict['isTot'],

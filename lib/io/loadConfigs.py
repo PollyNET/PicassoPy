@@ -39,7 +39,7 @@ def loadPicassoConfig(picasso_config_file, picasso_default_config_file):
             logging.info(f'picasso_default_config_file: {picasso_default_config_file} will be used')
             return picasso_default_config_file_dict
     else:
-        logging.critical(f'picasso_default_config_file:  {picasso_default_config_file} ncan not be found. Aborting')
+        logging.critical(f'picasso_default_config_file:  {picasso_default_config_file} can not be found. Aborting')
         return None
 
 

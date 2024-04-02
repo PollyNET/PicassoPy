@@ -4,8 +4,7 @@ def pollyChannelTags(chTagsIn:list, **Channels) -> list:
     chTagsOut = {}
     chTagsOut_ls = []
     chLabels = {}
-    logging.info(f'ChannelTags: {chTagsIn}')
-    nChs = len(chTagsIn)
+    nChs = len(Channels['flagFarRangeChannel'])
 
     if len(chTagsIn) != 0:
         chTagsOut_ls = chTagsIn
@@ -13,7 +12,7 @@ def pollyChannelTags(chTagsIn:list, **Channels) -> list:
 
     elif len(chTagsIn) == 0:
 
-        for iCh in range(nChs-1):
+        for iCh in range(nChs):
             chTagsOut[iCh] = sum(2 ** i * b for i, b in enumerate([Channels['flagFarRangeChannel'][iCh],
                                                                       Channels['flagNearRangeChannel'][iCh],
                                                                       Channels['flagRotRamanChannel'][iCh],
@@ -29,42 +28,58 @@ def pollyChannelTags(chTagsIn:list, **Channels) -> list:
                                                                       ]))
             
             if chTagsOut[iCh] == 73:
-                chLabels[iCh] = 'far-range total 355 nm'
+                ch_label = 'far-range total 355 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 74:
-                chLabels[iCh] = 'near-range 355 nm'
+                ch_label = 'near-range 355 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 81:
-                chLabels[iCh] = 'far-range cross 355 nm'
+                ch_label = 'far-range cross 355 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 129:
-                chLabels[iCh] = 'far-range 387 nm'
+                ch_label = 'far-range 387 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 130:
-                chLabels[iCh] = 'near-range 387 nm'
+                ch_label = 'near-range 387 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 257:
-                chLabels[iCh] = 'far-range 407 nm'
+                ch_label = 'far-range 407 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 517:
-                chLabels[iCh] = 'far-range rotational Raman 532 nm'
+                ch_label = 'far-range rotational Raman 532 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 521:
-                chLabels[iCh] = 'far-range total 532 nm'
+                ch_label = 'far-range total 532 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 522:
-                chLabels[iCh] = 'near-range total 532 nm'
+                ch_label = 'near-range total 532 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 529:
-                chLabels[iCh] = 'far-range cross 532 nm'
+                ch_label = 'far-range cross 532 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 545:
-                chLabels[iCh] = 'far-range parallel 532 nm'
+                ch_label = 'far-range parallel 532 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 1025:
-                chLabels[iCh] = 'far-range 607 nm'
+                ch_label = 'far-range 607 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 1026:
-                chLabels[iCh] = 'near-range 607 nm'
+                ch_label = 'near-range 607 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 2053:
-                chLabels[iCh] = 'far-range rotational Raman 1064 nm'
+                ch_label = 'far-range rotational Raman 1064 nm'
+                chTagsOut_ls.append(ch_label)
             elif chTagsOut[iCh] == 2057:
-                chLabels[iCh] = 'far-range total 1064 nm'
+                ch_label = 'far-range total 1064 nm'
+                chTagsOut_ls.append(ch_label)
+            else:
+                ch_label = 'unknown'
+                chTagsOut_ls.append(ch_label)
 
-            chTagsOut_ls.append(chLabels[iCh])
     
         logging.info(f'ChannelTags: {chTagsOut}')
-        logging.info(f'ChannelLabels: {chLabels}')
-        
-
+        #logging.info(f'ChannelLabels: {chLabels}')
+        logging.info(f'ChannelLabels: {chTagsOut_ls}')
         return chTagsOut_ls
 
 #function [chTagsO, chLabels, flagFarRangeChannelO, flagNearRangeChannelO, flagRotRamanChannelO, flagTotalChannelO, flagCrossChannelO, flagParallelChannelO, flag355nmChannelO, flag387nmChannelO, flag407nmChannelO, flag532nmChannelO, flag607nmChannelO, flag1064nmChannelO] = pollyChannelTags(chTagsI, varargin)
