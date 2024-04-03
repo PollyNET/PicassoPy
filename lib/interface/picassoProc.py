@@ -1,6 +1,8 @@
-from ..misc import *
+#from ..misc import *
 import re
 import logging
+import lib.misc.pollyChannelTags as pollyChannelTags
+import lib.preprocess.pollyPreprocess as pollyPreprocess
 
 class PicassoProc:
     counter = 0
@@ -11,7 +13,6 @@ class PicassoProc:
         self.polly_config_dict = polly_config_dict
         self.picasso_config_dict = picasso_config_dict
         self.num_of_channels = len(self.rawdata_dict['measurement_shots']['var_data'][0])
-        self.data
 
     def msite(self):
         msite = f"measurement site: {self.rawdata_dict['global_attributes']['location']}"
@@ -71,7 +72,7 @@ class PicassoProc:
             logging.info('date in nc-file will be replaced with date of filename.')
             np_array = np.array(self.rawdata_dict['measurement_time']['var_data']) ## converting to numpy-array for easier numpy-operations
             mdate = self.mdate_filename()
-            np_array[:,0] = mdate ## assing new date value to the whole first column of the 2d-numpy-array
+            np_array[:,0] = mdate ## assign new date value to the whole first column of the 2d-numpy-array
             self.rawdata_dict['measurement_time']['var_data'] = np_array
             return self
         else:
@@ -92,6 +93,45 @@ class PicassoProc:
                                                                                flag1064nmChannel=self.polly_config_dict['is1064nm']
                                                                                )
         self.polly_config_dict['channelTags'] = ChannelTags
+        return self
+
+    def preprocessing(self):
+        pollyPreprocess.pollyPreprocess(self.rawdata_dict,
+                deltaT=self.polly_config_dict['deltaT'],
+                flagForceMeasTime = self.polly_config_dict['flagForceMeasTime'],
+                maxHeightBin = self.polly_config_dict['max_height_bin'],
+                firstBinIndex = self.polly_config_dict['first_range_gate_indx'],
+                firstBinHeight = self.polly_config_dict['first_range_gate_height'],
+#                pollyType = CampaignConfig.name,
+                flagDeadTimeCorrection = self.polly_config_dict['flagDTCor'],
+                deadtimeCorrectionMode = self.polly_config_dict['dtCorMode'],
+                deadtimeParams = self.polly_config_dict['dt'],
+                flagSigTempCor = self.polly_config_dict['flagSigTempCor'],
+                tempCorFunc = self.polly_config_dict['tempCorFunc'],
+                meteorDataSource = self.polly_config_dict['meteorDataSource'],
+                gdas1Site = self.polly_config_dict['gdas1Site'],
+                gdas1_folder = self.picasso_config_dict['gdas1_folder'],
+                radiosondeSitenum = self.polly_config_dict['radiosondeSitenum'],
+                radiosondeFolder = self.polly_config_dict['radiosondeFolder'],
+                radiosondeType = self.polly_config_dict['radiosondeType'],
+                bgCorrectionIndex = self.polly_config_dict['bgCorRangeIndx'],
+#                asl = CampaignConfig.asl,
+                initialPolAngle = self.polly_config_dict['init_depAng'],
+                maskPolCalAngle = self.polly_config_dict['maskDepCalAng'],
+                minSNRThresh = self.polly_config_dict['mask_SNRmin'],
+                minPC_fog = self.polly_config_dict['minPC_fog'],
+#                flagFarRangeChannel = data.flagFarRangeChannel'],
+#                flag532nmChannel = data.flag532nmChannel,
+#                flagTotalChannel = data.flagTotalChannel,
+#                flag355nmChannel = data.flag355nmChannel,
+#                flag607nmChannel = data.flag607nmChannel,
+#                flag387nmChannel = data.flag387nmChannel,
+#                flag407nmChannel = data.flag407nmChannel,
+#                flag355nmRotRaman = data.flag355nmChannel & data.flagRotRamanChannel,
+#                flag532nmRotRaman = data.flag532nmChannel & data.flagRotRamanChannel,
+#                flag1064nmRotRaman = data.flag1064nmChannel & data.flagRotRamanChannel,
+                isUseLatestGDAS = self.polly_config_dict['flagUseLatestGDAS'],
+                )
         return self
 
 #    def __str__(self):

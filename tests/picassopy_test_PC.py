@@ -49,13 +49,16 @@ data_cube.reset_date_infile()
 
 ## checking for correct mshots
 data_cube.check_for_correct_mshots()
-#print(data_cube.filter_or_correct_false_mshots())
+data_cube.filter_or_correct_false_mshots()
 
 ## setting channelTags
+data_cube.setChannelTags()
+
 #for k in data_cube.polly_config_dict.keys():
 #    print(f'{k}: {data_cube.polly_config_dict[k]}')
-print(data_cube.num_of_channels)
-data_cube.setChannelTags()
+
+## preprocessing
+data_cube.preprocessing()
 #data_cube= data_cube.reset_date_infile()
 
 #print(dir(data_cube))
