@@ -2545,3 +2545,656 @@ maxHeightBin is: 3000
 firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
 2024-04-03 14:44:16,499 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
 2024-04-03 14:44:16,500 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 08:52:48,104 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 08:52:48,109 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 08:52:48,109 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 08:52:48,110 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 08:52:48,111 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 08:52:48,117 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 08:52:48,118 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 08:52:48,809 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 08:52:48,809 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 08:52:48,812 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 08:52:48,813 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 08:52:48,819 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 08:52:48,820 - INFO - picassoProc - correcting false mshots
+2024-04-04 08:52:48,821 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 08:52:48,821 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 08:52:48,861 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 08:52:48,863 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 08:52:48,863 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 08:52:48,865 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:06:13,279 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:06:13,279 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:06:13,282 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:06:13,287 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:06:13,287 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:06:13,288 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:06:13,289 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:06:13,640 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:06:13,640 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:06:13,646 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:06:13,647 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:06:13,648 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:06:13,648 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:06:13,649 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:06:13,649 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:06:13,726 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:06:13,727 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:06:13,731 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:06:13,744 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:06:31,734 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:06:31,735 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:06:31,737 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:06:31,742 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:06:31,742 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:06:31,743 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:06:31,744 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:06:32,067 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:06:32,068 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:06:32,071 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:06:32,076 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:06:32,076 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:06:32,077 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:06:32,077 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:06:32,078 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:06:32,128 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:06:32,128 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:06:32,129 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:06:32,138 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:08:00,123 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:08:00,123 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:08:00,126 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:08:00,130 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:08:00,131 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:08:00,131 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:08:00,132 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:08:00,512 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:08:00,512 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:08:00,515 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:08:00,520 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:08:00,520 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:08:00,521 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:08:00,522 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:08:00,525 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:08:00,597 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:08:00,598 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:08:00,599 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:08:00,601 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:08:35,310 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:08:35,311 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:08:35,313 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:08:35,318 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:08:35,318 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:08:35,319 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:08:35,320 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:08:35,644 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:08:35,645 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:08:35,647 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:08:35,652 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:08:35,652 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:08:35,653 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:08:35,653 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:08:35,654 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:08:35,738 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:08:35,739 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:08:35,740 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:08:35,746 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:09:41,153 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:09:41,153 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:09:41,157 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:09:41,161 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:09:41,162 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:09:41,162 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:09:41,163 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:09:41,543 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:09:41,543 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:09:41,546 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:09:41,551 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:09:41,551 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:09:41,552 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:09:41,553 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:09:41,553 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:09:41,603 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:09:41,605 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:09:41,606 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:09:41,608 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:11:03,801 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:11:03,802 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:11:03,804 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:11:03,810 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:11:03,810 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:11:03,811 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:11:03,812 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:11:04,139 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:11:04,139 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:11:04,142 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:11:04,147 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:11:04,148 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:11:04,152 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:11:04,154 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:11:04,154 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:11:04,248 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:11:04,253 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:11:04,253 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:11:04,255 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:11:15,700 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:11:15,700 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:11:15,702 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:11:15,707 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:11:15,707 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:11:15,707 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:11:15,708 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:11:16,070 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:11:16,070 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:11:16,073 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:11:16,074 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:11:16,079 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:11:16,079 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:11:16,080 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:11:16,080 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:11:16,126 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:11:16,131 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:11:16,132 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:11:16,133 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:13:31,827 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:13:31,827 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:13:31,830 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:13:31,835 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:13:31,835 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:13:31,836 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:13:31,837 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:13:32,158 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:13:32,158 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:13:32,161 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:13:32,165 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:13:32,166 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:13:32,166 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:13:32,167 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:13:32,168 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:13:32,225 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:13:32,225 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:13:32,226 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:13:32,226 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:14:51,297 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:14:51,298 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:14:51,300 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:14:51,306 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:14:51,306 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:14:51,307 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:14:51,307 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:14:51,735 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:14:51,736 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:14:51,738 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:14:51,739 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:14:51,744 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:14:51,744 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:14:51,745 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:14:51,745 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:14:51,800 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:14:51,801 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:14:51,803 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:14:51,804 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:15:12,196 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:15:12,197 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:15:12,199 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:15:12,204 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:15:12,205 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:15:12,205 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:15:12,207 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:15:12,568 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:15:12,568 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:15:12,572 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:15:12,577 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:15:12,577 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:15:12,578 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:15:12,578 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:15:12,579 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:15:12,638 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:15:12,638 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:15:12,639 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:15:12,640 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:15:37,157 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:15:37,157 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:15:37,160 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:15:37,161 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:15:37,166 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:15:37,166 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:15:37,167 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:15:37,500 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:15:37,501 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:15:37,503 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:15:37,508 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:15:37,508 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:15:37,509 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:15:37,509 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:15:37,510 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:15:37,544 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:15:37,545 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:15:37,546 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:15:37,555 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:17:08,879 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:17:08,880 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:17:08,882 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:17:08,883 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:17:08,883 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:17:08,883 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:17:08,884 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:17:09,226 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:17:09,226 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:17:09,228 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:17:09,228 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:17:09,229 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:17:09,229 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:17:09,230 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:17:09,230 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:17:09,232 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:17:09,233 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:17:09,233 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:17:09,233 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:18:38,285 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:18:38,285 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:18:38,288 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:18:38,288 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:18:38,288 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:18:38,289 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:18:38,289 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:18:38,610 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:18:38,610 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:18:38,612 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:18:38,613 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:18:38,613 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:18:38,613 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:18:38,613 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:18:38,614 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:18:38,615 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:18:38,615 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:18:38,615 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:18:38,616 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:19:13,824 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:19:13,824 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:19:13,826 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:19:13,827 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:19:13,827 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:19:13,828 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:19:13,828 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:19:14,164 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:19:14,164 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:19:14,168 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:19:14,169 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:19:14,169 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:19:14,169 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:19:14,171 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:19:14,171 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:19:14,175 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:19:14,176 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:19:14,176 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:19:14,177 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:19:27,244 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:19:27,245 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:19:27,247 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:19:27,247 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:19:27,248 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:19:27,248 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:19:27,249 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:19:27,663 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:19:27,663 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:19:27,666 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:19:27,667 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:19:27,667 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:19:27,667 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:19:27,667 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:19:27,667 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:19:27,669 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:19:27,669 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:19:27,669 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:19:27,669 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:20:24,010 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:20:24,011 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:20:24,013 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:20:24,013 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:20:24,013 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:20:24,014 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:20:24,015 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:20:24,333 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:20:24,333 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:20:24,335 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:20:24,336 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:20:24,336 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:20:24,336 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:20:24,337 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:20:24,337 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:20:24,338 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:20:24,338 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:20:24,338 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:20:24,339 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:20:55,803 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:20:55,803 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:20:55,805 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:20:55,806 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:20:55,806 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:20:55,806 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:20:55,807 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:20:56,132 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:20:56,132 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:20:56,134 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:20:56,135 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:20:56,135 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:20:56,135 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:20:56,135 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:20:56,135 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:20:56,137 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:20:56,137 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:20:56,137 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:20:56,138 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 09:36:57,721 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 09:36:57,721 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 09:36:57,723 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 09:36:57,724 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 09:36:57,724 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:36:57,725 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 09:36:57,725 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 09:36:58,070 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 09:36:58,071 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 09:36:58,073 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 09:36:58,073 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 09:36:58,073 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 09:36:58,073 - INFO - picassoProc - correcting false mshots
+2024-04-04 09:36:58,074 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 09:36:58,074 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 09:36:58,075 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:36:58,075 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 09:36:58,075 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 09:36:58,076 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 10:38:45,802 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 10:38:45,809 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 10:38:45,809 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 10:38:45,810 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 10:38:45,810 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:38:45,815 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:38:45,816 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 10:38:46,309 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 10:38:46,309 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 10:38:46,313 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 10:38:46,315 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 10:38:46,315 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 10:38:46,315 - INFO - picassoProc - correcting false mshots
+2024-04-04 10:38:46,315 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 10:38:46,315 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 10:38:46,317 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 10:38:46,318 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 10:38:46,318 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 10:38:46,320 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 10:39:41,262 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 10:39:41,262 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 10:39:41,265 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 10:39:41,266 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 10:39:41,266 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:39:41,267 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:39:41,267 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 10:39:41,586 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 10:39:41,586 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 10:39:41,589 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 10:39:41,589 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 10:39:41,590 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 10:39:41,590 - INFO - picassoProc - correcting false mshots
+2024-04-04 10:39:41,590 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 10:39:41,591 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 10:39:41,593 - INFO - pollyPreprocess - Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 10:39:41,593 - WARNING - pollyPreprocess - maxHeightBin or firstBinIndex is out of range. Total number of range bin is: 712
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 10:39:41,593 - INFO - pollyPreprocess - Set maxHeightBin and firstBinIndex to default values.
+2024-04-04 10:39:41,594 - INFO - pollyPreprocess - maxHeightBin: [1. 1. 1. ... 1. 1. 1.]
+2024-04-04 10:41:09,462 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 10:41:09,463 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 10:41:09,466 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 10:41:09,467 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 10:41:09,467 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:41:09,467 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:41:09,468 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 10:41:09,823 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 10:41:09,823 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 10:41:09,826 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 10:41:09,826 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 10:41:09,826 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 10:41:09,827 - INFO - picassoProc - correcting false mshots
+2024-04-04 10:41:09,827 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 10:41:09,827 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 10:41:09,829 - INFO - pollyPreprocess - Total number of range bin is: 6400
+maxHeightBin is: 3000
+firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252].
+2024-04-04 10:41:54,204 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 10:41:54,205 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 10:41:54,208 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 10:41:54,208 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 10:41:54,208 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:41:54,209 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:41:54,209 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 10:41:54,529 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 10:41:54,530 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 10:41:54,533 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 10:41:54,534 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 10:41:54,534 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 10:41:54,534 - INFO - picassoProc - correcting false mshots
+2024-04-04 10:41:54,534 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 10:41:54,535 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 10:43:25,312 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 10:43:25,313 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 10:43:25,316 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 10:43:25,316 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 10:43:25,316 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:43:25,317 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:43:25,317 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 10:43:25,635 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 10:43:25,635 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 10:43:25,638 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 10:43:25,639 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 10:43:25,639 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 10:43:25,639 - INFO - picassoProc - correcting false mshots
+2024-04-04 10:43:25,639 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 10:43:25,640 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 10:44:33,028 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 10:44:33,028 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 10:44:33,032 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 10:44:33,032 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 10:44:33,033 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:44:33,033 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:44:33,034 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 10:44:33,362 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 10:44:33,362 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 10:44:33,366 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 10:44:33,366 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 10:44:33,367 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 10:44:33,367 - INFO - picassoProc - correcting false mshots
+2024-04-04 10:44:33,367 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 10:44:33,367 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 10:45:30,788 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 10:45:30,788 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 10:45:30,791 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 10:45:30,791 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 10:45:30,791 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:45:30,792 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:45:30,793 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 10:45:31,129 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 10:45:31,129 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 10:45:31,132 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 10:45:31,132 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 10:45:31,132 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 10:45:31,133 - INFO - picassoProc - correcting false mshots
+2024-04-04 10:45:31,133 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 10:45:31,133 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 10:52:45,928 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 10:52:45,931 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 10:52:45,934 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 10:52:45,934 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 10:52:45,934 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:52:45,935 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:52:45,935 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 10:52:46,260 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 10:52:46,261 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 10:52:46,263 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 10:52:46,265 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 10:52:46,265 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 10:52:46,265 - INFO - picassoProc - correcting false mshots
+2024-04-04 10:52:46,266 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 10:52:46,266 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 10:55:54,659 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 10:55:54,660 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 10:55:54,663 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 10:55:54,663 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 10:55:54,663 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:55:54,664 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:55:54,664 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 10:55:54,985 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 10:55:54,986 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 10:55:54,988 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 10:55:54,989 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 10:55:54,989 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 10:55:54,989 - INFO - picassoProc - correcting false mshots
+2024-04-04 10:55:54,990 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 10:55:54,990 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 10:56:41,037 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 10:56:41,038 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 10:56:41,040 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 10:56:41,041 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 10:56:41,041 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:56:41,041 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:56:41,042 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 10:56:41,378 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 10:56:41,378 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 10:56:41,380 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 10:56:41,381 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 10:56:41,381 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 10:56:41,381 - INFO - picassoProc - correcting false mshots
+2024-04-04 10:56:41,382 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 10:56:41,382 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 10:57:10,709 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 10:57:10,709 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 10:57:10,712 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 10:57:10,712 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 10:57:10,713 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:57:10,713 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:57:10,714 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 10:57:11,065 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 10:57:11,066 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 10:57:11,069 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 10:57:11,070 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 10:57:11,071 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 10:57:11,071 - INFO - picassoProc - correcting false mshots
+2024-04-04 10:57:11,072 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 10:57:11,073 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 10:58:00,446 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 10:58:00,446 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 10:58:00,449 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 10:58:00,450 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 10:58:00,450 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:58:00,451 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 10:58:00,451 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 10:58:00,770 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 10:58:00,770 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 10:58:00,774 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 10:58:00,774 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 10:58:00,774 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 10:58:00,775 - INFO - picassoProc - correcting false mshots
+2024-04-04 10:58:00,775 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 10:58:00,775 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 10:58:00,775 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 11:00:01,686 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 11:00:01,686 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-04-04 11:00:01,686 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-04-04 11:00:01,687 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-04-04 11:00:01,687 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 11:00:01,687 - INFO - loadConfigs - polly_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 11:00:01,688 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 11:00:02,003 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 11:00:02,004 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 11:00:02,004 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 11:00:02,004 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 11:00:02,004 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 11:00:02,005 - INFO - picassoProc - correcting false mshots
+2024-04-04 11:00:02,005 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 11:00:02,005 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 11:00:02,005 - INFO - pollyPreprocess - starting data preprocessing

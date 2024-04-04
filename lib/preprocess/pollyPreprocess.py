@@ -3,9 +3,10 @@ import logging
 
 def pollyPreprocess(rawdata_dict, **param):
 # POLLYPREPROCESS Deadtime correction, background correction, first-bin shift, mask for low-SNR and mask for depolarization-calibration process.
-   
-    for k in rawdata_dict.keys():
-        print(k)
+    
+    logging.info('starting data preprocessing')
+#    for k in rawdata_dict.keys():
+#        print(k)
     rawSignal = rawdata_dict['raw_signal']['var_data']
     mShots = rawdata_dict['measurement_shots']['var_data']
     mTime = rawdata_dict['measurement_time']['var_data']
@@ -274,11 +275,11 @@ def pollyPreprocess(rawdata_dict, **param):
 #    config.maxHeightBin = ones(1, size(data.rawSignal, 1));
 #    config.firstBinIndex = 251;
 #end
-    logging.info(f'Total number of range bin is: {len(rawSignal)}\nmaxHeightBin is: {maxHeightBin}\nfirstBinIndex is {firstBinIndex}.')
-    if (maxHeightBin + np.max(firstBinIndex) -1) > len(rawSignal):
-        logging.warning(f'maxHeightBin or firstBinIndex is out of range. Total number of range bin is: {len(rawSignal)}\nmaxHeightBin is: {maxHeightBin}\nfirstBinIndex is {firstBinIndex}.')
+#    logging.info(f'Total number of range bin is: {len(rawSignal[0])}\nmaxHeightBin is: {maxHeightBin}\nfirstBinIndex is {firstBinIndex}.')
+    if (maxHeightBin + np.max(firstBinIndex) -1) > len(rawSignal[0]):
+        logging.warning(f'maxHeightBin or firstBinIndex is out of range. Total number of range bin is: {len(rawSignal[0])}\nmaxHeightBin is: {maxHeightBin}\nfirstBinIndex is {firstBinIndex}.')
         logging.info(f'Set maxHeightBin and firstBinIndex to default values.')
-        maxHeightBin = np.ones(rawSignal.shape[1])  ##TODO: length of maxHeightBin number of channels (shape[1]) or shape[0]???
+        maxHeightBin = np.ones(rawSignal.shape[2]) 
         logging.info(f'maxHeightBin: {maxHeightBin}')
         firstBinIndex = 251
 
@@ -321,6 +322,23 @@ def pollyPreprocess(rawdata_dict, **param):
 #    data.depCalAng = depCalAngInt;
 #    data.flagValidProfile = flagValidProfile;
 #end
+
+    mShotsPerPrf = deltaT * repRate
+#    print(mShotsPerPrf)
+#    print(mShots)
+#    print(deltaT)
+#    print(np.nanmean(np.diff(np.array(mTime[:,1]))))
+#    print(np.array(mTime[:,1]))
+#    print(len(mTime))
+#    print(np.diff(mTime))
+    if len(mTime) > 1:
+        #nInt = np.round(deltaT / (np.nanmean(np.diff(np.array(mTime[:,1]))) * 24 * 3600)) ## number of profiles to be integrated. Usually, 600 shots per 30 s
+        nInt = np.round(deltaT / (np.nanmean(np.diff(np.array(mTime[:,1]))))) ## number of profiles to be integrated. Usually, 600 shots per 30 s
+    else:
+        nInt = np.round(mShotsPerPrf / np.nanmean(np.array(mShots[0, :])))
+
+
+
 #
 #%% Modify mShots
 #% Expected mShots should be an matrix with dims of nChannels x profiles
