@@ -268,6 +268,10 @@ def pollyPreprocess(rawdata_dict, **param):
     isUseLatestGDAS = param.get('isUseLatestGDAS', False)
 
 
+    print(flagFarRangeChannel)
+    print(flag1064nmRotRaman)
+
+
 #%% Determine whether number of range bins is out of range
 #if (max(config.maxHeightBin + config.firstBinIndex - 1) > size(data.rawSignal, 2))
 #    warning('maxHeightBin or firstBinIndex is out of range.\nTotal number of range bin is %d.\nmaxHeightBin is %d\nfirstBinIndex is %d\n', size(data.rawSignal, 2), config.maxHeightBin, config.firstBinIndex);

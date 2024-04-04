@@ -58,8 +58,9 @@ def readPollyNetConfigLinkTable(polly_config_table_file, timestamp, device):
         ## get config-file for timeperiod and instrument
         config_array = filtered_result.loc[(filtered_result['Instrument'] == device)]
         if len(config_array) > 0:
-            polly_config_file = str(config_array['Config file'].to_string(index=False)).strip() ## get rid of whtiespaces
-            return polly_config_file
+            #polly_config_file = str(config_array['Config file'].to_string(index=False)).strip() ## get rid of whtiespaces
+            #return polly_config_file
+            return config_array
         else:
             logging.warning(f'no polly-config file could be found for {device}@{timestamp}.')
             return None 
@@ -91,7 +92,10 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                     if key in polly_config_file_dict.keys():
                         polly_config_dict[key] = polly_config_file_dict[key]
                     else:
-                        polly_config_dict[key] = polly_default_config_file_dict[key]
+                        if key=='isParallel': ## to be sure, that this key-value has a list length, which equals the number of channels of the polly-device
+                            polly_config_dict[key] = [0] * len(polly_config_file_dict['isFR'])
+                        else:
+                            polly_config_dict[key] = polly_default_config_file_dict[key]
                 ## check if a key in the polly_config_file exists, but not in polly_default_config_file
                 for key in polly_config_file_dict.keys():
                     if key not in polly_default_config_file_dict.keys():

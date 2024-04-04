@@ -3198,3 +3198,236 @@ firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 25
 2024-04-04 11:00:02,005 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
 2024-04-04 11:00:02,005 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
 2024-04-04 11:00:02,005 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 13:37:59,921 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 13:37:59,927 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 13:38:00,380 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 13:38:00,386 - WARNING - loadConfigs - polly config file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_lacros_config_leipzig_long_depol_cali.json does not exist
+2024-04-04 13:38:00,386 - WARNING - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json will be used
+2024-04-04 13:38:00,386 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 13:38:00,759 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 13:38:00,759 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 13:38:00,760 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 13:38:00,760 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 13:38:00,760 - INFO - picassoProc - flagCorrectFalseMShots: True
+2024-04-04 13:38:00,760 - INFO - picassoProc - correcting false mshots
+2024-04-04 13:38:00,761 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 0}
+2024-04-04 13:38:00,761 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown']
+2024-04-04 13:38:00,761 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 13:38:43,823 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 13:38:43,824 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 13:38:44,163 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 13:38:44,164 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 13:38:44,173 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 13:38:44,498 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 13:38:44,499 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 13:38:44,500 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 13:38:44,501 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 13:38:44,504 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 13:45:28,983 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 13:45:28,984 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 13:45:29,291 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 13:45:29,292 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 13:45:29,305 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 13:45:29,647 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 13:45:29,647 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 13:45:29,648 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 13:45:29,649 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 13:45:29,649 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 13:52:01,407 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 13:52:01,407 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 13:52:01,743 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 13:52:01,743 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 13:52:01,756 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 13:52:02,111 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 13:52:02,111 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 13:52:02,112 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 13:52:02,113 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 13:52:02,113 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 13:52:02,113 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 1, 13: 2053, 14: 2065, 15: 1}
+2024-04-04 13:52:02,114 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown', 'far-range rotational Raman 1064 nm', 'unknown', 'unknown']
+2024-04-04 13:52:02,114 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 14:07:00,939 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:07:00,940 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:07:19,737 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:07:19,738 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:07:44,671 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:07:44,671 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:07:45,011 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:07:45,012 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:07:45,030 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:07:45,372 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:07:45,372 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:07:45,373 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:07:45,374 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:07:45,374 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:07:45,374 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 1, 13: 2053, 14: 2065, 15: 1}
+2024-04-04 14:07:45,374 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown', 'far-range rotational Raman 1064 nm', 'unknown', 'unknown']
+2024-04-04 14:07:45,375 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 14:08:06,234 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:08:06,234 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:08:06,569 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:08:06,569 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:08:06,570 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:08:06,909 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:08:06,909 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:08:06,910 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:08:06,911 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:08:06,911 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:08:06,911 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 1, 13: 2053, 14: 2065, 15: 1}
+2024-04-04 14:08:06,912 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown', 'far-range rotational Raman 1064 nm', 'unknown', 'unknown']
+2024-04-04 14:08:06,912 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 14:10:41,236 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:10:41,236 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:10:41,629 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:10:41,630 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:11:00,156 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:11:00,156 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:11:00,477 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:11:00,478 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:11:00,479 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:11:00,832 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:11:00,832 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:11:00,833 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:11:00,834 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:11:00,834 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:11:00,834 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 1, 13: 2053, 14: 2065, 15: 1}
+2024-04-04 14:11:00,835 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown', 'far-range rotational Raman 1064 nm', 'unknown', 'unknown']
+2024-04-04 14:11:00,835 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 14:11:44,689 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:11:44,689 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:11:45,028 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:11:45,028 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:11:45,029 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:11:45,370 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:11:45,371 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:11:45,372 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:11:45,372 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:11:45,372 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:11:45,373 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 1, 13: 2053, 14: 2065, 15: 1}
+2024-04-04 14:11:45,373 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown', 'far-range rotational Raman 1064 nm', 'unknown', 'unknown']
+2024-04-04 14:11:45,374 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 14:15:13,799 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:15:13,800 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:15:14,122 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:15:14,123 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:15:14,125 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:15:14,466 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:15:14,466 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:15:14,466 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:15:14,467 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:15:14,467 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:15:14,467 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 1, 13: 2053, 14: 2065, 15: 1}
+2024-04-04 14:15:14,467 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown', 'far-range rotational Raman 1064 nm', 'unknown', 'unknown']
+2024-04-04 14:15:14,468 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 14:21:20,757 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:21:20,759 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:21:21,129 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:21:21,134 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:21:21,136 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:21:21,823 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:21:21,823 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:21:21,827 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:21:21,828 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:21:21,832 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:21:21,833 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 1, 13: 2053, 14: 2065, 15: 1}
+2024-04-04 14:21:21,834 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown', 'far-range rotational Raman 1064 nm', 'unknown', 'unknown']
+2024-04-04 14:21:21,834 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 14:21:38,585 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:21:38,586 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:21:38,929 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:21:38,934 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:21:38,937 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:21:39,260 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:21:39,260 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:21:39,265 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:21:39,268 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:21:39,272 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:21:39,272 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 1, 13: 2053, 14: 2065, 15: 1}
+2024-04-04 14:21:39,272 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown', 'far-range rotational Raman 1064 nm', 'unknown', 'unknown']
+2024-04-04 14:21:39,273 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 14:38:10,178 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:38:10,180 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:38:10,546 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:38:10,550 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:38:10,553 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:38:11,078 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:38:11,079 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:38:11,082 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:38:11,083 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:38:11,083 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:38:11,084 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 1, 13: 2053, 14: 2065, 15: 1}
+2024-04-04 14:38:11,084 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown', 'far-range rotational Raman 1064 nm', 'unknown', 'unknown']
+2024-04-04 14:38:33,071 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:38:33,071 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:38:33,442 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:38:33,443 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:38:33,444 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:38:33,770 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:38:33,771 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:38:33,774 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:38:33,775 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:38:33,775 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:38:33,775 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 1, 13: 2053, 14: 2065, 15: 1}
+2024-04-04 14:38:33,775 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown', 'far-range rotational Raman 1064 nm', 'unknown', 'unknown']
+2024-04-04 14:38:33,776 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 14:39:51,021 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:39:51,022 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:39:51,385 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:39:51,385 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:39:51,387 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:39:51,715 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:39:51,716 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:39:51,719 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:39:51,719 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:39:51,720 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:39:51,720 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 1, 13: 2053, 14: 2065, 15: 1}
+2024-04-04 14:39:51,720 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown', 'far-range rotational Raman 1064 nm', 'unknown', 'unknown']
+2024-04-04 14:39:51,720 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 14:45:06,775 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:45:06,775 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:45:07,149 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:45:07,150 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:45:07,156 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:45:07,577 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:45:07,577 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:45:07,580 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:45:07,581 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:45:07,581 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:45:07,582 - INFO - pollyChannelTags - ChannelTags: {0: 73, 1: 81, 2: 129, 3: 257, 4: 521, 5: 529, 6: 1025, 7: 2057, 8: 522, 9: 1026, 10: 74, 11: 130, 12: 1, 13: 2053, 14: 2065, 15: 1}
+2024-04-04 14:45:07,582 - INFO - pollyChannelTags - ChannelLabels: ['far-range total 355 nm', 'far-range cross 355 nm', 'far-range 387 nm', 'far-range 407 nm', 'far-range total 532 nm', 'far-range cross 532 nm', 'far-range 607 nm', 'far-range total 1064 nm', 'near-range total 532 nm', 'near-range 607 nm', 'near-range 355 nm', 'near-range 387 nm', 'unknown', 'far-range rotational Raman 1064 nm', 'unknown', 'unknown']
+2024-04-04 14:45:07,582 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 14:45:58,261 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:45:58,261 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:45:58,612 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:45:58,613 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:45:58,614 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:45:58,936 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:45:58,936 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:45:58,939 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:45:58,940 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:45:58,940 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:45:58,940 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 14:47:09,119 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:47:09,119 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:47:09,524 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:47:09,524 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:47:09,527 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:47:09,849 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:47:09,850 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:47:09,852 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:47:09,853 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:47:09,853 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:47:09,853 - INFO - pollyChannelTags - ChannelLabels: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'DFOV', '1058', '1064s', 'none']
+2024-04-04 14:47:09,854 - INFO - pollyPreprocess - starting data preprocessing
+2024-04-04 14:47:38,737 - INFO - loadConfigs - picasso_default_config_file: H:\PicassoPy\config\pollynet_processing_chain_config.json
+2024-04-04 14:47:38,738 - INFO - loadConfigs - picasso_config_file: H:\Pollynet_Processing_Chain\config\pollynet_processing_chain_config_rsd2_24h_exp.json
+2024-04-04 14:47:39,072 - INFO - loadConfigs - polly_default_config_file: H:\PicassoPy\config\polly_global_config.json
+2024-04-04 14:47:39,072 - INFO - loadConfigs - polly_config_file: H:\Pollynet_Processing_Chain\config\pollyConfigs\pollyxt_cpv_2021.txt
+2024-04-04 14:47:39,077 - INFO - readPollyRawData - reading nc-file: H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc
+2024-04-04 14:47:39,401 - INFO - picassoProc - measurement site: CVAO
+2024-04-04 14:47:39,401 - INFO - picassoProc - measuremnt date: 20240308
+2024-04-04 14:47:39,404 - INFO - picassoProc - date in nc-file equals date of filename
+2024-04-04 14:47:39,404 - INFO - picassoProc - flagFilterFalseMShots: False
+2024-04-04 14:47:39,404 - INFO - picassoProc - flagCorrectFalseMShots: False
+2024-04-04 14:47:39,405 - INFO - pollyChannelTags - ChannelLabels: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'DFOV', '1058', '1064s', 'none']
+2024-04-04 14:47:39,405 - INFO - pollyPreprocess - starting data preprocessing
