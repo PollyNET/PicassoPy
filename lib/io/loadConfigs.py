@@ -47,6 +47,7 @@ def readPollyNetConfigLinkTable(polly_config_table_file, timestamp, device):
     polly_config_table_file_path = Path(polly_config_table_file)
 
     if polly_config_table_file_path.is_file():
+        logging.info(f'pollynet_config_link_file: {polly_config_table_file}')
         excel_file_ds = pd.read_excel(f'{polly_config_table_file}', engine='openpyxl')
         ## search for timerange for given timestamp
         timestamp = str(timestamp)
@@ -63,10 +64,10 @@ def readPollyNetConfigLinkTable(polly_config_table_file, timestamp, device):
             return config_array
         else:
             logging.warning(f'no polly-config file could be found for {device}@{timestamp}.')
-            return None 
+            return pd.DataFrame()
     else:
         logging.warning(f'polly_config_table_file:  {polly_config_table_file} can not be found.')
-        return None
+        return pd.DataFrame()
 
 
 def loadPollyConfig(polly_config_file, polly_default_config_file):
@@ -105,7 +106,7 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                 logging.warning('polly_default_config_file: {polly_default_config_file} can not be read.')
 
         else:
-            logging.warning(f'polly config file: {polly_config_file} does not exist')
+            logging.warning(f'polly_config_file: {polly_config_file} does not exist')
             logging.warning(f'polly_default_config_file: {polly_default_config_file} will be used')
             return polly_default_config_file_dict
     else:

@@ -3431,3 +3431,36 @@ firstBinIndex is [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 25
 2024-04-04 14:47:39,404 - INFO - picassoProc - flagCorrectFalseMShots: False
 2024-04-04 14:47:39,405 - INFO - pollyChannelTags - ChannelLabels: ['FR-total-355 nm', 'FR-cross-355 nm', 'FR-387 nm', 'FR-407 nm', 'FR-total-532 nm', 'FR-cross-532 nm', 'FR-607 nm', 'FR-total-1064 nm', 'NR-total-532 nm', 'NR-607 nm', 'NR-total-355 nm', 'NR-387 nm', 'DFOV', '1058', '1064s', 'none']
 2024-04-04 14:47:39,405 - INFO - pollyPreprocess - starting data preprocessing
+2024-06-11 09:56:46,342 - INFO - loadConfigs - picasso_default_config_file: C:\_data\PicassoPy\config\pollynet_processing_chain_config.json
+2024-06-11 09:56:46,342 - WARNING - loadConfigs - picasso config file: /pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json does not exist
+2024-06-11 09:56:46,342 - INFO - loadConfigs - picasso_default_config_file: C:\_data\PicassoPy\config\pollynet_processing_chain_config.json will be used
+2024-06-11 09:56:46,342 - WARNING - loadConfigs - polly_config_table_file:  /pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx can not be found.
+2024-06-11 09:56:46,342 - INFO - loadConfigs - polly_default_config_file: C:\_data\PicassoPy\config\polly_global_config.json
+2024-06-11 09:56:46,342 - INFO - loadConfigs - polly_config_file: C:\_data\PicassoPy\config\polly_global_config.json
+2024-06-11 09:56:46,342 - CRITICAL - readPollyRawData - H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc does not exist.
+2024-06-11 10:40:15,844 - INFO - loadConfigs - picasso_default_config_file: C:\_data\PicassoPy\config\pollynet_processing_chain_config.json
+2024-06-11 10:40:15,844 - INFO - loadConfigs - picasso_config_file: C:\_data\Picasso_IO\pollynet_processing_chain_config_PC_mod.json
+2024-06-11 10:44:26,429 - CRITICAL - loadConfigs - picasso_default_config_file:  C:\_data\PicassoPy\config\pollynet_processing_chain_config.json can not be found. Aborting
+2024-06-11 10:45:05,138 - INFO - loadConfigs - picasso_default_config_file: C:\_data\PicassoPy\lib\config\pollynet_processing_chain_config.json
+2024-06-11 10:45:05,138 - INFO - loadConfigs - picasso_config_file: C:\_data\Picasso_IO\pollynet_processing_chain_config_PC_mod.json
+2024-06-11 10:49:00,529 - INFO - loadConfigs - picasso_default_config_file: C:\_data\PicassoPy\lib\config\pollynet_processing_chain_config.json
+2024-06-11 10:49:00,529 - INFO - loadConfigs - picasso_config_file: C:\_data\Picasso_IO\pollynet_processing_chain_config_PC_mod.json
+2024-06-11 10:49:58,599 - INFO - loadConfigs - picasso_default_config_file: C:\_data\PicassoPy\lib\config\pollynet_processing_chain_config.json
+2024-06-11 10:49:58,599 - INFO - loadConfigs - picasso_config_file: C:\_data\Picasso_IO\pollynet_processing_chain_config_PC_mod.json
+2024-06-11 10:50:27,300 - INFO - loadConfigs - picasso_default_config_file: C:\_data\PicassoPy\lib\config\pollynet_processing_chain_config.json
+2024-06-11 10:50:27,300 - INFO - loadConfigs - picasso_config_file: C:\_data\Picasso_IO\pollynet_processing_chain_config_PC_mod.json
+2024-06-11 10:51:35,162 - INFO - loadConfigs - picasso_default_config_file: C:\_data\PicassoPy\lib\config\pollynet_processing_chain_config.json
+2024-06-11 10:51:35,162 - INFO - loadConfigs - picasso_config_file: C:\_data\Picasso_IO\pollynet_processing_chain_config_PC_mod.json
+2024-06-11 10:56:00,458 - INFO - loadConfigs - picasso_default_config_file: C:\_data\PicassoPy\lib\config\pollynet_processing_chain_config.json
+2024-06-11 10:56:00,458 - INFO - loadConfigs - picasso_config_file: C:\_data\Picasso_IO\pollynet_processing_chain_config_PC_mod.json
+2024-06-11 10:56:00,928 - INFO - loadConfigs - polly_default_config_file: C:\_data\PicassoPy\lib\config\polly_global_config.json
+2024-06-11 10:56:00,928 - WARNING - loadConfigs - polly config file: C:\_data\Picasso_IO\configs\pollyConfigs\pollyxt_lacros_config_leipzig_long_depol_cali.json does not exist
+2024-06-11 10:56:00,928 - WARNING - loadConfigs - polly_default_config_file: C:\_data\PicassoPy\lib\config\polly_global_config.json will be used
+2024-06-11 10:56:00,928 - CRITICAL - readPollyRawData - H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc does not exist.
+2024-06-11 10:58:18,601 - INFO - loadConfigs - picasso_default_config_file: C:\_data\PicassoPy\lib\config\pollynet_processing_chain_config.json
+2024-06-11 10:58:18,601 - INFO - loadConfigs - picasso_config_file: C:\_data\Picasso_IO\pollynet_processing_chain_config_PC_mod.json
+2024-06-11 10:58:18,601 - INFO - loadConfigs - pollynet_config_link_file: C:\_data\Picasso_IO\pollynet_processing_chain_config_links_rsd2.xlsx
+2024-06-11 10:58:19,046 - INFO - loadConfigs - polly_default_config_file: C:\_data\PicassoPy\lib\config\polly_global_config.json
+2024-06-11 10:58:19,049 - WARNING - loadConfigs - polly config file: C:\_data\Picasso_IO\configs\pollyConfigs\pollyxt_lacros_config_leipzig_long_depol_cali.json does not exist
+2024-06-11 10:58:19,049 - WARNING - loadConfigs - polly_default_config_file: C:\_data\PicassoPy\lib\config\polly_global_config.json will be used
+2024-06-11 10:58:19,049 - CRITICAL - readPollyRawData - H:\picasso_io\pollyxt_cpv\data_zip\202403\2024_03_08_Fri_CPV_00_00_01.nc does not exist.

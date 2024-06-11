@@ -17,6 +17,8 @@ root_dir = helper.detect_path_type(root_dir)
 picasso_default_config_file = Path(root_dir,'config','pollynet_processing_chain_config.json')
 polly_default_config_file = Path(root_dir,'config','polly_global_config.json')
 picasso_config_file = "/pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json"
+polly_config_array = loadConfigs.readPollyNetConfigLinkTable(picasso_config_dict['pollynet_config_link_file'],timestamp=20230911,device="pollyxt_lacros")
+polly_config_file = str(polly_config_array['Config file'].to_string(index=False)).strip()
 
 
 ## loading configs as dicts

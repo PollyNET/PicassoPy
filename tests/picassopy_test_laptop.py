@@ -14,18 +14,21 @@ root_dir = Path(__file__).resolve().parent.parent
 
 root_dir = helper.detect_path_type(root_dir)
 ## setting config files
-picasso_default_config_file = Path(root_dir,'config','pollynet_processing_chain_config.json')
-polly_default_config_file = Path(root_dir,'config','polly_global_config.json')
-picasso_config_file = "/pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json"
-
+picasso_default_config_file = Path(root_dir,'lib','config','pollynet_processing_chain_config.json')
+polly_default_config_file = Path(root_dir,'lib','config','polly_global_config.json')
+#picasso_config_file = "/pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json"
+picasso_config_file = "C:\_data\Picasso_IO\pollynet_processing_chain_config_PC_mod.json"
 
 ## loading configs as dicts
 picasso_config_dict = loadConfigs.loadPicassoConfig(picasso_config_file,picasso_default_config_file)
-polly_config_file = loadConfigs.readPollyNetConfigLinkTable(picasso_config_dict['pollynet_config_link_file'],timestamp=20230911,device="pollyxt_lacros")
+polly_config_array = loadConfigs.readPollyNetConfigLinkTable(picasso_config_dict['pollynet_config_link_file'],timestamp=20230911,device="pollyxt_lacros")
+polly_config_file = str(polly_config_array['Config file'].to_string(index=False)).strip()
+
 if polly_config_file:
     polly_config_file_fullname = Path(picasso_config_dict['polly_config_folder'],polly_config_file)
 else:
     polly_config_file_fullname = polly_default_config_file
+
 polly_config_dict = loadConfigs.loadPollyConfig(polly_config_file_fullname, polly_default_config_file)
 
 ## reading level0 polly-nc-file and output as dict
