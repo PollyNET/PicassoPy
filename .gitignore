@@ -1,0 +1,4 @@
+PicassoPy.egg-info/
+__pycache__/
+dist/
+log/picasso_logger.log
