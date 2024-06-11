@@ -25,10 +25,11 @@ my_parser = argparse.ArgumentParser(description='PicassoPy PollynetProcessingCha
 
 ## Add the arguments
 my_parser.add_argument('--date', dest='timestamp',
-                       type=str,
+                       default=None,
                        help='the date of measurement: YYYYMMDD.')
 my_parser.add_argument('--device',
                        type=str,
+                       default=None,
                        help='the polly device (level1 nc-file).')
 my_parser.add_argument('--base_dir',
                        type=str,
@@ -48,6 +49,15 @@ my_parser.add_argument('--merge_to_single_24h_file',
 
 # init parser
 args = my_parser.parse_args()
+
+if args.timestamp != None and args.device != None:
+    pass
+elif args.timestamp == None:
+    print('No timestamp specified. Aborting')
+    sys.exit(1)
+elif args.device == None:
+    print('No device specified. Aborting')
+    sys.exit(1)
 
 
 ## loading configs as dicts
