@@ -37,7 +37,8 @@ my_parser.add_argument('--base_dir',
                        help='the directory of level0 polly data and logbook-files.')
 my_parser.add_argument('--picasso_config_file',
                        type=str,
-                       default=picasso_default_config_file,
+                       default=None,
+                       #default=picasso_default_config_file,
                        help='the json-type picasso config-file, default is lib/config/pollynet_processing_chain_config.json')
 my_parser.add_argument('--level0_file_to_process',
                        type=str,
@@ -47,7 +48,7 @@ my_parser.add_argument('--merge_to_single_24h_file',
                        action='store_true',
                        help='Flag to activate merging of multiple level0 files from one day to a single 24h file.')
 
-# init parser
+## init parser
 args = my_parser.parse_args()
 
 if args.timestamp != None and args.device != None:
@@ -58,12 +59,18 @@ elif args.timestamp == None:
 elif args.device == None:
     print('No device specified. Aborting')
     sys.exit(1)
+if args.picasso_config_file == None:
+    print('No picasso config file specified. Aborting')
+    sys.exit(1)
 
 
 ## loading configs as dicts
 picasso_config_dict = loadConfigs.loadPicassoConfig(args.picasso_config_file,picasso_default_config_file)
 polly_config_array = loadConfigs.readPollyNetConfigLinkTable(picasso_config_dict['pollynet_config_link_file'],timestamp=args.timestamp,device=args.device)
 polly_config_file = str(polly_config_array['Config file'].to_string(index=False)).strip()
+polly_device = str(polly_config_array['Instrument'].to_string(index=False)).strip()
+polly_location = str(polly_config_array['Location'].to_string(index=False)).strip()
+polly_asl = str(polly_config_array['asl.'].to_string(index=False)).strip()
 
 output_path = Path(picasso_config_dict["fileinfo_new"]).parent
 
@@ -71,7 +78,14 @@ if polly_config_file:
     polly_config_file_fullname = Path(picasso_config_dict['polly_config_folder'],polly_config_file)
 else:
     polly_config_file_fullname = polly_default_config_file
+
 polly_config_dict = loadConfigs.loadPollyConfig(polly_config_file_fullname, polly_default_config_file)
+## adding some information from pollynet_config_link_file (xlsx-file) to polly_config_dict
+polly_config_dict['name'] = polly_device
+polly_config_dict['site'] = polly_location
+polly_config_dict['asl'] = polly_asl
+
+
 
 if args.level0_file_to_process != None:
     rawfile_fullname = args.level0_file_to_process
@@ -99,6 +113,9 @@ data_cube.msite()
 ## measurement date
 data_cube.mdate()
 
+## measurement device
+data_cube.device()
+
 ## reset date if date in filename differs date within nc-file 
 data_cube.reset_date_infile()
 
@@ -107,8 +124,11 @@ data_cube.check_for_correct_mshots()
 #print(data_cube.filter_or_correct_false_mshots())
 
 ## setting channelTags
-print(data_cube.setChannelTags())
+data_cube.setChannelTags()
+#print(data_cube.setChannelTags())
 #data_cube= data_cube.reset_date_infile()
 
+## preprocessing
+data_cube.preprocessing()
 #print(dir(data_cube))
 #print(data_cube.picasso_config_dict)

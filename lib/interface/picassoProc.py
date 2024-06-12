@@ -16,9 +16,15 @@ class PicassoProc:
         self.num_of_channels = len(self.rawdata_dict['measurement_shots']['var_data'][0])
 
     def msite(self):
-        msite = f"measurement site: {self.rawdata_dict['global_attributes']['location']}"
-        logging.info(msite)
+        #msite = f"measurement site: {self.rawdata_dict['global_attributes']['location']}"
+        msite = self.polly_config_dict['site']
+        logging.info(f'measurement site: {msite}')
         return msite
+
+    def device(self):
+        device = self.polly_config_dict['name']
+        logging.info(f'measurement device: {device}')
+        return device
 
     def mdate_filename(self):
         filename = self.rawdata_dict['filename']

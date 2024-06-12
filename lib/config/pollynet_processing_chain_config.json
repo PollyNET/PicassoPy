@@ -1,6 +1,6 @@
 {
-    "fileinfo_new": "/pollyhome/Bildermacher2/todo_filelist/fileinfo_new_andi.txt",
-    "doneListFile": "/pollyhome/Bildermacher2/done_filelist/done_filelist_andi.txt",
+    "fileinfo_new": "/pollyhome/Bildermacher2/todo_filelist/fileinfo_new_default.txt",
+    "doneListFile": "/pollyhome/Bildermacher2/done_filelist/done_filelist_default.txt",
     "polly_config_folder": "/pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollyConfigs",
     "log_folder": "/data/level1a/polly/log",
     "gdas1_folder": "/data/level1a/model/gdas1/profiles",

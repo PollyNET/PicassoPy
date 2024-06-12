@@ -1,4 +1,5 @@
 PicassoPy.egg-info/
 __pycache__/
 dist/
+Pollynet_Processing_Chain/
 log/picasso_logger.log

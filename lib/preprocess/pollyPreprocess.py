@@ -1,10 +1,38 @@
 import numpy as np
 import logging
 
+
+def pollyDTCor(rawSignal,mShots,hRes, **varargin):
+    ## Defining default values for param keys (key initialization), if not explictly defined when calling the function
+    polly_device = varargin.get('device', False)
+    flagDeadTimeCorrection = varargin.get('flagDeadTimeCorrection', False)
+    DeadTimeCorrectionMode = varargin.get('DeadTimeCorrectionMode',2)
+    deadtimeParams = varargin.get('deadtimeParams',False)
+    deadtime = varargin.get('deadtime',False)
+
+    logging.info(f'... Deadtime-correction')
+
+    signal_out = rawSignal
+
+    ## reshape 2-dim matrix mShots to 3-dim matrix
+    #print(mShots.shape)
+    #print(rawSignal.shape)
+    reshaped_mShots = np.expand_dims(mShots, axis=1)
+    broadcasted_mShots = np.tile(reshaped_mShots, (1, rawSignal.shape[1], 1))
+    #print(broadcasted_mShots.shape)
+
+    ## Deadtime correction
+    if flagDeadTimeCorrection:
+        PCR = rawSignal/broadcasted_mShots*150.0/hRes ##convert photon counts to photon count rate PCR [MHz]
+        print(PCR)
+    return signal_out
+
+
+
 def pollyPreprocess(rawdata_dict, **param):
 # POLLYPREPROCESS Deadtime correction, background correction, first-bin shift, mask for low-SNR and mask for depolarization-calibration process.
     
-    logging.info('starting data preprocessing')
+    logging.info('starting data preprocessing...')
 #    for k in rawdata_dict.keys():
 #        print(k)
     rawSignal = rawdata_dict['raw_signal']['var_data']
@@ -239,7 +267,7 @@ def pollyPreprocess(rawdata_dict, **param):
     firstBinHeight = param.get('firstBinHeight', False)
     pollyType = param.get('pollyType', False)
     flagDeadTimeCorrection = param.get('flagDeadTimeCorrection', False)
-    deadtimeCorrectionMode = param.get('deadtimeCorrectionMode', False)
+    deadtimeCorrectionMode = param.get('deadtimeCorrectionMode', 2)
     deadtimeParams = param.get('deadtimeParams', False)
     flagSigTempCor = param.get('flagSigTempCor', False)
     tempCorFunc = param.get('tempCorFunc', False)
@@ -330,6 +358,7 @@ def pollyPreprocess(rawdata_dict, **param):
     mShotsPerPrf = deltaT * repRate
 #    print(mShotsPerPrf)
 #    print(mShots)
+#    print(mTime)
 #    print(deltaT)
 #    print(np.nanmean(np.diff(np.array(mTime[:,1]))))
 #    print(np.array(mTime[:,1]))
@@ -342,6 +371,15 @@ def pollyPreprocess(rawdata_dict, **param):
         nInt = np.round(mShotsPerPrf / np.nanmean(np.array(mShots[0, :])))
 
 
+## Deadtime correction
+    pollyDTCor(rawSignal=rawSignal,
+            mShots=mShots,
+            hRes=hRes, 
+            polly_device = pollyType,
+            flagDeadTimeCorrection = flagDeadTimeCorrection, 
+            DeadTimeCorrectionMode = deadtimeCorrectionMode,
+            deadtimeParams = deadtimeParams
+    )
 
 #
 #%% Modify mShots
