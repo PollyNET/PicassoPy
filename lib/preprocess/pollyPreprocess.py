@@ -14,22 +14,24 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
 
     signal_out = rawSignal
 
+    Nchannels = mShots.shape[1]
+
     ## reshape 2-dim matrix mShots to 3-dim matrix
     #print(mShots.shape)
     #print(rawSignal.shape)
     reshaped_mShots = np.expand_dims(mShots, axis=1)
     broadcasted_mShots = np.tile(reshaped_mShots, (1, rawSignal.shape[1], 1))
     #print(broadcasted_mShots.shape)
-    DeadTimeCorrectionMode = 1
+    DeadTimeCorrectionMode = 2
 
     ## Deadtime correction
     if flagDeadTimeCorrection:
-        PCR = rawSignal / broadcasted_mShots * 150.0 / hRes ##convert photon counts to photon count rate PCR [MHz]
+        PCR = rawSignal / broadcasted_mShots * 150.0 / hRes ##convert photon counts to Photon-Count-Rate PCR [MHz]
         #PCR_Cor = np.zeros_like(PCR)
 
         ## polynomial correction with parameters saved in netcdf file under variable 'deadtime_polynomial'
         if DeadTimeCorrectionMode == 1:
-            for iCh in range(0,rawSignal.shape[2]):
+            for iCh in range(0,Nchannels):
                 # Extract polynomial coefficients for the channel and reverse their order
                 coeffs = deadtime[:, iCh][::-1]
                 # Extract the PCR values for the channel
@@ -40,8 +42,11 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
                 signal_out[:, :, iCh] = PCR_Cor / (150.0 / hRes) * broadcasted_mShots[:, :, iCh]
 
 
-        ## nonparalyzable correction
-        #elif DeadTimeCorrectionMode == 2:
+        ## nonparalyzable correction: PCR_cor = PCR / (1 - tau*PCR), with tau beeing the dead-time 
+        elif DeadTimeCorrectionMode == 2:
+            for iCh in range(0,Nchannels):
+                PCR_Cor = PCR[:, :, iCh] / (1.0 - deadtimeParams[iCh][0] * 10**(-3) * PCR[:, :, iCh])
+                signal_out[:, :, iCh] = PCR_Cor / (150.0 / hRes) * broadcasted_mShots[:, :, iCh]
 
 #  for iCh = 1:size(sigI, 1)
 #            PCR_Cor = polyval(p.Results.deadtime(iCh, end:-1:1), ...
