@@ -1,10 +1,16 @@
 %initPicassoToolbox
-pollyDataFile = 'H:\\picasso_io\\pollyxt_cpv\\data_zip\\202403\\2024_03_08_Fri_CPV_00_00_01.nc';
+%pollyDataFile = 'H:\\picasso_io\\pollyxt_cpv\\data_zip\\202403\\2024_03_08_Fri_CPV_00_00_01.nc';
+pollyDataFile = 'C:\\_data\\Picasso_IO\\pollyxt_cpv\\data_zip\\202403\\2024_03_08_Fri_CPV_00_00_01.nc';
 %pollyConfigFile = 'H:\\Pollynet_Processing_Chain\\config\\pollyConfigs\\pollyxt_tropos_config_20230418-2.json'
-pollyConfigFile = 'H:\\Pollynet_Processing_Chain\\config\\pollyConfigs\\pollyxt_cpv_2021.txt';
-PicassoConfigFile = 'H:\\Pollynet_Processing_Chain\\config\\pollynet_processing_chain_config_rsd2_24h_exp.json';
-PicassoConfig = loadConfig(PicassoConfigFile, 'H:\\Pollynet_Processing_Chain\\lib\config\\pollynet_processing_chain_config.json');
-PollyConfig = loadPollyConfig(pollyConfigFile, 'H:\\Pollynet_Processing_Chain\\lib\config\\polly_global_config.json');
+%pollyConfigFile = 'H:\\Pollynet_Processing_Chain\\config\\pollyConfigs\\pollyxt_cpv_2021.txt';
+pollyConfigFile = 'C:\\_data\\Picasso_IO\\configs\\pollyConfigs\\pollyxt_cpv_2021.txt';
+%PicassoConfigFile = 'H:\\Pollynet_Processing_Chain\\config\\pollynet_processing_chain_config_rsd2_24h_exp.json';
+PicassoConfigFile = 'C:\\_data\\Picasso_IO\\pollynet_processing_chain_config_PC_mod.json';
+
+%PicassoConfig = loadConfig(PicassoConfigFile, 'H:\\Pollynet_Processing_Chain\\lib\config\\pollynet_processing_chain_config.json');
+PicassoConfig = loadConfig(PicassoConfigFile, PicassoConfigFile);
+%PollyConfig = loadPollyConfig(pollyConfigFile, 'H:\\Pollynet_Processing_Chain\\lib\config\\polly_global_config.json');
+PollyConfig = loadPollyConfig(pollyConfigFile, 'C:\\_data\\PicassoPy\\Pollynet_Processing_Chain\\lib\\config\\polly_global_config.json');
 %data = readPollyRawData(pollyDataFile, 'flagFilterFalseMShots', PollyConfig.flagFilterFalseMShots,'flagCorrectFalseMShots', PollyConfig.flagCorrectFalseMShots,'flagDeleteData', PicassoConfig.flagDeleteData,'dataFileFormat', PollyConfig.dataFileFormat,'deltaT', PollyConfig.deltaT);
 data = readPollyRawData(pollyDataFile, ...
             'flagFilterFalseMShots', PollyConfig.flagFilterFalseMShots, ...
