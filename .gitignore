@@ -3,3 +3,4 @@ __pycache__/
 dist/
 Pollynet_Processing_Chain/
 log/picasso_logger.log
+tests/pollynet_testing.m

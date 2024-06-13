@@ -6,11 +6,11 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
     ## Defining default values for param keys (key initialization), if not explictly defined when calling the function
     polly_device = varargin.get('device', False)
     flagDeadTimeCorrection = varargin.get('flagDeadTimeCorrection', False)
-    DeadTimeCorrectionMode = varargin.get('DeadTimeCorrectionMode',2)
-    deadtimeParams = varargin.get('deadtimeParams',False)
-    deadtime = varargin.get('deadtime',False)
+    DeadTimeCorrectionMode = varargin.get('DeadTimeCorrectionMode', 2)
+    deadtimeParams = varargin.get('deadtimeParams', [])
+    deadtime = varargin.get('deadtime', [])
 
-    logging.info(f'... Deadtime-correction')
+    logging.info(f'... Deadtime-correction (Mode: {DeadTimeCorrectionMode})')
 
     signal_out = rawSignal
 
@@ -22,80 +22,76 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
     reshaped_mShots = np.expand_dims(mShots, axis=1)
     broadcasted_mShots = np.tile(reshaped_mShots, (1, rawSignal.shape[1], 1))
     #print(broadcasted_mShots.shape)
-    DeadTimeCorrectionMode = 2
+#    DeadTimeCorrectionMode = 5
 
     ## Deadtime correction
     if flagDeadTimeCorrection:
         PCR = rawSignal / broadcasted_mShots * 150.0 / hRes ##convert photon counts to Photon-Count-Rate PCR [MHz]
         #PCR_Cor = np.zeros_like(PCR)
 
-        ## polynomial correction with parameters saved in netcdf file under variable 'deadtime_polynomial'
+        ## polynomial correction with parameters saved in the level0 netcdf-file under variable 'deadtime_polynomial'
         if DeadTimeCorrectionMode == 1:
             for iCh in range(0,Nchannels):
                 # Extract polynomial coefficients for the channel and reverse their order
                 coeffs = deadtime[:, iCh][::-1]
-                # Extract the PCR values for the channel
-                PCR_values = PCR[:, :, iCh]
                 # Evaluate the polynomial at each value in the PCR_values matrix
-                #PCR_Cor[:, :, iCh] = np.polyval(coeffs, PCR_values)
-                PCR_Cor = np.polyval(coeffs, PCR_values)
+                PCR_Cor = np.polyval(coeffs, PCR[:, :, iCh])
                 signal_out[:, :, iCh] = PCR_Cor / (150.0 / hRes) * broadcasted_mShots[:, :, iCh]
 
 
-        ## nonparalyzable correction: PCR_cor = PCR / (1 - tau*PCR), with tau beeing the dead-time 
+        ## nonparalyzable correction: PCR_cor = PCR / (1 - tau*PCR), with tau beeing the dead-time
+        ## reading from polly-config file under key 'dT' (only the first value from each channel)
         elif DeadTimeCorrectionMode == 2:
             for iCh in range(0,Nchannels):
                 PCR_Cor = PCR[:, :, iCh] / (1.0 - deadtimeParams[iCh][0] * 10**(-3) * PCR[:, :, iCh])
                 signal_out[:, :, iCh] = PCR_Cor / (150.0 / hRes) * broadcasted_mShots[:, :, iCh]
 
-#  for iCh = 1:size(sigI, 1)
-#            PCR_Cor = polyval(p.Results.deadtime(iCh, end:-1:1), ...
-#                              PCR(iCh, :, :));
-#            sigO(iCh, :, :) = PCR_Cor / (150.0 / hRes) .* MShots(iCh, :, :);
-#        end
-#
-#    % nonparalyzable correction
-#    elseif p.Results.deadtimeCorrectionMode == 2
-#        for iCh = 1:size(sigI, 1)
-#            PCR_Cor = PCR(iCh, :, :) ./ ...
-#                      (1.0 - p.Results.deadtimeParams(iCh) * 1e-3 * ...
-#                      PCR(iCh, :, :));
-#            sigO(iCh, :, :) = PCR_Cor / (150.0 / hRes) .* MShots(iCh, :, :);
-#        end
-#
-#    % user defined deadtime.
-#    % Regarding the format of deadtime, please go to /doc/polly_config.md
-#    elseif p.Results.deadtimeCorrectionMode == 3
-#        if ~ isempty(p.Results.deadtimeParams)
-#            for iCh = 1:size(sigI, 1)
-#                PCR_Cor = polyval(p.Results.deadtimeParams(iCh, end:-1:1), ...
-#                                  PCR(iCh, :, :));
-#                sigO(iCh, :, :) = PCR_Cor / (150.0 / hRes) .* MShots(iCh, :, :);
-#            end
-#        else
-#            warning(['User defined deadtime parameters were not found. ', ...
-#                     'Please go back to check the configuration ', ...
-#                     'file for %s.'], p.Results.pollyType);
-#            warning(['In order to continue the current processing, ', ...
-#                     'deadtime correction will not be implemented. ', ...
-#                     'Be careful!']);
-#        end
-#
-#    % No deadtime correction
-#    elseif p.Results.deadtimeCorrectionMode == 4
-#        fprintf(['Deadtime correction was turned off. ', ...
-#                 'Be careful to check the signal strength.\n']);
-#    else
-#        error(['Unknow deadtime correction setting! ', ...
-#               'Please go back to check the configuration ', ...
-#               'file for %s. For deadtimeCorrectionMode, only 1-4 is allowed.'], ...
-#               p.Results.pollyType);
-#    end
+
+        ## user defined deadtime, reading from polly-config file under key 'dT' (the whole matrix, polynome) 
+        elif DeadTimeCorrectionMode == 3:
+            if np.array(deadtimeParams).size != 0:
+                for iCh in range(0,Nchannels):
+                    # Extract polynomial coefficients for the channel and reverse their order
+                    coeffs = np.array(deadtimeParams[iCh][:])[::-1]
+                    # Evaluate the polynomial at each value in the PCR_values matrix
+                    PCR_Cor = np.polyval(coeffs, PCR[:, :, iCh])
+                    signal_out[:, :, iCh] = PCR_Cor / (150.0 / hRes) * broadcasted_mShots[:, :, iCh]
+            else:
+                logging.warning(f'User defined deadtime parameters were not found in polly-config file.')
+                logging.warning(f'In order to continue the current processing, deadtime correction will not be implemented.')
 
 
+        ## No deadtime correction
+        elif DeadTimeCorrectionMode == 4:
+            logging.warning(f'Deadtime correction was turned off. Be careful to check the signal strength.')
+
+
+        else:
+            logging.error(f'Unknow deadtime correction setting! Please go back to check the configuration.')
+            logging.error(f'For deadtimeCorrectionMode, only 1-4 is allowed.')
 
     return signal_out
 
+def pollyRemoveBG(rawSignal,**varargin):
+    maxHeightBin = varargin.get('maxHeightBin', 3000)
+    firstBinIndex = varargin.get('firstBinIndex', 1)
+    bgCorrectionIndex = varargin.get('bgCorrectionIndex', [1, 2])
+
+    logging.info(f'... Removing background from signal')
+
+    #print(maxHeightBin,firstBinIndex,bgCorrectionIndex)
+
+    ## Calculate the mean across the specified column range for each row and page
+    mean_matrix = np.mean(rawSignal[:, bgCorrectionIndex[0]:bgCorrectionIndex[1], :], axis=1, keepdims=True)
+
+    #Replicate the mean matrix along the second dimension
+    bg = np.tile(mean_matrix, (1, maxHeightBin, 1))
+
+    signal_out = np.full((rawSignal.shape[0], maxHeightBin, rawSignal.shape[2]), np.nan)
+    for iCh in range(0, rawSignal.shape[2]):
+        signal_out[:, :, iCh] = rawSignal[:,firstBinIndex[iCh]:(maxHeightBin+firstBinIndex[iCh]),iCh] - bg[:, :, iCh]
+
+    return signal_out, bg
 
 
 def pollyPreprocess(rawdata_dict, **param):
@@ -440,10 +436,10 @@ def pollyPreprocess(rawdata_dict, **param):
         nInt = np.round(mShotsPerPrf / np.nanmean(np.array(mShots[0, :])))
 
 
-## Deadtime correction
-    pollyDTCor(rawSignal=rawSignal,
-            mShots=mShots,
-            hRes=hRes, 
+    ## Deadtime correction
+    rawSignal = pollyDTCor(rawSignal = rawSignal,
+            mShots = mShots,
+            hRes = hRes, 
             polly_device = pollyType,
             flagDeadTimeCorrection = flagDeadTimeCorrection, 
             DeadTimeCorrectionMode = deadtimeCorrectionMode,
@@ -451,6 +447,23 @@ def pollyPreprocess(rawdata_dict, **param):
             deadtime = rawdata_dict['deadtime_polynomial']['var_data']
     )
 
+    ## Background Substraction
+    rawSignal, bg =  pollyRemoveBG(rawSignal = rawSignal,
+                       bgCorrectionIndex = bgCorrectionIndex,
+                       maxHeightBin = maxHeightBin,
+                       firstBinIndex = firstBinIndex
+    )
+
+
+    logging.info('finished data preprocessing.')
+
+#%% Background Substraction
+#[sigBGCor, bg] = pollyRemoveBG(rawSignal, ...
+#    'bgCorrectionIndex', config.bgCorrectionIndex, ...
+#    'maxHeightBin', config.maxHeightBin, ...
+#    'firstBinIndex', config.firstBinIndex);
+#data.bg = bg;
+#data.signal = sigBGCor;
 #
 #%% Modify mShots
 #% Expected mShots should be an matrix with dims of nChannels x profiles
