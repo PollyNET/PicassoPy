@@ -98,8 +98,8 @@ def pollyPreprocess(rawdata_dict, **param):
 # POLLYPREPROCESS Deadtime correction, background correction, first-bin shift, mask for low-SNR and mask for depolarization-calibration process.
     
     logging.info('starting data preprocessing...')
-#    for k in rawdata_dict.keys():
-#        print(k)
+    for k in rawdata_dict.keys():
+        print(k)
     rawSignal = rawdata_dict['raw_signal']['var_data']
     mShots = rawdata_dict['measurement_shots']['var_data']
     mTime = rawdata_dict['measurement_time']['var_data']
@@ -275,54 +275,6 @@ def pollyPreprocess(rawdata_dict, **param):
 #%    - 2021-01-20: Re-sample the profiles into temporal resolution of 30-s.
 #%
 #% .. Authors: - zhenping@tropos.de
-#
-#p = inputParser;
-#p.KeepUnmatched = true;
-#
-#addRequired(p, 'data', @isstruct);
-#addParameter(p, 'deltaT', 30, @isnumeric);
-#addParameter(p, 'flagForceMeasTime', false, @islogical);
-#addParameter(p, 'maxHeightBin', 3000, @isnumeric);
-#addParameter(p, 'firstBinIndex', 1, @isnumeric);
-#addParameter(p, 'firstBinHeight', 0, @isnumeric);
-#addParameter(p, 'pollyType', 'arielle', @ischar);
-#addParameter(p, 'flagDeadTimeCorrection', false, @islogical);
-#addParameter(p, 'deadtimeCorrectionMode', 2, @isnumeric);
-#addParameter(p, 'deadtimeParams', [], @isnumeric);
-#addParameter(p, 'flagSigTempCor', false, @islogical);
-#addParameter(p, 'tempCorFunc', '', @iscell);
-#addParameter(p, 'meteorDataSource', 'gdas1', @ischar);
-#addParameter(p, 'gdas1Site', '', @ischar);
-#addParameter(p, 'meteo_folder', '', @ischar);
-#addParameter(p, 'radiosondeSitenum', 0, @isnumeric);
-#addParameter(p, 'radiosondeFolder', '', @ischar);
-#addParameter(p, 'radiosondeType', 1, @isnumeric);
-#addParameter(p, 'bgCorrectionIndex', [1, 2], @isnumeric);
-#addParameter(p, 'asl', 0, @isnumeric);
-#addParameter(p, 'initialPolAngle', 0, @isnumeric);
-#addParameter(p, 'maskPolCalAngle', {}, @iscell);
-#addParameter(p, 'minSNRThresh', [], @isnumeric);
-#addParameter(p, 'minPC_fog', 50, @isnumeric);
-#addParameter(p, 'flagFarRangeChannel', false, @islogical);
-#addParameter(p, 'flag532nmChannel', false, @islogical);
-#addParameter(p, 'flagTotalChannel', false, @islogical);
-#addParameter(p, 'flag355nmChannel', false, @islogical);
-#addParameter(p, 'flag607nmChannel', false, @islogical);
-#addParameter(p, 'flag387nmChannel', false, @islogical);
-#addParameter(p, 'flag407nmChannel', false, @islogical);
-#addParameter(p, 'flag355nmRotRaman', false, @islogical);
-#addParameter(p, 'flag532nmRotRaman', false, @islogical);
-#addParameter(p, 'flag1064nmRotRaman', false, @islogical);
-#addParameter(p, 'flagUseLatestGDAS', false, @islogical);
-#
-#parse(p, data, varargin{:});
-#
-#if isempty(data.rawSignal)
-#    return;
-#end
-#
-#config = p.Results;   % copy name-value pairs to 'config'
-#
 
     ## Defining default values for param keys (key initialization), if not explictly defined when calling the function
     deltaT = param.get('deltaT', 30)
@@ -380,46 +332,6 @@ def pollyPreprocess(rawdata_dict, **param):
         logging.info(f'maxHeightBin: {maxHeightBin}')
         firstBinIndex = 251
 
-#
-#%% Re-sample the temporal grid to defined temporal grid with interval of deltaT
-#mShotsPerPrf = p.Results.deltaT * data.repRate;
-#if (length(data.mTime) > 1)
-#    nInt = round(p.Results.deltaT / (nanmean(diff(data.mTime)) * 24 * 3600));   % number of profiles to be
-#                                                                            % integrated. Usually, 600
-#                                                                            % shots per 30 s
-#else
-#    nInt = round(mShotsPerPrf / nanmean(data.mShots(1, :), 2));
-#end
-#
-#if nInt > 1
-#    % if shots of single profile is less than mShotsPerPrf
-#    warning('MShots for single profile is not %4.0f... Please check!!!', mShotsPerPrf);
-#
-#    nProfInt = floor(size(data.mShots, 2) / nInt);
-#    mShotsInt = NaN(size(data.mShots, 1), nProfInt);
-#    mTimeInt = NaN(1, nProfInt);
-#    rawSignalInt = NaN(size(data.rawSignal, 1), size(data.rawSignal, 2), nProfInt);
-#    depCalAngInt = NaN(nProfInt, 1);
-#    flagValidProfile = true(1, nProfInt);
-#
-#    for iProfInt = 1:nProfInt
-#        profIndx = ((iProfInt - 1) * nInt + 1):(iProfInt * nInt);
-#        mShotsInt(:, iProfInt) = nansum(data.mShots(:, profIndx), 2);
-#        mTimeInt(iProfInt) = data.mTime(1) + datenum(0, 1, 0, 0, 0, double(mShotsPerPrf / data.repRate * (iProfInt - 1)));
-#        rawSignalInt(:, :, iProfInt) = repmat(nansum(data.rawSignal(:, :, profIndx), 3), 1, 1, 1);
-#        if ~ isempty(data.depCalAng)
-#            depCalAngInt(iProfInt) = data.depCalAng(profIndx(1));
-#        end
-#        flagValidProfile(iProfInt) = all(data.flagValidProfile(profIndx));
-#    end
-#
-#    data.rawSignal = rawSignalInt;
-#    data.mTime = mTimeInt;
-#    data.mShots = mShotsInt;
-#    data.depCalAng = depCalAngInt;
-#    data.flagValidProfile = flagValidProfile;
-#end
-
     mShotsPerPrf = deltaT * repRate
 #    print(mShotsPerPrf)
 #    print(mShots)
@@ -454,59 +366,13 @@ def pollyPreprocess(rawdata_dict, **param):
                        firstBinIndex = firstBinIndex
     )
 
+    ## Height and first bin height correction
+    rawdata_dict['height'] = np.arange(0, rawSignal.shape[1]) * hRes * np.cos(zenithAng*np.pi/180) + firstBinHeight
+    rawdata_dict['alt'] = rawdata_dict['height'] + float(asl) ## geopotential height
+
 
     logging.info('finished data preprocessing.')
 
-#%% Background Substraction
-#[sigBGCor, bg] = pollyRemoveBG(rawSignal, ...
-#    'bgCorrectionIndex', config.bgCorrectionIndex, ...
-#    'maxHeightBin', config.maxHeightBin, ...
-#    'firstBinIndex', config.firstBinIndex);
-#data.bg = bg;
-#data.signal = sigBGCor;
-#
-#%% Modify mShots
-#% Expected mShots should be an matrix with dims of nChannels x profiles
-#% However, old polly generate mShots variable with one dimension.
-#if (size(data.mShots, 1) ~= size(data.rawSignal, 1)) && (size(data.mShots, 2) ~= size(data.rawSignal, 3))
-#    data.mShots = repmat(transpose(data.mShots), size(data.rawSignal, 1), 1);
-#end
-#
-#%% Re-locate measurement time forcefully.
-#if config.flagForceMeasTime
-#    data.mTime = data.filenameStartTime + ...
-#                 datenum(0, 1, 0, 0, 0, double(1:size(data.mTime, 2)) * p.Results.deltaT);
-#else
-#    %% Filter profiles with negative timestamp (which is an indication of power failure for the lidar system)
-#    data.mTime = data.mTime(data.flagValidProfile);
-#    data.mShots = data.mShots(:, data.flagValidProfile);
-#    data.depCalAng = data.depCalAng(data.flagValidProfile);
-#    data.rawSignal = data.rawSignal(:, :, data.flagValidProfile);
-#    data = rmfield(data, 'flagValidProfile');
-#end
-#
-#%% Deadtime correction
-#rawSignal = pollyDTCor(data.rawSignal, data.mShots, data.hRes, ...
-#                'flagDeadTimeCorrection', config.flagDeadTimeCorrection, ...
-#                'deadtimeCorrectionMode', config.deadtimeCorrectionMode, ...
-#                'deadtime', data.deadtime, ...
-#                'deadtimeParams', config.deadtimeParams, ...
-#                'pollyType', config.pollyType);
-#
-#%% Background Substraction
-#[sigBGCor, bg] = pollyRemoveBG(rawSignal, ...
-#    'bgCorrectionIndex', config.bgCorrectionIndex, ...
-#    'maxHeightBin', config.maxHeightBin, ...
-#    'firstBinIndex', config.firstBinIndex);
-#data.bg = bg;
-#data.signal = sigBGCor;
-#
-#%% Height (first bin height correction)
-#data.height = double((0:(size(data.signal, 2)-1)) * data.hRes * ...
-#    cos(data.zenithAng / 180 * pi) + config.firstBinHeight);   % [m]
-#data.alt = double(data.height + config.asl);   % geopotential height
-#% distance between range bin and system.
-#data.distance0 = double(data.height ./ cos(data.zenithAng / 180 * pi));
 #
 #%% Temperature effect correction (for Raman signal)
 #if config.flagSigTempCor

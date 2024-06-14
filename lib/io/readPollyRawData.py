@@ -94,6 +94,8 @@ def readPollyRawData(filename=str) -> dict:
             #data_dict[f'{var_name}___{var_att}'] = var_att_value
             data_dict[var_name]['var_att'][var_att] = var_att_value
 
+    data_dict['measurement_height_resolution']['var_data'] = data_dict['measurement_height_resolution']['var_data']*0.15
+
     nc_file_ds.close()
 
     return data_dict
