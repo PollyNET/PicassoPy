@@ -367,9 +367,28 @@ def pollyPreprocess(rawdata_dict, **param):
     )
 
     ## Height and first bin height correction
+    logging.info('... height bin calculations')
     rawdata_dict['height'] = np.arange(0, rawSignal.shape[1]) * hRes * np.cos(zenithAng*np.pi/180) + firstBinHeight
     rawdata_dict['alt'] = rawdata_dict['height'] + float(asl) ## geopotential height
 
+    ## Mask for bins with low SNR
+    logging.info('... mask bins with low SNR')
+    tot = rawSignal + 2 * bg
+    tot[tot <= 0] = np.nan
+
+    SNR = rawSignal / np.sqrt(tot)
+    SNR[SNR <= 0] = 0
+    SNR[np.isnan(SNR)] = 0
+
+    print(SNR)
+
+
+#SNR = pollySNR(data.signal, data.bg);
+#data.lowSNRMask = false(size(data.signal));
+#for iChannel = 1: size(data.signal, 1)
+#    data.lowSNRMask(iChannel, SNR(iChannel, :, :) < ...
+#                    config.minSNRThresh(iChannel)) = true;
+#end
 
     logging.info('finished data preprocessing.')
 
