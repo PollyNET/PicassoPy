@@ -1,6 +1,6 @@
 import numpy as np
 import logging
-
+from scipy.ndimage import label
 
 def pollyDTCor(rawSignal,mShots,hRes, **varargin):
     ## Defining default values for param keys (key initialization), if not explictly defined when calling the function
@@ -119,9 +119,7 @@ def pollyPolCaliTime(depCalAng, mTime, init_depAng, maskDepCalAng):
             flagPDepCal[iProf] = True
         elif maskDepCalAng[iProf] == 'n':
             flagNDepCal[iProf] = True
-    print(np.nanmax(np.abs(depCalAng - init_depAng)))
     flagDepCal = ~(np.abs(depCalAng - init_depAng) <= 0.5)
-    print(flagDepCal)
     ## the profile will be
     ## treated as depol cali
     ## profile if it has
@@ -132,10 +130,31 @@ def pollyPolCaliTime(depCalAng, mTime, init_depAng, maskDepCalAng):
     maskDepCal = flagDepCal
 
     ## search the calibration periods
-    valuesFlagDepCal = np.zeros(len(flagDepCal));
-    #valuesFlagDepCal[flagDepCal] = 1.0;
-    #valuesFlagDepCal(~ flagDepCal) = NaN;
-    #[depCalPeriods, nDepCalPeriods] = label(valuesFlagDepCal);
+    #valuesFlagDepCal = np.zeros(len(flagDepCal))
+    #valuesFlagDepCal[flagDepCal  == True] = 1
+    #valuesFlagDepCal[flagDepCal  == False] = 0
+    #depCalPeriods, nDepCalPeriods = label(valuesFlagDepCal) ## label connected componetns in the matrix
+    depCalPeriods, nDepCalPeriods = label(flagDepCal) ## label connected components in the matrix
+    #print(np.nanmax(depCalPeriods))
+    #print(nDepCalPeriods)
+
+    filtered_components = []
+    for iDepCalPeriod in range(nDepCalPeriods):
+        flagIDepCal = (depCalPeriods == iDepCalPeriod) # flag for the ith calibration period.
+         # Check if the component contains only 1s
+        if np.all(flagDepCal[flagIDepCal] == False):
+            filtered_components.append(iDepCalPeriod)
+        else:
+            continue
+        #tIDepCal = mTime[flagIDepCal]
+        tIDepCal = mTime[filtered_components]
+        print(tIDepCal)
+
+        t_all_p_depCal = tIDepCal[flagPDepCal]
+        t_all_n_depCal = tIDepCal[flagNDepCal]
+        print(t_all_p_depCal)
+        print(t_all_n_depCal)
+
 
 
 
