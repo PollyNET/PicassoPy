@@ -93,13 +93,60 @@ def pollyRemoveBG(rawSignal,**varargin):
 
     return signal_out, bg
 
+def pollyPolCaliTime(depCalAng, mTime, init_depAng, maskDepCalAng):
+
+    depCal_P_Ang_time_start = []
+    depCal_P_Ang_time_end = []
+    depCal_N_Ang_time_start = []
+    depCal_N_Ang_time_end = []
+    maskDepCal = np.zeros(len(mTime),dtype=bool)
+
+    if len(depCalAng) == 0:
+        ## if depCalAng is empty, which means the polly does not support auto depol calibration
+        return depCal_P_Ang_time_start, depCal_P_Ang_time_end, depCal_N_Ang_time_start, depCal_N_Ang_time_end, maskDepCal
+
+    if len(maskDepCalAng) == 0:
+        maskDepCalAng = ['none', 'none', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'none', 'none', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'n', 'none']
+        ## the mask for postive and negative
+        ## calibration angle. 'none' means
+        ## invalid profiles with different
+        ## depol_cal_angle
+
+    flagPDepCal = np.zeros(len(maskDepCalAng),dtype=bool)
+    flagNDepCal = np.zeros(len(maskDepCalAng),dtype=bool)
+    for iProf in range(0,len(maskDepCalAng)):
+        if maskDepCalAng[iProf] == 'p':
+            flagPDepCal[iProf] = True
+        elif maskDepCalAng[iProf] == 'n':
+            flagNDepCal[iProf] = True
+    print(np.nanmax(np.abs(depCalAng - init_depAng)))
+    flagDepCal = ~(np.abs(depCalAng - init_depAng) <= 0.5)
+    print(flagDepCal)
+    ## the profile will be
+    ## treated as depol cali
+    ## profile if it has
+    ## different
+    ## depol_cal_ang than
+    ## the init_depAng
+
+    maskDepCal = flagDepCal
+
+    ## search the calibration periods
+    valuesFlagDepCal = np.zeros(len(flagDepCal));
+    #valuesFlagDepCal[flagDepCal] = 1.0;
+    #valuesFlagDepCal(~ flagDepCal) = NaN;
+    #[depCalPeriods, nDepCalPeriods] = label(valuesFlagDepCal);
+
+
+
+    return depCal_P_Ang_time_start, depCal_P_Ang_time_end, depCal_N_Ang_time_start, depCal_N_Ang_time_end, maskDepCal
 
 def pollyPreprocess(rawdata_dict, **param):
 # POLLYPREPROCESS Deadtime correction, background correction, first-bin shift, mask for low-SNR and mask for depolarization-calibration process.
     
     logging.info('starting data preprocessing...')
-    for k in rawdata_dict.keys():
-        print(k)
+#    for k in rawdata_dict.keys():
+#        print(k)
     rawSignal = rawdata_dict['raw_signal']['var_data']
     mShots = rawdata_dict['measurement_shots']['var_data']
     mTime = rawdata_dict['measurement_time']['var_data']
@@ -108,6 +155,9 @@ def pollyPreprocess(rawdata_dict, **param):
     repRate = rawdata_dict['laser_rep_rate']['var_data']
     hRes = rawdata_dict['measurement_height_resolution']['var_data']
     mSite = rawdata_dict['global_attributes']['location']
+
+
+    data_dict = rawdata_dict.copy()
 
 
 
@@ -368,8 +418,8 @@ def pollyPreprocess(rawdata_dict, **param):
 
     ## Height and first bin height correction
     logging.info('... height bin calculations')
-    rawdata_dict['height'] = np.arange(0, rawSignal.shape[1]) * hRes * np.cos(zenithAng*np.pi/180) + firstBinHeight
-    rawdata_dict['alt'] = rawdata_dict['height'] + float(asl) ## geopotential height
+    data_dict['height'] = np.arange(0, rawSignal.shape[1]) * hRes * np.cos(zenithAng*np.pi/180) + firstBinHeight
+    data_dict['alt'] = data_dict['height'] + float(asl) ## geopotential height
 
     ## Mask for bins with low SNR
     logging.info('... mask bins with low SNR')
@@ -379,16 +429,26 @@ def pollyPreprocess(rawdata_dict, **param):
     SNR = rawSignal / np.sqrt(tot)
     SNR[SNR <= 0] = 0
     SNR[np.isnan(SNR)] = 0
+    #print(SNR)
+    ## create mask and mask every entry, where SNR < minSNRThresh
+    data_dict['lowSNRMask'] = np.ma.array(np.zeros(rawSignal.shape, dtype=bool), mask=np.ones(rawSignal.shape, dtype=bool))
+    #print(data_dict['lowSNRMask'])
+    for iCh in range(0, rawSignal.shape[2]):
+        data_dict['lowSNRMask'][:,:,iCh].mask = SNR[:,:,iCh].data < minSNRThresh[iCh]
+    #print(data_dict['lowSNRMask'])
 
-    print(SNR)
 
+    ## Mask for polarization calibration
+    logging.info('... mask for polarization calibration')
+    data_dict['depol_cal_ang_p_time_start'],data_dict['depol_cal_ang_p_time_end'],data_dict['depol_cal_ang_n_time_start'],data_dict['depol_cal_ang_n_time_end'],data_dict['depCalMask'] = pollyPolCaliTime(depCalAng=depCalAng, mTime=mTime, init_depAng=initialPolAngle, maskDepCalAng=maskPolCalAngle)
 
-#SNR = pollySNR(data.signal, data.bg);
-#data.lowSNRMask = false(size(data.signal));
-#for iChannel = 1: size(data.signal, 1)
-#    data.lowSNRMask(iChannel, SNR(iChannel, :, :) < ...
-#                    config.minSNRThresh(iChannel)) = true;
-#end
+#%% Mask for polarization calibration
+#[data.depol_cal_ang_p_time_start, data.depol_cal_ang_p_time_end, ...
+# data.depol_cal_ang_n_time_start, data.depol_cal_ang_n_time_end, ...
+# depCalMask] = pollyPolCaliTime(data.depCalAng, data.mTime, ...
+#                                config.initialPolAngle, config.maskPolCalAngle);
+#data.depCalMask = transpose(depCalMask);
+
 
     logging.info('finished data preprocessing.')
 
@@ -422,13 +482,6 @@ def pollyPreprocess(rawdata_dict, **param):
 #    end
 #end
 #
-#%% Mask for bins with low SNR
-#SNR = pollySNR(data.signal, data.bg);
-#data.lowSNRMask = false(size(data.signal));
-#for iChannel = 1: size(data.signal, 1)
-#    data.lowSNRMask(iChannel, SNR(iChannel, :, :) < ...
-#                    config.minSNRThresh(iChannel)) = true;
-#end
 #
 #%% Mask for polarization calibration
 #[data.depol_cal_ang_p_time_start, data.depol_cal_ang_p_time_end, ...
