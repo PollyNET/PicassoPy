@@ -1,5 +1,7 @@
 import numpy as np
 import logging
+import datetime
+import time
 from scipy.ndimage import label
 
 def pollyDTCor(rawSignal,mShots,hRes, **varargin):
@@ -119,43 +121,43 @@ def pollyPolCaliTime(depCalAng, mTime, init_depAng, maskDepCalAng):
             flagPDepCal[iProf] = True
         elif maskDepCalAng[iProf] == 'n':
             flagNDepCal[iProf] = True
-    flagDepCal = ~(np.abs(depCalAng - init_depAng) <= 0.5)
-    ## the profile will be
-    ## treated as depol cali
-    ## profile if it has
-    ## different
-    ## depol_cal_ang than
-    ## the init_depAng
+    flagDepCal = (np.abs(depCalAng - init_depAng) > 0.0)
+    ## the profile will be treated as depol cali profile if it has different
+    ## depol_cal_ang than the init_depAng
 
     maskDepCal = flagDepCal
 
     ## search the calibration periods
-    #valuesFlagDepCal = np.zeros(len(flagDepCal))
-    #valuesFlagDepCal[flagDepCal  == True] = 1
-    #valuesFlagDepCal[flagDepCal  == False] = 0
-    #depCalPeriods, nDepCalPeriods = label(valuesFlagDepCal) ## label connected componetns in the matrix
-    depCalPeriods, nDepCalPeriods = label(flagDepCal) ## label connected components in the matrix
-    #print(np.nanmax(depCalPeriods))
-    #print(nDepCalPeriods)
+    valuesFlagDepCal = flagDepCal.astype(int)
 
+    np.set_printoptions(threshold=np.inf)
+    ## label connected components in the matrix; 0 will stay 0
+    ## connected 1s will be numbered consecutively
+    depCalPeriods, nDepCalPeriods = label(valuesFlagDepCal)
+    #print(depCalPeriods)
+    
     filtered_components = []
-    for iDepCalPeriod in range(nDepCalPeriods):
-        flagIDepCal = (depCalPeriods == iDepCalPeriod) # flag for the ith calibration period.
-         # Check if the component contains only 1s
-        if np.all(flagDepCal[flagIDepCal] == False):
-            filtered_components.append(iDepCalPeriod)
-        else:
+    for iDepCalPeriod in range(1,nDepCalPeriods+1):
+        #flagIDepCal = (depCalPeriods == iDepCalPeriod) # flag for the ith calibration period.
+        flagIDepCal = depCalPeriods[depCalPeriods == iDepCalPeriod] # flag for the ith calibration period.
+        indices = np.where(depCalPeriods == flagIDepCal[0])[0]
+
+        if len(flagIDepCal) != len(maskDepCalAng):
+            logging.warning(f"Depolarization Calibration from Timestamp "
+            f"{mTime[indices[0]]} - {mTime[indices[-1]]} "
+            f"does not match the maskDepCalAng pattern in the polly-config file.\n"
+            f"This calibration phase will be skipped.")
             continue
+        else:
+            pass
         #tIDepCal = mTime[flagIDepCal]
-        tIDepCal = mTime[filtered_components]
-        print(tIDepCal)
+        #tIDepCal = mTime[filtered_components]
+        #print(tIDepCal)
 
-        t_all_p_depCal = tIDepCal[flagPDepCal]
-        t_all_n_depCal = tIDepCal[flagNDepCal]
-        print(t_all_p_depCal)
-        print(t_all_n_depCal)
-
-
+        #t_all_p_depCal = tIDepCal[flagPDepCal]
+        #t_all_n_depCal = tIDepCal[flagNDepCal]
+        #print(t_all_p_depCal)
+        #print(t_all_n_depCal)
 
 
     return depCal_P_Ang_time_start, depCal_P_Ang_time_end, depCal_N_Ang_time_start, depCal_N_Ang_time_end, maskDepCal
@@ -177,6 +179,19 @@ def pollyPreprocess(rawdata_dict, **param):
 
 
     data_dict = rawdata_dict.copy()
+
+    ## converting raw-mTime format from [YYYYMMDD seconds-of-day] to unixtimestamp-format
+    date_string = str(mTime[0][0])
+    seconds_of_day = mTime[:,1]
+    YYYY = int(date_string[:4])
+    MM = int(date_string[4:6])
+    DD = int(date_string[6:8])
+    datetime_obj = datetime.datetime(YYYY,MM,DD)
+    mTime_obj = [datetime_obj + datetime.timedelta(seconds=int(s)) for s in seconds_of_day]
+    mTime_str = [dt.strftime('%Y%m%d %H:%M:%S') for dt in mTime_obj]
+    # Convert to Unix timestamp
+    mTime_unixtimestamp = [int(time.mktime(dt.timetuple())) for dt in mTime_obj]
+
 
 
 
@@ -417,16 +432,16 @@ def pollyPreprocess(rawdata_dict, **param):
         nInt = np.round(mShotsPerPrf / np.nanmean(np.array(mShots[0, :])))
 
 
-    ## Deadtime correction
-    rawSignal = pollyDTCor(rawSignal = rawSignal,
-            mShots = mShots,
-            hRes = hRes, 
-            polly_device = pollyType,
-            flagDeadTimeCorrection = flagDeadTimeCorrection, 
-            DeadTimeCorrectionMode = deadtimeCorrectionMode,
-            deadtimeParams = deadtimeParams,
-            deadtime = rawdata_dict['deadtime_polynomial']['var_data']
-    )
+#    ## Deadtime correction
+#    rawSignal = pollyDTCor(rawSignal = rawSignal,
+#            mShots = mShots,
+#            hRes = hRes, 
+#            polly_device = pollyType,
+#            flagDeadTimeCorrection = flagDeadTimeCorrection, 
+#            DeadTimeCorrectionMode = deadtimeCorrectionMode,
+#            deadtimeParams = deadtimeParams,
+#            deadtime = rawdata_dict['deadtime_polynomial']['var_data']
+#    )
 
     ## Background Substraction
     rawSignal, bg =  pollyRemoveBG(rawSignal = rawSignal,
@@ -459,7 +474,7 @@ def pollyPreprocess(rawdata_dict, **param):
 
     ## Mask for polarization calibration
     logging.info('... mask for polarization calibration')
-    data_dict['depol_cal_ang_p_time_start'],data_dict['depol_cal_ang_p_time_end'],data_dict['depol_cal_ang_n_time_start'],data_dict['depol_cal_ang_n_time_end'],data_dict['depCalMask'] = pollyPolCaliTime(depCalAng=depCalAng, mTime=mTime, init_depAng=initialPolAngle, maskDepCalAng=maskPolCalAngle)
+    data_dict['depol_cal_ang_p_time_start'],data_dict['depol_cal_ang_p_time_end'],data_dict['depol_cal_ang_n_time_start'],data_dict['depol_cal_ang_n_time_end'],data_dict['depCalMask'] = pollyPolCaliTime(depCalAng=depCalAng, mTime=mTime_str, init_depAng=initialPolAngle, maskDepCalAng=maskPolCalAngle)
 
 #%% Mask for polarization calibration
 #[data.depol_cal_ang_p_time_start, data.depol_cal_ang_p_time_end, ...
