@@ -13,18 +13,11 @@ class PicassoProc:
         self.rawdata_dict = rawdata_dict
         self.polly_config_dict = polly_config_dict
         self.picasso_config_dict = picasso_config_dict
+        self.device = self.polly_config_dict['name']
+        self.location = self.polly_config_dict['site']
+        self.date = self.mdate_filename()
         self.num_of_channels = len(self.rawdata_dict['measurement_shots']['var_data'][0])
-
-    def msite(self):
-        #msite = f"measurement site: {self.rawdata_dict['global_attributes']['location']}"
-        msite = self.polly_config_dict['site']
-        logging.info(f'measurement site: {msite}')
-        return msite
-
-    def device(self):
-        device = self.polly_config_dict['name']
-        logging.info(f'measurement device: {device}')
-        return device
+        self.data_retrievals = {}
 
     def mdate_filename(self):
         filename = self.rawdata_dict['filename']
@@ -34,10 +27,21 @@ class PicassoProc:
         DD = mdate[2]
         return f"{YYYY}{MM}{DD}"
 
-    def mdate(self):
-        mdate = self.mdate_filename()
-        logging.info(f'measuremnt date: {mdate}')
-        return mdate
+#    def msite(self):
+#        #msite = f"measurement site: {self.rawdata_dict['global_attributes']['location']}"
+#        msite = self.polly_config_dict['site']
+#        logging.info(f'measurement site: {msite}')
+#        return msite
+#
+#    def device(self):
+#        device = self.polly_config_dict['name']
+#        logging.info(f'measurement device: {device}')
+#        return device
+#
+#    def mdate(self):
+#        mdate = self.mdate_filename()
+#        logging.info(f'measuremnt date: {mdate}')
+#        return mdate
 
     def mdate_infile(self):
         mdate_infilename = self.rawdata_dict['measurement_time']['var_data'][0][0]
@@ -99,11 +103,13 @@ class PicassoProc:
                                                                                flag607nmChannel=self.polly_config_dict['is607nm'],
                                                                                flag1064nmChannel=self.polly_config_dict['is1064nm']
                                                                                )
+        ChannelTags.remove("none")
+        self.data_retrievals['channel'] = ChannelTags
         self.polly_config_dict['channelTags'] = ChannelTags
         return self
 
     def preprocessing(self):
-        pollyPreprocess.pollyPreprocess(self.rawdata_dict,
+        preproc_dict = pollyPreprocess.pollyPreprocess(self.rawdata_dict,
                 deltaT=self.polly_config_dict['deltaT'],
                 flagForceMeasTime = self.polly_config_dict['flagForceMeasTime'],
                 maxHeightBin = self.polly_config_dict['max_height_bin'],
@@ -137,19 +143,10 @@ class PicassoProc:
                 flag355nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is355nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
                 flag532nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is532nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
                 flag1064nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is1064nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
-
-#                flagFarRangeChannel = data.flagFarRangeChannel'],
-#                flag532nmChannel = data.flag532nmChannel,
-#                flagTotalChannel = data.flagTotalChannel,
-#                flag355nmChannel = data.flag355nmChannel,
-#                flag607nmChannel = data.flag607nmChannel,
-#                flag387nmChannel = data.flag387nmChannel,
-#                flag407nmChannel = data.flag407nmChannel,
-#                flag355nmRotRaman = data.flag355nmChannel & data.flagRotRamanChannel,
-#                flag532nmRotRaman = data.flag532nmChannel & data.flagRotRamanChannel,
-#                flag1064nmRotRaman = data.flag1064nmChannel & data.flagRotRamanChannel,
                 isUseLatestGDAS = self.polly_config_dict['flagUseLatestGDAS'],
                 )
+        self.data_retrievals.update(preproc_dict)
+
         return self
 
 #    def __str__(self):

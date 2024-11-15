@@ -145,7 +145,7 @@ def pollyPolCaliTime(depCalAng, mTime, init_depAng, maskDepCalAng):
         #flagIDepCal = (depCalPeriods == iDepCalPeriod) # flag for the ith calibration period.
         flagIDepCal = depCalPeriods[depCalPeriods == iDepCalPeriod] # flag for the ith calibration period.
         indices = np.where(depCalPeriods == flagIDepCal[0])[0]
-        print(flagIDepCal)
+        #print(flagIDepCal)
 
         if len(flagIDepCal) != len(maskDepCalAng):
             logging.warning(f"Depolarization Calibration from Timestamp "
@@ -183,7 +183,8 @@ def pollyPreprocess(rawdata_dict, **param):
     mSite = rawdata_dict['global_attributes']['location']
 
 
-    data_dict = rawdata_dict.copy()
+    #data_dict = rawdata_dict.copy()
+    data_dict = {}
     
     ## print all of the large arrays to screen, not only starts and ends of an array
     np.set_printoptions(threshold=np.inf)
@@ -463,15 +464,18 @@ def pollyPreprocess(rawdata_dict, **param):
     logging.info('... height bin calculations')
     data_dict['height'] = np.arange(0, rawSignal.shape[1]) * hRes * np.cos(zenithAng*np.pi/180) + firstBinHeight
     data_dict['alt'] = data_dict['height'] + float(asl) ## geopotential height
+    data_dict['time'] = mTime_unixtimestamp
 
     ## Mask for bins with low SNR
     logging.info('... mask bins with low SNR')
     tot = rawSignal + 2 * bg
     tot[tot <= 0] = np.nan
+    data_dict['BG'] = bg
 
     SNR = rawSignal / np.sqrt(tot)
     SNR[SNR <= 0] = 0
     SNR[np.isnan(SNR)] = 0
+    data_dict['SNR'] = SNR
     #print(SNR)
     ## create mask and mask every entry, where SNR < minSNRThresh
     data_dict['lowSNRMask'] = np.ma.array(np.zeros(rawSignal.shape, dtype=bool), mask=np.ones(rawSignal.shape, dtype=bool))
@@ -485,11 +489,11 @@ def pollyPreprocess(rawdata_dict, **param):
     logging.info('... mask for polarization calibration')
     data_dict['depol_cal_ang_p_time_start'],data_dict['depol_cal_ang_p_time_end'],data_dict['depol_cal_ang_n_time_start'],data_dict['depol_cal_ang_n_time_end'],data_dict['depCalMask'] = pollyPolCaliTime(depCalAng=depCalAng, mTime=mTime_str, init_depAng=initialPolAngle, maskDepCalAng=maskPolCalAngle)
 
-    print(data_dict['depol_cal_ang_p_time_start'])
-    print(data_dict['depol_cal_ang_p_time_end'])
-    print(data_dict['depol_cal_ang_n_time_start'])
-    print(data_dict['depol_cal_ang_n_time_end'])
-    print(data_dict['depCalMask'])
+#    print(data_dict['depol_cal_ang_p_time_start'])
+#    print(data_dict['depol_cal_ang_p_time_end'])
+#    print(data_dict['depol_cal_ang_n_time_start'])
+#    print(data_dict['depol_cal_ang_n_time_end'])
+#    print(data_dict['depCalMask'])
 
 #%% Mask for polarization calibration
 #[data.depol_cal_ang_p_time_start, data.depol_cal_ang_p_time_end, ...
@@ -500,6 +504,9 @@ def pollyPreprocess(rawdata_dict, **param):
 
 
     logging.info('finished data preprocessing.')
+
+    return data_dict
+
 
 #
 #%% Temperature effect correction (for Raman signal)

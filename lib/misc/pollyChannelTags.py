@@ -9,7 +9,7 @@ def pollyChannelTags(chTagsIn:list, **Channels) -> list:
     if len(chTagsIn) != 0:
         chTagsOut_ls = chTagsIn
         logging.info(f'ChannelLabels: {chTagsOut_ls}')
-        return chTagsOut
+        return chTagsOut_ls
 
     elif len(chTagsIn) == 0:
 
