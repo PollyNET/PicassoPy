@@ -11,8 +11,8 @@ import lib.io.readPollyRawData as readPollyRawData
 import lib.interface.picassoProc as picassoProc
 import lib.misc.helper as helper
 import lib.misc.startscreen as startscreen
+import lib.misc.json2nc_mapping as json2nc_mapping
 
-from trosat import cfconv as cf
 
 ## getting root dir of PicassoPy
 root_dir0 = Path(__file__).resolve().parent.parent
@@ -134,96 +134,45 @@ data_cube.check_for_correct_mshots()
 ## setting channelTags
 data_cube.setChannelTags()
 #data_cube= data_cube.reset_date_infile()
-
 ## preprocessing
-data_cube.preprocessing()
+#data_cube.preprocessing()
 #print(data_cube.rawdata_dict.keys())
-print(data_cube.data_retrievals.keys())
+#print(data_cube.data_retrievals.keys())
 
+prod = "SNR"
+json_nc_mapping_dict = {}
+if prod in polly_config_dict["prodSaveList"]:
+    json_nc_mapping_dict[prod] = json2nc_mapping.read_json_to_dict(Path(root_dir,'lib','config',f'json2nc-mapper_{prod}.json'))
+
+template_long_name = json_nc_mapping_dict[prod]['variables'][prod]['attributes']['long_name']
+template_standard_name = json_nc_mapping_dict[prod]['variables'][prod]['attributes']['standard_name']
+
+for ch in data_cube.polly_config_dict['channelTags']:
+    ch = ch.replace(" ", "") ##remove whitespaces
+    var_key = f"{prod}_{ch}"
+    json2nc_mapping.add_variable_2_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], new_key=var_key, reference_key=prod, new_data = None, new_attributes=None)
+#for var in json_nc_mapping_dict[prod]['variables']:
+#    print(var,json_nc_mapping_dict[prod]['variables'][var])
+#    json2nc_mapping.update_variable_attribute_of_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], variable_key=var_key, attribute_key='long_name', new_value=f'{template_long_name} {ch}')
+#    json2nc_mapping.update_variable_attribute_of_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], variable_key=var_key, attribute_key='standard_name', new_value=f'{template_standard_name}_{ch}')
+#    print(var_key,json_nc_mapping_dict[prod]['variables'][var_key]['attributes']['long_name'])
+var_key_ls = ['SNR_FR-total-532nm','SNR_FR-total-355nm']
+for var_key in var_key_ls:
+    json_nc_mapping_dict[prod]['variables'][var_key]['attributes']['standard_name'] = f"{template_standard_name}_{var_key}"
+#    json2nc_mapping.update_variable_attribute_of_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], variable_key=var_key, attribute_key='standard_name', new_value=f"{template_standard_name}_{var_key}")
+    print(json_nc_mapping_dict[prod]['variables'][var_key]['attributes']['standard_name'])
+for var_key in var_key_ls:
+    print(var_key)
+    print(json_nc_mapping_dict[prod]['variables'][var_key])
+#for var in json_nc_mapping_dict[prod]['variables']:
+#    print(var,json_nc_mapping_dict[prod]['variables'][var])
 import json
-from netCDF4 import Dataset
-import numpy as np
+#print(json.dumps(json_nc_mapping_dict[prod], indent=4, sort_keys=False))
+exit()
 
-def create_netcdf_from_dict(nc_file_path, data_dict):
-    """
-    Creates a NetCDF file from a structured dictionary.
-    
-    Args:
-        nc_file_path (str): Path to the NetCDF file to create.
-        data_dict (dict): Dictionary with keys 'global_attributes', 'dimensions', and 'variables'.
-        
-    Example of `data_dict` structure:
-    {
-        "global_attributes": {
-            "title": "Example NetCDF File",
-            "institution": "My Organization"
-        },
-        "dimensions": {
-            "time": None,  # Unlimited dimension
-            "lat": 10,
-            "lon": 20
-        },
-        "variables": {
-            "temperature": {
-                "dimensions": ("time", "lat", "lon"),
-                "dtype": "float32",
-                "attributes": {
-                    "units": "K",
-                    "long_name": "Surface temperature"
-                },
-                "data": np.random.rand(5, 10, 20)  # Example data
-            },
-            "pressure": {
-                "dimensions": ("time", "lat", "lon"),
-                "dtype": "float32",
-                "attributes": {
-                    "units": "Pa",
-                    "long_name": "Surface pressure"
-                },
-                "data": np.random.rand(5, 10, 20)  # Example data
-            }
-        }
-    }
-    """
-    # Create a new NetCDF file
-    with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file:
-        # Add global attributes
-        if 'global_attributes' in data_dict:
-            for attr_name, attr_value in data_dict['global_attributes'].items():
-                setattr(nc_file, attr_name, attr_value)
-        
-        # Define dimensions
-        if 'dimensions' in data_dict:
-            for dim_name, dim_size in data_dict['dimensions'].items():
-                nc_file.createDimension(dim_name, dim_size)
-        
-        # Define variables and add data
-        if 'variables' in data_dict:
-            for var_name, var_info in data_dict['variables'].items():
-                # Extract variable metadata
-                dimensions = var_info['shape']
-                dtype = var_info['dtype']
-                attributes = var_info.get('attributes', {})
-                data = var_info.get('data')
-                
-                # Create variable
-                var = nc_file.createVariable(var_name, dtype, dimensions)
-                
-                # Add variable attributes
-                for attr_name, attr_value in attributes.items():
-                    setattr(var, attr_name, attr_value)
-                
-                # Add variable data (if provided)
-                if data is not None:
-                    print(var_name)
-                    var[:] = data
+json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], key_to_remove=prod)
 
-def read_json_to_dict(file_path):
-    with open(file_path, 'r') as file:
-        data = json.load(file)  # Parse JSON into a dictionary
-    return data
-
-json_nc_mapping_monitoring_dict = read_json_to_dict(Path(root_dir,'lib','config','polly_retrievals_meta_monitoring.json'))
+#json_nc_mapping_monitoring_dict = json2nc_mapping.read_json_to_dict(Path(root_dir,'lib','config','polly_retrievals_meta_monitoring.json'))
 
 """ set dimension sizes """
 print(data_cube.data_retrievals['BG'].shape)
@@ -239,6 +188,6 @@ for v in json_nc_mapping_monitoring_dict['variables']:
             json_nc_mapping_monitoring_dict['variables'][v]['data'] = data_cube.data_retrievals[v]
 print(json_nc_mapping_monitoring_dict['dimensions'])
 """ Create the NetCDF file """
-create_netcdf_from_dict("example.nc", json_nc_mapping_monitoring_dict)
+json2nc_mapping.create_netcdf_from_dict("example.nc", json_nc_mapping_monitoring_dict)
 
 #print(data_cube.picasso_config_dict)
