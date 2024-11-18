@@ -3,6 +3,7 @@ import sys
 import os
 import argparse
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import json
 from pathlib import Path
 from log import logger
 #from lib.io.loadConfigs import *
@@ -147,27 +148,18 @@ if prod in polly_config_dict["prodSaveList"]:
 template_long_name = json_nc_mapping_dict[prod]['variables'][prod]['attributes']['long_name']
 template_standard_name = json_nc_mapping_dict[prod]['variables'][prod]['attributes']['standard_name']
 
+
 for ch in data_cube.polly_config_dict['channelTags']:
     ch = ch.replace(" ", "") ##remove whitespaces
+    ch = ch.replace("-", "_")
     var_key = f"{prod}_{ch}"
-    json2nc_mapping.add_variable_2_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], new_key=var_key, reference_key=prod, new_data = None, new_attributes=None)
-#for var in json_nc_mapping_dict[prod]['variables']:
-#    print(var,json_nc_mapping_dict[prod]['variables'][var])
-#    json2nc_mapping.update_variable_attribute_of_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], variable_key=var_key, attribute_key='long_name', new_value=f'{template_long_name} {ch}')
-#    json2nc_mapping.update_variable_attribute_of_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], variable_key=var_key, attribute_key='standard_name', new_value=f'{template_standard_name}_{ch}')
-#    print(var_key,json_nc_mapping_dict[prod]['variables'][var_key]['attributes']['long_name'])
-var_key_ls = ['SNR_FR-total-532nm','SNR_FR-total-355nm']
-for var_key in var_key_ls:
-    json_nc_mapping_dict[prod]['variables'][var_key]['attributes']['standard_name'] = f"{template_standard_name}_{var_key}"
-#    json2nc_mapping.update_variable_attribute_of_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], variable_key=var_key, attribute_key='standard_name', new_value=f"{template_standard_name}_{var_key}")
+    json_nc_mapping_dict[prod]['variables'][var_key] = json_nc_mapping_dict[prod]['variables'][prod].copy()
+#    json2nc_mapping.add_variable_2_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], new_key=var_key, reference_key=prod, new_data = None, new_attributes=None)
+    json_nc_mapping_dict[prod]['variables'][var_key]['attributes']['standard_name'] = f"{template_standard_name}_{ch}"
+    json_nc_mapping_dict[prod]['variables'][var_key]['attributes']['long_name'] = f"{template_long_name} {ch}"
     print(json_nc_mapping_dict[prod]['variables'][var_key]['attributes']['standard_name'])
-for var_key in var_key_ls:
-    print(var_key)
-    print(json_nc_mapping_dict[prod]['variables'][var_key])
-#for var in json_nc_mapping_dict[prod]['variables']:
-#    print(var,json_nc_mapping_dict[prod]['variables'][var])
-import json
-#print(json.dumps(json_nc_mapping_dict[prod], indent=4, sort_keys=False))
+print(json_nc_mapping_dict.keys())
+print(json.dumps(json_nc_mapping_dict[prod], indent=4, sort_keys=False))
 exit()
 
 json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], key_to_remove=prod)
@@ -182,10 +174,7 @@ for d in json_nc_mapping_monitoring_dict['dimensions']:
 for v in json_nc_mapping_monitoring_dict['variables']:
     if v in data_cube.data_retrievals.keys():
         print(v,len(data_cube.data_retrievals[v]))
-        if v == "channel":
-            json_nc_mapping_monitoring_dict['variables'][v]['data'] = [i for i in range(len(data_cube.data_retrievals['channel'])) ]
-        else:
-            json_nc_mapping_monitoring_dict['variables'][v]['data'] = data_cube.data_retrievals[v]
+        json_nc_mapping_monitoring_dict['variables'][v]['data'] = data_cube.data_retrievals[v]
 print(json_nc_mapping_monitoring_dict['dimensions'])
 """ Create the NetCDF file """
 json2nc_mapping.create_netcdf_from_dict("example.nc", json_nc_mapping_monitoring_dict)
