@@ -580,3 +580,36 @@ def concat_files(timestamp,device,raw_folder,output_path):
     print('done!')
     return destination_file
 
+def remove_whitespaces_and_replace_dash_with_underscore(string):
+    new_string  = string.replace(" ", "").replace("-", "_")
+    return new_string
+
+def find_matching_dimension(array, reference_list):
+    """
+    Finds the dimension of a 3D array that matches the length of the reference list.
+
+    Args:
+        array (np.ndarray): The 3D NumPy array to check.
+        reference_list (list): The list to compare the dimension lengths with. This can also be a dict.
+
+    Returns:
+        int: The index of the matching dimension, or -1 if no match is found.
+    """
+    list_length = len(reference_list)
+    for dim_index, dim_size in enumerate(array.shape):
+        if dim_size == list_length:
+            return dim_index
+    return -1  # No matching dimension found
+
+def channel_2_variable_mapping(data_retrievals, var, channeltags_dict):
+    ## check length of channeltags_dict vs. length of data_retrievals[var].shape
+    channel_dim = find_matching_dimension(array=data_retrievals[var], reference_list=channeltags_dict)
+    for ch in channeltags_dict.keys():
+        ch_mod =remove_whitespaces_and_replace_dash_with_underscore(string=channeltags_dict[ch])
+        if channel_dim == 0:
+            data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][ch,:,:]
+        elif channel_dim == 1:
+            data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:,ch,:]
+        elif channel_dim == 2:
+            data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:,:,ch]
+

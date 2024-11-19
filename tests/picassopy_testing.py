@@ -113,14 +113,6 @@ rawdata_dict = readPollyRawData.readPollyRawData(filename=rawfile)
 ## initate picasso-object from class PicassoProc
 data_cube = picassoProc.PicassoProc(rawdata_dict,polly_config_dict,picasso_config_dict)
 
-## measurement site
-#data_cube.msite()
-
-## measurement date
-#data_cube.mdate()
-
-## measurement device
-#data_cube.device()
 #print(data_cube.device)
 #print(data_cube.location)
 #print(data_cube.date)
@@ -134,71 +126,38 @@ data_cube.check_for_correct_mshots()
 
 ## setting channelTags
 data_cube.setChannelTags()
+#print(data_cube.polly_config_dict['channelTags'])
+#print(data_cube.channel_dict)
+
 #data_cube= data_cube.reset_date_infile()
+
 ## preprocessing
 data_cube.preprocessing()
 #print(data_cube.rawdata_dict.keys())
 #print(data_cube.data_retrievals.keys())
 
-prod = "SNR"
-json_nc_mapping_dict = {}
-if prod in polly_config_dict["prodSaveList"]:
-    #json_nc_mapping_dict[prod] = json2nc_mapping.read_json_to_dict(Path(root_dir,'lib','config',f'json2nc-mapper_{prod}_simple.json'))
-    json_nc_mapping_dict[prod] = json2nc_mapping.read_json_to_dict(Path(root_dir,'lib','config',f'json2nc-mapper_{prod}.json'))
 
-#template_long_name = json_nc_mapping_dict[prod]['variables'][prod]['attributes']['long_name']
-#template_standard_name = json_nc_mapping_dict[prod]['variables'][prod]['attributes']['standard_name']
+## creating monitoring nc-files
+prod_ls = ["SNR","BG","RCS"]
+for prod in prod_ls:
+    json_nc_mapping_dict = {}
+    if prod in polly_config_dict["prodSaveList"]:
+        json_nc_mapping_dict[prod] = json2nc_mapping.read_json_to_dict(Path(root_dir,'lib','config',f'json2nc-mapper_{prod}.json'))
+    helper.channel_2_variable_mapping(data_retrievals=data_cube.data_retrievals, var=prod, channeltags_dict=data_cube.channel_dict)
+    
+    """ set dimension sizes """
+    for d in json_nc_mapping_dict[prod]['dimensions']:
+        json_nc_mapping_dict[prod]['dimensions'][d] = len(data_cube.data_retrievals[d])
+    
+    """ fill variables """
+    for v in list(json_nc_mapping_dict[prod]['variables'].keys()):
+    #for v in json_nc_mapping_dict[prod]['variables'].keys():
+        if v in data_cube.data_retrievals.keys():
+            json_nc_mapping_dict[prod]['variables'][v]['data'] = data_cube.data_retrievals[v]
+    ### TODO: remove empty key-value-pairs
+        if json_nc_mapping_dict[prod]['variables'][v]['data'] is None:
+            json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], key_to_remove=v)
 
-#keys2remove = []
-#for product in json_nc_mapping_dict[prod]['variables'].keys():
-#    p = product.replace(" ", "").replace("-", "_")
-#    if pr in data_cube.polly_config_dict['channelTags']:
-#        pass
-#    keys2remove.append(product)
-#
-#print(keys2remove)
-#for k in keys2remove:
-#    json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], key_to_remove=k)
+    """ Create the NetCDF file """
+    json2nc_mapping.create_netcdf_from_dict(f"{data_cube.date}_{data_cube.device}_{prod}.nc", json_nc_mapping_dict[prod])
 
-
-#for ch in data_cube.polly_config_dict['channelTags']:
-#    ch = ch.replace(" ", "") ##remove whitespaces
-#    ch = ch.replace("-", "_")
-#    var_key = f"{prod}_{ch}"
-#    json_nc_mapping_dict[prod]['variables'][var_key] = json_nc_mapping_dict[prod]['variables'][prod].copy()
-##    json2nc_mapping.add_variable_2_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], new_key=var_key, reference_key=prod, new_data = None, new_attributes=None)
-#    json_nc_mapping_dict[prod]['variables'][var_key]['attributes']['standard_name'] = f"{template_standard_name}_{ch}"
-#    json_nc_mapping_dict[prod]['variables'][var_key]['attributes']['long_name'] = f"{template_long_name} {ch}"
-#    print(json_nc_mapping_dict[prod]['variables'][var_key]['attributes']['standard_name'])
-#print(json_nc_mapping_dict.keys())
-#print(json.dumps(json_nc_mapping_dict[prod], indent=4, sort_keys=False))
-#exit()
-
-
-#json_nc_mapping_monitoring_dict = json2nc_mapping.read_json_to_dict(Path(root_dir,'lib','config','polly_retrievals_meta_monitoring.json'))
-
-""" set dimension sizes """
-for d in json_nc_mapping_dict[prod]['dimensions']:
-    json_nc_mapping_dict[prod]['dimensions'][d] = len(data_cube.data_retrievals[d])
-
-#print(json.dumps(json_nc_mapping_dict[prod], indent=4, sort_keys=False))
-json_nc_mapping_monitoring_dict['variables']['time']['data'] = data_cube.data_retrievals[prod]['timestamp']
-json_nc_mapping_monitoring_dict['variables']['height']['data'] = data_cube.data_retrievals[prod]['height']
-for n,v in enumerate(json_nc_mapping_dict['variables'].keys()):
-    print(v,len(data_cube.data_retrievals[prod][:,:,n]))
-    #json_nc_mapping_monitoring_dict['variables'][v]['data'] = data_cube.data_retrievals[v]
-    if len(json_nc_mapping_dict['variables'][v]['data']) == 0:
-        json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], key_to_remove=v)
- 
-""" Create the NetCDF file """
-json2nc_mapping.create_netcdf_from_dict("example.nc", json_nc_mapping_monitoring_dict)
-
-#for v in json_nc_mapping_monitoring_dict['variables']:
-#    if v in data_cube.data_retrievals.keys():
-#        print(v,len(data_cube.data_retrievals[v]))
-#        json_nc_mapping_monitoring_dict['variables'][v]['data'] = data_cube.data_retrievals[v]
-#print(json_nc_mapping_monitoring_dict['dimensions'])
-#""" Create the NetCDF file """
-#json2nc_mapping.create_netcdf_from_dict("example.nc", json_nc_mapping_monitoring_dict)
-
-#print(data_cube.picasso_config_dict)

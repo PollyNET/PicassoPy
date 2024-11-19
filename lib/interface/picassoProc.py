@@ -106,6 +106,7 @@ class PicassoProc:
         ChannelTags.remove("none")
         self.data_retrievals['channel'] = ChannelTags
         self.polly_config_dict['channelTags'] = ChannelTags
+        self.channel_dict = {i: item for i, item in enumerate(ChannelTags)}
         return self
 
     def preprocessing(self):
