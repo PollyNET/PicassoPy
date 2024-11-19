@@ -72,13 +72,14 @@ class PicassoProc:
 
     def mdate_consistency(self) -> bool:
         if self.mdate_filename() == self.mdate_infile():
-            logging.info('date in nc-file equals date of filename')
+            logging.info('... date in nc-file equals date of filename')
             return True
         else:
-            logging.warning('date in nc-file differs from date of filename')
+            logging.warning('... date in nc-file differs from date of filename')
             return False
 
     def reset_date_infile(self):
+        logging.info('date consistency-check... ')
         if self.mdate_consistency() == False:
             logging.info('date in nc-file will be replaced with date of filename.')
             np_array = np.array(self.rawdata_dict['measurement_time']['var_data']) ## converting to numpy-array for easier numpy-operations

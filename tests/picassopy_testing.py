@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import json
 from pathlib import Path
 from log import logger
+import logging
 #from lib.io.loadConfigs import *
 import lib.io.loadConfigs as loadConfigs
 import lib.io.readPollyRawData as readPollyRawData
@@ -129,7 +130,8 @@ data_cube.setChannelTags()
 #print(data_cube.polly_config_dict['channelTags'])
 #print(data_cube.channel_dict)
 
-#data_cube= data_cube.reset_date_infile()
+## check for correct date in nc-file
+data_cube.reset_date_infile()
 
 ## preprocessing
 data_cube.preprocessing()
@@ -143,21 +145,26 @@ for prod in prod_ls:
     json_nc_mapping_dict = {}
     if prod in polly_config_dict["prodSaveList"]:
         json_nc_mapping_dict[prod] = json2nc_mapping.read_json_to_dict(Path(root_dir,'lib','config',f'json2nc-mapper_{prod}.json'))
-    helper.channel_2_variable_mapping(data_retrievals=data_cube.data_retrievals, var=prod, channeltags_dict=data_cube.channel_dict)
-    
-    """ set dimension sizes """
-    for d in json_nc_mapping_dict[prod]['dimensions']:
-        json_nc_mapping_dict[prod]['dimensions'][d] = len(data_cube.data_retrievals[d])
-    
-    """ fill variables """
-    for v in list(json_nc_mapping_dict[prod]['variables'].keys()):
-    #for v in json_nc_mapping_dict[prod]['variables'].keys():
-        if v in data_cube.data_retrievals.keys():
-            json_nc_mapping_dict[prod]['variables'][v]['data'] = data_cube.data_retrievals[v]
-    ### TODO: remove empty key-value-pairs
-        if json_nc_mapping_dict[prod]['variables'][v]['data'] is None:
-            json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], key_to_remove=v)
 
-    """ Create the NetCDF file """
-    json2nc_mapping.create_netcdf_from_dict(f"{data_cube.date}_{data_cube.device}_{prod}.nc", json_nc_mapping_dict[prod])
+        """ map channels to variables """
+        helper.channel_2_variable_mapping(data_retrievals=data_cube.data_retrievals, var=prod, channeltags_dict=data_cube.channel_dict)
+        
+        """ set dimension sizes """
+        for d in json_nc_mapping_dict[prod]['dimensions']:
+            json_nc_mapping_dict[prod]['dimensions'][d] = len(data_cube.data_retrievals[d])
+        
+        """ fill variables """
+        for v in list(json_nc_mapping_dict[prod]['variables'].keys()):
+        #for v in json_nc_mapping_dict[prod]['variables'].keys():
+            if v in data_cube.data_retrievals.keys():
+                json_nc_mapping_dict[prod]['variables'][v]['data'] = data_cube.data_retrievals[v]
+        ### TODO: remove empty key-value-pairs
+            if json_nc_mapping_dict[prod]['variables'][v]['data'] is None:
+                json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], key_to_remove=v)
+    
+        """ Create the NetCDF file """
+        output_filename = Path(picasso_config_dict["results_folder"],f"{data_cube.date}_{data_cube.device}_{prod}.nc")
+        json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict[prod])
+    else:
+        logging.warning(f"No product of type '{prod}' found in prodSaveList-key of polly-config-file")
 

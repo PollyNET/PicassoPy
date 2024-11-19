@@ -80,7 +80,7 @@ def pollyRemoveBG(rawSignal,**varargin):
     firstBinIndex = varargin.get('firstBinIndex', 1)
     bgCorrectionIndex = varargin.get('bgCorrectionIndex', [1, 2])
 
-    logging.info(f'... Removing background from signal')
+    logging.info(f'... removing background from signal')
 
     #print(maxHeightBin,firstBinIndex,bgCorrectionIndex)
 
@@ -183,7 +183,6 @@ def calculate_rcs(datasignal,data_dict,mShots,hRes):
         np.ndarray: Computed RCS array.
     """
 
-    logging.info('calculate Range-corrected Signal')
     mShots_transposed = mShots.T 
     mShots_broadcasted = np.expand_dims(mShots, axis=1)
     
@@ -519,6 +518,7 @@ def pollyPreprocess(rawdata_dict, **param):
 #data.depCalMask = transpose(depCalMask);
 
     ## Range-corrected Signal calculation
+    logging.info('... calculate range-corrected Signal')
     mask = data_dict['lowSNRMask'].mask
     RCS_masked = np.ma.masked_array(preproSignal,mask=mask)
 #    data_dict['RCS'] = calculate_rcs(datasignal=preproSignal,data_dict=data_dict,mShots=mShots,hRes=hRes)
