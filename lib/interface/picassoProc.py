@@ -104,7 +104,9 @@ class PicassoProc:
                                                                                flag607nmChannel=self.polly_config_dict['is607nm'],
                                                                                flag1064nmChannel=self.polly_config_dict['is1064nm']
                                                                                )
-        ChannelTags.remove("none")
+        if 'none' in ChannelTags:
+            ChannelTags.remove("none")
+        ##TODO sometimes the channel tag is also 'unknown'
         self.data_retrievals['channel'] = ChannelTags
         self.polly_config_dict['channelTags'] = ChannelTags
         self.channel_dict = {i: item for i, item in enumerate(ChannelTags)}

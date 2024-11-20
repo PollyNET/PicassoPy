@@ -29,6 +29,7 @@ dependencies = [
   "netCDF4",
   "xarray",
   "pandas",
+  "openpyxl", # might be an optional dependency
 ]
 
 [tool.setuptools.packages]
