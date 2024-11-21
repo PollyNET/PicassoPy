@@ -21,15 +21,14 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
     Nchannels = mShots.shape[1]
 
     ## reshape 2-dim matrix mShots to 3-dim matrix
-    #print(mShots.shape)
-    reshaped_mShots = np.expand_dims(mShots, axis=1)
-    broadcasted_mShots = np.tile(reshaped_mShots, (1, rawSignal.shape[1], 1))
+    #reshaped_mShots = np.expand_dims(mShots, axis=1)
+    #broadcasted_mShots = np.tile(reshaped_mShots, (1, rawSignal.shape[1], 1))
     scale_factor = 150.0 / hRes
 
     ## Deadtime correction
     if flagDeadTimeCorrection:
-        PCR = rawSignal / broadcasted_mShots * scale_factor ##convert photon counts to Photon-Count-Rate PCR [MHz]
-        #PCR_Cor = np.zeros_like(PCR)
+        PCR = rawSignal / mShots[:, np.newaxis, :] * scale_factor
+        #PCR = rawSignal / broadcasted_mShots * scale_factor ##convert photon counts to Photon-Count-Rate PCR [MHz]
 
         ## polynomial correction with parameters saved in the level0 netcdf-file under variable 'deadtime_polynomial'
         if DeadTimeCorrectionMode == 1:
@@ -57,7 +56,8 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
                 for iCh in range(Nchannels):
                     # Evaluate the polynomial for the current channel
                     PCR_Cor = np.polyval(coeffs_matrix[iCh], PCR[:, :, iCh])
-                    signal_out[:, :, iCh] = PCR_Cor * broadcasted_mShots[:, :, iCh] / scale_factor
+                    #signal_out[:, :, iCh] = PCR_Cor * broadcasted_mShots[:, :, iCh] / scale_factor
+                    signal_out[:, :, iCh] = PCR_Cor * mShots[:, np.newaxis, iCh] / scale_factor
             else:
                 logging.warning(f'User defined deadtime parameters were not found in polly-config file.')
                 logging.warning(f'In order to continue the current processing, deadtime correction will not be implemented.')
