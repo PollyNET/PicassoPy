@@ -36,7 +36,8 @@ def detect_path_type(fullpath):
         path_object = Path(fullpath)
         return path_object
     else:
-        return "Unknown OS-type"
+        # that happens if no folders are given
+        return Path(fullpath)
 
 def os_name():
     return platform.system()

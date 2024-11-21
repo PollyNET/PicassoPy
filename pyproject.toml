@@ -1,0 +1,36 @@
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel", 
+            ]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "PicassoPy"
+version = "0.1.1"
+authors = [
+  { name="Andi Klamt", email="klamt@tropos.de" },
+]
+description='Data cube for handling atmospheric observations of profiling remote sensing instruments.'
+requires-python = ">=3.8"
+license = {text = "MIT License"}
+classifiers = [
+  'Development Status :: 1 - Planning',
+  'Intended Audience :: Science/Research',
+  'License :: OSI Approved :: BSD License',  
+  'Operating System :: POSIX :: Linux',        
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3.8',
+]
+readme = 'README.md'
+dependencies = [
+  "numpy", 
+  "scipy",
+  "netCDF4",
+  "xarray",
+  "pandas",
+  "openpyxl", # might be an optional dependency
+]
+
+[tool.setuptools.packages]
+find = {}
