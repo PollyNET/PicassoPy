@@ -37,7 +37,8 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
                 coeffs = deadtime[:, iCh][::-1]
                 # Evaluate the polynomial at each value in the PCR_values matrix
                 PCR_Cor = np.polyval(coeffs, PCR[:, :, iCh])
-                signal_out[:, :, iCh] = PCR_Cor / scale_factor * broadcasted_mShots[:, :, iCh]
+                #signal_out[:, :, iCh] = PCR_Cor / scale_factor * broadcasted_mShots[:, :, iCh]
+                siignal_out[:, :, iCh] = PCR_Cor / scale_factor * mShots[:, np.newaxis, iCh]
 
 
         ## nonparalyzable correction: PCR_cor = PCR / (1 - tau*PCR), with tau beeing the dead-time
@@ -45,7 +46,8 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
         elif DeadTimeCorrectionMode == 2:
             for iCh in range(0,Nchannels):
                 PCR_Cor = PCR[:, :, iCh] / (1.0 - deadtimeParams[iCh][0] * 10**(-3) * PCR[:, :, iCh])
-                signal_out[:, :, iCh] = PCR_Cor / scale_factor * broadcasted_mShots[:, :, iCh]
+                #signal_out[:, :, iCh] = PCR_Cor / scale_factor * broadcasted_mShots[:, :, iCh]
+                signal_out[:, :, iCh] = PCR_Cor / scale_factor * mShots[:, np.newaxis, iCh]
 
 
         ## user defined deadtime, reading from polly-config file under key 'dT' (the whole matrix, polynome) 
