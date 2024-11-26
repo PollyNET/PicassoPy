@@ -4,6 +4,7 @@ import numpy as np
 import logging
 import lib.misc.pollyChannelTags as pollyChannelTags
 import lib.preprocess.pollyPreprocess as pollyPreprocess
+import lib.qc.pollySaturationDetect as pollySaturationDetect
 
 class PicassoProc:
     counter = 0
@@ -17,6 +18,7 @@ class PicassoProc:
         self.location = self.polly_config_dict['site']
         self.date = self.mdate_filename()
         self.num_of_channels = len(self.rawdata_dict['measurement_shots']['var_data'][0])
+        self.num_of_profiles = self.rawdata_dict['raw_signal']['var_data'].shape[0]
         self.data_retrievals = {}
 
     def mdate_filename(self):
@@ -150,6 +152,12 @@ class PicassoProc:
                 isUseLatestGDAS = self.polly_config_dict['flagUseLatestGDAS'],
                 )
         self.data_retrievals.update(preproc_dict)
+
+        return self
+
+    def pollySaturationDetect(self):
+
+        pollySaturationDetect.pollySaturationDetect(data_cube=self)
 
         return self
 
