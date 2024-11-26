@@ -4,6 +4,53 @@ import datetime
 import time
 import itertools
 from scipy.ndimage import label
+from multiprocessing import Pool, cpu_count
+#from lib.preprocess.optimized_polyval import process_signal
+#from lib.preprocess.compute_pcr import compute_pcr
+#import numpy as np
+#from multiprocessing import Pool, cpu_count
+
+def compute_channel_pcr(args):
+    """
+    Computes PCR for a single channel.
+
+    Parameters:
+        args: Tuple containing (rawSignal, mShots, scale_factor, channel_index).
+
+    Returns:
+        np.ndarray: Computed PCR for the given channel.
+    """
+    rawSignal, mShots, scale_factor, ch = args
+    return (rawSignal[:, :, ch] / mShots[:, np.newaxis, ch]) * scale_factor
+
+def compute_pcr_parallel(rawSignal, mShots, scale_factor):
+    """
+    Computes PCR using multiprocessing for channel-wise parallelism.
+
+    Parameters:
+        rawSignal: 3D input array (shape: [M, N, P]).
+        mShots: 2D multiplicative factors array (shape: [M, P]).
+        scale_factor: Scaling factor for the computation.
+
+    Returns:
+        np.ndarray: 3D output array (PCR) with the same shape as rawSignal.
+    """
+    M, N, P = rawSignal.shape
+    PCR = np.zeros((M, N, P), dtype=np.float64)
+
+    # Prepare arguments for each channel
+    args = [(rawSignal, mShots, scale_factor, ch) for ch in range(P)]
+
+    # Use a pool of workers to compute each channel in parallel
+    with Pool(processes=min(cpu_count(), P)) as pool:
+        results = pool.map(compute_channel_pcr, args)
+
+    # Collect the results
+    for ch, result in enumerate(results):
+        PCR[:, :, ch] = result
+
+    return PCR
+
 
 #@profile
 def pollyDTCor(rawSignal,mShots,hRes, **varargin):
@@ -20,16 +67,21 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
 
     Nchannels = mShots.shape[1]
 
-    ## reshape 2-dim matrix mShots to 3-dim matrix
-    #reshaped_mShots = np.expand_dims(mShots, axis=1)
-    #broadcasted_mShots = np.tile(reshaped_mShots, (1, rawSignal.shape[1], 1))
     scale_factor = 150.0 / hRes
 
     ## Deadtime correction
     if flagDeadTimeCorrection:
         ## convert photon counts to Photon-Count-Rate PCR [MHz]
+#        start_time_command1 = time.time()
+#        PCR = np.zeros_like(rawSignal,dtype=np.float64)
+#        compute_pcr(rawSignal.astype(np.float64), mShots.astype(np.float64), scale_factor, PCR)
+        # Compute PCR in parallel
+        #PCR = compute_pcr_parallel(rawSignal, mShots, scale_factor)
         PCR = rawSignal / mShots[:, np.newaxis, :] * scale_factor
-        #PCR = rawSignal / broadcasted_mShots * scale_factor
+#        end_time_command1 = time.time()
+#        elapsed_time_command1 = end_time_command1 - start_time_command1
+#        print(f"Time taken: {elapsed_time_command1:.4f} seconds")
+#        exit()
 
         ## polynomial correction with parameters saved in the level0 netcdf-file under variable 'deadtime_polynomial'
         if DeadTimeCorrectionMode == 1:
@@ -39,7 +91,7 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
                 # Evaluate the polynomial at each value in the PCR_values matrix
                 PCR_Cor = np.polyval(coeffs, PCR[:, :, iCh])
                 #signal_out[:, :, iCh] = PCR_Cor / scale_factor * broadcasted_mShots[:, :, iCh]
-                siignal_out[:, :, iCh] = PCR_Cor / scale_factor * mShots[:, np.newaxis, iCh]
+                signal_out[:, :, iCh] = PCR_Cor / scale_factor * mShots[:, np.newaxis, iCh]
 
 
         ## nonparalyzable correction: PCR_cor = PCR / (1 - tau*PCR), with tau beeing the dead-time
@@ -54,6 +106,10 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
         ## user defined deadtime, reading from polly-config file under key 'dT' (the whole matrix, polynome) 
         elif DeadTimeCorrectionMode == 3:
             if np.array(deadtimeParams).size != 0:
+#                deadtimeParams=np.array(deadtimeParams)
+#                signal_out = np.zeros_like(PCR)
+#                process_signal(PCR, mShots.astype(np.float64), deadtimeParams, Nchannels, scale_factor, signal_out)
+#                PCR_Cor = PCR
                 # Pre-extract polynomial coefficients for all channels and reverse their order
                 coeffs_matrix = np.array([np.array(deadtimeParams[ch][::-1]) for ch in range(Nchannels)])
                 for iCh in range(Nchannels):
