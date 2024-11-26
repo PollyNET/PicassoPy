@@ -5,7 +5,7 @@ import time
 import itertools
 from scipy.ndimage import label
 
-@profile
+#@profile
 def pollyDTCor(rawSignal,mShots,hRes, **varargin):
     ## Defining default values for param keys (key initialization), if not explictly defined when calling the function
     polly_device = varargin.get('device', False)
@@ -27,8 +27,9 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
 
     ## Deadtime correction
     if flagDeadTimeCorrection:
+        ## convert photon counts to Photon-Count-Rate PCR [MHz]
         PCR = rawSignal / mShots[:, np.newaxis, :] * scale_factor
-        #PCR = rawSignal / broadcasted_mShots * scale_factor ##convert photon counts to Photon-Count-Rate PCR [MHz]
+        #PCR = rawSignal / broadcasted_mShots * scale_factor
 
         ## polynomial correction with parameters saved in the level0 netcdf-file under variable 'deadtime_polynomial'
         if DeadTimeCorrectionMode == 1:
@@ -73,7 +74,7 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
             logging.error(f'Unknow deadtime correction setting! Please go back to check the configuration.')
             logging.error(f'For deadtimeCorrectionMode, only 1-4 is allowed.')
 
-    return signal_out
+    return PCR_Cor, signal_out
 
 def pollyRemoveBG(rawSignal,**varargin):
     maxHeightBin = varargin.get('maxHeightBin', 3000)
@@ -456,7 +457,7 @@ def pollyPreprocess(rawdata_dict, **param):
 
 
     ## Deadtime correction
-    preproSignal = pollyDTCor(rawSignal = rawSignal,
+    PCR_Cor, preproSignal = pollyDTCor(rawSignal = rawSignal,
             mShots = mShots,
             hRes = hRes, 
             polly_device = pollyType,
@@ -465,6 +466,8 @@ def pollyPreprocess(rawdata_dict, **param):
             deadtimeParams = deadtimeParams,
             deadtime = rawdata_dict['deadtime_polynomial']['var_data']
     )
+    data_dict['PCR_cor'] = PCR_Cor
+
 
     ## Background Substraction
     preproSignal, bg =  pollyRemoveBG(rawSignal = preproSignal,

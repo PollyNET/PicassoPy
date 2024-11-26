@@ -52,7 +52,7 @@ def create_netcdf_from_dict(nc_file_path, data_dict):
         }
     }
     """
-    logging.info(f"start writing {nc_file_path}")
+    logging.info(f"writing to file: {nc_file_path}")
     # Create a new NetCDF file
     with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file:
         # Add global attributes
@@ -84,7 +84,6 @@ def create_netcdf_from_dict(nc_file_path, data_dict):
                 # Add variable data (if provided)
                 if data is not None:
                     var[:] = data
-    logging.info(f"writing finished")
 
 
 def add_variable_2_json_dict_mapper(data_dict, new_key, reference_key, new_data = None, new_attributes=None):

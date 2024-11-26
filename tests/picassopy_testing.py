@@ -138,7 +138,8 @@ data_cube.preprocessing()
 #print(data_cube.rawdata_dict.keys())
 #print(data_cube.data_retrievals.keys())
 
-
+data_cube.pollySaturationDetect()
+exit()
 ## creating monitoring nc-files
 prod_ls = ["SNR","BG","RCS"]
 for prod in prod_ls:
