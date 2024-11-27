@@ -608,10 +608,16 @@ def channel_2_variable_mapping(data_retrievals, var, channeltags_dict):
     channel_dim = find_matching_dimension(array=data_retrievals[var], reference_list=channeltags_dict)
     for ch in channeltags_dict.keys():
         ch_mod =remove_whitespaces_and_replace_dash_with_underscore(string=channeltags_dict[ch])
-        if channel_dim == 0:
-            data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][ch,:,:]
-        elif channel_dim == 1:
-            data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:,ch,:]
-        elif channel_dim == 2:
-            data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:,:,ch]
+        if len(data_retrievals[var].shape) == 3:
+            if channel_dim == 0:
+                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][ch,:,:]
+            elif channel_dim == 1:
+                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:,ch,:]
+            elif channel_dim == 2:
+                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:,:,ch]
+        elif len(data_retrievals[var].shape) == 2:
+            if channel_dim == 0:
+                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][ch,:]
+            elif channel_dim == 1:
+                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:,ch]
 

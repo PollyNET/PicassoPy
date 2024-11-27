@@ -157,7 +157,9 @@ class PicassoProc:
 
     def pollySaturationDetect(self):
 
-        pollySaturationDetect.pollySaturationDetect(data_cube=self)
+        self.flagSaturation = pollySaturationDetect.pollySaturationDetect(data_cube = self,
+                                                    hFullOverlap = self.polly_config_dict['heightFullOverlap'],
+                                                    sigSaturateThresh = self.polly_config_dict['saturate_thresh'])
 
         return self
 

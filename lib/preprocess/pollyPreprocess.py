@@ -78,6 +78,7 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
         # Compute PCR in parallel
         #PCR = compute_pcr_parallel(rawSignal, mShots, scale_factor)
         PCR = rawSignal / mShots[:, np.newaxis, :] * scale_factor
+        PCR_Cor = PCR
 #        end_time_command1 = time.time()
 #        elapsed_time_command1 = end_time_command1 - start_time_command1
 #        print(f"Time taken: {elapsed_time_command1:.4f} seconds")
@@ -89,18 +90,16 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
                 # Extract polynomial coefficients for the channel and reverse their order
                 coeffs = deadtime[:, iCh][::-1]
                 # Evaluate the polynomial at each value in the PCR_values matrix
-                PCR_Cor = np.polyval(coeffs, PCR[:, :, iCh])
-                #signal_out[:, :, iCh] = PCR_Cor / scale_factor * broadcasted_mShots[:, :, iCh]
-                signal_out[:, :, iCh] = PCR_Cor / scale_factor * mShots[:, np.newaxis, iCh]
+                PCR_Cor[:,:,iCh] = np.polyval(coeffs, PCR[:, :, iCh])
+                signal_out[:, :, iCh] = PCR_Cor[:,:,iCh] * mShots[:, np.newaxis, iCh] / scale_factor
 
 
         ## nonparalyzable correction: PCR_cor = PCR / (1 - tau*PCR), with tau beeing the dead-time
         ## reading from polly-config file under key 'dT' (only the first value from each channel)
         elif DeadTimeCorrectionMode == 2:
             for iCh in range(0,Nchannels):
-                PCR_Cor = PCR[:, :, iCh] / (1.0 - deadtimeParams[iCh][0] * 10**(-3) * PCR[:, :, iCh])
-                #signal_out[:, :, iCh] = PCR_Cor / scale_factor * broadcasted_mShots[:, :, iCh]
-                signal_out[:, :, iCh] = PCR_Cor / scale_factor * mShots[:, np.newaxis, iCh]
+                PCR_Cor[:,:,iCh]= PCR[:, :, iCh] / (1.0 - deadtimeParams[iCh][0] * 10**(-3) * PCR[:, :, iCh])
+                signal_out[:, :, iCh] = PCR_Cor[:,:,iCh] * mShots[:, np.newaxis, iCh] / scale_factor
 
 
         ## user defined deadtime, reading from polly-config file under key 'dT' (the whole matrix, polynome) 
@@ -114,9 +113,8 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
                 coeffs_matrix = np.array([np.array(deadtimeParams[ch][::-1]) for ch in range(Nchannels)])
                 for iCh in range(Nchannels):
                     # Evaluate the polynomial for the current channel
-                    PCR_Cor = np.polyval(coeffs_matrix[iCh], PCR[:, :, iCh])
-                    #signal_out[:, :, iCh] = PCR_Cor * broadcasted_mShots[:, :, iCh] / scale_factor
-                    signal_out[:, :, iCh] = PCR_Cor * mShots[:, np.newaxis, iCh] / scale_factor
+                    PCR_Cor[:,:,iCh] = np.polyval(coeffs_matrix[iCh], PCR[:, :, iCh])
+                    signal_out[:, :, iCh] = PCR_Cor[:,:,iCh] * mShots[:, np.newaxis, iCh] / scale_factor
             else:
                 logging.warning(f'User defined deadtime parameters were not found in polly-config file.')
                 logging.warning(f'In order to continue the current processing, deadtime correction will not be implemented.')
@@ -531,6 +529,7 @@ def pollyPreprocess(rawdata_dict, **param):
                        maxHeightBin = maxHeightBin,
                        firstBinIndex = firstBinIndex
     )
+    data_dict['BG'] = bg[:, 1, :] ## reshaping the3-dim. BG-matrix to 2-dim matrix
 
     ## Height and first bin height correction
     logging.info('... height bin calculations')
@@ -542,7 +541,6 @@ def pollyPreprocess(rawdata_dict, **param):
     logging.info('... mask bins with low SNR')
     tot = preproSignal + 2 * bg
     tot[tot <= 0] = np.nan
-    data_dict['BG'] = bg
 
     SNR = preproSignal / np.sqrt(tot)
     SNR[SNR <= 0] = 0

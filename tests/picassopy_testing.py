@@ -165,7 +165,7 @@ for prod in prod_ls:
     
         """ Create the NetCDF file """
         output_filename = Path(picasso_config_dict["results_folder"],f"{data_cube.date}_{data_cube.device}_{prod}.nc")
-        json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict[prod])
+        json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict[prod],compression_level=1)
     else:
         logging.warning(f"No product of type '{prod}' found in prodSaveList-key of polly-config-file")
 

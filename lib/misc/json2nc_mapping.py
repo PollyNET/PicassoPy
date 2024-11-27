@@ -11,7 +11,7 @@ def read_json_to_dict(file_path):
     return data
 
 
-def create_netcdf_from_dict(nc_file_path, data_dict):
+def create_netcdf_from_dict(nc_file_path, data_dict, compression_level=1):
     """
     Creates a NetCDF file from a structured dictionary.
 
@@ -75,7 +75,7 @@ def create_netcdf_from_dict(nc_file_path, data_dict):
                 data = var_info.get('data')
 
                 # Create variable
-                var = nc_file.createVariable(var_name, dtype, dimensions)
+                var = nc_file.createVariable(var_name, dtype, dimensions,zlib=True,complevel=compression_level)
 
                 # Add variable attributes
                 for attr_name, attr_value in attributes.items():

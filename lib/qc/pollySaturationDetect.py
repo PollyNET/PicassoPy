@@ -1,7 +1,7 @@
 import numpy as np
 import logging
 
-def pollySaturationDetect(data_cube):
+def pollySaturationDetect(data_cube,**varargin):
 #% POLLYSATURATIONDETECT detect the bins which is fully saturated by the clouds.
 #%
 #% USAGE:
@@ -40,6 +40,8 @@ def pollySaturationDetect(data_cube):
 #nChannels = size(data.signal, 1);
 #nProfiles = size(data.signal, 3);
     logging.info('Saturation detection')
+    hFullOverlap = varargin.get('hFullOverlap', [])
+    sigSaturateThresh = varargin.get('sigSaturateThresh', 100)
 
     if not data_cube.rawdata_dict['raw_signal']['var_data'].any():
         return None
@@ -56,8 +58,18 @@ def pollySaturationDetect(data_cube):
 
     nChannels = data_cube.num_of_channels
     nProfiles = data_cube.num_of_profiles
-    print(nChannels,nProfiles)
-    print(rawSignal.shape)
+
+    flagSaturation = np.full(PCR.shape, False, dtype=bool)
+
+    for iChannel in range(nChannels):
+        for iProfile in range(nProfiles):
+            flagSaturation[iProfile,:,iChannel] = saturationDetect(signal=PCR[iProfile,:,iChannel],
+                                              height=data_cube.data_retrievals['height'],
+                                              hBase=hFullOverlap,
+                                              hTop=10000,
+                                              sigThresh=sigSaturateThresh,
+                                              cloudMaxGThickness=500)
+    return flagSaturation
 
 
 
@@ -88,6 +100,8 @@ def pollySaturationDetect(data_cube):
 #
 #
 #
+def saturationDetect(signal, height, hBase, hTop, sigThresh, cloudMaxGThickness):
+
 #function [flag] = saturationDetect(signal, height, hBase, hTop, ...
 #                    sigThresh, cloudMaxGThickness)
 #% SATURATIONDETECT saturation bin detection. More detailed information can 
@@ -115,6 +129,21 @@ def pollySaturationDetect(data_cube):
 #%    2018-12-21: First Edition by Zhenping
 #%    2019-07-08: Add the criteria for the absolute values
 #% .. Authors: - zhenping@tropos.de
+
+    flag = np.full(signal.shape, False, dtype=bool)
+
+    ## determine whether the signal is over the saturation threshold
+    flag[signal > sigThresh] = True
+
+    ## check Base and Top heights
+    hBaseIndx = np.where(height > hBase)[0] ## TODO: channelwise hBaseIndexing
+    hTopIndx = np.where(height <= hTop)[0]
+
+    print(hBaseIndx)
+    print(hTopIndx)
+
+    return flag
+
 #
 #flag = false(size(signal));
 #if isempty(signal) || (numel(signal) < 2)

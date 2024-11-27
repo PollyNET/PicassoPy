@@ -16,67 +16,9 @@
     "history": ""
   },
   "dimensions": {
-    "height": 0,
     "time": 0
   },
   "variables": {
-    "alt": {
-      "dtype": "f4",
-      "shape": [
-        "height"
-      ],
-      "data": null,
-      "attributes": {
-        "unit": "m",
-        "long_name": "Height of lidar above mean sea level",
-        "standard_name": "altitude"
-      }
-    },
-    "longitude": {
-      "dtype": "f4",
-      "shape": [],
-      "data": null,
-      "attributes": {
-        "unit": "degrees_east",
-        "long_name": "Longitude of the site",
-        "standard_name": "longitude",
-        "axis": "Y"
-      }
-    },
-    "latitude": {
-      "dtype": "f4",
-      "shape": [],
-      "data": null,
-      "attributes": {
-        "unit": "degrees_north",
-        "long_name": "Latitude of the site",
-        "standard_name": "latitude",
-        "axis": "Y"
-      }
-    },
-    "height": {
-      "dtype": "f4",
-      "shape": [
-        "height"
-      ],
-      "data": null,
-      "attributes": {
-        "unit": "m",
-        "long_name": "Height above the ground",
-        "standard_name": "height",
-        "axis": "Z"
-      }
-    },
-    "tilt_angle": {
-      "dtype": "f4",
-      "shape": [],
-      "data": null,
-      "attributes": {
-        "unit": "degrees",
-        "long_name": "Tilt angle of lidar device",
-        "standard_name": "tilt_angle"
-      }
-    },
     "time": {
       "dtype": "f8",
       "shape": [
@@ -94,8 +36,7 @@
     "BG_FR_total_355nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -112,8 +53,7 @@
     "BG_FR_cross_355nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -130,8 +70,7 @@
     "BG_FR_387nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -148,8 +87,7 @@
     "BG_FR_407nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -166,8 +104,7 @@
     "BG_FR_total_532nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -184,8 +121,7 @@
     "BG_FR_cross_532nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -202,8 +138,7 @@
     "BG_FR_parallel_532nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -220,8 +155,7 @@
     "BG_FR_607nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -238,8 +172,7 @@
     "BG_FR_total_1064nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -256,8 +189,7 @@
     "BG_1064s": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -274,8 +206,7 @@
     "BG_NR_total_355nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -292,8 +223,7 @@
     "BG_NR_387nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -310,8 +240,7 @@
     "BG_NR_total_532nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -328,8 +257,7 @@
     "BG_NR_cross_532nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -346,8 +274,7 @@
     "BG_NR_607nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -364,8 +291,7 @@
     "BG_NR_1064nm": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -382,8 +308,7 @@
     "BG_DFOV": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -400,8 +325,7 @@
     "BG_RR_355": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -418,8 +342,7 @@
     "BG_RR_532": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
@@ -436,8 +359,7 @@
     "BG_RR_1064": {
       "dtype": "f8",
       "shape": [
-        "time",
-        "height"
+        "time"
       ],
       "data": null,
       "_FillValue": -999999999,
