@@ -17,22 +17,7 @@ def loadGHK(data_cube):
     sigma_angstroem=0.2
     MC_count=3
 
-    # for now manually, andi will implement generally
     pcd = data_cube.polly_config_dict
-    flag_355_total_FR = (np.array(pcd['isFR']) & np.array(pcd['is355nm']) & np.array(pcd['isTot'])).astype(bool)
-    flag_355_cross_FR = (np.array(pcd['isFR']) & np.array(pcd['is355nm']) & np.array(pcd['isCross'])).astype(bool)
-    flag_387_total_FR = (np.array(pcd['isFR']) & np.array(pcd['is387nm'])).astype(bool)
-    flag_407_total_FR = (np.array(pcd['isFR']) & np.array(pcd['is407nm'])).astype(bool)
-    flag_532_total_FR = (np.array(pcd['isFR']) & np.array(pcd['is532nm']) & np.array(pcd['isTot'])).astype(bool)
-    flag_532_cross_FR = (np.array(pcd['isFR']) & np.array(pcd['is532nm']) & np.array(pcd['isCross'])).astype(bool)
-    flag_607_total_FR = (np.array(pcd['isFR']) & np.array(pcd['is607nm'])).astype(bool)
-    flag_1064_total_FR = (np.array(pcd['isFR']) & np.array(pcd['is1064nm']) & np.array(pcd['isTot'])).astype(bool)
-    flag_1064_cross_FR = (np.array(pcd['isFR']) & np.array(pcd['is1064nm']) & np.array(pcd['isCross'])).astype(bool)
-    flag_1064_RR_FR = (np.array(pcd['isFR']) & np.array(pcd['is1064nm']) & np.array(pcd['isRR'])).astype(bool)
-    flag_355_total_NR = (np.array(pcd['isNR']) & np.array(pcd['is355nm']) & np.array(pcd['isTot'])).astype(bool)
-    flag_387_total_NR = (np.array(pcd['isNR']) & np.array(pcd['is387nm'])).astype(bool)
-    flag_532_total_NR = (np.array(pcd['isNR']) & np.array(pcd['is532nm']) & np.array(pcd['isTot'])).astype(bool)
-    flag_607_total_NR = (np.array(pcd['isNR']) & np.array(pcd['is607nm'])).astype(bool)
 
     #print('flag_532_total', flag_532_total_FR)
     #print('flag_532_cross', flag_532_cross_FR)
@@ -52,23 +37,23 @@ def loadGHK(data_cube):
     if True:
         print('H is empty -> calculate parameters')
 
-        K[flag_355_total_FR] = 1.0
-        K[flag_532_total_FR] = 1.0
-        K[flag_1064_total_FR] = 1.0
+        K[data_cube.flag_355_total_FR] = 1.0
+        K[data_cube.flag_532_total_FR] = 1.0
+        K[data_cube.flag_1064_total_FR] = 1.0
     
-        G[flag_355_total_FR] = 1.0
-        G[flag_355_cross_FR] = 1.0
-        G[flag_532_total_FR] = 1.0
-        G[flag_532_cross_FR] = 1.0    
-        G[flag_1064_total_FR] = 1.0
-        G[flag_1064_cross_FR] = 1.0  
+        G[data_cube.flag_355_total_FR] = 1.0
+        G[data_cube.flag_355_cross_FR] = 1.0
+        G[data_cube.flag_532_total_FR] = 1.0
+        G[data_cube.flag_532_cross_FR] = 1.0    
+        G[data_cube.flag_1064_total_FR] = 1.0
+        G[data_cube.flag_1064_cross_FR] = 1.0  
 
-        H[flag_355_total_FR] = onemx_onepx(TR[flag_355_total_FR])
-        H[flag_355_cross_FR] = onemx_onepx(TR[flag_355_cross_FR])
-        H[flag_532_total_FR] = onemx_onepx(TR[flag_532_total_FR])
-        H[flag_532_cross_FR] = onemx_onepx(TR[flag_532_cross_FR])
-        H[flag_1064_total_FR] = onemx_onepx(TR[flag_1064_total_FR])
-        H[flag_1064_cross_FR] = onemx_onepx(TR[flag_1064_cross_FR])
+        H[data_cube.flag_355_total_FR] = onemx_onepx(TR[data_cube.flag_355_total_FR])
+        H[data_cube.flag_355_cross_FR] = onemx_onepx(TR[data_cube.flag_355_cross_FR])
+        H[data_cube.flag_532_total_FR] = onemx_onepx(TR[data_cube.flag_532_total_FR])
+        H[data_cube.flag_532_cross_FR] = onemx_onepx(TR[data_cube.flag_532_cross_FR])
+        H[data_cube.flag_1064_total_FR] = onemx_onepx(TR[data_cube.flag_1064_total_FR])
+        H[data_cube.flag_1064_cross_FR] = onemx_onepx(TR[data_cube.flag_1064_cross_FR])
     else:
         print("Using GHK from config file")
     print('TR', TR)
@@ -85,22 +70,6 @@ def loadGHK(data_cube):
     data_cube.polly_config_dict['voldepol_error_532'] = np.array(data_cube.polly_config_dict['voldepol_error_532'])
     data_cube.polly_config_dict['voldepol_error_1064'] = np.array(data_cube.polly_config_dict['voldepol_error_1064'])
 
-    data_cube.flags = {
-        'flag_355_total_FR': flag_355_total_FR,
-        'flag_355_cross_FR': flag_355_cross_FR,
-        'flag_387_total_FR': flag_387_total_FR,
-        'flag_407_total_FR': flag_407_total_FR,
-        'flag_532_total_FR': flag_532_total_FR,
-        'flag_532_cross_FR': flag_532_cross_FR,
-        'flag_607_total_FR': flag_607_total_FR,
-        'flag_1064_total_FR': flag_1064_total_FR,
-        'flag_1064_cross_FR': flag_1064_cross_FR,
-        'flag_1064_RR_FR': flag_1064_RR_FR,
-        'flag_355_total_NR': flag_355_total_NR,
-        'flag_387_total_NR': flag_387_total_NR,
-        'flag_532_total_NR': flag_532_total_NR,
-        'flag_607_total_NR': flag_607_total_NR,
-    }
     return data_cube
 
 
@@ -137,7 +106,7 @@ def calibrateGHK(data_cube):
     print('yeah some calibration')
 
 
-    if np.any(data_cube.flags['flag_532_total_FR']) and np.any(data_cube.flags['flag_532_cross_FR']):
+    if np.any(data_cube.flag_532_total_FR) and np.any(data_cubeflag_532_cross_FR):
         print('and even a green channel')
 
 
