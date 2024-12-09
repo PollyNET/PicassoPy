@@ -112,6 +112,43 @@ class PicassoProc:
         self.data_retrievals['channel'] = ChannelTags
         self.polly_config_dict['channelTags'] = ChannelTags
         self.channel_dict = {i: item for i, item in enumerate(ChannelTags)}
+
+        ChannelFlags =  pollyChannelTags.pollyChannelflags(flagFarRangeChannel=self.polly_config_dict['isFR'],
+                                                                               flagNearRangeChannel=self.polly_config_dict['isNR'],
+                                                                               flagRotRamanChannel=self.polly_config_dict['isRR'],
+                                                                               flagTotalChannel=self.polly_config_dict['isTot'],
+                                                                               flagCrossChannel=self.polly_config_dict['isCross'],
+                                                                               flagParallelChannel=self.polly_config_dict['isParallel'],
+                                                                               flag355nmChannel=self.polly_config_dict['is355nm'],
+                                                                               flag387nmChannel=self.polly_config_dict['is387nm'],
+                                                                               flag407nmChannel=self.polly_config_dict['is407nm'],
+                                                                               flag532nmChannel=self.polly_config_dict['is532nm'],
+                                                                               flag607nmChannel=self.polly_config_dict['is607nm'],
+                                                                               flag1064nmChannel=self.polly_config_dict['is1064nm']
+                                                                               )
+        self.flags = ChannelFlags
+        self.flag_355_total_FR = ChannelFlags[0]
+        self.flag_355_cross_FR = ChannelFlags[1]
+        self.flag_355_parallel_FR = ChannelFlags[2]
+        self.flag_355_total_NR = ChannelFlags[3]
+        self.flag_387_total_FR = ChannelFlags[4]
+        self.flag_387_total_NR = ChannelFlags[5]
+        self.flag_407_total_FR = ChannelFlags[6]
+        self.flag_407_total_NR = ChannelFlags[7]
+        self.flag_532_total_FR = ChannelFlags[8]
+        self.flag_532_cross_FR = ChannelFlags[9]
+        self.flag_532_parallel_FR = ChannelFlags[10]
+        self.flag_532_total_NR = ChannelFlags[11]
+        self.flag_532_cross_NR = ChannelFlags[12]
+        self.flag_532_total_RR = ChannelFlags[13]
+        self.flag_607_total_FR = ChannelFlags[14]
+        self.flag_607_total_NR = ChannelFlags[15]
+        self.flag_1058_total_FR = ChannelFlags[16]
+        self.flag_1064_total_FR = ChannelFlags[17]
+        self.flag_1064_cross_FR = ChannelFlags[18]
+        self.flag_1064_total_NR = ChannelFlags[19]
+
+
         return self
 
     def preprocessing(self):
