@@ -127,6 +127,7 @@ data_cube.check_for_correct_mshots()
 
 ## setting channelTags
 data_cube.setChannelTags()
+print(data_cube.flag_532_cross_FR)
 #print(data_cube.polly_config_dict['channelTags'])
 #print(data_cube.channel_dict)
 
