@@ -6,6 +6,8 @@ import lib.misc.pollyChannelTags as pollyChannelTags
 import lib.preprocess.pollyPreprocess as pollyPreprocess
 import lib.qc.pollySaturationDetect as pollySaturationDetect
 
+import lib.calibration.polarization as polarization
+
 class PicassoProc:
     counter = 0
 
@@ -162,6 +164,18 @@ class PicassoProc:
                                                     sigSaturateThresh = self.polly_config_dict['saturate_thresh'])
 
         return self
+
+
+    def polarizationCaliD90(self):
+        """
+        
+        The stuff that starts here in the matlab version
+        https://github.com/PollyNET/Pollynet_Processing_Chain/blob/5efd7d35596c67ef8672f5948e47d1f9d46ab867/lib/interface/picassoProcV3.m#L442
+        """
+
+        polarization.loadGHK(self)
+        polarization.calibrateGHK(self)
+
 
 #    def __str__(self):
 #        return f"{self.rawdata_dict}"
