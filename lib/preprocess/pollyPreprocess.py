@@ -10,6 +10,8 @@ from multiprocessing import Pool, cpu_count
 #import numpy as np
 #from multiprocessing import Pool, cpu_count
 
+from lib.retrievals.collection import calc_snr
+
 def compute_channel_pcr(args):
     """
     Computes PCR for a single channel.
@@ -531,6 +533,8 @@ def pollyPreprocess(rawdata_dict, **param):
                        firstBinIndex = firstBinIndex
     )
     data_dict['BG'] = bg[:, 1, :] ## reshaping the3-dim. BG-matrix to 2-dim matrix
+    # Store the background corrected signal
+    data_dict['BCS'] = preproSignal 
 
     ## Height and first bin height correction
     logging.info('... height bin calculations')
