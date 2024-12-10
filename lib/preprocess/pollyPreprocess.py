@@ -193,7 +193,7 @@ def pollyPolCaliTime(depCalAng, mTime, init_depAng, maskDepCalAng):
     if nDepCalPeriods >= 1:
         pass
     else:
-        loggin.info(f'No Depolarization Calibration phase found.')
+        logging.info(f'No Depolarization Calibration phase found.')
         return depCal_P_Ang_time_start, depCal_P_Ang_time_end, depCal_N_Ang_time_start, depCal_N_Ang_time_end, maskDepCal
 
     for iDepCalPeriod in range(1,nDepCalPeriods+1):
@@ -481,7 +481,8 @@ def pollyPreprocess(rawdata_dict, **param):
 
 #%% Determine whether number of range bins is out of range
 #if (max(config.maxHeightBin + config.firstBinIndex - 1) > size(data.rawSignal, 2))
-#    warning('maxHeightBin or firstBinIndex is out of range.\nTotal number of range bin is %d.\nmaxHeightBin is %d\nfirstBinIndex is %d\n', size(data.rawSignal, 2), config.maxHeightBin, config.firstBinIndex);
+#    warning('maxHeightBin or firstBinIndex is out of range.\nTotal number of range bin is %d.\nmaxHeightBin is
+#     %d\nfirstBinIndex is %d\n', size(data.rawSignal, 2), config.maxHeightBin, config.firstBinIndex);
 #    fprintf('Set maxHeightBin and firstBinIndex to default values.\n');
 #    config.maxHeightBin = ones(1, size(data.rawSignal, 1));
 #    config.firstBinIndex = 251;
@@ -539,13 +540,8 @@ def pollyPreprocess(rawdata_dict, **param):
 
     ## Mask for bins with low SNR
     logging.info('... mask bins with low SNR')
-    tot = preproSignal + 2 * bg
-    tot[tot <= 0] = np.nan
-
-    SNR = preproSignal / np.sqrt(tot)
-    SNR[SNR <= 0] = 0
-    SNR[np.isnan(SNR)] = 0
-    data_dict['SNR'] = SNR
+    SNR = calc_snr(preproSignal, bg)
+    data_dict['SNR'] = calc_snr(preproSignal, bg)
     #print(SNR)
     ## create mask and mask every entry, where SNR < minSNRThresh
     data_dict['lowSNRMask'] = np.ma.array(np.zeros(preproSignal.shape, dtype=bool), mask=np.ones(preproSignal.shape, dtype=bool))
@@ -559,7 +555,11 @@ def pollyPreprocess(rawdata_dict, **param):
 
     ## Mask for polarization calibration
     logging.info('... mask for polarization calibration')
-    data_dict['depol_cal_ang_p_time_start'],data_dict['depol_cal_ang_p_time_end'],data_dict['depol_cal_ang_n_time_start'],data_dict['depol_cal_ang_n_time_end'],data_dict['depCalMask'] = pollyPolCaliTime(depCalAng=depCalAng, mTime=mTime_str, init_depAng=initialPolAngle, maskDepCalAng=maskPolCalAngle)
+    (data_dict['depol_cal_ang_p_time_start'], data_dict['depol_cal_ang_p_time_end'], 
+     data_dict['depol_cal_ang_n_time_start'], data_dict['depol_cal_ang_n_time_end'], 
+     data_dict['depCalMask']) = pollyPolCaliTime(
+         depCalAng=depCalAng, mTime=mTime_unixtimestamp, 
+         init_depAng=initialPolAngle, maskDepCalAng=maskPolCalAngle)
 
 #    print(data_dict['depol_cal_ang_p_time_start'])
 #    print(data_dict['depol_cal_ang_p_time_end'])

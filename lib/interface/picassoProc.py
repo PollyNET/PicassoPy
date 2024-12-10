@@ -31,6 +31,35 @@ class PicassoProc:
         DD = mdate[2]
         return f"{YYYY}{MM}{DD}"
 
+    def gf(self, wavelength, meth, telescope):
+        """get flag shorthand
+
+        i.e., the following two calls are equivalent
+        ```
+        data_cube.flag_532_total_FR
+        data_cube.gf(532, 'total', 'FR')
+        ```        
+        
+        where the pattern `{wavelength}_{total|cross|parallel|rr}_{NR|FR|DFOV}` from
+        https://github.com/PollyNET/Pollynet_Processing_Chain/issues/303 is obeyed
+
+        Parameters
+        ----------
+        wavelength
+            wavelength tag
+        meth
+            method
+        telescope
+            telescope
+
+        Returns
+        -------
+        array
+            with bool flag
+        
+        """
+        return getattr(self, f'flag_{wavelength}_{meth}_{telescope}')
+
 #    def msite(self):
 #        #msite = f"measurement site: {self.rawdata_dict['global_attributes']['location']}"
 #        msite = self.polly_config_dict['site']
@@ -211,7 +240,7 @@ class PicassoProc:
         """
 
         polarization.loadGHK(self)
-        polarization.calibrateGHK(self)
+        return polarization.calibrateGHK(self)
 
 
 #    def __str__(self):
