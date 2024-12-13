@@ -65,43 +65,39 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
 
     logging.info(f'... Deadtime-correction (Mode: {DeadTimeCorrectionMode})')
 
-    signal_out = rawSignal
-
     Nchannels = mShots.shape[1]
 
     scale_factor = 150.0 / hRes
 
+    ## convert photon counts to Photon-Count-Rate PCR [MHz]
+#    start_time_command1 = time.time()
+#    compute_pcr(rawSignal.astype(np.float64), mShots.astype(np.float64), scale_factor, PCR)
+    # Compute PCR in parallel
+#    end_time_command1 = time.time()
+#    elapsed_time_command1 = end_time_command1 - start_time_command1
+#    print(f"Time taken: {elapsed_time_command1:.4f} seconds")
+    PCR = rawSignal * (150/hRes) / mShots[:,np.newaxis,:]
+    PCR_Cor = np.zeros_like(PCR)
+    signalDTCor = np.zeros_like(PCR)
+
     ## Deadtime correction
     if flagDeadTimeCorrection:
-        ## convert photon counts to Photon-Count-Rate PCR [MHz]
-#        start_time_command1 = time.time()
-#        PCR = np.zeros_like(rawSignal,dtype=np.float64)
-#        compute_pcr(rawSignal.astype(np.float64), mShots.astype(np.float64), scale_factor, PCR)
-        # Compute PCR in parallel
-        #PCR = compute_pcr_parallel(rawSignal, mShots, scale_factor)
-        PCR = rawSignal / mShots[:, np.newaxis, :] * scale_factor
-        PCR_Cor = PCR
-#        end_time_command1 = time.time()
-#        elapsed_time_command1 = end_time_command1 - start_time_command1
-#        print(f"Time taken: {elapsed_time_command1:.4f} seconds")
-#        exit()
 
         ## polynomial correction with parameters saved in the level0 netcdf-file under variable 'deadtime_polynomial'
         if DeadTimeCorrectionMode == 1:
-            for iCh in range(0,Nchannels):
+            for iCh in range(Nchannels):
                 # Extract polynomial coefficients for the channel and reverse their order
                 coeffs = deadtime[:, iCh][::-1]
-                # Evaluate the polynomial at each value in the PCR_values matrix
-                PCR_Cor[:,:,iCh] = np.polyval(coeffs, PCR[:, :, iCh])
-                signal_out[:, :, iCh] = PCR_Cor[:,:,iCh] * mShots[:, np.newaxis, iCh] / scale_factor
+                PCR_Cor[:,:,iCh] = np.polyval(deadtime[:,iCh][::-1], PCR[:,:,iCh])
+                signalDTCor[:,:,iCh] = PCR_Cor[:,:,iCh]*mShots[:,np.newaxis,iCh]/(150/hRes)
 
 
         ## nonparalyzable correction: PCR_cor = PCR / (1 - tau*PCR), with tau beeing the dead-time
         ## reading from polly-config file under key 'dT' (only the first value from each channel)
         elif DeadTimeCorrectionMode == 2:
-            for iCh in range(0,Nchannels):
+            for iCh in range(Nchannels):
                 PCR_Cor[:,:,iCh]= PCR[:, :, iCh] / (1.0 - deadtimeParams[iCh][0] * 10**(-3) * PCR[:, :, iCh])
-                signal_out[:, :, iCh] = PCR_Cor[:,:,iCh] * mShots[:, np.newaxis, iCh] / scale_factor
+                signalDTCor[:, :, iCh] = PCR_Cor[:,:,iCh] * mShots[:, np.newaxis, iCh] / scale_factor
 
 
         ## user defined deadtime, reading from polly-config file under key 'dT' (the whole matrix, polynome) 
@@ -116,7 +112,7 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
                 for iCh in range(Nchannels):
                     # Evaluate the polynomial for the current channel
                     PCR_Cor[:,:,iCh] = np.polyval(coeffs_matrix[iCh], PCR[:, :, iCh])
-                    signal_out[:, :, iCh] = PCR_Cor[:,:,iCh] * mShots[:, np.newaxis, iCh] / scale_factor
+                    signalDTCor[:, :, iCh] = PCR_Cor[:,:,iCh] * mShots[:, np.newaxis, iCh] / scale_factor
             else:
                 logging.warning(f'User defined deadtime parameters were not found in polly-config file.')
                 logging.warning(f'In order to continue the current processing, deadtime correction will not be implemented.')
@@ -130,7 +126,7 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
             logging.error(f'Unknow deadtime correction setting! Please go back to check the configuration.')
             logging.error(f'For deadtimeCorrectionMode, only 1-4 is allowed.')
 
-    return PCR_Cor, signal_out
+    return PCR_Cor, signalDTCor
 
 def pollyRemoveBG(rawSignal,**varargin):
     maxHeightBin = varargin.get('maxHeightBin', 3000)
@@ -524,33 +520,33 @@ def pollyPreprocess(rawdata_dict, **param):
             deadtime = rawdata_dict['deadtime_polynomial']['var_data']
     )
     data_dict['PCR_cor'] = PCR_Cor
-
+    data_dict['preproSignal'] = preproSignal 
 
     ## Background Substraction
-    preproSignal, bg =  pollyRemoveBG(rawSignal = preproSignal,
+    sigBGCor, bg =  pollyRemoveBG(rawSignal = preproSignal,
                        bgCorrectionIndex = bgCorrectionIndex,
                        maxHeightBin = maxHeightBin,
                        firstBinIndex = firstBinIndex
     )
     data_dict['BG'] = bg[:, 1, :] ## reshaping the3-dim. BG-matrix to 2-dim matrix
     # Store the background corrected signal
-    data_dict['BCS'] = preproSignal 
+    data_dict['sigBGCor'] = sigBGCor 
 
     ## Height and first bin height correction
     logging.info('... height bin calculations')
-    data_dict['height'] = np.arange(0, preproSignal.shape[1]) * hRes * np.cos(zenithAng*np.pi/180) + firstBinHeight
+    data_dict['height'] = np.arange(0, sigBGCor.shape[1]) * hRes * np.cos(zenithAng*np.pi/180) + firstBinHeight
     data_dict['alt'] = data_dict['height'] + float(asl) ## geopotential height
     data_dict['time'] = mTime_unixtimestamp
 
     ## Mask for bins with low SNR
     logging.info('... mask bins with low SNR')
-    SNR = calc_snr(preproSignal, bg)
-    data_dict['SNR'] = calc_snr(preproSignal, bg)
+    SNR = calc_snr(sigBGCor, bg)
+    data_dict['SNR'] = SNR
     #print(SNR)
     ## create mask and mask every entry, where SNR < minSNRThresh
-    data_dict['lowSNRMask'] = np.ma.array(np.zeros(preproSignal.shape, dtype=bool), mask=np.ones(preproSignal.shape, dtype=bool))
+    data_dict['lowSNRMask'] = np.ma.array(np.zeros(sigBGCor.shape, dtype=bool), mask=np.ones(sigBGCor.shape, dtype=bool))
     #print(data_dict['lowSNRMask'])
-    for iCh in range(0, preproSignal.shape[2]):
+    for iCh in range(0, sigBGCor.shape[2]):
         #data_dict['lowSNRMask'][:,:,iCh].mask = SNR[:,:,iCh].data < minSNRThresh[iCh]
         data_dict['lowSNRMask'][:,:,iCh] = np.ma.masked_where(SNR[:,:,iCh].data < minSNRThresh[iCh], SNR[:,:,iCh])
 
@@ -581,7 +577,7 @@ def pollyPreprocess(rawdata_dict, **param):
     ## Range-corrected Signal calculation
     logging.info('... calculate range-corrected Signal')
     mask = data_dict['lowSNRMask'].mask
-    RCS_masked = np.ma.masked_array(preproSignal,mask=mask)
+    RCS_masked = np.ma.masked_array(sigBGCor,mask=mask)
 #    data_dict['RCS'] = calculate_rcs(datasignal=preproSignal,data_dict=data_dict,mShots=mShots,hRes=hRes)
     data_dict['RCS'] = calculate_rcs(datasignal=RCS_masked,data_dict=data_dict,mShots=mShots,hRes=hRes)
 

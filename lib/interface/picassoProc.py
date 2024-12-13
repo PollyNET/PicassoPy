@@ -240,7 +240,17 @@ class PicassoProc:
         """
 
         polarization.loadGHK(self)
-        return polarization.calibrateGHK(self)
+        self.pol_cali = polarization.calibrateGHK(self)
+
+
+    def cloudScreen(self):
+        """https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L663"""
+        pass
+
+
+    def cloudFreeSeg(self):
+        """https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L707"""
+        pass
 
 
 #    def __str__(self):

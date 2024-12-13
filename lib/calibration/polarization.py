@@ -1,5 +1,5 @@
 
-
+import logging
 from collections import defaultdict
 import pprint
 import numpy as np
@@ -102,35 +102,21 @@ def calibrateGHK(data_cube):
     which also calls
     https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/depolCaliGHK.m
 
-    I guess some refactoring is a good idea here
-    - the switch case has to be solved more elegant
-    - the error for missing channel was caught 
-
-    
-    That signal should be needed as well (not only the SNR)
-    [sigBGCor, bg] = pollyRemoveBG(rawSignal, ...
-    'bgCorrectionIndex', config.bgCorrectionIndex, ...
-    'maxHeightBin', config.maxHeightBin, ...
-    'firstBinIndex', config.firstBinIndex);
-    data.bg = bg;
-    data.signal = sigBGCor;
-
     """
-    print('yeah some calibration')
 
     pol_cali = {}
 
-    for wv in [532]:
+    for wv in [355, 532, 1064]:
         if np.any(data_cube.gf(wv, 'total', 'FR')) and np.any(data_cube.gf(wv, 'cross', 'FR')):
-            print(f'and even a {wv} green channel')
+            logging.info(f'and even a {wv} channel')
 
-            bcs_total = np.squeeze(data_cube.data_retrievals['BCS'][:,:,data_cube.gf(wv, 'total', 'FR')])
+            sigBGCor_total = np.squeeze(data_cube.data_retrievals['sigBGCor'][:,:,data_cube.gf(wv, 'total', 'FR')])
             bg_total = np.squeeze(data_cube.data_retrievals['BG'][:,data_cube.gf(wv, 'total', 'FR')])
-            bcs_cross = np.squeeze(data_cube.data_retrievals['BCS'][:,:,data_cube.gf(wv, 'cross', 'FR')])
+            sigBGCor_cross = np.squeeze(data_cube.data_retrievals['sigBGCor'][:,:,data_cube.gf(wv, 'cross', 'FR')])
             bg_cross = np.squeeze(data_cube.data_retrievals['BG'][:,data_cube.gf(wv, 'cross', 'FR')])
 
             pol_cali[wv] = depol_cali_ghk(
-                bcs_total, bg_total, bcs_cross, bg_cross, data_cube.data_retrievals['time'],
+                sigBGCor_total, bg_total, sigBGCor_cross, bg_cross, data_cube.data_retrievals['time'],
                 data_cube.data_retrievals['depol_cal_ang_p_time_start'],
                 data_cube.data_retrievals['depol_cal_ang_p_time_end'],
                 data_cube.data_retrievals['depol_cal_ang_n_time_start'],
@@ -143,10 +129,13 @@ def calibrateGHK(data_cube):
                 data_cube.polly_config_dict[f'rel_std_dplus_{wv}'],
                 data_cube.polly_config_dict[f'rel_std_dminus_{wv}'],
                 data_cube.polly_config_dict[f'depol_cal_segmentLen_{wv}'],
-                data_cube.polly_config_dict[f'depol_cal_smoothWin_{wv}'], collect_debug=True)
-            print(f'pol_cali_{wv}', pol_cali[wv])
+                data_cube.polly_config_dict[f'depol_cal_smoothWin_{wv}'], collect_debug=False)
+            logging.info(f'pol_cali_{wv}   {pol_cali[wv]}')
+        else:
+            logging.warning(f'calibrateGHK no {wv} channel')
 
-    # to get it out, later include it into data_cube
+    # TODO handling of default and database calibrations
+
     return pol_cali
 
 
@@ -213,8 +202,9 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
         global_attri = defaultdict(list) # the beauty of a proper programming language
 
     if signal_t.size == 0 or signal_x.size == 0:
-        print("Warning: No data for polarization calibration.")
-        return pol_cali_eta, pol_cali_eta_std, pol_cali_start_time, pol_cali_stop_time, 0, global_attri
+        logging.warning("Warning: No data for polarization calibration.")
+        #return pol_cali_eta, pol_cali_eta_std, pol_cali_start_time, pol_cali_stop_time, 0, global_attri
+        return {'status': 0}
 
     # the iteration of days can be omitted if unixtimestamps are used
 
@@ -263,6 +253,7 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
         indx_bad_x_m = (snr_x_m <= SNRmin[3]) | (sig_x_m >= sig_max[3])
 
         # Calculate dplus and dminus
+        #print('smooth_win', smooth_win)
         dplus = smooth_signal(sig_x_p, smooth_win) / smooth_signal(sig_t_p, smooth_win)
         dminus = smooth_signal(sig_x_m, smooth_win) / smooth_signal(sig_t_m, smooth_win)
         dplus = np.where(np.isfinite(dplus), dplus, np.nan)
@@ -306,15 +297,18 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
             global_attri['cali_time'].append(np.mean([this_cali_start_time, this_cali_stop_time]))
 
     if not mean_dplus or not mean_dminus:
-        print("Plus or minus 45° calibration is missing.")
-        return pol_cali_eta, pol_cali_eta_std, pol_cali_start_time, pol_cali_stop_time, 0, global_attri
+        logging.warning("Plus or minus 45° calibration is missing.")
+        #return pol_cali_eta, pol_cali_eta_std, pol_cali_start_time, pol_cali_stop_time, 0, global_attri
+        return {'status': 0}
 
     pol_cali_eta = [float(1 / K * np.sqrt(dp * dm)) for dp, dm in zip(mean_dplus, mean_dminus)]
     pol_cali_eta_std = [float(0.5 * (dp * std_dm + dm * std_dp) / np.sqrt(dp * dm)) for 
                         dp, std_dp, dm, std_dm in zip(mean_dplus, std_dplus, mean_dminus, std_dminus)]
     
-    results = [pol_cali_eta, pol_cali_eta_std, pol_cali_start_time, pol_cali_stop_time, 1]
-    results.append(dict(global_attri)) if collect_debug else None
+    results =  {'eta': pol_cali_eta, 'eta_std': pol_cali_eta_std, 'time_start': pol_cali_start_time, 'time_end': pol_cali_stop_time, 'status': 1}
+    results['eta_best'] = pol_cali_eta[np.argmin(pol_cali_eta_std)]
+    if collect_debug:
+        results['global_attri'] = dict(global_attri)
     return results
 
 # Helper functions
