@@ -1,4 +1,5 @@
 #from ..misc import *
+import datetime
 import re
 import numpy as np
 import logging
@@ -7,6 +8,8 @@ import lib.preprocess.pollyPreprocess as pollyPreprocess
 import lib.qc.pollySaturationDetect as pollySaturationDetect
 
 import lib.calibration.polarization as polarization
+import lib.io.readMeteo as readMeteo
+import lib.misc.molecular as molecular
 
 class PicassoProc:
     counter = 0
@@ -249,8 +252,47 @@ class PicassoProc:
 
 
     def cloudFreeSeg(self):
-        """https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L707"""
+        """https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L707
+        
+        .. code-block:: python
+        
+            data_cube.clFreGrps = [
+                [35,300],
+                [2500,2800]
+            ]
+        
+        """
+        self.clFreeGrps = []
+
+
+    def loadMeteo(self):
+
+        self.met = readMeteo.Meteo(
+            self.polly_config_dict['meteorDataSource'], 
+            self.polly_config_dict['meteo_folder'],
+            self.polly_config_dict['meteo_file'])
+        self.met.load(
+            datetime.datetime.timestamp(datetime.datetime.strptime(self.date, '%Y%m%d')),
+            self.data_retrievals['height'])
+
+
+    def loadAOD(self):
+        """"""
         pass
+
+
+    def calcMolecular(self):
+        """calculate the molecular scattering for the cloud free periods
+        
+        with the strategy of first averaging the met data and then calculating the rayleigh scattering
+        
+        """
+
+        time_slices = [self.data_retrievals['time64'][grp] for grp in self.clFreeGrps]
+        print('time slices of cloud free ', time_slices)
+        mean_profiles = self.met.get_mean_profiles(time_slices) 
+        self.mol_profiles = molecular.calc_profiles(mean_profiles)
+
 
 
 #    def __str__(self):

@@ -534,9 +534,11 @@ def pollyPreprocess(rawdata_dict, **param):
 
     ## Height and first bin height correction
     logging.info('... height bin calculations')
+    # TODO first bin hight might change for different telescopes...
     data_dict['height'] = np.arange(0, sigBGCor.shape[1]) * hRes * np.cos(zenithAng*np.pi/180) + firstBinHeight
     data_dict['alt'] = data_dict['height'] + float(asl) ## geopotential height
     data_dict['time'] = mTime_unixtimestamp
+    data_dict['time64'] = np.array([np.datetime64(t) for t in mTime_obj])
 
     ## Mask for bins with low SNR
     logging.info('... mask bins with low SNR')
