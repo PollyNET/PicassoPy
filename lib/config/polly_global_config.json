@@ -26,6 +26,7 @@
     "AERONETSite": "",
 
     "max_height_bin": 3000,
+    "indexing_convention": "1based",
     "first_range_gate_indx": [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252],
     "first_range_gate_height": 3.75,
     "deltaT": 30,

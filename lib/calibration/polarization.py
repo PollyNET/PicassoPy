@@ -93,14 +93,18 @@ def loadGHK(data_cube):
 def calibrateGHK(data_cube):
     """
     
-    
-    To keep track of the process at some point:
+    Returns:
+    --------
+    pol_cali : dict
+        polarization factors from delta 90 for each wavelength containing 
+        sub-dicts with 'eta', 'eta_std', 'time_start', 'time_end', 'status'
+
+    History:
+    --------
 
     Function is called here https://github.com/PollyNET/Pollynet_Processing_Chain/blob/5f5e4d0fd3dcebe7f87220cf802fcd6f414fe235/lib/interface/picassoProcV3.m#L548
-    The two most relevant functions here are     
-    https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/pollyPolCaliGHK.m
-    which also calls
-    https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/depolCaliGHK.m
+    The two most relevant functions here are https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/pollyPolCaliGHK.m
+    which also calls https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/depolCaliGHK.m
 
     """
 

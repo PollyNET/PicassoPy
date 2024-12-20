@@ -142,12 +142,18 @@ def pollyRemoveBG(rawSignal,**varargin):
 
     #Replicate the mean matrix along the second dimension
     bg = np.tile(mean_matrix, (1, maxHeightBin, 1))
-
-    signal_out = np.full((rawSignal.shape[0], maxHeightBin, rawSignal.shape[2]), np.nan)
-    for iCh in range(0, rawSignal.shape[2]):
-        signal_out[:, :, iCh] = rawSignal[:,firstBinIndex[iCh]:(maxHeightBin+firstBinIndex[iCh]),iCh] - bg[:, :, iCh]
-
+    signal_out = slicerange(rawSignal, maxHeightBin, firstBinIndex) - bg
     return signal_out, bg
+
+
+def slicerange(array, maxHeightBin, firstBinIndex):
+    """slice a give array from firstBinIndex to maxHeightBin + firstBinIndex"""
+    out = np.full((array.shape[0], maxHeightBin, array.shape[2]), np.nan)
+    
+    for iCh in range(0, array.shape[2]):
+        out[:, :, iCh] = array[:,firstBinIndex[iCh]:(maxHeightBin+firstBinIndex[iCh]),iCh]
+    return out
+
 
 def pollyPolCaliTime(depCalAng, mTime, init_depAng, maskDepCalAng):
 
@@ -220,37 +226,37 @@ def pollyPolCaliTime(depCalAng, mTime, init_depAng, maskDepCalAng):
 
     return depCal_P_Ang_time_start, depCal_P_Ang_time_end, depCal_N_Ang_time_start, depCal_N_Ang_time_end, maskDepCal
 
-def calculate_rcs(datasignal,data_dict,mShots,hRes):
+def calculate_rcs(datasignal,ranges):
     """
     Function for calculating RCS.
 
     Args:
-        data: An object or dictionary containing the fields:
-              - datasignal: 3D NumPy array
-              - data_dict: dict containing infos for time, height, ...
-              - mShots: 2D NumPy array
-              - hRes: Scalar resolution (int or float)
-        channel: Index or condition to slice the first dimension of `signal` and `mShots`.
+        datasignal: 
+            signal to range correct
+        ranges: 
+            ranges that are squared
 
     Returns:
         np.ndarray: Computed RCS array.
     """
 
-    mShots_transposed = mShots.T 
-    mShots_broadcasted = np.expand_dims(mShots, axis=1)
-    
-    height_squared = data_dict['height'] ** 2
-    height_squared_broadcasted = height_squared.reshape(1, -1, 1)
+    print(datasignal.shape)
+    ranges_squared = ranges**2
+    ranges2d = np.repeat(ranges_squared[np.newaxis,:], datasignal.shape[0], axis=0)
+    print('ranges2d', ranges2d.shape)
     
     # Perform the computation
+    #RCS = (
+    #    datasignal / mShots_broadcasted * 150 / float(hRes) * height_squared_broadcasted
+    #)
     RCS = (
-        datasignal / mShots_broadcasted * 150 / float(hRes) * height_squared_broadcasted
+        datasignal * ranges2d[:,:,np.newaxis]
     )
     
     return RCS
 
 
-def pollyPreprocess(rawdata_dict, **param):
+def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
     """
     POLLYPREPROCESS Deadtime correction, background correction, first-bin shift, mask for low-SNR and mask for depolarization-calibration process.
     
@@ -520,7 +526,10 @@ def pollyPreprocess(rawdata_dict, **param):
             deadtime = rawdata_dict['deadtime_polynomial']['var_data']
     )
     data_dict['PCR_cor'] = PCR_Cor
-    data_dict['preproSignal'] = preproSignal 
+    data_dict['PCR_slice'] = slicerange(PCR_Cor, maxHeightBin, firstBinIndex)
+    # most likely the preprocesssed deadtime corrected signal can be omitted
+    if not collect_debug:
+        data_dict['preproSignal'] = preproSignal 
 
     ## Background Substraction
     sigBGCor, bg =  pollyRemoveBG(rawSignal = preproSignal,
@@ -536,6 +545,8 @@ def pollyPreprocess(rawdata_dict, **param):
     logging.info('... height bin calculations')
     # TODO first bin hight might change for different telescopes...
     data_dict['height'] = np.arange(0, sigBGCor.shape[1]) * hRes * np.cos(zenithAng*np.pi/180) + firstBinHeight
+
+    data_dict['range'] = np.arange(0, sigBGCor.shape[1]) * hRes + firstBinHeight
     data_dict['alt'] = data_dict['height'] + float(asl) ## geopotential height
     data_dict['time'] = mTime_unixtimestamp
     data_dict['time64'] = np.array([np.datetime64(t) for t in mTime_obj])
@@ -579,9 +590,10 @@ def pollyPreprocess(rawdata_dict, **param):
     ## Range-corrected Signal calculation
     logging.info('... calculate range-corrected Signal')
     mask = data_dict['lowSNRMask'].mask
-    RCS_masked = np.ma.masked_array(sigBGCor,mask=mask)
+    # masked arry might be slow
+    #RCS_masked = np.ma.masked_array(sigBGCor+bg,mask=mask)
 #    data_dict['RCS'] = calculate_rcs(datasignal=preproSignal,data_dict=data_dict,mShots=mShots,hRes=hRes)
-    data_dict['RCS'] = calculate_rcs(datasignal=RCS_masked,data_dict=data_dict,mShots=mShots,hRes=hRes)
+    data_dict['RCS'] = calculate_rcs(data_dict['PCR_slice'], data_dict['range'])
 
 
     logging.info('finished data preprocessing.')

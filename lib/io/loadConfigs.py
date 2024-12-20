@@ -1,6 +1,7 @@
 from . import *
 import json
 import pandas as pd
+import numpy as np
 
 def loadPicassoConfig(picasso_config_file, picasso_default_config_file):
     picasso_default_config_file_path = Path(picasso_default_config_file)
@@ -70,6 +71,25 @@ def readPollyNetConfigLinkTable(polly_config_table_file, timestamp, device):
         return pd.DataFrame()
 
 
+def fix_indexing(config_dict, keys=['first_range_gate_indx',]):
+    """
+    """
+
+    if not 'indexing_convention' in config_dict:
+        logging.warning(f'indexing_convention not given, assuming 1based')
+        config_dict['indexing_convention'] = '1based'
+
+    for k in keys:
+        print('before', config_dict[k])
+        if isinstance(config_dict[k], list):
+            config_dict[k] = (np.array(config_dict[k])-1).tolist()
+        else:
+            config_dict[k] = config_dict[k] - 1
+        print('after', config_dict[k])
+            
+    return config_dict
+
+
 def loadPollyConfig(polly_config_file, polly_default_config_file):
     polly_default_config_file_path = Path(polly_default_config_file)
     polly_config_file_path = Path(polly_config_file)
@@ -101,14 +121,14 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                 for key in polly_config_file_dict.keys():
                     if key not in polly_default_config_file_dict.keys():
                         polly_config_dict[key] = polly_config_file_dict[key]
-                return polly_config_dict
+                return fix_indexing(polly_config_dict)
             except Exception:
                 logging.warning('polly_default_config_file: {polly_default_config_file} can not be read.')
 
         else:
             logging.warning(f'polly_config_file: {polly_config_file} does not exist')
             logging.warning(f'polly_default_config_file: {polly_default_config_file} will be used')
-            return polly_default_config_file_dict
+            return fix_indexing(polly_default_config_file_dict)
     else:
         logging.critical(f'polly_default_config_file:  {polly_default_config_file} can not be found. Aborting')
         return None

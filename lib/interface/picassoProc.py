@@ -10,6 +10,7 @@ import lib.qc.pollySaturationDetect as pollySaturationDetect
 import lib.calibration.polarization as polarization
 import lib.io.readMeteo as readMeteo
 import lib.misc.molecular as molecular
+import lib.calibration.rayleighfit as rayleighfit
 
 class PicassoProc:
     counter = 0
@@ -185,7 +186,7 @@ class PicassoProc:
 
         return self
 
-    def preprocessing(self):
+    def preprocessing(self, collect_debug=False):
         preproc_dict = pollyPreprocess.pollyPreprocess(self.rawdata_dict,
                 deltaT=self.polly_config_dict['deltaT'],
                 flagForceMeasTime = self.polly_config_dict['flagForceMeasTime'],
@@ -221,6 +222,7 @@ class PicassoProc:
                 flag532nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is532nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
                 flag1064nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is1064nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
                 isUseLatestGDAS = self.polly_config_dict['flagUseLatestGDAS'],
+                collect_debug=collect_debug,
                 )
         self.data_retrievals.update(preproc_dict)
 
@@ -292,6 +294,13 @@ class PicassoProc:
         print('time slices of cloud free ', time_slices)
         mean_profiles = self.met.get_mean_profiles(time_slices) 
         self.mol_profiles = molecular.calc_profiles(mean_profiles)
+    
+    def rayleighFit(self):
+
+        print('Start Rayleigh Fit')
+
+        return rayleighfit.rayleighfit(self)
+
 
 
 
