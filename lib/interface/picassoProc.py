@@ -295,11 +295,20 @@ class PicassoProc:
         mean_profiles = self.met.get_mean_profiles(time_slices) 
         self.mol_profiles = molecular.calc_profiles(mean_profiles)
     
+
     def rayleighFit(self):
+        """do the rayleigh fit
+        
+        direct translation from the matlab code. There might be noticeable numerical discrepancies (especially in the residual)
+        seemed to work ok for 532, 1064, but with issues for 355
+        """
 
         print('Start Rayleigh Fit')
+        logging.warning(f'Potential for differences to matlab code du to numerical issues (subtraction of two small values)')
 
-        return rayleighfit.rayleighfit(self)
+        self.refH =  rayleighfit.rayleighfit(self)
+        print(self.refH)
+        return self.refH
 
 
 

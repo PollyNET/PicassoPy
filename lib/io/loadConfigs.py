@@ -80,12 +80,10 @@ def fix_indexing(config_dict, keys=['first_range_gate_indx',]):
         config_dict['indexing_convention'] = '1based'
 
     for k in keys:
-        print('before', config_dict[k])
         if isinstance(config_dict[k], list):
             config_dict[k] = (np.array(config_dict[k])-1).tolist()
         else:
             config_dict[k] = config_dict[k] - 1
-        print('after', config_dict[k])
             
     return config_dict
 
