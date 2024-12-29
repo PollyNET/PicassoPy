@@ -311,6 +311,14 @@ class PicassoProc:
         return self.refH
 
 
+    def polarizationCaliMol(self):
+        """
+        
+        """
+
+        logging.warning(f'not checked against the matlab code')
+        if self.polly_config_dict['flagMolDepolCali']:
+            self.pol_cali_mol = polarization.calibrateMol(self)
 
 
 #    def __str__(self):

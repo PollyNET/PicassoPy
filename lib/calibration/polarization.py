@@ -360,3 +360,161 @@ def analyze_segments(dplus, dminus, segment_len, rel_std_dplus, rel_std_dminus):
     [~, index_min] = min(data.polCali532Attri.polCaliEtaStd);
     data.polCaliEta532=data.polCali532Attri.polCaliEta(index_min);
 """
+
+def default_to_regular(d):
+    if isinstance(d, defaultdict):
+        d = {k: default_to_regular(v) for k, v in d.items()}
+    return d
+
+
+def calibrateMol(data_cube):
+    """calibrate the polarization with the molecular signal
+    
+    Converted from the matlab code to the best knowledge, but not cross-validated yet
+    
+    """
+
+    #temp = {'eta': [], 'eta_std': [], 'fac': [], 'fac_std': [],
+    #        'time_start': [], 'time_end': [], 'status': 0}
+    pol_cali = defaultdict(lambda: defaultdict(list))
+
+    config_dict = data_cube.polly_config_dict
+
+    for i, cldFree in enumerate(data_cube.clFreeGrps):
+        print(i, cldFree)
+        cldFreeTime = np.array(data_cube.data_retrievals['time'])[cldFree]
+        print(cldFreeTime)
+
+        #for wv in [355, 532, 1064]:
+        for wv, t, tel in [(532, 'total', 'FR'), (355, 'total', 'FR')]:
+            if np.any(data_cube.gf(wv, t, tel)) and np.any(data_cube.gf(wv, 'cross', tel)):
+                logging.info(f'and even a {wv} channel')
+    
+                sigBGCor_total = np.squeeze(data_cube.data_retrievals['sigBGCor'][slice(*cldFree),:,data_cube.gf(wv, 'total', 'FR')])
+                bg_total = np.squeeze(data_cube.data_retrievals['BG'][slice(*cldFree),data_cube.gf(wv, 'total', 'FR')])
+                sigBGCor_cross = np.squeeze(data_cube.data_retrievals['sigBGCor'][slice(*cldFree),:,data_cube.gf(wv, 'cross', 'FR')])
+                bg_cross = np.squeeze(data_cube.data_retrievals['BG'][slice(*cldFree),data_cube.gf(wv, 'cross', 'FR')])
+
+                refHInd = data_cube.refH[i][f'{wv}_{t}_{tel}']['refHInd']
+                print(f'referenceH {wv} {t} {tel}', refHInd)
+
+                ret = depol_cali_mol(
+                    sigBGCor_total[:, slice(*refHInd)], bg_total, 
+                    sigBGCor_cross[:, slice(*refHInd)], bg_cross,
+                    np.squeeze(data_cube.polly_config_dict['TR'][data_cube.gf(wv, t, tel)]), 0,
+                    np.squeeze(data_cube.polly_config_dict['TR'][data_cube.gf(wv, 'cross', tel)]), 0,
+                    10,
+                    config_dict[f'molDepol{wv}'], config_dict[f'molDepolStd{wv}'],
+                )
+                if not ret['status'] == 0:
+                    pol_cali[f'{wv}_{t}_{tel}']['eta'].append(ret['eta'])
+                    pol_cali[f'{wv}_{t}_{tel}']['eta_std'].append(ret['eta_std'])
+                    pol_cali[f'{wv}_{t}_{tel}']['fac'].append(ret['fac'])
+                    pol_cali[f'{wv}_{t}_{tel}']['fac_std'].append(ret['fac_std'])
+                    pol_cali[f'{wv}_{t}_{tel}']['time_start'].append(int(cldFreeTime[0]))
+                    pol_cali[f'{wv}_{t}_{tel}']['time_end'].append(int(cldFreeTime[1]))
+                    pol_cali[f'{wv}_{t}_{tel}']['status'] = 1
+
+    return default_to_regular(pol_cali)
+    
+
+def depol_cali_mol(signal_t, background_t, signal_c, background_c, TR_t, TR_t_std, TR_c, TR_c_std, minSNR, mdr, mdrStd):
+    """ Molecular polarization calibration.
+    
+    INPUTS:
+        signal_t: numeric
+            Total signal (photon count).
+        background_t: numeric
+            Background at total channel (photon count).
+        signal_c: numeric
+            Cross signal (photon count).
+        background_c: numeric
+            Background at cross channel (photon count).
+        TR_t: scalar
+            Transmission ratio at total channel.
+        TR_t_std: scalar
+            Uncertainty of the transmission ratio at total channel.
+        TR_c: scalar
+            Transmission ratio at cross channel.
+        TR_c_std: scalar
+            Uncertainty of the transmission ratio at cross channel.
+        minSNR: float
+            The SNR constraint for the signal strength at reference height.
+        mdr: float
+            Default molecular depolarization ratio.
+        mdrStd: float
+            Default standard deviation of molecular depolarization ratio.
+    
+    OUTPUTS:
+        polCaliEta: array
+            Polarization calibration eta.
+        polCaliEtaStd: array
+            Uncertainty of polarization calibration eta.
+        polCaliFac: array
+            Polarization calibration factor.
+        polCaliFacStd: array
+            Uncertainty of polarization calibration factor.
+    
+    REFERENCES:
+        Baars, H., et al., Aerosol profiling with lidar in the Amazon Basin during the wet and dry season,
+        J Geophys Res-Atmos, 117, 10.1029/2012jd018338, 2012.
+    
+    HISTORY:
+        - 2021-07-06: First edition by Zhenping
+        - 2024-12-23: 
+    
+    Authors: - zhenping@tropos.de
+    """
+    polCaliEta = []
+    polCaliEtaStd = []
+    polCaliFac = []
+    polCaliFacStd = []
+
+    #print(signal_t, signal_t)
+    sig_t = np.nansum(signal_t[:, :], axis=0)
+    bg_t = np.nansum(background_t[:], axis=0) * signal_t.shape[1]
+    SNR_TSig = calc_snr(sig_t, bg_t)
+    sig_c = np.nansum(signal_c[:, :], axis=0)
+    bg_c = np.nansum(background_c[:], axis=0) * signal_c.shape[1]
+    SNR_CSig = calc_snr(sig_c, bg_c)
+
+    # Check validity of signals
+    flagValidTSig = (SNR_TSig >= minSNR)
+    flagValidCSig = (SNR_CSig >= minSNR)
+
+    if not np.all(flagValidTSig) or not np.all(flagValidCSig):
+        print("Too noisy at the reference height to enable molecular polarization calibration.")
+        return {'status': 0}
+
+    sig_t = np.nansum(sig_t)
+    bg_t = np.nansum(bg_t)
+    sig_c = np.nansum(sig_c)
+    bg_c = np.nansum(bg_c)
+
+    std_sig_t = np.sqrt(sig_t + bg_t)
+    std_sig_c = np.sqrt(sig_c + bg_c)
+
+    # Calculate derivatives for uncertainty propagation
+    polCaliFacFunc = lambda x: (x / sig_c) * (1 + mdr * TR_t) / (1 + mdr * TR_c)
+    deriv_depolCali_tSig = (polCaliFacFunc(sig_t * 1.01) - polCaliFacFunc(sig_t)) / (0.01 * sig_t)
+
+    polCaliFacFunc = lambda x: (sig_t / x) * (1 + mdr * TR_t) / (1 + mdr * TR_c)
+    deriv_depolCali_cSig = (polCaliFacFunc(sig_c * 1.01) - polCaliFacFunc(sig_c)) / (0.01 * sig_c)
+
+    polCaliFacFunc = lambda x: (sig_t / sig_c) * (1 + x * TR_t) / (1 + x * TR_c)
+    deriv_depolCali_mdr = (polCaliFacFunc(mdr + 0.0005) - polCaliFacFunc(mdr)) / 0.0005
+
+    # Calculate polarization calibration factor and uncertainties
+    polCaliFac = (sig_c / sig_t) * (1 + mdr * TR_t) / (1 + mdr * TR_c)
+    polCaliFacStd = np.sqrt(
+        deriv_depolCali_tSig**2 * std_sig_t**2 +
+        deriv_depolCali_cSig**2 * std_sig_c**2 +
+        deriv_depolCali_mdr**2 * mdrStd**2
+    )
+    polCaliEta = polCaliFac * (1 + TR_c) / (1 + TR_t)
+    polCaliEtaStd = polCaliFacStd * (1 + TR_c) / (1 + TR_t)
+
+    print(polCaliEta, polCaliEtaStd, polCaliFac, polCaliFacStd)
+    results =  {'eta': float(polCaliEta), 'eta_std': float(polCaliEtaStd), 
+                'fac': float(polCaliFac), 'fac_std': float(polCaliFacStd), 'status': 1}
+    return results
