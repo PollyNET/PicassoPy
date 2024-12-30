@@ -6,6 +6,7 @@ import logging
 import lib.misc.pollyChannelTags as pollyChannelTags
 import lib.preprocess.pollyPreprocess as pollyPreprocess
 import lib.qc.pollySaturationDetect as pollySaturationDetect
+import lib.qc.transCor as transCor
 
 import lib.calibration.polarization as polarization
 import lib.io.readMeteo as readMeteo
@@ -319,6 +320,19 @@ class PicassoProc:
         logging.warning(f'not checked against the matlab code')
         if self.polly_config_dict['flagMolDepolCali']:
             self.pol_cali_mol = polarization.calibrateMol(self)
+
+
+    def transCor(self):
+        """
+        
+        """
+
+        if self.polly_config_dict['flagTransCor']:
+            logging.warning('NO transmission correction')
+            self.data_retrievals['sigTCor'], self.data_retrievals['BGTCor'] = \
+                  transCor.transCorGHK_cube(self)
+        else:
+            logging.warning('NO transmission correction')
 
 
 #    def __str__(self):
