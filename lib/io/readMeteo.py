@@ -99,8 +99,7 @@ class Meteo:
         """load the data and resample to 15 minute intervals
         """
 
-        self.ds =  self.reader.load(times, heights)
-
+        self.ds = self.reader.load(times, heights)
         self.ds = self.ds.resample(time='15min').interpolate()
 
         return self

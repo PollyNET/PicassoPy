@@ -12,6 +12,7 @@ import lib.calibration.polarization as polarization
 import lib.io.readMeteo as readMeteo
 import lib.misc.molecular as molecular
 import lib.calibration.rayleighfit as rayleighfit
+import lib.retrievals.klettfernald as klettfernald
 
 class PicassoProc:
     counter = 0
@@ -333,6 +334,14 @@ class PicassoProc:
                   transCor.transCorGHK_cube(self)
         else:
             logging.warning('NO transmission correction')
+
+
+    def retrievalKlett(self):
+        """
+        """
+
+        self.data_retrievals['klett'] = \
+            klettfernald.run_cldFreeGrps(self)
 
 
 #    def __str__(self):
