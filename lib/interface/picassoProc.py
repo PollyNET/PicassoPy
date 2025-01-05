@@ -13,6 +13,7 @@ import lib.io.readMeteo as readMeteo
 import lib.misc.molecular as molecular
 import lib.calibration.rayleighfit as rayleighfit
 import lib.retrievals.klettfernald as klettfernald
+import lib.retrievals.raman as raman
 
 class PicassoProc:
     counter = 0
@@ -343,6 +344,13 @@ class PicassoProc:
         self.data_retrievals['klett'] = \
             klettfernald.run_cldFreeGrps(self)
 
+
+    def retrievalRaman(self):
+        """
+        """
+
+        self.data_retrievals['raman'] = \
+            raman.run_cldFreeGrps(self)
 
 #    def __str__(self):
 #        return f"{self.rawdata_dict}"

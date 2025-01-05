@@ -22,7 +22,7 @@ def run_cldFreeGrps(data_cube, collect_debug=True):
         print('cldFree mod', cldFree)
         for wv, t, tel in [(532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]:
         #for wv, t, tel in [(532, 'total', 'FR')]:
-            if np.any(data_cube.gf(wv, 'total', 'FR')):
+            if np.any(data_cube.gf(wv, t, tel)):
                 print(f'{wv}, {t}, {tel}')
                 sig = np.nansum(np.squeeze(
                     data_cube.data_retrievals['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
@@ -93,7 +93,7 @@ def fernald(height, signal, bg, LR_aer, refH, refBeta, molBsc, window_size=40, c
     History
     -------
     - 2021-05-30: First edition by Zhenping.
-    - 2024-02-03: AI Translation
+    - 2025-01-03: AI Translation
 
     """
 
