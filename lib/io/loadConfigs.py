@@ -99,7 +99,7 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
             polly_default_config_file_json = open(polly_default_config_file, "r")
             polly_default_config_file_dict = json.load(polly_default_config_file_json)
         except Exception:
-            logging.critical('polly_default_config_file: {polly_default_config_file} can not be read.')
+            logging.critical(f'polly_default_config_file: {polly_default_config_file} can not be read.')
         if polly_config_file_path.is_file():
             logging.info(f'polly_config_file: {polly_config_file}')
             try:
@@ -119,13 +119,23 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                 for key in polly_config_file_dict.keys():
                     if key not in polly_default_config_file_dict.keys():
                         polly_config_dict[key] = polly_config_file_dict[key]
-                return fix_indexing(polly_config_dict)
+
+                if 'first_range_gate_indx' in polly_default_config_file_dict.keys():
+                    fix_indexing_keys = ['first_range_gate_indx']
+                elif 'LC' in polly_default_config_file_dict.keys():
+                    fix_indexing_keys = ['LC']
+                return fix_indexing(polly_config_dict,keys=fix_indexing_keys)
+                
             except Exception:
-                logging.warning('polly_default_config_file: {polly_default_config_file} can not be read.')
+                logging.warning(f'polly_config_file: {polly_config_file} can not be read.')
 
         else:
             logging.warning(f'polly_config_file: {polly_config_file} does not exist')
             logging.warning(f'polly_default_config_file: {polly_default_config_file} will be used')
+            if 'first_range_gate_indx' in polly_default_config_file_dict.keys():
+                fix_indexing_keys = ['first_range_gate_indx']
+            elif 'LC' in polly_default_config_file_dict.keys():
+                fix_indexing_keys = ['LC']
             return fix_indexing(polly_default_config_file_dict)
     else:
         logging.critical(f'polly_default_config_file:  {polly_default_config_file} can not be found. Aborting')
