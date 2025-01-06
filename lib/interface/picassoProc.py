@@ -1,10 +1,19 @@
 #from ..misc import *
+import datetime
 import re
 import numpy as np
 import logging
 import lib.misc.pollyChannelTags as pollyChannelTags
 import lib.preprocess.pollyPreprocess as pollyPreprocess
 import lib.qc.pollySaturationDetect as pollySaturationDetect
+import lib.qc.transCor as transCor
+
+import lib.calibration.polarization as polarization
+import lib.io.readMeteo as readMeteo
+import lib.misc.molecular as molecular
+import lib.calibration.rayleighfit as rayleighfit
+import lib.retrievals.klettfernald as klettfernald
+import lib.retrievals.raman as raman
 
 class PicassoProc:
     counter = 0
@@ -28,6 +37,35 @@ class PicassoProc:
         MM = mdate[1]
         DD = mdate[2]
         return f"{YYYY}{MM}{DD}"
+
+    def gf(self, wavelength, meth, telescope):
+        """get flag shorthand
+
+        i.e., the following two calls are equivalent
+        ```
+        data_cube.flag_532_total_FR
+        data_cube.gf(532, 'total', 'FR')
+        ```        
+        
+        where the pattern `{wavelength}_{total|cross|parallel|rr}_{NR|FR|DFOV}` from
+        https://github.com/PollyNET/Pollynet_Processing_Chain/issues/303 is obeyed
+
+        Parameters
+        ----------
+        wavelength
+            wavelength tag
+        meth
+            method
+        telescope
+            telescope
+
+        Returns
+        -------
+        array
+            with bool flag
+        
+        """
+        return getattr(self, f'flag_{wavelength}_{meth}_{telescope}')
 
 #    def msite(self):
 #        #msite = f"measurement site: {self.rawdata_dict['global_attributes']['location']}"
@@ -139,8 +177,8 @@ class PicassoProc:
         self.flag_532_cross_FR = ChannelFlags[9]
         self.flag_532_parallel_FR = ChannelFlags[10]
         self.flag_532_total_NR = ChannelFlags[11]
-        self.flag_532_cross_NR = ChannelFlags[12]
-        self.flag_532_total_RR = ChannelFlags[13]
+        self.flag_532_cross_DFOV = ChannelFlags[12]
+        self.flag_532_rr_FR = ChannelFlags[13]
         self.flag_607_total_FR = ChannelFlags[14]
         self.flag_607_total_NR = ChannelFlags[15]
         self.flag_1058_total_FR = ChannelFlags[16]
@@ -151,7 +189,7 @@ class PicassoProc:
 
         return self
 
-    def preprocessing(self):
+    def preprocessing(self, collect_debug=False):
         preproc_dict = pollyPreprocess.pollyPreprocess(self.rawdata_dict,
                 deltaT=self.polly_config_dict['deltaT'],
                 flagForceMeasTime = self.polly_config_dict['flagForceMeasTime'],
@@ -187,6 +225,7 @@ class PicassoProc:
                 flag532nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is532nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
                 flag1064nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is1064nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
                 isUseLatestGDAS = self.polly_config_dict['flagUseLatestGDAS'],
+                collect_debug=collect_debug,
                 )
         self.data_retrievals.update(preproc_dict)
 
@@ -199,6 +238,119 @@ class PicassoProc:
                                                     sigSaturateThresh = self.polly_config_dict['saturate_thresh'])
 
         return self
+
+
+    def polarizationCaliD90(self):
+        """
+        
+        The stuff that starts here in the matlab version
+        https://github.com/PollyNET/Pollynet_Processing_Chain/blob/5efd7d35596c67ef8672f5948e47d1f9d46ab867/lib/interface/picassoProcV3.m#L442
+        """
+
+        polarization.loadGHK(self)
+        self.pol_cali = polarization.calibrateGHK(self)
+
+
+    def cloudScreen(self):
+        """https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L663"""
+        pass
+
+
+    def cloudFreeSeg(self):
+        """https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L707
+        
+        .. code-block:: python
+        
+            data_cube.clFreGrps = [
+                [35,300],
+                [2500,2800]
+            ]
+        
+        """
+        self.clFreeGrps = []
+
+
+    def loadMeteo(self):
+
+        self.met = readMeteo.Meteo(
+            self.polly_config_dict['meteorDataSource'], 
+            self.polly_config_dict['meteo_folder'],
+            self.polly_config_dict['meteo_file'])
+        self.met.load(
+            datetime.datetime.timestamp(datetime.datetime.strptime(self.date, '%Y%m%d')),
+            self.data_retrievals['height'])
+
+
+    def loadAOD(self):
+        """"""
+        pass
+
+
+    def calcMolecular(self):
+        """calculate the molecular scattering for the cloud free periods
+        
+        with the strategy of first averaging the met data and then calculating the rayleigh scattering
+        
+        """
+
+        time_slices = [self.data_retrievals['time64'][grp] for grp in self.clFreeGrps]
+        print('time slices of cloud free ', time_slices)
+        mean_profiles = self.met.get_mean_profiles(time_slices) 
+        self.mol_profiles = molecular.calc_profiles(mean_profiles)
+    
+
+    def rayleighFit(self):
+        """do the rayleigh fit
+        
+        direct translation from the matlab code. There might be noticeable numerical discrepancies (especially in the residual)
+        seemed to work ok for 532, 1064, but with issues for 355
+        """
+
+        print('Start Rayleigh Fit')
+        logging.warning(f'Potential for differences to matlab code du to numerical issues (subtraction of two small values)')
+
+        self.refH =  rayleighfit.rayleighfit(self)
+        print(self.refH)
+        return self.refH
+
+
+    def polarizationCaliMol(self):
+        """
+        
+        """
+
+        logging.warning(f'not checked against the matlab code')
+        if self.polly_config_dict['flagMolDepolCali']:
+            self.pol_cali_mol = polarization.calibrateMol(self)
+
+
+    def transCor(self):
+        """
+        
+        """
+
+        if self.polly_config_dict['flagTransCor']:
+            logging.warning('NO transmission correction')
+            self.data_retrievals['sigTCor'], self.data_retrievals['BGTCor'] = \
+                  transCor.transCorGHK_cube(self)
+        else:
+            logging.warning('NO transmission correction')
+
+
+    def retrievalKlett(self):
+        """
+        """
+
+        self.data_retrievals['klett'] = \
+            klettfernald.run_cldFreeGrps(self)
+
+
+    def retrievalRaman(self):
+        """
+        """
+
+        self.data_retrievals['raman'] = \
+            raman.run_cldFreeGrps(self)
 
 #    def __str__(self):
 #        return f"{self.rawdata_dict}"

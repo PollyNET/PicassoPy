@@ -1,9 +1,9 @@
+
+from collections import defaultdict
 import numpy as np
 
 # Global variable
 ASSUME_AIR_IDEAL = True
-
-
 
 def air_refractive_index(wavelength, pressure, temperature, C, relative_humidity):
     """Calculate the refractive index of air.
@@ -397,48 +397,6 @@ def physical_constants():
         'R': 8.314510
     }
 
-def rayleigh_scattering(wavelength, pressure, temperature, C, rh):
-    """Calculate the molecular volume backscatter coefficient and extinction coefficient.
-
-    Parameters:
-    ----------
-    wavelength : float
-        Wavelength in nanometers [nm].
-    pressure : float
-        Atmospheric pressure [hPa].
-    temperature : float
-        Atmospheric temperature [K].
-    C : float
-        CO2 concentration [ppmv].
-    rh : float
-        Relative humidity as a percentage (0 to 100).
-
-    Returns:
-    -------
-    beta_mol : float
-        Molecular backscatter coefficient [m^{-1}*sr^{-1}].
-    alpha_mol : float
-        Molecular extinction coefficient [m^{-1}].
-
-    References:
-    ----------
-    Bucholtz, A.: Rayleigh-scattering calculations for the terrestrial atmosphere, 
-    Appl. Opt. 34, 2765-2773 (1995).
-    A. Behrendt and T. Nakamura, "Calculation of the calibration constant of polarization lidar and 
-    its dependency on atmospheric temperature," Opt. Express, vol. 10, no. 16, pp. 805-817, 2002.
-
-    History:
-    -------
-    First edition by Zhenping, 2017-12-16. 
-    Based on the Python source code of Ioannis Binietoglou's 
-    [repo](https://bitbucket.org/iannis_b/lidar_molecular).
-    AI-Translated, 2024-12-03
-    """
-    beta_mol = beta_pi_rayleigh(wavelength, pressure, temperature, C, rh)
-    alpha_mol = alpha_rayleigh(wavelength, pressure, temperature, C, rh)
-    return beta_mol, alpha_mol
-
-
 def pressure_to_rh(partial_pressure, temperature):
     """Convert water vapour partial pressure to relative humidity.
     
@@ -530,3 +488,65 @@ def sigma_rayleigh(wavelength, pressure, temperature, C, rh):
     sig = f1 * f2 * f_k
     return sig
 
+
+def rayleigh_scattering(wavelength, pressure, temperature, C, rh):
+    """Calculate the molecular volume backscatter coefficient and extinction coefficient.
+
+    Parameters:
+    ----------
+    wavelength : float
+        Wavelength in nanometers [nm].
+    pressure : float
+        Atmospheric pressure [hPa].
+    temperature : float
+        Atmospheric temperature [K].
+    C : float
+        CO2 concentration [ppmv].
+    rh : float
+        Relative humidity as a percentage (0 to 100).
+
+    Returns:
+    -------
+    beta_mol : float
+        Molecular backscatter coefficient [m^{-1}*sr^{-1}].
+    alpha_mol : float
+        Molecular extinction coefficient [m^{-1}].
+
+    References:
+    ----------
+    Bucholtz, A.: Rayleigh-scattering calculations for the terrestrial atmosphere, 
+    Appl. Opt. 34, 2765-2773 (1995).
+    A. Behrendt and T. Nakamura, "Calculation of the calibration constant of polarization lidar and 
+    its dependency on atmospheric temperature," Opt. Express, vol. 10, no. 16, pp. 805-817, 2002.
+
+    History:
+    -------
+    First edition by Zhenping, 2017-12-16. 
+    Based on the Python source code of Ioannis Binietoglou's 
+    [repo](https://bitbucket.org/iannis_b/lidar_molecular).
+    AI-Translated, 2024-12-03
+    """
+    beta_mol = beta_pi_rayleigh(wavelength, pressure, temperature, C, rh)
+    alpha_mol = alpha_rayleigh(wavelength, pressure, temperature, C, rh)
+    return beta_mol, alpha_mol
+
+
+def calc_profiles(met_profiles, wavelengths=[355, 387, 407, 532, 607, 1058, 1064], CO2=400):
+    """for a list of xarray averaged meteorology profiles, calculate the rayleigh scattering 
+    
+    """
+
+    print('len mean_profiles', len(met_profiles))
+    shp = (len(met_profiles), met_profiles[0].height.shape[0])
+    print('shape of the molecular scattering', shp)
+    print('for the wavelengths ', wavelengths)
+    m_p = defaultdict(lambda: np.zeros(shp))
+
+    for i, p in enumerate(met_profiles):
+        for wv in wavelengths:
+            m_p[f'mBsc_{wv}'][i,:], m_p[f'mExt_{wv}'][i,:] = rayleigh_scattering(
+                wv, p['pressure'].values/100, p['temperature'].values, CO2, p['rh'].values*100)
+        m_p['number_density'][i,:] = number_density_at_pt(
+            p['pressure'].values/100, p['temperature'].values, p['rh'].values*100, True)
+
+    return dict(m_p)

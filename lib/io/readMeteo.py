@@ -96,11 +96,20 @@ class Meteo:
 
     
     def load(self, times, heights):
+        """load the data and resample to 15 minute intervals
+        """
 
-        self.ds =  self.reader.load(times, heights)
+        self.ds = self.reader.load(times, heights)
+        self.ds = self.ds.resample(time='15min').interpolate()
 
         return self
 
+    def get_mean_profiles(self, time_slice):
+
+        mean_profiles = []
+        for t in time_slice:
+            mean_profiles.append(self.ds.sel(time=slice(*t)).mean(dim='time'))
+        return mean_profiles
 
 
 class MeteoNcCloudnet:
@@ -159,7 +168,6 @@ class MeteoNcCloudnet:
 
         ds = xr.load_dataset(filename)
 
-        print(ds)
         variables_to_select = [
             'height',
             'temperature',
@@ -167,7 +175,6 @@ class MeteoNcCloudnet:
             'rh', 'q'
         ]
         ds = ds[variables_to_select]
-
 
         height_2d = ds.height.values
         #height_grid = data_cube.data_retrievals['height']
