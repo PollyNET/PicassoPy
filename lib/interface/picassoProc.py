@@ -7,6 +7,7 @@ import lib.misc.pollyChannelTags as pollyChannelTags
 import lib.preprocess.pollyPreprocess as pollyPreprocess
 import lib.qc.pollySaturationDetect as pollySaturationDetect
 import lib.qc.transCor as transCor
+import lib.qc.overlap as overlap
 
 import lib.calibration.polarization as polarization
 import lib.io.readMeteo as readMeteo
@@ -343,6 +344,7 @@ class PicassoProc:
 
         self.data_retrievals['klett'] = \
             klettfernald.run_cldFreeGrps(self)
+        self.data_retrievals['avail_optical_profiles'].append('klett')
 
 
     def retrievalRaman(self):
@@ -351,6 +353,23 @@ class PicassoProc:
 
         self.data_retrievals['raman'] = \
             raman.run_cldFreeGrps(self)
+        self.data_retrievals['avail_optical_profiles'].append('raman')
+
+
+    def calcOverlap(self):
+        """estimate the overlap function
+
+        two approaches should be considered for now:
+        - average over all cloud free periods in the data chunk and estimate
+          one overlap profile
+        - only average for a cloud free group and estimate overlap profile for each
+            
+        """
+
+        self.data_retrievals['overlap_frnr'] = overlap.run_frnr_cldFreeGrps(self)
+        self.data_retrievals['overlap_raman'] = overlap.run_raman_cldFreeGrps(self)
+
+
 
 #    def __str__(self):
 #        return f"{self.rawdata_dict}"

@@ -551,6 +551,8 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
     data_dict['time'] = mTime_unixtimestamp
     data_dict['time64'] = np.array([np.datetime64(t) for t in mTime_obj])
 
+    data_dict['avail_optical_profiles'] = []
+
     ## Mask for bins with low SNR
     logging.info('... mask bins with low SNR')
     SNR = calc_snr(sigBGCor, bg)
