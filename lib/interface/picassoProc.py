@@ -144,14 +144,14 @@ class PicassoProc:
                                                                                flag607nmChannel=self.polly_config_dict['is607nm'],
                                                                                flag1064nmChannel=self.polly_config_dict['is1064nm']
                                                                                )
-        if 'none' in ChannelTags:
-            ChannelTags.remove("none")
-        ##TODO sometimes the channel tag is also 'unknown'
+
+        ChannelTags, self.polly_config_dict = pollyChannelTags.polly_config_channel_corrections(chTagsOut_ls=ChannelTags,polly_config_dict=self.polly_config_dict)
+
         self.data_retrievals['channel'] = ChannelTags
         self.polly_config_dict['channelTags'] = ChannelTags
         self.channel_dict = {i: item for i, item in enumerate(ChannelTags)}
 
-        ChannelFlags =  pollyChannelTags.pollyChannelflags(flagFarRangeChannel=self.polly_config_dict['isFR'],
+        ChannelFlags =  pollyChannelTags.pollyChannelflags(channel_dict_length=len(self.channel_dict),flagFarRangeChannel=self.polly_config_dict['isFR'],
                                                                                flagNearRangeChannel=self.polly_config_dict['isNR'],
                                                                                flagRotRamanChannel=self.polly_config_dict['isRR'],
                                                                                flagTotalChannel=self.polly_config_dict['isTot'],
@@ -164,6 +164,7 @@ class PicassoProc:
                                                                                flag607nmChannel=self.polly_config_dict['is607nm'],
                                                                                flag1064nmChannel=self.polly_config_dict['is1064nm']
                                                                                )
+        
         self.flags = ChannelFlags
         self.flag_355_total_FR = ChannelFlags[0]
         self.flag_355_cross_FR = ChannelFlags[1]
