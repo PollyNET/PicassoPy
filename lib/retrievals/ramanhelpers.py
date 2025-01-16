@@ -1,5 +1,7 @@
 
 import numpy as np
+from scipy.ndimage import uniform_filter1d
+from scipy.stats import norm, poisson
 
 def movingslope_variedWin(signal, winWidth):
     """
@@ -142,3 +144,50 @@ def _getcoef(t, supportlength, modelorder):
     A = np.vander(t.flatten(), modelorder + 1, increasing=True)
     pinvA = np.linalg.pinv(A)
     return pinvA[1]  # Only the linear term
+
+
+def sigGenWithNoise(signal, noise=None, nProfile=1, method='norm'):
+    """
+    SIGGENWITHNOISE generate noise-containing signal with a certain noise-adding 
+    algorithm.
+
+    Parameters
+    ----------
+    signal : array
+        Signal strength.
+    noise : array, optional
+        Noise. Unit should be the same as signal. Default is sqrt(signal).
+    nProfile : int, optional
+        Number of signal profiles to generate. Default is 1.
+    method : str, optional
+        'norm': Normally distributed noise -> signalGen = signal + norm * noise.
+        'poisson': Poisson distributed noise -> signalGen = poisson(signal, nProfile).
+        Default is 'norm'.
+
+    Returns
+    -------
+    signalGen : array
+        Noise-containing signal. Shape is (len(signal), nProfile).
+
+    History
+    -------
+    - 2021-06-13: First edition by Zhenping.
+    """
+    if noise is None:
+        noise = np.sqrt(signal)
+    
+    signal = np.array(signal).reshape(1, -1)
+    noise = np.array(noise).reshape(1, -1)
+
+    signalGen = np.full((len(signal.flatten()), nProfile), np.nan)
+
+    if method == 'norm':
+        for iBin in range(len(signal.flatten())):
+            signalGen[iBin, :] = signal[0, iBin] + norm.rvs(scale=noise[0, iBin], size=nProfile)
+    elif method == 'poisson':
+        for iBin in range(len(signal.flatten())):
+            signalGen[iBin, :] = poisson.rvs(signal[0, iBin], size=nProfile)
+    else:
+        raise ValueError('A valid method should be provided.')
+
+    return signalGen
