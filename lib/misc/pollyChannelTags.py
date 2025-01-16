@@ -9,6 +9,8 @@ def pollyChannelTags(chTagsIn:list, **Channels) -> list:
 
     if len(chTagsIn) != 0:
         chTagsOut_ls = chTagsIn
+#        if 'none' in chTagsOut_ls:
+#            chTagsOut_ls.remove("none")
         logging.info(f'ChannelLabels: {chTagsOut_ls}')
         return chTagsOut_ls
 
@@ -82,15 +84,30 @@ def pollyChannelTags(chTagsIn:list, **Channels) -> list:
             else:
                 ch_label = 'unknown'
                 chTagsOut_ls.append(ch_label)
-            
-        logging.info(f'ChannelTags: {chTagsOut}')
+
+#        if 'none' in chTagsOut_ls:
+#            chTagsOut_ls.remove("none")
+        #logging.info(f'ChannelTags: {chTagsOut}')
         #logging.info(f'ChannelLabels: {chLabels}')
         logging.info(f'ChannelLabels: {chTagsOut_ls}')
         return chTagsOut_ls
 
-def pollyChannelflags(**Channels):
+def polly_config_channel_corrections(chTagsOut_ls,polly_config_dict):
+    nChs_orig = len(chTagsOut_ls)
+    # Find indices where "none" is in the list
+    none_indices = [i for i, x in enumerate(chTagsOut_ls) if x == "none"]
+    # Remove all occurrences of "none"
+    chTagsOut_ls = [x for x in chTagsOut_ls if x != "none"]
+    # remove entries from polly-config of  'none' - channel
+    for key, values in polly_config_dict.items():
+        if isinstance(values, list) and len(values) == nChs_orig:
+            polly_config_dict[key] = [val for i, val in enumerate(values) if i not in none_indices]
+    return chTagsOut_ls, polly_config_dict
+
+def pollyChannelflags(channel_dict_length,**Channels):
     flags = {}
-    nChs = len(Channels['flagFarRangeChannel'])
+#    nChs = len(Channels['flagFarRangeChannel'])
+    nChs = channel_dict_length
 
     ## flag initialization
     flag_355_total_FR    = np.full(nChs, False, dtype=bool) 
