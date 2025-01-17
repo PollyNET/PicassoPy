@@ -111,9 +111,23 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                 for key in polly_default_config_file_dict.keys():
                     if key in polly_config_file_dict.keys():
                         polly_config_dict[key] = polly_config_file_dict[key]
+                        continue
                     else:
-                        if key=='isParallel': ## to be sure, that this key-value has a list length, which equals the number of channels of the polly-device
-                            polly_config_dict[key] = [0] * len(polly_config_file_dict['isFR'])
+                        if key == 'prodSaveList':
+                            polly_config_dict[key] = polly_default_config_file_dict[key]
+                            continue
+                        channels = len(polly_config_file_dict['isFR']) ## isFR is a key, which has to be in the local-polly-config
+                        if isinstance(polly_default_config_file_dict[key], list) and len(polly_default_config_file_dict[key]) == channels:
+                            polly_config_dict[key] = polly_default_config_file_dict[key]
+                        elif isinstance(polly_default_config_file_dict[key], list) and len(polly_default_config_file_dict[key]) > 4 and len(polly_default_config_file_dict[key]) != channels:
+                            ## number of channels from the default-polly-config has to be adapted to the correct number of channels, taken from the local-polly-config
+                            if len(polly_default_config_file_dict[key]) > channels:
+                                polly_config_dict[key] = polly_default_config_file_dict[key][:channels]
+                            elif len(polly_default_config_file_dict[key]) < channels:
+                                polly_config_dict[key] = polly_default_config_file_dict[key]
+                                last_element = polly_default_config_file_dict[key][-1]
+                                extension_length = channels - len(polly_default_config_file_dict[key])
+                                polly_config_dict[key].extend([last_element] * extension_length)
                         else:
                             polly_config_dict[key] = polly_default_config_file_dict[key]
                 ## check if a key in the polly_config_file exists, but not in polly_default_config_file
