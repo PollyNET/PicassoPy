@@ -178,6 +178,7 @@ def sigGenWithNoise(signal, noise=None, nProfile=1, method='norm'):
     
     signal = np.array(signal).reshape(1, -1)
     noise = np.array(noise).reshape(1, -1)
+    noise[np.isnan(noise)] = 0
 
     signalGen = np.full((len(signal.flatten()), nProfile), np.nan)
 

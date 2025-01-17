@@ -29,8 +29,9 @@ def run_cldFreeGrps(data_cube, collect_debug=True):
         print('cldFree ', i, cldFree)
         cldFree = cldFree[0], cldFree[1] + 1
         print('cldFree mod', cldFree)
-        #for wv, t, tel in [(532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]:
-        channels = [((532, 'total', 'FR'), (607, 'total', 'FR'))]
+        channels = [((355, 'total', 'FR'), (387, 'total', 'FR')),
+                    ((532, 'total', 'FR'), (607, 'total', 'FR')),
+                    ((1064, 'total', 'FR'), (607, 'total', 'FR')),]
         for (wv, t, tel), (wv_r, t_r, tel_r) in channels:
             if np.any(data_cube.gf(wv, t, tel)) and np.any(data_cube.gf(wv_r, t_r, tel_r)):
                 print((wv, t, tel), (wv_r, t_r, tel_r))
