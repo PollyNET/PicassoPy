@@ -7,7 +7,9 @@ import lib.misc.pollyChannelTags as pollyChannelTags
 import lib.preprocess.pollyPreprocess as pollyPreprocess
 import lib.qc.pollySaturationDetect as pollySaturationDetect
 import lib.qc.transCor as transCor
-import lib.qc.overlap as overlap
+import lib.qc.overlapEst as overlapEst
+import lib.qc.overlapCor as overlapCor
+
 
 import lib.calibration.polarization as polarization
 import lib.io.readMeteo as readMeteo
@@ -332,7 +334,7 @@ class PicassoProc:
         """
 
         if self.polly_config_dict['flagTransCor']:
-            logging.warning('NO transmission correction')
+            logging.warning('transmission correction')
             self.data_retrievals['sigTCor'], self.data_retrievals['BGTCor'] = \
                   transCor.transCorGHK_cube(self)
         else:
@@ -360,16 +362,34 @@ class PicassoProc:
     def calcOverlap(self):
         """estimate the overlap function
 
-        two approaches should be considered for now:
-        - average over all cloud free periods in the data chunk and estimate
-          one overlap profile
-        - only average for a cloud free group and estimate overlap profile for each
+        different to the matlab version, where an average over all cloud
+        free periods is taken, it is done here per cloud free segment
             
         """
 
-        self.data_retrievals['overlap_frnr'] = overlap.run_frnr_cldFreeGrps(self)
-        self.data_retrievals['overlap_raman'] = overlap.run_raman_cldFreeGrps(self)
+        self.data_retrievals['overlap'] = {}
+        self.data_retrievals['overlap']['frnr'] = overlapEst.run_frnr_cldFreeGrps(self)
+        self.data_retrievals['overlap']['raman'] = overlapEst.run_raman_cldFreeGrps(self)
 
+    def overlapCor(self):
+        """
+
+        the overlap correction is implemented differently to the matlab version
+        first a 2d (time, height) correction array is constructed then it is applied.
+        In future this will allow for time variing overlap functions
+        
+        """
+
+        if self.polly_config_dict['overlapCorMode'] == 0:
+            logging.info('no overlap Correction')
+            return self
+        logging.info('overlap Correction')
+        if self.polly_config_dict['overlapCorMode'] == 1:
+            logging.info('overlapCorMode 1 -> need file for overlapfunction')
+            self.data_retrievals['overlap']['file'] = overlapEst.load(self)
+        self.data_retrievals['overlap2d'] = overlapCor.spread(self)
+        self.data_retrievals['sigOLCor'], self.data_retrievals['BGOLCor'] = \
+              overlapCor.apply_cube(self)
 
 
 #    def __str__(self):
