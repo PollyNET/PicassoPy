@@ -341,25 +341,46 @@ class PicassoProc:
             logging.warning('NO transmission correction')
 
 
-    def retrievalKlett(self):
+    def retrievalKlett(self, oc=False):
         """
         """
 
-        self.data_retrievals['klett'] = \
-            klettfernald.run_cldFreeGrps(self)
-        self.data_retrievals['avail_optical_profiles'].append('klett')
+        retrievalname = 'klett'
+        kwargs = {}
+        if oc:
+            retrievalname +='_OC'
+            kwargs['signal'] = 'OLCor'
+
+        print('retrievalname', retrievalname)
+        self.data_retrievals[retrievalname] = \
+            klettfernald.run_cldFreeGrps(self, **kwargs)
+        if retrievalname not in self.data_retrievals['avail_optical_profiles']:
+            self.data_retrievals['avail_optical_profiles'].append(retrievalname)
 
 
-    def retrievalRaman(self):
+    def retrievalRaman(self, oc=False):
         """
         """
 
-        self.data_retrievals['raman'] = \
-            raman.run_cldFreeGrps(self)
-        self.data_retrievals['avail_optical_profiles'].append('raman')
+        retrievalname = 'raman'
+        kwargs = {}
+        if oc:
+            retrievalname +='_OC'
+            kwargs['signal'] = 'OLCor'
+
+            # get the full overlap height for the overlap corrected variant
+            # group by the cloud free groups 
+            kwargs['heightFullOverlap'] = \
+                [np.mean(self.data_retrievals['heightFullOverCor'][slice(*cF)], axis=0) for 
+                 cF in self.clFreeGrps]
+
+        self.data_retrievals[retrievalname] = \
+            raman.run_cldFreeGrps(self, **kwargs)
+        if retrievalname not in self.data_retrievals['avail_optical_profiles']:
+            self.data_retrievals['avail_optical_profiles'].append(retrievalname)
 
 
-    def calcOverlap(self):
+    def overlapCalc(self):
         """estimate the overlap function
 
         different to the matlab version, where an average over all cloud
@@ -370,6 +391,15 @@ class PicassoProc:
         self.data_retrievals['overlap'] = {}
         self.data_retrievals['overlap']['frnr'] = overlapEst.run_frnr_cldFreeGrps(self)
         self.data_retrievals['overlap']['raman'] = overlapEst.run_raman_cldFreeGrps(self)
+    
+    def overlapFixLowestBins(self):
+        """the lowest bins are affected by stange near range effects"""
+
+        height = self.data_retrievals['range']
+        for k in self.data_retrievals['overlap']:
+            return overlapCor.fixLowest(
+                self.data_retrievals['overlap'][k], np.where(height > 800)[0][0])
+
 
     def overlapCor(self):
         """
@@ -388,8 +418,10 @@ class PicassoProc:
             logging.info('overlapCorMode 1 -> need file for overlapfunction')
             self.data_retrievals['overlap']['file'] = overlapEst.load(self)
         self.data_retrievals['overlap2d'] = overlapCor.spread(self)
-        self.data_retrievals['sigOLCor'], self.data_retrievals['BGOLCor'] = \
-              overlapCor.apply_cube(self)
+        ret = overlapCor.apply_cube(self)
+        self.data_retrievals['sigOLCor'] = ret[0]
+        self.data_retrievals['BGOLCor'] = ret[1]
+        self.data_retrievals['heightFullOverCor'] = ret[2]
 
 
 #    def __str__(self):

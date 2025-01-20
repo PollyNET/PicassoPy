@@ -4,7 +4,7 @@ import numpy as np
 from scipy.ndimage import uniform_filter1d
 
 
-def run_cldFreeGrps(data_cube, collect_debug=True):
+def run_cldFreeGrps(data_cube, signal='TCor', collect_debug=True):
     """
     """
 
@@ -25,10 +25,10 @@ def run_cldFreeGrps(data_cube, collect_debug=True):
             if np.any(data_cube.gf(wv, t, tel)):
                 print(f'{wv}, {t}, {tel}')
                 sig = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
-                print(data_cube.data_retrievals['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, t, tel)].shape)
+                    data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
+                print(data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)].shape)
                 bg = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['BGTCor'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
+                    data_cube.data_retrievals[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
                 #return None, None, sig, molBsc*1e3, None
 

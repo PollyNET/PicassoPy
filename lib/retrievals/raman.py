@@ -12,7 +12,7 @@ sigma_angstroem=0.2
 MC_count=3
 
 
-def run_cldFreeGrps(data_cube, collect_debug=True):
+def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, collect_debug=True):
     """
     """
 
@@ -23,6 +23,11 @@ def run_cldFreeGrps(data_cube, collect_debug=True):
     config_dict = data_cube.polly_config_dict
 
     opt_profiles = [{} for i in range(len(data_cube.clFreeGrps))]
+
+    if not heightFullOverlap: 
+        heightFullOverlap = [
+            np.array(config_dict['heightFullOverlap']) for i in data_cube.clFreeGrps]
+    print(heightFullOverlap)
 
     print('Starting Raman retrieval')
     for i, cldFree in enumerate(data_cube.clFreeGrps):
@@ -38,17 +43,17 @@ def run_cldFreeGrps(data_cube, collect_debug=True):
             # TODO add flag for nighttime measurements?
 
                 sig = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
-                print('shape sig', data_cube.data_retrievals['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, t, tel)].shape)
+                    data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
+                print('shape sig', data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)].shape)
                 bg = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['BGTCor'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
+                    data_cube.data_retrievals[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
                 molExt = data_cube.mol_profiles[f'mExt_{wv}'][i,:]
 
                 sig_r = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['sigTCor'][slice(*cldFree),:,data_cube.gf(wv_r, t, tel)]), axis=0)
+                    data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv_r, t, tel)]), axis=0)
                 bg_r = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['BGTCor'][slice(*cldFree),data_cube.gf(wv_r, t, tel)]), axis=0)
+                    data_cube.data_retrievals[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv_r, t, tel)]), axis=0)
                 molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i,:]
                 molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i,:]
                 number_density = data_cube.mol_profiles[f'number_density'][i,:]
@@ -61,9 +66,10 @@ def run_cldFreeGrps(data_cube, collect_debug=True):
 
                 refHInd = data_cube.refH[i][f"{wv}_{t}_{tel}"]['refHInd']
                 refH = height[np.array(refHInd)]
-                heightFullOverlap = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, t, tel)][0]
+                hFullOverlap = heightFullOverlap[i][data_cube.gf(wv, t, tel)][0]
+                print(hFullOverlap, config_dict[f'smoothWin_raman_{wv}'] / 2 * hres)
                 hBaseInd = np.argmax(
-                    height >= (heightFullOverlap + config_dict[f'smoothWin_raman_{wv}'] / 2 * hres))
+                    height >= (hFullOverlap + config_dict[f'smoothWin_raman_{wv}'] / 2 * hres))
                 print('refHInd', refHInd, 'refH', refH, 'hBaseInd', hBaseInd, 'hBase', height[hBaseInd])
 
                 SNRRef = calc_snr(
@@ -76,6 +82,7 @@ def run_cldFreeGrps(data_cube, collect_debug=True):
                     print('high enough to continue')
                     aerExt_tmp = prof['aerExt'].copy()
                     aerExt_tmp[:hBaseInd] = aerExt_tmp[hBaseInd]
+                    #prof['aerExt'][:hBaseInd] = aerExt_tmp[hBaseInd]
                     print('filling below overlap with', aerExt_tmp[hBaseInd])
                     prof.update(
                         raman_bsc(height, sig, sig_r, aerExt_tmp, config_dict['angstrexp'], 
@@ -172,6 +179,7 @@ def raman_ext(height, sig, lambda_emit, lambda_Raman,
 
         # Generate signal with noise
         noise = np.sqrt(sig + bg)
+        noise[np.isnan(noise)] = 0
 
         # this should actually be a function
         signal_gen = np.array([sig + norm.rvs(scale=noise) for _ in range(MC_count)])
