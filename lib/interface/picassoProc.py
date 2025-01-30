@@ -17,6 +17,7 @@ import lib.misc.molecular as molecular
 import lib.calibration.rayleighfit as rayleighfit
 import lib.retrievals.klettfernald as klettfernald
 import lib.retrievals.raman as raman
+import lib.retrievals.depolarization as depolarization 
 
 class PicassoProc:
     counter = 0
@@ -422,6 +423,21 @@ class PicassoProc:
         self.data_retrievals['sigOLCor'] = ret[0]
         self.data_retrievals['BGOLCor'] = ret[1]
         self.data_retrievals['heightFullOverCor'] = ret[2]
+
+
+    def calcDepol(self):
+        """
+        """
+        
+        for ret_prof_name in self.data_retrievals['avail_optical_profiles']:
+            print(ret_prof_name)
+        
+        ret_prof_name = 'klett'
+        self.data_retrievals[ret_prof_name] = depolarization.voldepol_cldFreeGrps(
+            self, ret_prof_name) 
+
+
+
 
 
 #    def __str__(self):

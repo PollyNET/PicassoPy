@@ -45,6 +45,8 @@ def run_cldFreeGrps(data_cube, signal='TCor', collect_debug=True):
                     molBsc, config_dict[f'smoothWin_klett_{wv}'], collect_debug=collect_debug)
                 prof['aerExt'] = prof['aerBsc'] * config_dict[f"LR{wv}"]
                 prof['aerExtStd'] = prof['aerBscStd'] * config_dict[f"LR{wv}"]
+                prof['retrieval'] = 'klett'
+                prof['signal'] = signal
                 print(prof.keys())
                 opt_profiles[i][f"{wv}_{t}_{tel}"] = prof
 

@@ -81,7 +81,7 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
 #    end_time_command1 = time.time()
 #    elapsed_time_command1 = end_time_command1 - start_time_command1
 #    print(f"Time taken: {elapsed_time_command1:.4f} seconds")
-    PCR = rawSignal * (150/hRes) / mShots[:,np.newaxis,:]
+    PCR = rawSignal * (150./hRes) / mShots[:,np.newaxis,:]
     PCR_Cor = np.zeros_like(PCR)
     signalDTCor = np.zeros_like(PCR)
 

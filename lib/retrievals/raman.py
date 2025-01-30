@@ -96,6 +96,8 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, collect_de
                                    smoothWinBsc=config_dict[f'smoothWin_raman_{wv}'])
                     )
 
+                prof['retrieval'] = 'raman'
+                prof['signal'] = signal
                 opt_profiles[i][f"{wv}_{t}_{tel}"] = prof
 
     return opt_profiles
