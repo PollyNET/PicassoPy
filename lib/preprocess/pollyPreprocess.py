@@ -94,7 +94,7 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
                 # Extract polynomial coefficients for the channel and reverse their order
                 coeffs = deadtime[:, iCh][::-1]
                 PCR_Cor[:,:,iCh] = np.polyval(deadtime[:,iCh][::-1], PCR[:,:,iCh])
-                signalDTCor[:,:,iCh] = PCR_Cor[:,:,iCh]*mShots_norm[:,np.newaxis,iCh]/(150/hRes)
+                signalDTCor[:,:,iCh] = PCR_Cor[:,:,iCh]*mShots_norm[:,np.newaxis,iCh]/(150./hRes)
 
 
         ## nonparalyzable correction: PCR_cor = PCR / (1 - tau*PCR), with tau beeing the dead-time
@@ -601,6 +601,8 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
     #RCS_masked = np.ma.masked_array(sigBGCor+bg,mask=mask)
 #    data_dict['RCS'] = calculate_rcs(datasignal=preproSignal,data_dict=data_dict,mShots=mShots,hRes=hRes)
     data_dict['RCS'] = calculate_rcs(data_dict['PCR_slice'], data_dict['range'])
+    mShots_norm = np.repeat(np.mean(mShots, axis=0)[np.newaxis,:], mShots.shape[0], axis=0)
+    data_dict['RCS'] = calculate_rcs(data_dict['sigBGCor']*(150/hRes)/mShots_norm[:,np.newaxis,:], data_dict['range'])
 
 
     logging.info('finished data preprocessing.')
