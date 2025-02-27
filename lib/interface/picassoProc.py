@@ -18,15 +18,17 @@ import lib.calibration.rayleighfit as rayleighfit
 import lib.retrievals.klettfernald as klettfernald
 import lib.retrievals.raman as raman
 import lib.retrievals.depolarization as depolarization 
+import lib.retrievals.angstroem as angstroem 
 
 class PicassoProc:
     counter = 0
 
-    def __init__(self, rawdata_dict, polly_config_dict, picasso_config_dict):
+    def __init__(self, rawdata_dict, polly_config_dict, picasso_config_dict, polly_default_dict):
         type(self).counter += 1
         self.rawdata_dict = rawdata_dict
         self.polly_config_dict = polly_config_dict
         self.picasso_config_dict = picasso_config_dict
+        self.polly_default_dict = polly_default_dict
         self.device = self.polly_config_dict['name']
         self.location = self.polly_config_dict['site']
         self.date = self.mdate_filename()
@@ -432,11 +434,20 @@ class PicassoProc:
         for ret_prof_name in self.data_retrievals['avail_optical_profiles']:
             print(ret_prof_name)
         
-        ret_prof_name = 'klett'
-        self.data_retrievals[ret_prof_name] = depolarization.voldepol_cldFreeGrps(
-            self, ret_prof_name) 
+            self.data_retrievals[ret_prof_name] = depolarization.voldepol_cldFreeGrps(
+                self, ret_prof_name) 
+            self.data_retrievals[ret_prof_name] = depolarization.pardepol_cldFreeGrps(
+                self, ret_prof_name) 
 
 
+    def Angstroem(self):
+        """
+        """
+        for ret_prof_name in self.data_retrievals['avail_optical_profiles']:
+            print(ret_prof_name)
+        
+            self.data_retrievals[ret_prof_name] = angstroem.ae_cldFreeGrps(
+                self, ret_prof_name) 
 
 
 
