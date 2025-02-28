@@ -71,7 +71,7 @@ class PicassoProc:
             with bool flag
         
         """
-        return getattr(self, f'flag_{wavelength}_{meth}_{telescope}')
+        return getattr(self, f'flag_{wavelength}_{meth}_{telescope}', False)
 
 #    def msite(self):
 #        #msite = f"measurement site: {self.rawdata_dict['global_attributes']['location']}"
@@ -344,7 +344,7 @@ class PicassoProc:
             logging.warning('NO transmission correction')
 
 
-    def retrievalKlett(self, oc=False):
+    def retrievalKlett(self, oc=False, nr=False):
         """
         """
 
@@ -353,6 +353,8 @@ class PicassoProc:
         if oc:
             retrievalname +='_OC'
             kwargs['signal'] = 'OLCor'
+        if nr:
+            kwargs['nr'] = True
 
         print('retrievalname', retrievalname)
         self.data_retrievals[retrievalname] = \
@@ -361,7 +363,7 @@ class PicassoProc:
             self.data_retrievals['avail_optical_profiles'].append(retrievalname)
 
 
-    def retrievalRaman(self, oc=False):
+    def retrievalRaman(self, oc=False, nr=False):
         """
         """
 
@@ -376,6 +378,8 @@ class PicassoProc:
             kwargs['heightFullOverlap'] = \
                 [np.mean(self.data_retrievals['heightFullOverCor'][slice(*cF)], axis=0) for 
                  cF in self.clFreeGrps]
+        if nr:
+            kwargs['nr'] = True
 
         self.data_retrievals[retrievalname] = \
             raman.run_cldFreeGrps(self, **kwargs)

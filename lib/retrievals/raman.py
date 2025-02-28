@@ -12,7 +12,7 @@ sigma_angstroem=0.2
 MC_count=3
 
 
-def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, collect_debug=True):
+def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, collect_debug=True):
     """
     """
 
@@ -37,10 +37,18 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, collect_de
         channels = [((355, 'total', 'FR'), (387, 'total', 'FR')),
                     ((532, 'total', 'FR'), (607, 'total', 'FR')),
                     ((1064, 'total', 'FR'), (607, 'total', 'FR')),]
+        if nr:
+            channels += [((532, 'total', 'NR'), (607, 'total', 'NR')), 
+                         ((355, 'total', 'NR'), (387, 'total', 'NR'))]
         for (wv, t, tel), (wv_r, t_r, tel_r) in channels:
             if np.any(data_cube.gf(wv, t, tel)) and np.any(data_cube.gf(wv_r, t_r, tel_r)):
-                print((wv, t, tel), (wv_r, t_r, tel_r))
+                print(f'== {wv}, {t}, {tel} | {wv_r}, {t_r}, {tel_r} raman ========')
             # TODO add flag for nighttime measurements?
+                if tel == 'NR':
+                    # TODO refBeta is calculate from the far field in the Matlab version
+                    key_smooth = 'smoothWin_raman_NR_'
+                else:
+                    key_smooth = 'smoothWin_raman_'
 
                 sig = np.nansum(np.squeeze(
                     data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
@@ -58,18 +66,28 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, collect_de
                 molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i,:]
                 number_density = data_cube.mol_profiles[f'number_density'][i,:]
 
+                if wv == 1064 and wv_r == 607:
+                    molExt_mod = data_cube.mol_profiles[f'mExt_532'][i,:]
+                    wv_mod = 532
+                else:
+                    wv_mod = wv
+                    molExt_mod = molExt
+
                 prof = raman_ext(
-                    height, sig_r, wv, wv_r, molExt, molExt_r,
-                    number_density, config_dict[f'angstrexp'], config_dict[f'smoothWin_raman_{wv}'], 
+                    height, sig_r, wv_mod, wv_r, molExt_mod, molExt_r,
+                    number_density, config_dict[f'angstrexp'], config_dict[f'{key_smooth}{wv}'], 
                     'moving', 15, bg_r
                     )
+                if wv == 1064 and wv_r == 607:
+                    prof['aerExt'] = prof['aerExt'] / (1064./532.)**config_dict[f'angstrexp']
+                    prof['aerExtStd'] = prof['aerExtStd'] / (1064./532.)**config_dict[f'angstrexp']
 
                 refHInd = data_cube.refH[i][f"{wv}_{t}_{tel}"]['refHInd']
                 refH = height[np.array(refHInd)]
                 hFullOverlap = heightFullOverlap[i][data_cube.gf(wv, t, tel)][0]
-                print(hFullOverlap, config_dict[f'smoothWin_raman_{wv}'] / 2 * hres)
+                print(hFullOverlap, config_dict[f'{key_smooth}{wv}'] / 2 * hres)
                 hBaseInd = np.argmax(
-                    height >= (hFullOverlap + config_dict[f'smoothWin_raman_{wv}'] / 2 * hres))
+                    height >= (hFullOverlap + config_dict[f'{key_smooth}{wv}'] / 2 * hres))
                 print('refHInd', refHInd, 'refH', refH, 'hBaseInd', hBaseInd, 'hBase', height[hBaseInd])
 
                 SNRRef = calc_snr(
@@ -87,13 +105,13 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, collect_de
                     prof.update(
                         raman_bsc(height, sig, sig_r, aerExt_tmp, config_dict['angstrexp'], 
                               molExt, molBsc, molExt_r, molBsc_r,
-                              refH, config_dict[f'refBeta{wv}'], config_dict[f'smoothWin_raman_{wv}'],
+                              refH, config_dict[f'refBeta{wv}'], config_dict[f'{key_smooth}{wv}'],
                               True, wv, wv_r, bg, bg_r, prof['aerExtStd'], sigma_angstroem, MC_count, 'monte-carlo'))      
                     prof.update(
                         lidarratio(aerExt_tmp, prof['aerBsc'], hRes=hres, 
                                    aerExtStd=prof['aerExtStd'], aerBscStd=prof['aerBscStd'],
-                                   smoothWinExt=config_dict[f'smoothWin_raman_{wv}'], 
-                                   smoothWinBsc=config_dict[f'smoothWin_raman_{wv}'])
+                                   smoothWinExt=config_dict[f'{key_smooth}{wv}'], 
+                                   smoothWinBsc=config_dict[f'{key_smooth}{wv}'])
                     )
 
                 prof['retrieval'] = 'raman'

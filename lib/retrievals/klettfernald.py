@@ -4,7 +4,7 @@ import numpy as np
 from scipy.ndimage import uniform_filter1d
 
 
-def run_cldFreeGrps(data_cube, signal='TCor', collect_debug=True):
+def run_cldFreeGrps(data_cube, signal='TCor', nr=False, collect_debug=True):
     """
     """
 
@@ -20,11 +20,22 @@ def run_cldFreeGrps(data_cube, signal='TCor', collect_debug=True):
         print('cldFree ', i, cldFree)
         cldFree = cldFree[0], cldFree[1] + 1
         print('cldFree mod', cldFree)
-        for wv, t, tel in [(532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]:
-        #for wv, t, tel in [(355, 'total', 'FR')]:
-        #for wv, t, tel in [(532, 'total', 'FR')]:
+
+        channels = [
+            (532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]
+        if nr:
+            channels += [(532, 'total', 'NR'), (355, 'total', 'NR')]
+
+        for wv, t, tel in channels:
             if np.any(data_cube.gf(wv, t, tel)):
                 print(f'== {wv}, {t}, {tel} klett =================================')
+                if tel == 'NR':
+                    # TODO refBeta is calculate from the far field in the Matlab version
+                    key_smooth = 'smoothWin_klett_NR_'
+                    key_LR = 'LR_NR_'
+                else:
+                    key_smooth = 'smoothWin_klett_'
+                    key_LR = 'LR'
                 sig = np.nansum(np.squeeze(
                     data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
                 print(data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)].shape)
@@ -37,15 +48,15 @@ def run_cldFreeGrps(data_cube, signal='TCor', collect_debug=True):
                 refH = height[np.array(refHInd)]
                 print('refHInd', refHInd, 'refH', refH)
 
-                print('LR ', config_dict[f"LR{wv}"], refH, 
+                print('LR ', config_dict[f"{key_LR}{wv}"], refH, 
                       'refBeta', config_dict[f'refBeta{wv}'],
-                      'smoothWin_klett', config_dict[f'smoothWin_klett_{wv}'])
+                      'smoothWin_klett', config_dict[f'{key_smooth}{wv}'])
                 #aerBsc, aerBscStd, aerBR, aerBRStd, RCS, signal, molBsc, aerBR = fernald(
                 prof = fernald(
-                    height, sig, bg, config_dict[f"LR{wv}"], refH, config_dict[f'refBeta{wv}'],
-                    molBsc, config_dict[f'smoothWin_klett_{wv}'], collect_debug=collect_debug)
-                prof['aerExt'] = prof['aerBsc'] * config_dict[f"LR{wv}"]
-                prof['aerExtStd'] = prof['aerBscStd'] * config_dict[f"LR{wv}"]
+                    height, sig, bg, config_dict[f"{key_LR}{wv}"], refH, config_dict[f'refBeta{wv}'],
+                    molBsc, config_dict[f'{key_smooth}{wv}'], collect_debug=collect_debug)
+                prof['aerExt'] = prof['aerBsc'] * config_dict[f"{key_LR}{wv}"]
+                prof['aerExtStd'] = prof['aerBscStd'] * config_dict[f"{key_LR}{wv}"]
                 prof['retrieval'] = 'klett'
                 prof['signal'] = signal
                 print(prof.keys())
