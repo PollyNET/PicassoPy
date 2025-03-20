@@ -12,6 +12,8 @@ import lib.qc.overlapCor as overlapCor
 
 
 import lib.calibration.polarization as polarization
+import lib.cloudmask.cloudscreen as cloudscreen
+import lib.cloudmask.profilesegment as profilesegment
 import lib.io.readMeteo as readMeteo
 import lib.misc.molecular as molecular
 import lib.calibration.rayleighfit as rayleighfit
@@ -260,7 +262,7 @@ class PicassoProc:
 
     def cloudScreen(self):
         """https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L663"""
-        pass
+        self.flagCloudFree = cloudscreen.cloudscreen(self)
 
 
     def cloudFreeSeg(self):
@@ -274,7 +276,7 @@ class PicassoProc:
             ]
         
         """
-        self.clFreeGrps = []
+        self.clFreeGrps = profilesegment.segment(self)
 
 
     def loadMeteo(self):
