@@ -1,5 +1,6 @@
 from . import *
 import netCDF4
+import numpy as np
 #from pathlib import Path
 #import logging
 #import sys
@@ -93,6 +94,11 @@ def readPollyRawData(filename=str) -> dict:
             var_att_value = nc_file_ds.variables[var_name].getncattr(var_att)
             #data_dict[f'{var_name}___{var_att}'] = var_att_value
             data_dict[var_name]['var_att'][var_att] = var_att_value
+        
+        #print(var_name, type(data_dict[var_name]['var_data']))
+        if isinstance(data_dict[var_name]['var_data'], np.ma.MaskedArray):
+            data_dict[var_name]['var_data'] = data_dict[var_name]['var_data'].data
+        #print(var_name, type(data_dict[var_name]['var_data']))
 
     data_dict['measurement_height_resolution']['var_data'] = data_dict['measurement_height_resolution']['var_data']*0.15
 

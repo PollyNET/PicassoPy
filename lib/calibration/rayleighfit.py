@@ -57,7 +57,7 @@ def rayleighfit(data_cube):
                     refHInd = fit_profile(
                         height, rcs, sig, bg, mSig, DPInd,
                         config_dict[f'minRefThickness{wv}'], config_dict[f'minRefDeltaExt{wv}'],
-                        config_dict[f'minRefSNR{wv}'], flagShowDetail=True)
+                        config_dict[f'minRefSNR{wv}'], flagShowDetail=False)
                     print('refHInd', refHInd)
 
                     # for debugging reasons
@@ -120,7 +120,7 @@ def DouglasPeucker(signal, height, epsilon, heightBase, heightTop, maxHThick, wi
         - 2018-07-31: Add the maxHThick argument to control the maximum thickness of each output segment.
         - 2024-12-20: Direct translated from matlab with ai
     """
-    print('height', height[:30], 'epsilon', epsilon, 'height', heightBase, heightTop, 'maxHThick', maxHThick, 'window_size', window_size)
+    #print('height', height[:30], 'epsilon', epsilon, 'height', heightBase, heightTop, 'maxHThick', maxHThick, 'window_size', window_size)
 
     # Input check
     if len(signal) != len(height):
@@ -129,8 +129,8 @@ def DouglasPeucker(signal, height, epsilon, heightBase, heightTop, maxHThick, wi
     # Find the boundary for implementing Douglas-Peucker method
     hBaseIndx = np.argmax((height[:-1] - heightBase) * (height[1:] - heightBase) <= 0) + 1
     hTopIndx = np.argmax((height[:-1] - heightTop) * (height[1:] - heightTop) <= 0) + 1
-    print('hBaseIndx', hBaseIndx, height[hBaseIndx])
-    print('hTopIndx', hTopIndx, height[hTopIndx])
+    #print('hBaseIndx', hBaseIndx, height[hBaseIndx])
+    #print('hTopIndx', hTopIndx, height[hTopIndx])
 
     if hBaseIndx == 0:
         hBaseIndx = 1
@@ -173,10 +173,10 @@ def DP_algorithm(pointList, epsilon, maxHThick):
         sigIndx (list): Indices of simplified points.
     """
     if len(pointList) == 1:
-        print('pointList == 1')
+        #print('pointList == 1')
         return [0]
     elif len(pointList) == 2:
-        print('pointList == 2')
+        #print('pointList == 2')
         return [0, 1]
 
     dMax = 0
@@ -369,7 +369,7 @@ def fit_profile(height, sig_aer, pc, bg, sig_mol, dpIndx, layerThickConstrain,
         test1 = test2 = test3 = test4 = test5 = True
         iDpBIndx = dpIndx[iIndx]
         iDpTIndx = dpIndx[iIndx + 1] + 1 # matlab slicing issue??
-        print(iIndx, iDpBIndx, iDpTIndx)
+        #print(iIndx, iDpBIndx, iDpTIndx)
 
         # check layer thickness
         if not ((height[iDpTIndx] - height[iDpBIndx]) > layerThickConstrain):
@@ -393,7 +393,7 @@ def fit_profile(height, sig_aer, pc, bg, sig_mol, dpIndx, layerThickConstrain,
         # Quality test 2: near and far - range cross criteria
         winLen = int(layerThickConstrain / (height[1] - height[0]))
         if winLen <= 0:
-            print('Warning: layerThickConstrain is too small.')
+            # print('Warning: layerThickConstrain is too small.')
             winLen = 5
 
         for jIndx in range(dpIndx[0], dpIndx[-1] - winLen, winLen):
@@ -414,7 +414,7 @@ def fit_profile(height, sig_aer, pc, bg, sig_mol, dpIndx, layerThickConstrain,
             continue
 
         # Quality test 3: white-noise criterion
-        print('white noise criterion ', iDpBIndx, iDpTIndx)
+        #print('white noise criterion ', iDpBIndx, iDpTIndx)
         residual = (sig_aer_norm[iDpBIndx:iDpTIndx] - 
                    sig_mol[iDpBIndx:iDpTIndx])
 
@@ -432,10 +432,10 @@ def fit_profile(height, sig_aer, pc, bg, sig_mol, dpIndx, layerThickConstrain,
             #continue
 
         # Note: chi2fit implementation needed here
-        print('white noise chi2fit input', np.nanmean(x), np.nanmean(residual), np.nanmean(std_aer_norm[iDpBIndx:iDpTIndx]))
+        #print('white noise chi2fit input', np.nanmean(x), np.nanmean(residual), np.nanmean(std_aer_norm[iDpBIndx:iDpTIndx]))
         thisIntersect, thisSlope, _, _, _, _ = chi2fit(
             x, residual, std_aer_norm[iDpBIndx:iDpTIndx])
-        print('white noise chi2fit ', thisIntersect, thisSlope)
+        #print('white noise chi2fit ', thisIntersect, thisSlope)
         
         residual_fit = thisIntersect + thisSlope * x
         et = residual - residual_fit
