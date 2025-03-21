@@ -21,6 +21,9 @@ import lib.retrievals.klettfernald as klettfernald
 import lib.retrievals.raman as raman
 import lib.retrievals.depolarization as depolarization 
 import lib.retrievals.angstroem as angstroem 
+import lib.calibration.lidarconstant as lidarconstant
+
+import lib.retrievals.highres as highres
 
 class PicassoProc:
     counter = 0
@@ -455,6 +458,29 @@ class PicassoProc:
             self.data_retrievals[ret_prof_name] = angstroem.ae_cldFreeGrps(
                 self, ret_prof_name) 
 
+    def LidarCalibration(self):
+        """
+        """
+        self.LC = {}
+        self.LC['klett'] = lidarconstant.lc_for_cldFreeGrps(
+            self, 'klett')
+        self.LC['raman'] = lidarconstant.lc_for_cldFreeGrps(
+            self, 'raman')
+        
+        logging.warning('reading calibration constant from database not working yet')
+        self.LCused = lidarconstant.get_best_LC(self.LC['raman'])
+
+
+    def attBsc_volDepol(self):
+        """highres attBsc and voldepol in 2d
+        """
+
+        # for now try with mutable state in data_cube
+        logging.info('attBsc 2d retrieval')
+        highres.attbsc_2d(self)
+
+        logging.info('voldepol 2d retrieval')
+        highres.voldepol_2d(self)
 
 
 #    def __str__(self):

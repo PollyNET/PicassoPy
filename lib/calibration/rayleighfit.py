@@ -5,8 +5,6 @@ from scipy.ndimage import uniform_filter1d
 
 #import fastrdp
 
-
-
 def rayleighfit(data_cube):
     """ """
 

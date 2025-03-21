@@ -118,8 +118,8 @@ def apply_cube(data_cube):
                 logging.warning(f"no overlap correction function for {wv}")
                 olFunc = 1
 
-            idxOL = np.argmax(olFunc > 0.1, axis=1)
-            olFunc[olFunc < 0.1] = np.nan
+            idxOL = np.argmax(olFunc > 0.07, axis=1)
+            olFunc[olFunc < 0.07] = np.nan
             sigOLCor[:,:,indxt] = np.expand_dims(
                 sigBGCor_total / olFunc,  -1)
             BGOLCor[:,indxt] = np.expand_dims(bg_total, -1)
