@@ -24,6 +24,7 @@ import lib.retrievals.angstroem as angstroem
 import lib.calibration.lidarconstant as lidarconstant
 
 import lib.retrievals.highres as highres
+import lib.retrievals.quasiV1 as quasiV1
 
 class PicassoProc:
     counter = 0
@@ -482,6 +483,23 @@ class PicassoProc:
         logging.info('voldepol 2d retrieval')
         highres.voldepol_2d(self)
 
+
+    def molecular2D(self):
+        """
+        """
+
+        self.mol_2d = molecular.calc_2d(
+            self.met.ds)
+
+
+    def quasiV1(self):
+        """
+        """
+
+        quasiV1.quasi_bsc(self)
+        quasiV1.quasi_pdr(self)
+        quasiV1.quasi_angstrom(self)
+        quasiV1.target_cat(self)
 
 #    def __str__(self):
 #        return f"{self.rawdata_dict}"

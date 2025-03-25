@@ -710,4 +710,57 @@ def mean_stable(x, win, minBin=None, maxBin=None, minRelStd=None):
     return xStable, xIndx, xRelStd
 
 
+from scipy.sparse import diags
+
+def smooth2a(matrix_in, Nr, Nc=None):
+    """
+    Smooths 2D array data while ignoring NaNs.
+
+    This function smooths the data in `matrix_in` using a mean filter over a
+    rectangle of size (2*Nr+1)-by-(2*Nc+1). Each element is replaced by the mean
+    of the surrounding rectangle, ignoring NaN elements. If an element is NaN,
+    it remains NaN in the output. At the edges, as much of the rectangle as fits
+    is used.
+
+    Parameters:
+        matrix_in (ndarray): Original matrix to be smoothed.
+        Nr (int): Number of points used to smooth rows.
+        Nc (int, optional): Number of points used to smooth columns.
+                            If not specified, Nc = Nr.
+
+    Returns:
+        ndarray: Smoothed version of the input matrix.
+
+    References:
+        - Written by Greg Reeves, March 2009, Division of Biology, Caltech.
+        - Inspired by "smooth2" by Kelly Hilands, October 2004, Applied Research Laboratory, Penn State University.
+        - Developed from code by Olof Liungman, 1997, Dept. of Oceanography, Earth Sciences Centre, Göteborg University.
+    """
+
+    if Nc is None:
+        Nc = Nr
+
+    if not isinstance(Nr, (int, np.int64)) or not isinstance(Nc, (int, np.int64)):
+        raise ValueError("Nr and Nc must be scalars!")
+
+    # Matrix dimensions
+    rows, cols = matrix_in.shape
+
+    # Create smoothing matrices
+    eL = diags(np.ones((2 * Nr + 1, rows)), np.arange(-Nr, Nr + 1), shape=(rows, rows)).toarray()
+    eR = diags(np.ones((2 * Nc + 1, cols)), np.arange(-Nc, Nc + 1), shape=(cols, cols)).toarray()
+
+    # Replace NaNs with 0 for summation
+    mask_nan = np.isnan(matrix_in)
+    matrix_in_filled = np.where(mask_nan, 0, matrix_in)
+
+    # Compute normalizing matrix to count non-NaN elements
+    normalize = eL @ (~mask_nan) @ eR
+    normalize[mask_nan] = np.nan  # Retain NaNs in the final output
+
+    # Compute smoothed matrix
+    matrix_out = (eL @ matrix_in_filled @ eR) / normalize
+
+    return matrix_out
+
 
