@@ -203,6 +203,18 @@ data_cube.Angstroem()
 
 print('avail_optical_profiles', data_cube.data_retrievals['avail_optical_profiles'])
 
+data_cube.LidarCalibration()
+
+# gives also
+# data_cube.LCused
+
+data_cube.attBsc_volDepol()
+
+data_cube.molecularHighres()
+
+data_cube.quasiV1()
+
+data_cube.quasiV2()
 
 exit()
 

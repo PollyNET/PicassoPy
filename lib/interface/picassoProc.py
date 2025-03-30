@@ -25,6 +25,8 @@ import lib.calibration.lidarconstant as lidarconstant
 
 import lib.retrievals.highres as highres
 import lib.retrievals.quasiV1 as quasiV1
+import lib.retrievals.quasiV2 as quasiV2
+import lib.retrievals.quasi as quasi
 
 class PicassoProc:
     counter = 0
@@ -484,7 +486,7 @@ class PicassoProc:
         highres.voldepol_2d(self)
 
 
-    def molecular2D(self):
+    def molecularHighres(self):
         """
         """
 
@@ -497,9 +499,19 @@ class PicassoProc:
         """
 
         quasiV1.quasi_bsc(self)
-        quasiV1.quasi_pdr(self)
-        quasiV1.quasi_angstrom(self)
-        quasiV1.target_cat(self)
+        quasi.quasi_pdr(self, version='V1')
+        quasi.quasi_angstrom(self, version='V1')
+        quasi.target_cat(self, version='V1')
+
+    def quasiV2(self):
+        """
+        """
+
+        quasiV2.quasi_bsc(self)
+        quasi.quasi_pdr(self, version='V2')
+        quasi.quasi_angstrom(self, version='V2')
+        quasi.target_cat(self, version='V2')
+
 
 #    def __str__(self):
 #        return f"{self.rawdata_dict}"

@@ -40,6 +40,7 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, 
         if nr:
             channels += [((532, 'total', 'NR'), (607, 'total', 'NR')), 
                          ((355, 'total', 'NR'), (387, 'total', 'NR'))]
+
         for (wv, t, tel), (wv_r, t_r, tel_r) in channels:
             if np.any(data_cube.gf(wv, t, tel)) and np.any(data_cube.gf(wv_r, t_r, tel_r)):
                 print(f'== {wv}, {t}, {tel} | {wv_r}, {t_r}, {tel_r} raman ========')
