@@ -42,7 +42,9 @@ class PicassoProc:
         self.date = self.mdate_filename()
         self.num_of_channels = len(self.rawdata_dict['measurement_shots']['var_data'][0])
         self.num_of_profiles = self.rawdata_dict['raw_signal']['var_data'].shape[0]
-        self.data_retrievals = {}
+        self.retrievals_highres = {}
+        self.retrievals_profile = {}
+        self.retrievals_profile['avail_optical_profiles'] = []
 
     def mdate_filename(self):
         filename = self.rawdata_dict['filename']
@@ -161,7 +163,7 @@ class PicassoProc:
 
         ChannelTags, self.polly_config_dict = pollyChannelTags.polly_config_channel_corrections(chTagsOut_ls=ChannelTags,polly_config_dict=self.polly_config_dict)
 
-        self.data_retrievals['channel'] = ChannelTags
+        self.retrievals_highres['channel'] = ChannelTags
         self.polly_config_dict['channelTags'] = ChannelTags
         self.channel_dict = {i: item for i, item in enumerate(ChannelTags)}
 
@@ -242,7 +244,7 @@ class PicassoProc:
                 isUseLatestGDAS = self.polly_config_dict['flagUseLatestGDAS'],
                 collect_debug=collect_debug,
                 )
-        self.data_retrievals.update(preproc_dict)
+        self.retrievals_highres.update(preproc_dict)
 
         return self
 
@@ -293,7 +295,7 @@ class PicassoProc:
             self.polly_config_dict['meteo_file'])
         self.met.load(
             datetime.datetime.timestamp(datetime.datetime.strptime(self.date, '%Y%m%d')),
-            self.data_retrievals['height'])
+            self.retrievals_highres['height'])
 
 
     def loadAOD(self):
@@ -308,7 +310,7 @@ class PicassoProc:
         
         """
 
-        time_slices = [self.data_retrievals['time64'][grp] for grp in self.clFreeGrps]
+        time_slices = [self.retrievals_highres['time64'][grp] for grp in self.clFreeGrps]
         print('time slices of cloud free ', time_slices)
         mean_profiles = self.met.get_mean_profiles(time_slices) 
         self.mol_profiles = molecular.calc_profiles(mean_profiles)
@@ -346,7 +348,7 @@ class PicassoProc:
 
         if self.polly_config_dict['flagTransCor']:
             logging.warning('transmission correction')
-            self.data_retrievals['sigTCor'], self.data_retrievals['BGTCor'] = \
+            self.retrievals_highres['sigTCor'], self.retrievals_highres['BGTCor'] = \
                   transCor.transCorGHK_cube(self)
         else:
             logging.warning('NO transmission correction')
@@ -365,10 +367,10 @@ class PicassoProc:
             kwargs['nr'] = True
 
         print('retrievalname', retrievalname)
-        self.data_retrievals[retrievalname] = \
+        self.retrievals_profile[retrievalname] = \
             klettfernald.run_cldFreeGrps(self, **kwargs)
-        if retrievalname not in self.data_retrievals['avail_optical_profiles']:
-            self.data_retrievals['avail_optical_profiles'].append(retrievalname)
+        if retrievalname not in self.retrievals_profile['avail_optical_profiles']:
+            self.retrievals_profile['avail_optical_profiles'].append(retrievalname)
 
 
     def retrievalRaman(self, oc=False, nr=False):
@@ -384,15 +386,15 @@ class PicassoProc:
             # get the full overlap height for the overlap corrected variant
             # group by the cloud free groups 
             kwargs['heightFullOverlap'] = \
-                [np.mean(self.data_retrievals['heightFullOverCor'][slice(*cF)], axis=0) for 
+                [np.mean(self.retrievals_highres['heightFullOverCor'][slice(*cF)], axis=0) for 
                  cF in self.clFreeGrps]
         if nr:
             kwargs['nr'] = True
 
-        self.data_retrievals[retrievalname] = \
+        self.retrievals_profile[retrievalname] = \
             raman.run_cldFreeGrps(self, **kwargs)
-        if retrievalname not in self.data_retrievals['avail_optical_profiles']:
-            self.data_retrievals['avail_optical_profiles'].append(retrievalname)
+        if retrievalname not in self.retrievals_profile['avail_optical_profiles']:
+            self.retrievals_profile['avail_optical_profiles'].append(retrievalname)
 
 
     def overlapCalc(self):
@@ -403,17 +405,17 @@ class PicassoProc:
             
         """
 
-        self.data_retrievals['overlap'] = {}
-        self.data_retrievals['overlap']['frnr'] = overlapEst.run_frnr_cldFreeGrps(self)
-        self.data_retrievals['overlap']['raman'] = overlapEst.run_raman_cldFreeGrps(self)
+        self.retrievals_profile['overlap'] = {}
+        self.retrievals_profile['overlap']['frnr'] = overlapEst.run_frnr_cldFreeGrps(self)
+        self.retrievals_profile['overlap']['raman'] = overlapEst.run_raman_cldFreeGrps(self)
     
     def overlapFixLowestBins(self):
         """the lowest bins are affected by stange near range effects"""
 
-        height = self.data_retrievals['range']
-        for k in self.data_retrievals['overlap']:
+        height = self.retrievals_highres['range']
+        for k in self.retrievals_profile['overlap']:
             return overlapCor.fixLowest(
-                self.data_retrievals['overlap'][k], np.where(height > 800)[0][0])
+                self.retrievals_profile['overlap'][k], np.where(height > 800)[0][0])
 
 
     def overlapCor(self):
@@ -431,34 +433,34 @@ class PicassoProc:
         logging.info('overlap Correction')
         if self.polly_config_dict['overlapCorMode'] == 1:
             logging.info('overlapCorMode 1 -> need file for overlapfunction')
-            self.data_retrievals['overlap']['file'] = overlapEst.load(self)
-        self.data_retrievals['overlap2d'] = overlapCor.spread(self)
+            self.retrievals_profile['overlap']['file'] = overlapEst.load(self)
+        self.retrievals_highres['overlap2d'] = overlapCor.spread(self)
         ret = overlapCor.apply_cube(self)
-        self.data_retrievals['sigOLCor'] = ret[0]
-        self.data_retrievals['BGOLCor'] = ret[1]
-        self.data_retrievals['heightFullOverCor'] = ret[2]
+        self.retrievals_highres['sigOLCor'] = ret[0]
+        self.retrievals_highres['BGOLCor'] = ret[1]
+        self.retrievals_highres['heightFullOverCor'] = ret[2]
 
 
     def calcDepol(self):
         """
         """
         
-        for ret_prof_name in self.data_retrievals['avail_optical_profiles']:
+        for ret_prof_name in self.retrievals_profile['avail_optical_profiles']:
             print(ret_prof_name)
         
-            self.data_retrievals[ret_prof_name] = depolarization.voldepol_cldFreeGrps(
+            self.retrievals_profile[ret_prof_name] = depolarization.voldepol_cldFreeGrps(
                 self, ret_prof_name) 
-            self.data_retrievals[ret_prof_name] = depolarization.pardepol_cldFreeGrps(
+            self.retrievals_profile[ret_prof_name] = depolarization.pardepol_cldFreeGrps(
                 self, ret_prof_name) 
 
 
     def Angstroem(self):
         """
         """
-        for ret_prof_name in self.data_retrievals['avail_optical_profiles']:
+        for ret_prof_name in self.retrievals_profile['avail_optical_profiles']:
             print(ret_prof_name)
         
-            self.data_retrievals[ret_prof_name] = angstroem.ae_cldFreeGrps(
+            self.retrievals_profile[ret_prof_name] = angstroem.ae_cldFreeGrps(
                 self, ret_prof_name) 
 
     def LidarCalibration(self):

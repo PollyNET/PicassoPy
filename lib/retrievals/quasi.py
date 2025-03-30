@@ -10,8 +10,8 @@ def quasi_pdr(data_cube, wvs=[532], version='V1'):
     """
     """
 
-    rgs = data_cube.data_retrievals['range']
-    time = data_cube.data_retrievals['time64']
+    rgs = data_cube.retrievals_highres['range']
+    time = data_cube.retrievals_highres['time64']
     config_dict = data_cube.polly_config_dict
     default_dict = data_cube.polly_default_dict
     #hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
@@ -23,11 +23,11 @@ def quasi_pdr(data_cube, wvs=[532], version='V1'):
         flagc = data_cube.gf(wv, 'cross', tel)
 
         sigt = np.squeeze(
-            data_cube.data_retrievals[f'sigBGCor'][:,:,flagt])
+            data_cube.retrievals_highres[f'sigBGCor'][:,:,flagt])
         sigc = np.squeeze(
-            data_cube.data_retrievals[f'sigBGCor'][:,:,flagc])
-        sigt[data_cube.data_retrievals['depCalMask'], :] = np.nan
-        sigc[data_cube.data_retrievals['depCalMask'], :] = np.nan
+            data_cube.retrievals_highres[f'sigBGCor'][:,:,flagc])
+        sigt[data_cube.retrievals_highres['depCalMask'], :] = np.nan
+        sigc[data_cube.retrievals_highres['depCalMask'], :] = np.nan
 
         # TODO check if halving the window is needed
         smooth_t = int(np.array(config_dict['quasi_smooth_t'])[data_cube.gf(wv, t, tel)][0] / 2)
@@ -46,15 +46,15 @@ def quasi_pdr(data_cube, wvs=[532], version='V1'):
             data_cube.pol_cali[int(wv)]['eta_best'], config_dict[f'voldepol_error_{wv}'],
             1)
 
-        quasi_bsc = data_cube.data_retrievals[f"quasiBsc{version}_{wv}_{t}_{tel}"]
+        quasi_bsc = data_cube.retrievals_highres[f"quasiBsc{version}_{wv}_{t}_{tel}"]
 
         molDepol = default_dict[f'molDepol{wv}']
         #quasi_pdr = (vdr + 1) / \jjj
         #    (mBsc * (molDepol - vdr)) * (quasi_bsc * (1 + molDepol) + 1) - 1
         quasi_pdr = (vdr + 1) / (mBsc * (molDepol - vdr) / quasi_bsc / (1 + molDepol) + 1) - 1
 
-        data_cube.data_retrievals[f"quasiPdr{version}_{wv}_{t}_{tel}"] = quasi_pdr
-        data_cube.data_retrievals[f"quasiVdr{version}_{wv}_{t}_{tel}"] = vdr
+        data_cube.retrievals_highres[f"quasiPdr{version}_{wv}_{t}_{tel}"] = quasi_pdr
+        data_cube.retrievals_highres[f"quasiVdr{version}_{wv}_{t}_{tel}"] = vdr
 
 
 def quasi_angstrom(data_cube, version='V1'):
@@ -62,10 +62,10 @@ def quasi_angstrom(data_cube, version='V1'):
 
     t = 'total'
     tel = 'FR'
-    ratio_par_bsc = data_cube.data_retrievals[f'quasiBsc{version}_532_{t}_{tel}'] / \
-        data_cube.data_retrievals[f'quasiBsc{version}_1064_{t}_{tel}']
+    ratio_par_bsc = data_cube.retrievals_highres[f'quasiBsc{version}_532_{t}_{tel}'] / \
+        data_cube.retrievals_highres[f'quasiBsc{version}_1064_{t}_{tel}']
     ratio_par_bsc[ratio_par_bsc < 0] = np.nan
-    data_cube.data_retrievals[f"quasiAE{version}_532_1064"] = ratio_par_bsc / np.log(532/1064)
+    data_cube.retrievals_highres[f"quasiAE{version}_532_1064"] = ratio_par_bsc / np.log(532/1064)
 
 
 
@@ -82,13 +82,13 @@ def target_cat(data_cube, version='V1'):
     else:
         hFullOL = 0
 
-    tcMask = target_classify(data_cube.data_retrievals['range'],
-        data_cube.data_retrievals['attBsc_532_total_FR'], 
-        data_cube.data_retrievals[f'quasiBsc{version}_1064_total_FR'],
-        data_cube.data_retrievals[f'quasiBsc{version}_532_total_FR'], 
-        data_cube.data_retrievals[f'quasiPdr{version}_532_total_FR'],
-        data_cube.data_retrievals[f'quasiVdr{version}_532_total_FR'], 
-        data_cube.data_retrievals[f'quasiAE{version}_532_1064'],
+    tcMask = target_classify(data_cube.retrievals_highres['range'],
+        data_cube.retrievals_highres['attBsc_532_total_FR'], 
+        data_cube.retrievals_highres[f'quasiBsc{version}_1064_total_FR'],
+        data_cube.retrievals_highres[f'quasiBsc{version}_532_total_FR'], 
+        data_cube.retrievals_highres[f'quasiPdr{version}_532_total_FR'],
+        data_cube.retrievals_highres[f'quasiVdr{version}_532_total_FR'], 
+        data_cube.retrievals_highres[f'quasiAE{version}_532_1064'],
 
         clearThresBsc1064=config_dict['clear_thres_par_beta_1064'],
         turbidThresBsc1064=config_dict['turbid_thres_par_beta_1064'],
@@ -107,7 +107,7 @@ def target_cat(data_cube, version='V1'):
         hFullOL=hFullOL
     )
         
-    tcMask[data_cube.data_retrievals['depCalMask'], :] = 0
+    tcMask[data_cube.retrievals_highres['depCalMask'], :] = 0
     # add fog mask
     # add low SNR mask
     # set the value during the depolarization calibration period or in fog conditions to 0
@@ -115,7 +115,7 @@ def target_cat(data_cube, version='V1'):
     # set the value with low SNR to 0
     #data.tcMaskV1((data.quality_mask_532 ~= 0) | (data.quality_mask_1064 ~= 0) | (data.quality_mask_vdr_532 ~= 0)) = 0;
 
-    data_cube.data_retrievals[f"tcMask{version}"] = tcMask
+    data_cube.retrievals_highres[f"tcMask{version}"] = tcMask
 
 
 def target_classify(height, attBeta532, quasiBsc1064, quasiBsc532, quasiPDR532, VDR532, quasiAE, **kwargs):

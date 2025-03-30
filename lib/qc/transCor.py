@@ -8,9 +8,9 @@ def transCorGHK_cube(data_cube, signal='BGCor'):
 
     config_dict = data_cube.polly_config_dict
 
-    BGTCor = data_cube.data_retrievals['BG'].copy() 
+    BGTCor = data_cube.retrievals_highres['BG'].copy() 
     # Store the background corrected signal
-    sigTCor = data_cube.data_retrievals[f'sig{signal}'].copy() 
+    sigTCor = data_cube.retrievals_highres[f'sig{signal}'].copy() 
 
     for wv in [355, 532, 1064]:
         flagt = data_cube.gf(wv, 'total', 'FR')
@@ -20,10 +20,10 @@ def transCorGHK_cube(data_cube, signal='BGCor'):
         if np.any(flagt) and np.any(flagc):
             logging.info(f'and even a {wv} channel')
 
-            sigBGCor_total = np.squeeze(data_cube.data_retrievals[f'sig{signal}'][:,:,flagt])
-            bg_total = np.squeeze(data_cube.data_retrievals['BG'][:,flagt])
-            sigBGCor_cross = np.squeeze(data_cube.data_retrievals[f'sig{signal}'][:,:,flagc])
-            bg_cross = np.squeeze(data_cube.data_retrievals['BG'][:,flagc])
+            sigBGCor_total = np.squeeze(data_cube.retrievals_highres[f'sig{signal}'][:,:,flagt])
+            bg_total = np.squeeze(data_cube.retrievals_highres['BG'][:,flagt])
+            sigBGCor_cross = np.squeeze(data_cube.retrievals_highres[f'sig{signal}'][:,:,flagc])
+            bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][:,flagc])
 
             print('G', config_dict['G'][flagt], config_dict['G'][flagc])
             print('H', config_dict['H'][flagt], config_dict['H'][flagc])

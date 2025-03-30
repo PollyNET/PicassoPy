@@ -11,7 +11,7 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
     """
 
     config_dict = data_cube.polly_config_dict
-    opt_profiles = data_cube.data_retrievals[ret_prof_name]
+    opt_profiles = data_cube.retrievals_profile[ret_prof_name]
     print('no_profiles ', len(opt_profiles))
     print(opt_profiles[0].keys())
 
@@ -30,11 +30,11 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
                 logging.info(f'voldepol at channel {wv} cldFree {i} {cldFree}')
 
                 sigt = np.nansum(np.squeeze(
-                    data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,flagt]), axis=0)
+                    data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,flagt]), axis=0)
                 #bgt = np.nansum(np.squeeze(
-                #    data_cube.data_retrievals[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, 'total', tel)]), axis=0)
+                #    data_cube.retrievals_highres[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, 'total', tel)]), axis=0)
                 sigc = np.nansum(np.squeeze(
-                    data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,flagc]), axis=0)
+                    data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,flagc]), axis=0)
 
                 print(channel, data_cube.pol_cali[int(wv)]['eta_best'])
 
@@ -170,7 +170,7 @@ def pardepol_cldFreeGrps(data_cube, ret_prof_name):
     """
 
     config_dict = data_cube.polly_config_dict
-    opt_profiles = data_cube.data_retrievals[ret_prof_name]
+    opt_profiles = data_cube.retrievals_profile[ret_prof_name]
     print('no_profiles ', len(opt_profiles))
     print(opt_profiles[0].keys())
     signal = 'BGCor'

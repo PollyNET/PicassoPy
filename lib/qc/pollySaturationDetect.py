@@ -50,15 +50,15 @@ def pollySaturationDetect(data_cube,**varargin):
     rawSignal = data_cube.rawdata_dict['raw_signal']['var_data']
     hRes = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
 
-    if 'PCR_slice' in data_cube.data_retrievals.keys():
-        PCR = data_cube.data_retrievals['PCR_slice']
+    if 'PCR_slice' in data_cube.retrievals_highres.keys():
+        PCR = data_cube.retrievals_highres['PCR_slice']
     else:
         logging.info('no PCR_cor key was found in data_cube object, using uncorrected PCR.')
         PCR = rawSignal / mShots[:, np.newaxis, :] * 150.0 / hRes
 
     nChannels = data_cube.num_of_channels
     nProfiles = data_cube.num_of_profiles
-    height=data_cube.data_retrievals['range']
+    height=data_cube.retrievals_highres['range']
 
     flagSaturation = np.full(PCR.shape, False, dtype=bool)
 

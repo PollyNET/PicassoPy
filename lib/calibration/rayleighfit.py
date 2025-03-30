@@ -9,7 +9,7 @@ def rayleighfit(data_cube):
     """ """
 
     # TODO ist data.distance0 and height the same? https://github.com/PollyNET/Pollynet_Processing_Chain/blob/e413f9254094ff2c0a18fcdac4e9bebb5385d526/lib/preprocess/pollyPreprocess.m#L299
-    height = data_cube.data_retrievals['range']
+    height = data_cube.retrievals_highres['range']
     logging.warning(f'rayleighfit seems to use range in matlab, but the met data should be in height >> RECHECK!')
     logging.warning(f'at 10km height this is a difference of about 4 indices')
     config_dict = data_cube.polly_config_dict
@@ -25,11 +25,11 @@ def rayleighfit(data_cube):
                 if np.any(data_cube.gf(wv, 'total', 'FR')):
                     print(f'refH for {wv}')
                     rcs = np.nanmean(np.squeeze(
-                        data_cube.data_retrievals['RCS'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
+                        data_cube.retrievals_highres['RCS'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
                     sig = np.nansum(np.squeeze(
-                        data_cube.data_retrievals['sigBGCor'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
+                        data_cube.retrievals_highres['sigBGCor'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
                     bg = np.nansum(np.squeeze(
-                        data_cube.data_retrievals['BG'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
+                        data_cube.retrievals_highres['BG'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
 
                     mSig = (
                         data_cube.mol_profiles[f'mBsc_{wv}'][i,:] * \

@@ -9,8 +9,8 @@ def segment(data_cube):
     # the flag in the original matlab version
     # flagValPrf = flagCloudFree & (~ data.fogMask) & (~ data.depCalMask) & (~ data.shutterOnMask);    
 
-    # TODO for some reason data_cube.data_retrievals['depCalMask'] is of type masked_array
-    flagValPrf = data_cube.flagCloudFree & (~data_cube.data_retrievals['depCalMask'])
+    # TODO for some reason data_cube.retrievals_highres['depCalMask'] is of type masked_array
+    flagValPrf = data_cube.flagCloudFree & (~data_cube.retrievals_highres['depCalMask'])
 
     print('intNProfiles', config_dict['intNProfiles'], 'minIntNProfiles', config_dict['minIntNProfiles'])
     clFreeGrps = clFreeSeg(flagValPrf, config_dict['intNProfiles'], config_dict['minIntNProfiles'])

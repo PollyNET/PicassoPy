@@ -22,12 +22,12 @@ def spread(data_cube):
     (https://github.com/PollyNET/Pollynet_Processing_Chain/blob/e413f9254094ff2c0a18fcdac4e9bebb5385d526/lib/qc/olCor.m#L34)
     """
     config_dict = data_cube.polly_config_dict
-    height = data_cube.data_retrievals['range']
-    time = data_cube.data_retrievals['time64']
+    height = data_cube.retrievals_highres['range']
+    time = data_cube.retrievals_highres['time64']
     print('overlapCorMode ', config_dict['overlapCorMode'], 
           ' overlapCalMode ', config_dict['overlapCalMode'])
 
-    overlap = data_cube.data_retrievals['overlap']
+    overlap = data_cube.retrievals_profile['overlap']
     print(overlap.keys())
     if config_dict['overlapCorMode'] == 1:
         k = 'file'
@@ -87,14 +87,14 @@ def apply_cube(data_cube):
     """ 
 
     """
-    height = data_cube.data_retrievals['range']
+    height = data_cube.retrievals_highres['range']
     config_dict = data_cube.polly_config_dict
-    BGOLCor = data_cube.data_retrievals['BGTCor'].copy() 
+    BGOLCor = data_cube.retrievals_highres['BGTCor'].copy() 
     heightFullOverlapCor = np.repeat(
         np.array(config_dict['heightFullOverlap'])[np.newaxis,:],
         BGOLCor.shape[0], axis=0)
-    sigOLCor = data_cube.data_retrievals['sigTCor'].copy() 
-    overlap2d = data_cube.data_retrievals['overlap2d']
+    sigOLCor = data_cube.retrievals_highres['sigTCor'].copy() 
+    overlap2d = data_cube.retrievals_highres['overlap2d']
 
     alt_wv = {607: 532, 387: 355, 1064: 532}
      
@@ -103,9 +103,9 @@ def apply_cube(data_cube):
         indxt = np.where(flag)[0]
 
         # TODO fix that error, that is for now required for debugging
-        #sigBGCor_total = np.squeeze(data_cube.data_retrievals['sigTCor'][:,:,flag])
-        sigBGCor_total = np.squeeze(data_cube.data_retrievals['sigBGCor'][:,:,flag])
-        bg_total = np.squeeze(data_cube.data_retrievals['BGTCor'][:,flag])
+        #sigBGCor_total = np.squeeze(data_cube.retrievals_highres['sigTCor'][:,:,flag])
+        sigBGCor_total = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:,:,flag])
+        bg_total = np.squeeze(data_cube.retrievals_highres['BGTCor'][:,flag])
 
         if config_dict['overlapCorMode'] in [1,2]:
             print('correct overlap', wv)

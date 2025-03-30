@@ -12,8 +12,8 @@ def quasi_bsc(data_cube):
     """
     """
 
-    rgs = data_cube.data_retrievals['range']
-    time = data_cube.data_retrievals['time64']
+    rgs = data_cube.retrievals_highres['range']
+    time = data_cube.retrievals_highres['time64']
     config_dict = data_cube.polly_config_dict
     
     channels = [((355, 'total', 'FR'), (387, 'total', 'FR')),
@@ -21,13 +21,13 @@ def quasi_bsc(data_cube):
                 ((1064, 'total', 'FR'), (607, 'total', 'FR')),]
 
     for (wv, t, tel), (wv_r, t_r, tel_r) in channels:
-        att_beta_qsi = data_cube.data_retrievals[f'attBsc_{wv}_{t}_{tel}'].copy()
+        att_beta_qsi = data_cube.retrievals_highres[f'attBsc_{wv}_{t}_{tel}'].copy()
         # TODO check if halving the window is needed
         smooth_t = int(np.array(config_dict['quasi_smooth_t'])[data_cube.gf(wv, t, tel)][0] / 2)
         smooth_h = int(np.array(config_dict['quasi_smooth_h'])[data_cube.gf(wv, t, tel)][0] / 2)
         att_beta_qsi = helper.smooth2a(att_beta_qsi, smooth_t, smooth_h)
 
-        att_beta_r_qsi = data_cube.data_retrievals[f'attBsc_{wv_r}_{t}_{tel}'].copy()
+        att_beta_r_qsi = data_cube.retrievals_highres[f'attBsc_{wv_r}_{t}_{tel}'].copy()
         # TODO check if halving the window is needed
         smooth_t = int(np.array(config_dict['quasi_smooth_t'])[data_cube.gf(wv_r, t, tel)][0] / 2)
         smooth_h = int(np.array(config_dict['quasi_smooth_h'])[data_cube.gf(wv_r, t, tel)][0] / 2)
@@ -51,8 +51,8 @@ def quasi_bsc(data_cube):
             mExt, mBsc, mExt_r, 0.5, config_dict[f'LR{wv}'], nIters=3
         )
 
-        data_cube.data_retrievals[f"quasiBscV2_{wv}_{t}_{tel}"] = quasi_par_bsc
-        data_cube.data_retrievals[f"quasiExtV2_{wv}_{t}_{tel}"] = quasi_par_ext
+        data_cube.retrievals_highres[f"quasiBscV2_{wv}_{t}_{tel}"] = quasi_par_bsc
+        data_cube.retrievals_highres[f"quasiExtV2_{wv}_{t}_{tel}"] = quasi_par_ext
 
 
 

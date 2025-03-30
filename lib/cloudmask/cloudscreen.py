@@ -15,11 +15,11 @@ def cloudscreen(data_cube):
     print('Starting cloud screen')
     print('cloud screen mode', config_dict['cloudScreenMode'])
     print('slope_thres', config_dict['maxSigSlope4FilterCloud'])
-    height = data_cube.data_retrievals['range']
+    height = data_cube.retrievals_highres['range']
 
     wv = 532
-    RCS = np.squeeze(data_cube.data_retrievals['RCS'][:,:,data_cube.gf(wv, 'total', 'FR')])
-    bg = np.squeeze(data_cube.data_retrievals['BG'][:,data_cube.gf(wv, 'total', 'FR')])
+    RCS = np.squeeze(data_cube.retrievals_highres['RCS'][:,:,data_cube.gf(wv, 'total', 'FR')])
+    bg = np.squeeze(data_cube.retrievals_highres['BG'][:,data_cube.gf(wv, 'total', 'FR')])
     hFullOL = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, 'total', 'FR')][0]
 
     if config_dict['cloudScreenMode'] == 1:
@@ -34,8 +34,8 @@ def cloudscreen(data_cube):
 
     # and for near range if it exists
     if np.any(data_cube.gf(wv, 'total', 'NR')):
-        RCS = np.squeeze(data_cube.data_retrievals['RCS'][:,:,data_cube.gf(wv, 'total', 'NR')])
-        bg = np.squeeze(data_cube.data_retrievals['BG'][:,data_cube.gf(wv, 'total', 'NR')])
+        RCS = np.squeeze(data_cube.retrievals_highres['RCS'][:,:,data_cube.gf(wv, 'total', 'NR')])
+        bg = np.squeeze(data_cube.retrievals_highres['BG'][:,data_cube.gf(wv, 'total', 'NR')])
         hFullOL = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, 'total', 'NR')][0]
         if config_dict['cloudScreenMode'] == 1:
             flagCloudFree_NR, layerStatus_NR = screenfunc(

@@ -17,7 +17,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
          
     """
 
-    height = data_cube.data_retrievals['range']
+    height = data_cube.retrievals_highres['range']
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
     config_dict = data_cube.polly_config_dict
     heightFullOverlap = [
@@ -29,7 +29,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
 
     for i, cldFree in enumerate(data_cube.clFreeGrps):
         cldFree = cldFree[0], cldFree[1] + 1
-        profiles = data_cube.data_retrievals[retrieval][i]
+        profiles = data_cube.retrievals_profile[retrieval][i]
 
         for channel in profiles:
             wv, t, tel = channel.split('_')
@@ -46,7 +46,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
 
             sig = profiles[channel]['signal']
             signal = np.nanmean(np.squeeze(
-                data_cube.data_retrievals[f'sig{sig}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
+                data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
             molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
             molExt = data_cube.mol_profiles[f'mExt_{wv}'][i,:]
 
@@ -72,7 +72,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
             if retrieval == 'raman' and int(wv) in elastic2raman.keys():
                 wv_r = elastic2raman[int(wv)] 
                 signal_r = np.nanmean(np.squeeze(
-                    data_cube.data_retrievals[f'sig{sig}'][slice(*cldFree),:,data_cube.gf(wv_r, t, tel)]), axis=0)
+                    data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree),:,data_cube.gf(wv_r, t, tel)]), axis=0)
                 #molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i,:]
                 molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i,:]
                 aerExt_r = aerExt * (int(wv)/int(wv_r))**config_dict['angstrexp'] 

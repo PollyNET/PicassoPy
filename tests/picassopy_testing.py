@@ -145,7 +145,7 @@ data_cube.reset_date_infile()
 ## preprocessing
 data_cube.preprocessing()
 #print(data_cube.rawdata_dict.keys())
-#print(data_cube.data_retrievals.keys())
+#print(data_cube.retrievals_highres.keys())
 
 data_cube.SaturationDetect()
 
@@ -201,7 +201,7 @@ data_cube.calcDepol()
 
 data_cube.Angstroem()
 
-print('avail_optical_profiles', data_cube.data_retrievals['avail_optical_profiles'])
+print('avail_optical_profiles', data_cube.retrievals_profile['avail_optical_profiles'])
 
 data_cube.LidarCalibration()
 
@@ -228,17 +228,17 @@ for prod in prod_ls:
         json_nc_mapping_dict[prod] = json2nc_mapping.read_json_to_dict(Path(root_dir,'lib','config',f'json2nc-mapper_{prod}.json'))
 
         """ map channels to variables """
-        helper.channel_2_variable_mapping(data_retrievals=data_cube.data_retrievals, var=prod, channeltags_dict=data_cube.channel_dict)
+        helper.channel_2_variable_mapping(data_retrievals=data_cube.retrievals_highres, var=prod, channeltags_dict=data_cube.channel_dict)
         
         """ set dimension sizes """
         for d in json_nc_mapping_dict[prod]['dimensions']:
-            json_nc_mapping_dict[prod]['dimensions'][d] = len(data_cube.data_retrievals[d])
+            json_nc_mapping_dict[prod]['dimensions'][d] = len(data_cube.retrievals_highres[d])
         
         """ fill variables """
         for v in list(json_nc_mapping_dict[prod]['variables'].keys()):
         #for v in json_nc_mapping_dict[prod]['variables'].keys():
-            if v in data_cube.data_retrievals.keys():
-                json_nc_mapping_dict[prod]['variables'][v]['data'] = data_cube.data_retrievals[v]
+            if v in data_cube.retrievals_highres.keys():
+                json_nc_mapping_dict[prod]['variables'][v]['data'] = data_cube.retrievals_highres[v]
         ### TODO: remove empty key-value-pairs
             if json_nc_mapping_dict[prod]['variables'][v]['data'] is None:
                 json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], key_to_remove=v)

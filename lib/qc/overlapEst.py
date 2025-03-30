@@ -12,7 +12,7 @@ def run_frnr_cldFreeGrps(data_cube, collect_debug=True):
     """
     """
 
-    height = data_cube.data_retrievals['range']
+    height = data_cube.retrievals_highres['range']
     logging.warning(f'rayleighfit seems to use range in matlab, but the met data should be in height >> RECHECK!')
     logging.warning(f'at 10km height this is a difference of about 4 indices')
     config_dict = data_cube.polly_config_dict
@@ -28,13 +28,13 @@ def run_frnr_cldFreeGrps(data_cube, collect_debug=True):
             if np.any(data_cube.gf(wv, 'total', 'FR')) and np.any(data_cube.gf(wv, 'total', 'NR')):
                 print(wv, 'both telescopes available')
                 sigFR = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, 'total', 'FR')]), axis=0)
+                    data_cube.retrievals_highres['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, 'total', 'FR')]), axis=0)
                 bgFR = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['BGTCor'][slice(*cldFree),data_cube.gf(wv, 'total', 'FR')]), axis=0)
+                    data_cube.retrievals_highres['BGTCor'][slice(*cldFree),data_cube.gf(wv, 'total', 'FR')]), axis=0)
                 sigNR = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, 'total', 'NR')]), axis=0)
+                    data_cube.retrievals_highres['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, 'total', 'NR')]), axis=0)
                 bgNR = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['BGTCor'][slice(*cldFree),data_cube.gf(wv, 'total', 'NR')]), axis=0)
+                    data_cube.retrievals_highres['BGTCor'][slice(*cldFree),data_cube.gf(wv, 'total', 'NR')]), axis=0)
                 hFullOverlap = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, 'total', 'FR')][0]
                 ol = overlapCalc(height, sigFR, bgFR, sigNR, bgNR, hFullOverlap=hFullOverlap)
                 overlap[i][f"{wv}_total_FR"] = ol
@@ -110,7 +110,7 @@ def run_raman_cldFreeGrps(data_cube, collect_debug=True):
     """
     """
 
-    height = data_cube.data_retrievals['range']
+    height = data_cube.retrievals_highres['range']
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
     logging.warning(f'rayleighfit seems to use range in matlab, but the met data should be in height >> RECHECK!')
     logging.warning(f'at 10km height this is a difference of about 4 indices')
@@ -128,18 +128,18 @@ def run_raman_cldFreeGrps(data_cube, collect_debug=True):
             if np.any(data_cube.gf(wv, t, tel)) and np.any(data_cube.gf(wv_r, t_r, tel_r)):
                 print(wv, wv_r, 'both wavelengths available')
                 sig = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
+                    data_cube.retrievals_highres['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
                 bg = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['BGTCor'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
+                    data_cube.retrievals_highres['BGTCor'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
                 molExt = data_cube.mol_profiles[f'mExt_{wv}'][i,:]
 
-                aerBsc = data_cube.data_retrievals['raman'][i][f"{wv}_{t}_{tel}"]['aerBsc']
+                aerBsc = data_cube.retrievals_profile['raman'][i][f"{wv}_{t}_{tel}"]['aerBsc']
 
                 sig_r = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['sigTCor'][slice(*cldFree),:,data_cube.gf(wv_r, t, tel)]), axis=0)
+                    data_cube.retrievals_highres['sigTCor'][slice(*cldFree),:,data_cube.gf(wv_r, t, tel)]), axis=0)
                 bg_r = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['BGTCor'][slice(*cldFree),data_cube.gf(wv_r, t, tel)]), axis=0)
+                    data_cube.retrievals_highres['BGTCor'][slice(*cldFree),data_cube.gf(wv_r, t, tel)]), axis=0)
                 molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i,:]
                 molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i,:]
                 hFullOverlap = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, t, tel)][0]

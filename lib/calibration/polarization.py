@@ -117,17 +117,17 @@ def calibrateGHK(data_cube):
         if np.any(data_cube.gf(wv, 'total', 'FR')) and np.any(data_cube.gf(wv, 'cross', 'FR')):
             logging.info(f'and even a {wv} channel')
 
-            sigBGCor_total = np.squeeze(data_cube.data_retrievals['sigBGCor'][:,:,data_cube.gf(wv, 'total', 'FR')])
-            bg_total = np.squeeze(data_cube.data_retrievals['BG'][:,data_cube.gf(wv, 'total', 'FR')])
-            sigBGCor_cross = np.squeeze(data_cube.data_retrievals['sigBGCor'][:,:,data_cube.gf(wv, 'cross', 'FR')])
-            bg_cross = np.squeeze(data_cube.data_retrievals['BG'][:,data_cube.gf(wv, 'cross', 'FR')])
+            sigBGCor_total = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:,:,data_cube.gf(wv, 'total', 'FR')])
+            bg_total = np.squeeze(data_cube.retrievals_highres['BG'][:,data_cube.gf(wv, 'total', 'FR')])
+            sigBGCor_cross = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:,:,data_cube.gf(wv, 'cross', 'FR')])
+            bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][:,data_cube.gf(wv, 'cross', 'FR')])
 
             pol_cali[wv] = depol_cali_ghk(
-                sigBGCor_total, bg_total, sigBGCor_cross, bg_cross, data_cube.data_retrievals['time'],
-                data_cube.data_retrievals['depol_cal_ang_p_time_start'],
-                data_cube.data_retrievals['depol_cal_ang_p_time_end'],
-                data_cube.data_retrievals['depol_cal_ang_n_time_start'],
-                data_cube.data_retrievals['depol_cal_ang_n_time_end'],
+                sigBGCor_total, bg_total, sigBGCor_cross, bg_cross, data_cube.retrievals_highres['time'],
+                data_cube.retrievals_highres['depol_cal_ang_p_time_start'],
+                data_cube.retrievals_highres['depol_cal_ang_p_time_end'],
+                data_cube.retrievals_highres['depol_cal_ang_n_time_start'],
+                data_cube.retrievals_highres['depol_cal_ang_n_time_end'],
                 # K should be 0d?
                 np.squeeze(data_cube.polly_config_dict['K'][data_cube.gf(wv, 'total', 'FR')]),
                 [data_cube.polly_config_dict[f'depol_cal_minbin_{wv}'], data_cube.polly_config_dict[f'depol_cal_maxbin_{wv}']],
@@ -383,7 +383,7 @@ def calibrateMol(data_cube):
 
     for i, cldFree in enumerate(data_cube.clFreeGrps):
         print(i, cldFree)
-        cldFreeTime = np.array(data_cube.data_retrievals['time'])[cldFree]
+        cldFreeTime = np.array(data_cube.retrievals_highres['time'])[cldFree]
         print(cldFreeTime)
 
         #for wv in [355, 532, 1064]:
@@ -391,10 +391,10 @@ def calibrateMol(data_cube):
             if np.any(data_cube.gf(wv, t, tel)) and np.any(data_cube.gf(wv, 'cross', tel)):
                 logging.info(f'and even a {wv} channel')
     
-                sigBGCor_total = np.squeeze(data_cube.data_retrievals['sigBGCor'][slice(*cldFree),:,data_cube.gf(wv, 'total', 'FR')])
-                bg_total = np.squeeze(data_cube.data_retrievals['BG'][slice(*cldFree),data_cube.gf(wv, 'total', 'FR')])
-                sigBGCor_cross = np.squeeze(data_cube.data_retrievals['sigBGCor'][slice(*cldFree),:,data_cube.gf(wv, 'cross', 'FR')])
-                bg_cross = np.squeeze(data_cube.data_retrievals['BG'][slice(*cldFree),data_cube.gf(wv, 'cross', 'FR')])
+                sigBGCor_total = np.squeeze(data_cube.retrievals_highres['sigBGCor'][slice(*cldFree),:,data_cube.gf(wv, 'total', 'FR')])
+                bg_total = np.squeeze(data_cube.retrievals_highres['BG'][slice(*cldFree),data_cube.gf(wv, 'total', 'FR')])
+                sigBGCor_cross = np.squeeze(data_cube.retrievals_highres['sigBGCor'][slice(*cldFree),:,data_cube.gf(wv, 'cross', 'FR')])
+                bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][slice(*cldFree),data_cube.gf(wv, 'cross', 'FR')])
 
                 refHInd = data_cube.refH[i][f'{wv}_{t}_{tel}']['refHInd']
                 print(f'referenceH {wv} {t} {tel}', refHInd)

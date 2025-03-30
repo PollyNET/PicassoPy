@@ -15,7 +15,7 @@ def ae_cldFreeGrps(data_cube, ret_prof_name):
     """
 
     config_dict = data_cube.polly_config_dict
-    opt_profiles = data_cube.data_retrievals[ret_prof_name]
+    opt_profiles = data_cube.retrievals_profile[ret_prof_name]
 
     for i, cldFree in enumerate(data_cube.clFreeGrps):
         cldFree = cldFree[0], cldFree[1] + 1

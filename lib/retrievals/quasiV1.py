@@ -8,8 +8,8 @@ def quasi_bsc(data_cube):
     """
     """
 
-    rgs = data_cube.data_retrievals['range']
-    time = data_cube.data_retrievals['time64']
+    rgs = data_cube.retrievals_highres['range']
+    time = data_cube.retrievals_highres['time64']
     config_dict = data_cube.polly_config_dict
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
     heightFullOverlap = np.array(config_dict['heightFullOverlap'])
@@ -18,7 +18,7 @@ def quasi_bsc(data_cube):
     #channels = [(532, 'total', 'FR')]
 
     for wv, t, tel in channels:
-        att_beta_qsi = data_cube.data_retrievals[f'attBsc_{wv}_{t}_{tel}'].copy()
+        att_beta_qsi = data_cube.retrievals_highres[f'attBsc_{wv}_{t}_{tel}'].copy()
 
         # TODO check if halving the window is needed
         smooth_t = int(np.array(config_dict['quasi_smooth_t'])[data_cube.gf(wv, t, tel)][0] / 2)
@@ -44,8 +44,8 @@ def quasi_bsc(data_cube):
             rgs, att_beta_qsi, mExt, mBsc, config_dict[f'LR{wv}'], nIters=6
         )
 
-        data_cube.data_retrievals[f"quasiBscV1_{wv}_{t}_{tel}"] = quasi_par_bsc
-        data_cube.data_retrievals[f"quasiExtV1_{wv}_{t}_{tel}"] = quasi_par_ext
+        data_cube.retrievals_highres[f"quasiBscV1_{wv}_{t}_{tel}"] = quasi_par_bsc
+        data_cube.retrievals_highres[f"quasiExtV1_{wv}_{t}_{tel}"] = quasi_par_ext
 
 
 

@@ -152,7 +152,7 @@ class MeteoNcCloudnet:
         
         not quite sure on the interface yet
         ```
-        met.load(data_cube.data_retrievals['time'][0])
+        met.load(data_cube.retrievals_highres['time'][0])
         met.load(datetime.datetime.timestamp(datetime.datetime.strptime(data_cube.date, '%Y%m%d')))
         ```
 
@@ -180,7 +180,7 @@ class MeteoNcCloudnet:
         ds = ds[variables_to_select]
 
         height_2d = ds.height.values
-        #height_grid = data_cube.data_retrievals['height']
+        #height_grid = data_cube.retrievals_highres['height']
         time = ds.time.values.astype('datetime64[s]').astype(int)
         
         # for some reasons this interpolation provides strange results in the lowermost layers

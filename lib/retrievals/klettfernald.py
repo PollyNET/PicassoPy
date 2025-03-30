@@ -8,7 +8,7 @@ def run_cldFreeGrps(data_cube, signal='TCor', nr=False, collect_debug=True):
     """
     """
 
-    height = data_cube.data_retrievals['range']
+    height = data_cube.retrievals_highres['range']
     logging.warning(f'rayleighfit seems to use range in matlab, but the met data should be in height >> RECHECK!')
     logging.warning(f'at 10km height this is a difference of about 4 indices')
     config_dict = data_cube.polly_config_dict
@@ -37,10 +37,10 @@ def run_cldFreeGrps(data_cube, signal='TCor', nr=False, collect_debug=True):
                     key_smooth = 'smoothWin_klett_'
                     key_LR = 'LR'
                 sig = np.nansum(np.squeeze(
-                    data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
-                print(data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)].shape)
+                    data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
+                print(data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)].shape)
                 bg = np.nansum(np.squeeze(
-                    data_cube.data_retrievals[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
+                    data_cube.retrievals_highres[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
                 #return None, None, sig, molBsc*1e3, None
 

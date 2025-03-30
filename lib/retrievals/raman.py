@@ -16,7 +16,7 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, 
     """
     """
 
-    height = data_cube.data_retrievals['range']
+    height = data_cube.retrievals_highres['range']
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
     logging.warning(f'rayleighfit seems to use range in matlab, but the met data should be in height >> RECHECK!')
     logging.warning(f'at 10km height this is a difference of about 4 indices')
@@ -52,17 +52,17 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, 
                     key_smooth = 'smoothWin_raman_'
 
                 sig = np.nansum(np.squeeze(
-                    data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
-                print('shape sig', data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)].shape)
+                    data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
+                print('shape sig', data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)].shape)
                 bg = np.nansum(np.squeeze(
-                    data_cube.data_retrievals[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
+                    data_cube.retrievals_highres[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
                 molExt = data_cube.mol_profiles[f'mExt_{wv}'][i,:]
 
                 sig_r = np.nansum(np.squeeze(
-                    data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv_r, t, tel)]), axis=0)
+                    data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv_r, t, tel)]), axis=0)
                 bg_r = np.nansum(np.squeeze(
-                    data_cube.data_retrievals[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv_r, t, tel)]), axis=0)
+                    data_cube.retrievals_highres[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv_r, t, tel)]), axis=0)
                 molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i,:]
                 molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i,:]
                 number_density = data_cube.mol_profiles[f'number_density'][i,:]
