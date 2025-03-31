@@ -1,6 +1,7 @@
 
 from collections import defaultdict
 import numpy as np
+import xarray as xr
 
 # Global variable
 ASSUME_AIR_IDEAL = True
@@ -550,3 +551,23 @@ def calc_profiles(met_profiles, wavelengths=[355, 387, 407, 532, 607, 1058, 1064
             p['pressure'].values/100, p['temperature'].values, p['rh'].values*100, True)
 
     return dict(m_p)
+
+def calc_2d(met, wavelengths=[355, 387, 407, 532, 607, 1058, 1064], CO2=400):
+    """ """
+
+    ds_mol = xr.Dataset(
+        coords=dict(
+            time=met['time'],
+            height=met['height'],
+        )
+    )
+    
+    for wv in wavelengths:
+        mBsc, mExt = rayleigh_scattering(
+            wv, met['pressure'].values/100, met['temperature'].values, CO2, met['rh'].values*100)
+
+        ds_mol[f'mBsc_{wv}'] = (['time', 'height'], mBsc)
+        ds_mol[f'mExt_{wv}'] = (['time', 'height'], mExt)
+        
+    return ds_mol
+

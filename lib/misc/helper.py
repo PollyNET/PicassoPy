@@ -9,6 +9,9 @@ import xarray
 from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 
+import numpy as np
+from scipy.ndimage import uniform_filter1d
+
 def detect_path_type(fullpath):
     """
     Detect the type of path (Windows or Linux) based on the input.
@@ -620,4 +623,144 @@ def channel_2_variable_mapping(data_retrievals, var, channeltags_dict):
                 data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][ch,:]
             elif channel_dim == 1:
                 data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:,ch]
+
+
+
+
+def mean_stable(x, win, minBin=None, maxBin=None, minRelStd=None):
+    """Calculate the mean value of x based on the least fluctuated 
+    segment of x. The searching is based on the std inside each window of x.
+
+    Parameters
+    ----------
+    x : ndarray
+        Signal array.
+    win : int
+        Window width for calculating the relative standard deviation.
+    minBin : int, optional
+        The start index for the mean calculation (default: 1).
+    maxBin : int, optional
+        The end index for the mean calculation (default: length of x).
+    minRelStd : float, optional
+        Minimum relative standard deviation threshold.
+
+    Returns
+    -------
+    xStable : float
+        Stable mean value.
+    xIndx : ndarray
+        Index of the elements used to calculate the mean value.
+    xRelStd : float
+        Relative uncertainty of the sequences used to calculate the mean values.
+
+    History
+    -------
+    - 2021-05-30: First edition by Zhenping
+
+    .. Authors: - zhenping@tropos.de
+    """
+    # Default values for minBin and maxBin
+    if minBin is None:
+        minBin = 0
+    if maxBin is None:
+        maxBin = len(x)
+
+    # Handle NaN values and smooth the array
+    flagNaN = np.isnan(x)
+    x_smoothed = uniform_filter1d(x, size=win, mode='nearest')
+    x_smoothed[flagNaN] = np.nan
+
+    # If the range between maxBin and minBin is less than or equal to the window size
+    if (maxBin - minBin + 1) <= win:
+        xIndx = np.arange(minBin, maxBin + 1)
+        xStable = np.nanmean(x_smoothed[minBin:maxBin + 1])
+        xRelStd = np.nanstd(x_smoothed[minBin:maxBin + 1]) / xStable
+        return xStable, xIndx, xRelStd
+
+    # Calculate relative standard deviation for each window
+    relStd = []
+    for iX in range(minBin, maxBin - win + 1):
+        window = x_smoothed[iX:iX + win]
+        thisStd = np.nanstd(window)
+        thisMean = np.nanmean(window)
+
+        if np.sum(np.isnan(window)) / (win + 1) <= 0.2:
+            relStd.append(thisStd / abs(thisMean))
+        else:
+            relStd.append(np.nan)
+
+    relStd = np.array(relStd)
+
+    # Determine index with minimum relative standard deviation
+    if minRelStd is None:
+        indxTmp = np.nanargmin(relStd)
+        indx = indxTmp + minBin
+    else:
+        thisRelStd = np.nanmin(relStd)
+        indxTmp = np.nanargmin(relStd)
+        if thisRelStd > minRelStd:
+            return None, None, None
+        indx = indxTmp + minBin
+
+    # Calculate the stable mean value and its relative standard deviation
+    xStable = np.nanmean(x_smoothed[indx:indx + win])
+    xIndx = np.arange(indx, indx + win)
+    xRelStd = relStd[indxTmp]
+
+    return xStable, xIndx, xRelStd
+
+
+from scipy.sparse import diags
+
+def smooth2a(matrix_in, Nr, Nc=None):
+    """
+    Smooths 2D array data while ignoring NaNs.
+
+    This function smooths the data in `matrix_in` using a mean filter over a
+    rectangle of size (2*Nr+1)-by-(2*Nc+1). Each element is replaced by the mean
+    of the surrounding rectangle, ignoring NaN elements. If an element is NaN,
+    it remains NaN in the output. At the edges, as much of the rectangle as fits
+    is used.
+
+    Parameters:
+        matrix_in (ndarray): Original matrix to be smoothed.
+        Nr (int): Number of points used to smooth rows.
+        Nc (int, optional): Number of points used to smooth columns.
+                            If not specified, Nc = Nr.
+
+    Returns:
+        ndarray: Smoothed version of the input matrix.
+
+    References:
+        - Written by Greg Reeves, March 2009, Division of Biology, Caltech.
+        - Inspired by "smooth2" by Kelly Hilands, October 2004, Applied Research Laboratory, Penn State University.
+        - Developed from code by Olof Liungman, 1997, Dept. of Oceanography, Earth Sciences Centre, Göteborg University.
+    """
+
+    if Nc is None:
+        Nc = Nr
+
+    if not isinstance(Nr, (int, np.int64)) or not isinstance(Nc, (int, np.int64)):
+        raise ValueError("Nr and Nc must be scalars!")
+
+    # Matrix dimensions
+    rows, cols = matrix_in.shape
+
+    # Create smoothing matrices
+    eL = diags(np.ones((2 * Nr + 1, rows)), np.arange(-Nr, Nr + 1), shape=(rows, rows)).toarray()
+    eR = diags(np.ones((2 * Nc + 1, cols)), np.arange(-Nc, Nc + 1), shape=(cols, cols)).toarray()
+
+    # Replace NaNs with 0 for summation
+    mask_nan = np.isnan(matrix_in)
+    matrix_in_filled = np.where(mask_nan, 0, matrix_in)
+
+    # Compute normalizing matrix to count non-NaN elements
+    normalize = eL @ (~mask_nan) @ eR
+    normalize[mask_nan] = np.nan  # Retain NaNs in the final output
+
+    # Compute smoothed matrix
+    matrix_out = (eL @ matrix_in_filled @ eR) / normalize
+
+    return matrix_out
+
 

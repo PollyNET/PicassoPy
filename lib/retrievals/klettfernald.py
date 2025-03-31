@@ -4,7 +4,7 @@ import numpy as np
 from scipy.ndimage import uniform_filter1d
 
 
-def run_cldFreeGrps(data_cube, collect_debug=True):
+def run_cldFreeGrps(data_cube, signal='TCor', nr=False, collect_debug=True):
     """
     """
 
@@ -20,15 +20,27 @@ def run_cldFreeGrps(data_cube, collect_debug=True):
         print('cldFree ', i, cldFree)
         cldFree = cldFree[0], cldFree[1] + 1
         print('cldFree mod', cldFree)
-        for wv, t, tel in [(532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]:
-        #for wv, t, tel in [(532, 'total', 'FR')]:
+
+        channels = [
+            (532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]
+        if nr:
+            channels += [(532, 'total', 'NR'), (355, 'total', 'NR')]
+
+        for wv, t, tel in channels:
             if np.any(data_cube.gf(wv, t, tel)):
-                print(f'{wv}, {t}, {tel}')
+                print(f'== {wv}, {t}, {tel} klett =================================')
+                if tel == 'NR':
+                    # TODO refBeta is calculate from the far field in the Matlab version
+                    key_smooth = 'smoothWin_klett_NR_'
+                    key_LR = 'LR_NR_'
+                else:
+                    key_smooth = 'smoothWin_klett_'
+                    key_LR = 'LR'
                 sig = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
-                print(data_cube.data_retrievals['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, t, tel)].shape)
+                    data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
+                print(data_cube.data_retrievals[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)].shape)
                 bg = np.nansum(np.squeeze(
-                    data_cube.data_retrievals['BGTCor'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
+                    data_cube.data_retrievals[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
                 #return None, None, sig, molBsc*1e3, None
 
@@ -36,15 +48,17 @@ def run_cldFreeGrps(data_cube, collect_debug=True):
                 refH = height[np.array(refHInd)]
                 print('refHInd', refHInd, 'refH', refH)
 
-                print('LR ', config_dict[f"LR{wv}"], refH, 
+                print('LR ', config_dict[f"{key_LR}{wv}"], refH, 
                       'refBeta', config_dict[f'refBeta{wv}'],
-                      'smoothWin_klett', config_dict[f'smoothWin_klett_{wv}'])
+                      'smoothWin_klett', config_dict[f'{key_smooth}{wv}'])
                 #aerBsc, aerBscStd, aerBR, aerBRStd, RCS, signal, molBsc, aerBR = fernald(
                 prof = fernald(
-                    height, sig, bg, config_dict[f"LR{wv}"], refH, config_dict[f'refBeta{wv}'],
-                    molBsc, config_dict[f'smoothWin_klett_{wv}'], collect_debug=collect_debug)
-                prof['aerExt'] = prof['aerBsc'] * config_dict[f"LR{wv}"]
-                prof['aerExtStd'] = prof['aerBscStd'] * config_dict[f"LR{wv}"]
+                    height, sig, bg, config_dict[f"{key_LR}{wv}"], refH, config_dict[f'refBeta{wv}'],
+                    molBsc, config_dict[f'{key_smooth}{wv}'], collect_debug=collect_debug)
+                prof['aerExt'] = prof['aerBsc'] * config_dict[f"{key_LR}{wv}"]
+                prof['aerExtStd'] = prof['aerBscStd'] * config_dict[f"{key_LR}{wv}"]
+                prof['retrieval'] = 'klett'
+                prof['signal'] = signal
                 print(prof.keys())
                 opt_profiles[i][f"{wv}_{t}_{tel}"] = prof
 
@@ -114,18 +128,9 @@ def fernald(height, signal, bg, LR_aer, refH, refBeta, molBsc, window_size=40, c
     LR_mol = np.full(height.shape[0], 8 * np.pi / 3)
 
     # Reference altitude indices
-    if np.isscalar(refH):
-        if refH > height[-1] or refH < height[0]:
-            raise ValueError("refAlt is out of range.")
-        indRefH = np.where(height >= refH)[0][0]
-        indRefH = np.full(2, indRefH)
-    elif len(refH) == 2:
-        if (refH[0] < height[-1]) and (refH[1] > height[0]):
-            indRefH = [int((refH[0] - height[0]) / dH), int((refH[1] - height[0]) / dH)]
-        else:
-            raise ValueError("refH is out of range.")
-    else:
-        raise ValueError("Invalid refAlt length.")
+    assert len(refH) == 2, 'refH has to be given as base and top'
+    indRefH = np.searchsorted(height, refH)
+    print('indRefH ', indRefH)
 
     # Aerosol lidar ratio setup
     if np.isscalar(LR_aer):
@@ -135,16 +140,18 @@ def fernald(height, signal, bg, LR_aer, refH, refBeta, molBsc, window_size=40, c
 
     # Range corrected signal (RCS)
     RCS = signal * height**2
+    #RCS *= (1-0.001764883459848266)
 
     # Smoothing signal
-    indRefMid = int(np.mean(indRefH))
+    indRefMid = int(np.ceil(np.mean(indRefH)))
     RCS = uniform_filter1d(RCS, size=window_size)
     RCS[indRefMid] = np.mean(RCS[indRefH[0]:indRefH[1] + 1])
     
     print('indRefH', indRefH, indRefMid)
-    print(RCS.shape)
+    print('refH slice shape ', RCS[indRefH[0]:indRefH[1] + 1].shape)
     print('RCS[indRefMid] ', RCS[indRefMid], )
 
+    print('mean(mBsc)', np.mean(molBsc[indRefH[0]:indRefH[1] + 1]), refBeta)
     # Initialize parameters
     aerBsc = np.full(height.shape[0], np.nan)
     aerBsc[indRefMid] = refBeta
@@ -162,6 +169,10 @@ def fernald(height, signal, bg, LR_aer, refH, refBeta, molBsc, window_size=40, c
                          LR_aer[iAlt] * numerator) * np.abs(height[iAlt + 1] - height[iAlt]))
         aerBsc[iAlt] = numerator / (denominator1 + denominator2) - molBsc[iAlt]
         aerBR[iAlt] = aerBsc[iAlt] / molBsc[iAlt]
+        #if iAlt > indRefMid - 150:
+        #    print(f"{iAlt:4d} {A:14.6e} {RCS[iAlt]:14.6e} {numerator:14.6e} {(denominator1 + denominator2):14.6e} {molBsc[iAlt]:14.6e} {aerBsc[iAlt]:14.6e} {aerBR[iAlt]:14.6e}")
+        #    print(f"{iAlt:4d} {A:14.6e} {(LR_aer[iAlt + 1] - LR_mol[iAlt + 1]):14.6e} {(LR_aer[iAlt] - LR_mol[iAlt]):14.6e} {(height[iAlt + 1] - height[iAlt]):14.6e}")
+
 
     # Forward retrieval
     for iAlt in range(indRefMid + 1, height.shape[0]):

@@ -7,23 +7,36 @@ import lib.misc.pollyChannelTags as pollyChannelTags
 import lib.preprocess.pollyPreprocess as pollyPreprocess
 import lib.qc.pollySaturationDetect as pollySaturationDetect
 import lib.qc.transCor as transCor
-import lib.qc.overlap as overlap
+import lib.qc.overlapEst as overlapEst
+import lib.qc.overlapCor as overlapCor
+
 
 import lib.calibration.polarization as polarization
+import lib.cloudmask.cloudscreen as cloudscreen
+import lib.cloudmask.profilesegment as profilesegment
 import lib.io.readMeteo as readMeteo
 import lib.misc.molecular as molecular
 import lib.calibration.rayleighfit as rayleighfit
 import lib.retrievals.klettfernald as klettfernald
 import lib.retrievals.raman as raman
+import lib.retrievals.depolarization as depolarization 
+import lib.retrievals.angstroem as angstroem 
+import lib.calibration.lidarconstant as lidarconstant
+
+import lib.retrievals.highres as highres
+import lib.retrievals.quasiV1 as quasiV1
+import lib.retrievals.quasiV2 as quasiV2
+import lib.retrievals.quasi as quasi
 
 class PicassoProc:
     counter = 0
 
-    def __init__(self, rawdata_dict, polly_config_dict, picasso_config_dict):
+    def __init__(self, rawdata_dict, polly_config_dict, picasso_config_dict, polly_default_dict):
         type(self).counter += 1
         self.rawdata_dict = rawdata_dict
         self.polly_config_dict = polly_config_dict
         self.picasso_config_dict = picasso_config_dict
+        self.polly_default_dict = polly_default_dict
         self.device = self.polly_config_dict['name']
         self.location = self.polly_config_dict['site']
         self.date = self.mdate_filename()
@@ -66,7 +79,7 @@ class PicassoProc:
             with bool flag
         
         """
-        return getattr(self, f'flag_{wavelength}_{meth}_{telescope}')
+        return getattr(self, f'flag_{wavelength}_{meth}_{telescope}', False)
 
 #    def msite(self):
 #        #msite = f"measurement site: {self.rawdata_dict['global_attributes']['location']}"
@@ -233,7 +246,7 @@ class PicassoProc:
 
         return self
 
-    def pollySaturationDetect(self):
+    def SaturationDetect(self):
 
         self.flagSaturation = pollySaturationDetect.pollySaturationDetect(data_cube = self,
                                                     hFullOverlap = self.polly_config_dict['heightFullOverlap'],
@@ -255,7 +268,7 @@ class PicassoProc:
 
     def cloudScreen(self):
         """https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L663"""
-        pass
+        self.flagCloudFree = cloudscreen.cloudscreen(self)
 
 
     def cloudFreeSeg(self):
@@ -269,7 +282,7 @@ class PicassoProc:
             ]
         
         """
-        self.clFreeGrps = []
+        self.clFreeGrps = profilesegment.segment(self)
 
 
     def loadMeteo(self):
@@ -332,44 +345,172 @@ class PicassoProc:
         """
 
         if self.polly_config_dict['flagTransCor']:
-            logging.warning('NO transmission correction')
+            logging.warning('transmission correction')
             self.data_retrievals['sigTCor'], self.data_retrievals['BGTCor'] = \
                   transCor.transCorGHK_cube(self)
         else:
             logging.warning('NO transmission correction')
 
 
-    def retrievalKlett(self):
+    def retrievalKlett(self, oc=False, nr=False):
         """
         """
 
-        self.data_retrievals['klett'] = \
-            klettfernald.run_cldFreeGrps(self)
-        self.data_retrievals['avail_optical_profiles'].append('klett')
+        retrievalname = 'klett'
+        kwargs = {}
+        if oc:
+            retrievalname +='_OC'
+            kwargs['signal'] = 'OLCor'
+        if nr:
+            kwargs['nr'] = True
+
+        print('retrievalname', retrievalname)
+        self.data_retrievals[retrievalname] = \
+            klettfernald.run_cldFreeGrps(self, **kwargs)
+        if retrievalname not in self.data_retrievals['avail_optical_profiles']:
+            self.data_retrievals['avail_optical_profiles'].append(retrievalname)
 
 
-    def retrievalRaman(self):
+    def retrievalRaman(self, oc=False, nr=False):
         """
         """
 
-        self.data_retrievals['raman'] = \
-            raman.run_cldFreeGrps(self)
-        self.data_retrievals['avail_optical_profiles'].append('raman')
+        retrievalname = 'raman'
+        kwargs = {}
+        if oc:
+            retrievalname +='_OC'
+            kwargs['signal'] = 'OLCor'
+
+            # get the full overlap height for the overlap corrected variant
+            # group by the cloud free groups 
+            kwargs['heightFullOverlap'] = \
+                [np.mean(self.data_retrievals['heightFullOverCor'][slice(*cF)], axis=0) for 
+                 cF in self.clFreeGrps]
+        if nr:
+            kwargs['nr'] = True
+
+        self.data_retrievals[retrievalname] = \
+            raman.run_cldFreeGrps(self, **kwargs)
+        if retrievalname not in self.data_retrievals['avail_optical_profiles']:
+            self.data_retrievals['avail_optical_profiles'].append(retrievalname)
 
 
-    def calcOverlap(self):
+    def overlapCalc(self):
         """estimate the overlap function
 
-        two approaches should be considered for now:
-        - average over all cloud free periods in the data chunk and estimate
-          one overlap profile
-        - only average for a cloud free group and estimate overlap profile for each
+        different to the matlab version, where an average over all cloud
+        free periods is taken, it is done here per cloud free segment
             
         """
 
-        self.data_retrievals['overlap_frnr'] = overlap.run_frnr_cldFreeGrps(self)
-        self.data_retrievals['overlap_raman'] = overlap.run_raman_cldFreeGrps(self)
+        self.data_retrievals['overlap'] = {}
+        self.data_retrievals['overlap']['frnr'] = overlapEst.run_frnr_cldFreeGrps(self)
+        self.data_retrievals['overlap']['raman'] = overlapEst.run_raman_cldFreeGrps(self)
+    
+    def overlapFixLowestBins(self):
+        """the lowest bins are affected by stange near range effects"""
 
+        height = self.data_retrievals['range']
+        for k in self.data_retrievals['overlap']:
+            return overlapCor.fixLowest(
+                self.data_retrievals['overlap'][k], np.where(height > 800)[0][0])
+
+
+    def overlapCor(self):
+        """
+
+        the overlap correction is implemented differently to the matlab version
+        first a 2d (time, height) correction array is constructed then it is applied.
+        In future this will allow for time variing overlap functions
+        
+        """
+
+        if self.polly_config_dict['overlapCorMode'] == 0:
+            logging.info('no overlap Correction')
+            return self
+        logging.info('overlap Correction')
+        if self.polly_config_dict['overlapCorMode'] == 1:
+            logging.info('overlapCorMode 1 -> need file for overlapfunction')
+            self.data_retrievals['overlap']['file'] = overlapEst.load(self)
+        self.data_retrievals['overlap2d'] = overlapCor.spread(self)
+        ret = overlapCor.apply_cube(self)
+        self.data_retrievals['sigOLCor'] = ret[0]
+        self.data_retrievals['BGOLCor'] = ret[1]
+        self.data_retrievals['heightFullOverCor'] = ret[2]
+
+
+    def calcDepol(self):
+        """
+        """
+        
+        for ret_prof_name in self.data_retrievals['avail_optical_profiles']:
+            print(ret_prof_name)
+        
+            self.data_retrievals[ret_prof_name] = depolarization.voldepol_cldFreeGrps(
+                self, ret_prof_name) 
+            self.data_retrievals[ret_prof_name] = depolarization.pardepol_cldFreeGrps(
+                self, ret_prof_name) 
+
+
+    def Angstroem(self):
+        """
+        """
+        for ret_prof_name in self.data_retrievals['avail_optical_profiles']:
+            print(ret_prof_name)
+        
+            self.data_retrievals[ret_prof_name] = angstroem.ae_cldFreeGrps(
+                self, ret_prof_name) 
+
+    def LidarCalibration(self):
+        """
+        """
+        self.LC = {}
+        self.LC['klett'] = lidarconstant.lc_for_cldFreeGrps(
+            self, 'klett')
+        self.LC['raman'] = lidarconstant.lc_for_cldFreeGrps(
+            self, 'raman')
+        
+        logging.warning('reading calibration constant from database not working yet')
+        self.LCused = lidarconstant.get_best_LC(self.LC['raman'])
+
+
+    def attBsc_volDepol(self):
+        """highres attBsc and voldepol in 2d
+        """
+
+        # for now try with mutable state in data_cube
+        logging.info('attBsc 2d retrieval')
+        highres.attbsc_2d(self)
+
+        logging.info('voldepol 2d retrieval')
+        highres.voldepol_2d(self)
+
+
+    def molecularHighres(self):
+        """
+        """
+
+        self.mol_2d = molecular.calc_2d(
+            self.met.ds)
+
+
+    def quasiV1(self):
+        """
+        """
+
+        quasiV1.quasi_bsc(self)
+        quasi.quasi_pdr(self, version='V1')
+        quasi.quasi_angstrom(self, version='V1')
+        quasi.target_cat(self, version='V1')
+
+    def quasiV2(self):
+        """
+        """
+
+        quasiV2.quasi_bsc(self)
+        quasi.quasi_pdr(self, version='V2')
+        quasi.quasi_angstrom(self, version='V2')
+        quasi.target_cat(self, version='V2')
 
 
 #    def __str__(self):

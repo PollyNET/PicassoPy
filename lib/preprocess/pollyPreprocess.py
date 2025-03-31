@@ -53,6 +53,20 @@ def compute_pcr_parallel(rawSignal, mShots, scale_factor):
 
     return PCR
 
+def faster_polyval(a,x):
+    """faster version than np.polyval(), using numba would provide 10% increase, but with different function"""
+    y = a[-1]
+    for ai in a[-2::-1]:
+        y *= x
+        y += ai
+    return y
+#@jit(nopython=True)
+#def faster_polyval(p, x):
+#    y = np.zeros(x.shape, dtype=float)
+#    for i, v in enumerate(p):
+#        y *= x
+#        y += v
+#    return y
 
 #@profile
 def pollyDTCor(rawSignal,mShots,hRes, **varargin):
@@ -62,6 +76,11 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
     DeadTimeCorrectionMode = varargin.get('DeadTimeCorrectionMode', 2)
     deadtimeParams = varargin.get('deadtimeParams', [])
     deadtime = varargin.get('deadtime', [])
+    #print('mShots', np.all(mShots[:,0] == mShots[0,0]), mShots[0,0], np.min(mShots[:,0]), np.max(mShots[:,0]))
+    if not np.all(mShots[:,0] == mShots[0,0]):
+        logging.warning(f"... mShots not constant min {np.min(mShots)} max {np.max(mShots)}")
+    mShots_norm = np.repeat(np.mean(mShots, axis=0)[np.newaxis,:], mShots.shape[0], axis=0)
+    #print('mShots_norm', mShots_norm.shape, 'mShots_norm', mShots_norm[0,:])
 
     logging.info(f'... Deadtime-correction (Mode: {DeadTimeCorrectionMode})')
 
@@ -76,8 +95,8 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
 #    end_time_command1 = time.time()
 #    elapsed_time_command1 = end_time_command1 - start_time_command1
 #    print(f"Time taken: {elapsed_time_command1:.4f} seconds")
-    PCR = rawSignal * (150/hRes) / mShots[:,np.newaxis,:]
-    PCR_Cor = np.zeros_like(PCR)
+    PCR = rawSignal * (150./hRes) / mShots[:,np.newaxis,:]
+    #PCR_Cor = np.zeros_like(PCR)
     signalDTCor = np.zeros_like(PCR)
 
     ## Deadtime correction
@@ -88,16 +107,19 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
             for iCh in range(Nchannels):
                 # Extract polynomial coefficients for the channel and reverse their order
                 coeffs = deadtime[:, iCh][::-1]
-                PCR_Cor[:,:,iCh] = np.polyval(deadtime[:,iCh][::-1], PCR[:,:,iCh])
-                signalDTCor[:,:,iCh] = PCR_Cor[:,:,iCh]*mShots[:,np.newaxis,iCh]/(150/hRes)
+                #PCR_Cor[:,:,iCh] = np.polyval(deadtime[:,iCh][::-1], PCR[:,:,iCh])
+                #PCR_Cor[:,:,iCh] = faster_polyval(deadtime[:,iCh], PCR[:,:,iCh])
+                #signalDTCor[:,:,iCh] = PCR_Cor[:,:,iCh]*mShots_norm[:,np.newaxis,iCh]/(150./hRes)
+                signalDTCor[:,:,iCh] = faster_polyval(deadtime[:,iCh], PCR[:,:,iCh])*mShots_norm[:,np.newaxis,iCh]/(150./hRes)
 
 
         ## nonparalyzable correction: PCR_cor = PCR / (1 - tau*PCR), with tau beeing the dead-time
         ## reading from polly-config file under key 'dT' (only the first value from each channel)
         elif DeadTimeCorrectionMode == 2:
             for iCh in range(Nchannels):
-                PCR_Cor[:,:,iCh]= PCR[:, :, iCh] / (1.0 - deadtimeParams[iCh][0] * 10**(-3) * PCR[:, :, iCh])
-                signalDTCor[:, :, iCh] = PCR_Cor[:,:,iCh] * mShots[:, np.newaxis, iCh] / scale_factor
+                #PCR_Cor[:,:,iCh]= PCR[:, :, iCh] / (1.0 - deadtimeParams[iCh][0] * 10**(-3) * PCR[:, :, iCh])
+                #signalDTCor[:, :, iCh] = PCR_Cor[:,:,iCh] * mShots_norm[:, np.newaxis, iCh] / scale_factor
+                signalDTCor[:, :, iCh] = PCR[:, :, iCh] / (1.0 - deadtimeParams[iCh][0] * 10**(-3) * PCR[:, :, iCh]) * mShots_norm[:, np.newaxis, iCh] / scale_factor
 
 
         ## user defined deadtime, reading from polly-config file under key 'dT' (the whole matrix, polynome) 
@@ -111,8 +133,10 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
                 coeffs_matrix = np.array([np.array(deadtimeParams[ch][::-1]) for ch in range(Nchannels)])
                 for iCh in range(Nchannels):
                     # Evaluate the polynomial for the current channel
-                    PCR_Cor[:,:,iCh] = np.polyval(coeffs_matrix[iCh], PCR[:, :, iCh])
-                    signalDTCor[:, :, iCh] = PCR_Cor[:,:,iCh] * mShots[:, np.newaxis, iCh] / scale_factor
+                    #PCR_Cor[:,:,iCh] = np.polyval(coeffs_matrix[iCh], PCR[:, :, iCh])
+                    #PCR_Cor[:,:,iCh] = faster_polyval(coeffs_matrix[iCh][::-1], PCR[:, :, iCh])
+                    #signalDTCor[:, :, iCh] = PCR_Cor[:,:,iCh] * mShots_norm[:, np.newaxis, iCh] / scale_factor
+                    signalDTCor[:, :, iCh] = faster_polyval(coeffs_matrix[iCh][::-1], PCR[:, :, iCh]) * mShots_norm[:, np.newaxis, iCh] / scale_factor
             else:
                 logging.warning(f'User defined deadtime parameters were not found in polly-config file.')
                 logging.warning(f'In order to continue the current processing, deadtime correction will not be implemented.')
@@ -126,7 +150,8 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
             logging.error(f'Unknow deadtime correction setting! Please go back to check the configuration.')
             logging.error(f'For deadtimeCorrectionMode, only 1-4 is allowed.')
 
-    return PCR_Cor, signalDTCor
+    #return PCR_Cor, signalDTCor
+    return signalDTCor
 
 def pollyRemoveBG(rawSignal,**varargin):
     maxHeightBin = varargin.get('maxHeightBin', 3000)
@@ -516,7 +541,8 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
 
 
     ## Deadtime correction
-    PCR_Cor, preproSignal = pollyDTCor(rawSignal = rawSignal,
+    #PCR_Cor, preproSignal = pollyDTCor(rawSignal = rawSignal,
+    preproSignal = pollyDTCor(rawSignal = rawSignal,
             mShots = mShots,
             hRes = hRes, 
             polly_device = pollyType,
@@ -525,11 +551,11 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
             deadtimeParams = deadtimeParams,
             deadtime = rawdata_dict['deadtime_polynomial']['var_data']
     )
-    data_dict['PCR_cor'] = PCR_Cor
-    data_dict['PCR_slice'] = slicerange(PCR_Cor, maxHeightBin, firstBinIndex)
     # most likely the preprocesssed deadtime corrected signal can be omitted
-    if not collect_debug:
+    if collect_debug:
+        #data_dict['PCR_cor'] = PCR_Cor
         data_dict['preproSignal'] = preproSignal 
+    #data_dict['PCR_slice'] = slicerange(PCR_Cor, maxHeightBin, firstBinIndex)
 
     ## Background Substraction
     sigBGCor, bg =  pollyRemoveBG(rawSignal = preproSignal,
@@ -559,11 +585,15 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
     data_dict['SNR'] = SNR
     #print(SNR)
     ## create mask and mask every entry, where SNR < minSNRThresh
-    data_dict['lowSNRMask'] = np.ma.array(np.zeros(sigBGCor.shape, dtype=bool), mask=np.ones(sigBGCor.shape, dtype=bool))
+    #data_dict['lowSNRMask'] = np.ma.array(np.zeros(sigBGCor.shape, dtype=bool), mask=np.ones(sigBGCor.shape, dtype=bool))
+    # a plain bool mask should be faster. Let's give it a try
+    data_dict['lowSNRMask'] = np.zeros_like(sigBGCor).astype(bool)
     #print(data_dict['lowSNRMask'])
     for iCh in range(0, sigBGCor.shape[2]):
         #data_dict['lowSNRMask'][:,:,iCh].mask = SNR[:,:,iCh].data < minSNRThresh[iCh]
-        data_dict['lowSNRMask'][:,:,iCh] = np.ma.masked_where(SNR[:,:,iCh].data < minSNRThresh[iCh], SNR[:,:,iCh])
+        #data_dict['lowSNRMask'][:,:,iCh] = np.ma.masked_where(SNR[:,:,iCh].data < minSNRThresh[iCh], SNR[:,:,iCh])
+        data_dict['lowSNRMask'][:,:,iCh][SNR[:,:,iCh] < minSNRThresh[iCh]] = True
+
 
     #print(data_dict['lowSNRMask'])
 
@@ -591,10 +621,13 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
 
     ## Range-corrected Signal calculation
     logging.info('... calculate range-corrected Signal')
-    mask = data_dict['lowSNRMask'].mask
+    #mask = data_dict['lowSNRMask'].mask
+    mask = data_dict['lowSNRMask']
     # masked arry might be slow
     #RCS_masked = np.ma.masked_array(sigBGCor+bg,mask=mask)
 #    data_dict['RCS'] = calculate_rcs(datasignal=preproSignal,data_dict=data_dict,mShots=mShots,hRes=hRes)
+    mShots_norm = np.repeat(np.mean(mShots, axis=0)[np.newaxis,:], mShots.shape[0], axis=0)
+    data_dict['PCR_slice'] = data_dict['sigBGCor']*(150/hRes)/mShots_norm[:,np.newaxis,:]
     data_dict['RCS'] = calculate_rcs(data_dict['PCR_slice'], data_dict['range'])
 
 

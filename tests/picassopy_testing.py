@@ -80,6 +80,7 @@ polly_default_file = str(polly_config_array['Default file'].to_string(index=Fals
 polly_device = str(polly_config_array['Instrument'].to_string(index=False)).strip()
 polly_location = str(polly_config_array['Location'].to_string(index=False)).strip()
 polly_asl = str(polly_config_array['asl.'].to_string(index=False)).strip()
+polly_default_file = str(polly_config_array['Default file'].to_string(index=False)).strip()
 
 output_path = Path(picasso_config_dict["fileinfo_new"]).parent
 print(polly_default_file)
@@ -93,13 +94,12 @@ if polly_default_file:
 else:
     polly_default_file_fullname = polly_default_global_defaults_file
 polly_config_dict = loadConfigs.loadPollyConfig(polly_config_file_fullname, polly_default_config_file)
-polly_default_dict = loadConfigs.loadPollyConfig(polly_default_file_fullname, polly_default_global_defaults_file)
 
 ## adding some information from pollynet_config_link_file (xlsx-file) to polly_config_dict
 polly_config_dict['name'] = polly_device
 polly_config_dict['site'] = polly_location
 polly_config_dict['asl'] = polly_asl
-
+polly_default_dict = loadConfigs.loadPollyConfig(polly_default_file_fullname, polly_default_global_defaults_file)
 
 
 if args.level0_file_to_process != None:
@@ -120,7 +120,7 @@ else:
 rawdata_dict = readPollyRawData.readPollyRawData(filename=rawfile)
 
 ## initate picasso-object from class PicassoProc
-data_cube = picassoProc.PicassoProc(rawdata_dict,polly_config_dict,picasso_config_dict)
+data_cube = picassoProc.PicassoProc(rawdata_dict,polly_config_dict,picasso_config_dict, polly_default_dict)
 
 #print(data_cube.device)
 #print(data_cube.location)
@@ -147,8 +147,79 @@ data_cube.preprocessing()
 #print(data_cube.rawdata_dict.keys())
 #print(data_cube.data_retrievals.keys())
 
-data_cube.pollySaturationDetect()
+data_cube.SaturationDetect()
+
+data_cube.polarizationCaliD90()
+
+data_cube.cloudScreen()
+
+data_cube.cloudFreeSeg()
+
+data_cube.clFreeGrps = [
+    [35, 300],
+    [1000, 1300],
+    [2650, 2870]
+]
+
+data_cube.polly_config_dict['meteorDataSource'] = 'nc_cloudnet'
+data_cube.polly_config_dict['meteo_folder'] = '/mnt/c/Users/radenz/localdata/coala/model_ecmwf'
+data_cube.polly_config_dict['meteo_file'] = ".*/{0:%Y}/{0:%Y%m%d}.*.nc"
+
+data_cube.loadMeteo()
+
+data_cube.calcMolecular()
+
+data_cube.rayleighFit()
+
+# for now, take the FR refH to the NR
+for e in data_cube.refH:
+    e['532_total_NR'] = e['532_total_FR']
+    e['355_total_NR'] = e['355_total_FR']
+
+data_cube.polly_config_dict['flagMolDepolCali'] = False
+data_cube.polarizationCaliMol()
+
+data_cube.transCor()
+
+data_cube.retrievalKlett(nr=True)
+
+data_cube.retrievalRaman(nr=True)
+
+data_cube.overlapCalc()
+
+data_cube.overlapFixLowestBins()
+
+data_cube.polly_config_dict['overlapCorMode'] = 2
+data_cube.polly_config_dict['overlapCalMode'] = 2
+data_cube.overlapCor()
+
+data_cube.retrievalKlett(oc=True)
+
+data_cube.retrievalRaman(oc=True)
+
+data_cube.calcDepol()
+
+data_cube.Angstroem()
+
+print('avail_optical_profiles', data_cube.data_retrievals['avail_optical_profiles'])
+
+data_cube.LidarCalibration()
+
+# gives also
+# data_cube.LCused
+
+data_cube.attBsc_volDepol()
+
+data_cube.molecularHighres()
+
+data_cube.quasiV1()
+
+data_cube.quasiV2()
+
 exit()
+
+
+
 ## creating monitoring nc-files
 prod_ls = ["SNR","BG","RCS"]
 for prod in prod_ls:

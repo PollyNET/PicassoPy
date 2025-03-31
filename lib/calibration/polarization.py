@@ -8,10 +8,13 @@ from scipy.ndimage import uniform_filter1d
 from lib.retrievals.collection import calc_snr
 
 
+# Helper functions
 def onemx_onepx(x):
     """calculate the fraction of (1-x)/(1+x)"""
     return (1-x)/(1+x)
 
+def smooth_signal(signal, window_len):
+    return uniform_filter1d(signal, size=window_len, mode='nearest')
 
 
 def loadGHK(data_cube):
@@ -29,7 +32,7 @@ def loadGHK(data_cube):
     print('data_cube keys ', data_cube.__dict__.keys())
     print('======================================')
     #pprint.pprint(data_cube.polly_config_dict)
-    print(data_cube.polly_config_dict.keys())
+    #print(data_cube.polly_config_dict.keys())
     print('======================================')
     G = np.array(data_cube.polly_config_dict['G']).astype(float)
     H = np.array(data_cube.polly_config_dict['H']).astype(float)
@@ -315,9 +318,6 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
         results['global_attri'] = dict(global_attri)
     return results
 
-# Helper functions
-def smooth_signal(signal, window_len):
-    return uniform_filter1d(signal, size=window_len, mode='nearest')
 
 def analyze_segments(dplus, dminus, segment_len, rel_std_dplus, rel_std_dminus): 
     results = []
@@ -379,6 +379,7 @@ def calibrateMol(data_cube):
     pol_cali = defaultdict(lambda: defaultdict(list))
 
     config_dict = data_cube.polly_config_dict
+    default_dict = data_cube.polly_default_dict
 
     for i, cldFree in enumerate(data_cube.clFreeGrps):
         print(i, cldFree)
@@ -404,7 +405,7 @@ def calibrateMol(data_cube):
                     np.squeeze(data_cube.polly_config_dict['TR'][data_cube.gf(wv, t, tel)]), 0,
                     np.squeeze(data_cube.polly_config_dict['TR'][data_cube.gf(wv, 'cross', tel)]), 0,
                     10,
-                    config_dict[f'molDepol{wv}'], config_dict[f'molDepolStd{wv}'],
+                    default_dict[f'molDepol{wv}'], default_dict[f'molDepolStd{wv}'],
                 )
                 if not ret['status'] == 0:
                     pol_cali[f'{wv}_{t}_{tel}']['eta'].append(ret['eta'])

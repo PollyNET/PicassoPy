@@ -40,7 +40,7 @@ def pollySaturationDetect(data_cube,**varargin):
 #nChannels = size(data.signal, 1);
 #nProfiles = size(data.signal, 3);
     logging.info('Saturation detection')
-    hFullOverlap = varargin.get('hFullOverlap', [])
+    hFullOverlap = np.array(varargin.get('hFullOverlap', []))
     sigSaturateThresh = varargin.get('sigSaturateThresh', 100)
 
     if not data_cube.rawdata_dict['raw_signal']['var_data'].any():
@@ -50,22 +50,24 @@ def pollySaturationDetect(data_cube,**varargin):
     rawSignal = data_cube.rawdata_dict['raw_signal']['var_data']
     hRes = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
 
-    if 'PCR_cor' in data_cube.data_retrievals.keys():
-        PCR = data_cube.data_retrievals['PCR_cor']
+    if 'PCR_slice' in data_cube.data_retrievals.keys():
+        PCR = data_cube.data_retrievals['PCR_slice']
     else:
         logging.info('no PCR_cor key was found in data_cube object, using uncorrected PCR.')
         PCR = rawSignal / mShots[:, np.newaxis, :] * 150.0 / hRes
 
     nChannels = data_cube.num_of_channels
     nProfiles = data_cube.num_of_profiles
+    height=data_cube.data_retrievals['range']
 
     flagSaturation = np.full(PCR.shape, False, dtype=bool)
 
     for iChannel in range(nChannels):
+        hFullOverlap_channel = hFullOverlap[iChannel]
         for iProfile in range(nProfiles):
             flagSaturation[iProfile,:,iChannel] = saturationDetect(signal=PCR[iProfile,:,iChannel],
-                                              height=data_cube.data_retrievals['height'],
-                                              hBase=hFullOverlap,
+                                              height=height,
+                                              hBase=hFullOverlap_channel,
                                               hTop=10000,
                                               sigThresh=sigSaturateThresh,
                                               cloudMaxGThickness=500)
@@ -136,11 +138,11 @@ def saturationDetect(signal, height, hBase, hTop, sigThresh, cloudMaxGThickness)
     flag[signal > sigThresh] = True
 
     ## check Base and Top heights
-    hBaseIndx = np.where(height > hBase)[0] ## TODO: channelwise hBaseIndexing
+    hBaseIndx = np.where(height > hBase)[0] 
     hTopIndx = np.where(height <= hTop)[0]
 
-    print(hBaseIndx)
-    print(hTopIndx)
+    #print(hBaseIndx)
+    #print(hTopIndx)
 
     return flag
 
@@ -185,3 +187,5 @@ def saturationDetect(signal, height, hBase, hTop, sigThresh, cloudMaxGThickness)
 #
 #end
 
+
+# %%

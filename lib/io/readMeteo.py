@@ -105,6 +105,9 @@ class Meteo:
         return self
 
     def get_mean_profiles(self, time_slice):
+        """get the mean meteorological profiles
+        
+        """
 
         mean_profiles = []
         for t in time_slice:
