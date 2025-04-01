@@ -1,12 +1,12 @@
 
 import logging
 import numpy as np
-from lib.retrievals.ramanhelpers import *
+from ppcpy.retrievals.ramanhelpers import *
 from scipy.stats import norm
 from scipy.ndimage import uniform_filter1d
 from scipy.signal import savgol_filter
 
-from lib.retrievals.collection import calc_snr
+from ppcpy.retrievals.collection import calc_snr
 
 sigma_angstroem=0.2
 MC_count=3

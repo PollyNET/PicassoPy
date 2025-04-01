@@ -3,8 +3,8 @@ import logging
 import numpy as np
 from scipy.ndimage import uniform_filter1d
 
-from lib.retrievals.collection import calc_snr
-from lib.misc.helper import mean_stable
+from ppcpy.retrievals.collection import calc_snr
+from ppcpy.misc.helper import mean_stable
 
 
 

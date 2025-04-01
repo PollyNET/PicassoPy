@@ -7,13 +7,13 @@ import json
 from pathlib import Path
 from log import logger
 import logging
-#from lib.io.loadConfigs import *
-import lib.io.loadConfigs as loadConfigs
-import lib.io.readPollyRawData as readPollyRawData
-import lib.interface.picassoProc as picassoProc
-import lib.misc.helper as helper
-import lib.misc.startscreen as startscreen
-import lib.misc.json2nc_mapping as json2nc_mapping
+#from ppcpy.io.loadConfigs import *
+import ppcpy.io.loadConfigs as loadConfigs
+import ppcpy.io.readPollyRawData as readPollyRawData
+import ppcpy.interface.picassoProc as picassoProc
+import ppcpy.misc.helper as helper
+import ppcpy.misc.startscreen as startscreen
+import ppcpy.misc.json2nc_mapping as json2nc_mapping
 
 
 ## getting root dir of PicassoPy
@@ -21,9 +21,9 @@ root_dir0 = Path(__file__).resolve().parent.parent
 root_dir = helper.detect_path_type(root_dir0)
 
 ## setting config files
-picasso_default_config_file = Path(root_dir,'lib','config','pollynet_processing_chain_config.json')
-polly_default_config_file = Path(root_dir,'lib','config','polly_global_config.json')
-polly_default_global_defaults_file = Path(root_dir,'lib','config','polly_global_defaults.json')
+picasso_default_config_file = Path(root_dir,'ppcpy','config','pollynet_processing_chain_config.json')
+polly_default_config_file = Path(root_dir,'ppcpy','config','polly_global_config.json')
+polly_default_global_defaults_file = Path(root_dir,'ppcpy','config','polly_global_defaults.json')
 #picasso_config_file = "/pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json"
 
 
@@ -45,7 +45,7 @@ my_parser.add_argument('--picasso_config_file',
                        type=str,
                        default=None,
                        #default=picasso_default_config_file,
-                       help='the json-type picasso config-file, default is lib/config/pollynet_processing_chain_config.json')
+                       help='the json-type picasso config-file, default is ppcpy/config/pollynet_processing_chain_config.json')
 my_parser.add_argument('--level0_file_to_process',
                        type=str,
                        default=None,
@@ -225,7 +225,7 @@ prod_ls = ["SNR","BG","RCS"]
 for prod in prod_ls:
     json_nc_mapping_dict = {}
     if prod in polly_config_dict["prodSaveList"]:
-        json_nc_mapping_dict[prod] = json2nc_mapping.read_json_to_dict(Path(root_dir,'lib','config',f'json2nc-mapper_{prod}.json'))
+        json_nc_mapping_dict[prod] = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config',f'json2nc-mapper_{prod}.json'))
 
         """ map channels to variables """
         helper.channel_2_variable_mapping(data_retrievals=data_cube.retrievals_highres, var=prod, channeltags_dict=data_cube.channel_dict)

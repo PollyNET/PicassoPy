@@ -5,12 +5,12 @@ import time
 import itertools
 from scipy.ndimage import label
 from multiprocessing import Pool, cpu_count
-#from lib.preprocess.optimized_polyval import process_signal
-#from lib.preprocess.compute_pcr import compute_pcr
+#from ppcpy.preprocess.optimized_polyval import process_signal
+#from ppcpy.preprocess.compute_pcr import compute_pcr
 #import numpy as np
 #from multiprocessing import Pool, cpu_count
 
-from lib.retrievals.collection import calc_snr
+from ppcpy.retrievals.collection import calc_snr
 
 def compute_channel_pcr(args):
     """

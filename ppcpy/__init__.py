@@ -7,8 +7,8 @@ import numpy as np
 from pathlib import Path
 import log.logger as logger
 #from PicassoPy.log.logger import *
-#from PicassoPy.lib.io.loadConfigs import *
-#from PicassoPy.lib.io.readPollyRawData import *
-#from PicassoPy.lib.interface.picassoProc import *
-#import PicassoPy.lib.io.loadConfig
+#from PicassoPy.ppcpy.io.loadConfigs import *
+#from PicassoPy.ppcpy.io.readPollyRawData import *
+#from PicassoPy.ppcpy.interface.picassoProc import *
+#import PicassoPy.ppcpy.io.loadConfig
 

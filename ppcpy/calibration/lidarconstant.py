@@ -1,7 +1,7 @@
 
 
 import numpy as np
-from lib.misc.helper import mean_stable
+from ppcpy.misc.helper import mean_stable
 
 
 elastic2raman = {355: 387, 532: 607}

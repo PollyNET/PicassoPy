@@ -10,6 +10,7 @@ name = "PicassoPy"
 version = "0.1.1"
 authors = [
   { name="Andi Klamt", email="klamt@tropos.de" },
+  { name="Martin Radenz", email="radenz@tropos.de" },
 ]
 description='Data cube for handling atmospheric observations of profiling remote sensing instruments.'
 requires-python = ">=3.8"

@@ -1,8 +1,8 @@
 
 
 import numpy as np
-import lib.misc.helper as helper
-import lib.retrievals.depolarization as depolarization
+import ppcpy.misc.helper as helper
+import ppcpy.retrievals.depolarization as depolarization
 
 from scipy.interpolate import interp1d
 

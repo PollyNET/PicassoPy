@@ -3,30 +3,30 @@ import datetime
 import re
 import numpy as np
 import logging
-import lib.misc.pollyChannelTags as pollyChannelTags
-import lib.preprocess.pollyPreprocess as pollyPreprocess
-import lib.qc.pollySaturationDetect as pollySaturationDetect
-import lib.qc.transCor as transCor
-import lib.qc.overlapEst as overlapEst
-import lib.qc.overlapCor as overlapCor
+import ppcpy.misc.pollyChannelTags as pollyChannelTags
+import ppcpy.preprocess.pollyPreprocess as pollyPreprocess
+import ppcpy.qc.pollySaturationDetect as pollySaturationDetect
+import ppcpy.qc.transCor as transCor
+import ppcpy.qc.overlapEst as overlapEst
+import ppcpy.qc.overlapCor as overlapCor
 
 
-import lib.calibration.polarization as polarization
-import lib.cloudmask.cloudscreen as cloudscreen
-import lib.cloudmask.profilesegment as profilesegment
-import lib.io.readMeteo as readMeteo
-import lib.misc.molecular as molecular
-import lib.calibration.rayleighfit as rayleighfit
-import lib.retrievals.klettfernald as klettfernald
-import lib.retrievals.raman as raman
-import lib.retrievals.depolarization as depolarization 
-import lib.retrievals.angstroem as angstroem 
-import lib.calibration.lidarconstant as lidarconstant
+import ppcpy.calibration.polarization as polarization
+import ppcpy.cloudmask.cloudscreen as cloudscreen
+import ppcpy.cloudmask.profilesegment as profilesegment
+import ppcpy.io.readMeteo as readMeteo
+import ppcpy.misc.molecular as molecular
+import ppcpy.calibration.rayleighfit as rayleighfit
+import ppcpy.retrievals.klettfernald as klettfernald
+import ppcpy.retrievals.raman as raman
+import ppcpy.retrievals.depolarization as depolarization 
+import ppcpy.retrievals.angstroem as angstroem 
+import ppcpy.calibration.lidarconstant as lidarconstant
 
-import lib.retrievals.highres as highres
-import lib.retrievals.quasiV1 as quasiV1
-import lib.retrievals.quasiV2 as quasiV2
-import lib.retrievals.quasi as quasi
+import ppcpy.retrievals.highres as highres
+import ppcpy.retrievals.quasiV1 as quasiV1
+import ppcpy.retrievals.quasiV2 as quasiV2
+import ppcpy.retrievals.quasi as quasi
 
 class PicassoProc:
     counter = 0

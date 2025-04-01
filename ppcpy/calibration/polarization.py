@@ -5,7 +5,7 @@ import pprint
 import numpy as np
 from scipy.ndimage import uniform_filter1d
 
-from lib.retrievals.collection import calc_snr
+from ppcpy.retrievals.collection import calc_snr
 
 
 # Helper functions

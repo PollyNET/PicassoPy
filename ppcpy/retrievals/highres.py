@@ -2,8 +2,8 @@
 
 
 import numpy as np
-import lib.qc.transCor as transCor
-import lib.retrievals.depolarization as depolarization
+import ppcpy.qc.transCor as transCor
+import ppcpy.retrievals.depolarization as depolarization
 
 
 def attbsc_2d(data_cube, nr=True):

@@ -1,6 +1,6 @@
 
 import numpy as np
-import lib.misc.helper as helper
+import ppcpy.misc.helper as helper
 
 from scipy.interpolate import interp1d
 
