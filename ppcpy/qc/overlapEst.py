@@ -27,14 +27,10 @@ def run_frnr_cldFreeGrps(data_cube, collect_debug=True):
         for wv in [355, 387, 532, 607]:
             if np.any(data_cube.gf(wv, 'total', 'FR')) and np.any(data_cube.gf(wv, 'total', 'NR')):
                 print(wv, 'both telescopes available')
-                sigFR = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, 'total', 'FR')]), axis=0)
-                bgFR = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres['BGTCor'][slice(*cldFree),data_cube.gf(wv, 'total', 'FR')]), axis=0)
-                sigNR = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, 'total', 'NR')]), axis=0)
-                bgNR = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres['BGTCor'][slice(*cldFree),data_cube.gf(wv, 'total', 'NR')]), axis=0)
+                sigFR = np.squeeze(data_cube.retrievals_profile['sigTCor'][i,:,data_cube.gf(wv, 'total', 'FR')])
+                bgFR = np.squeeze(data_cube.retrievals_profile['BGTCor'][i,data_cube.gf(wv, 'total', 'FR')])
+                sigNR = np.squeeze(data_cube.retrievals_profile['sigTCor'][i,:,data_cube.gf(wv, 'total', 'NR')])
+                bgNR = np.squeeze(data_cube.retrievals_profile['BGTCor'][i,data_cube.gf(wv, 'total', 'NR')])
                 hFullOverlap = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, 'total', 'FR')][0]
                 ol = overlapCalc(height, sigFR, bgFR, sigNR, bgNR, hFullOverlap=hFullOverlap)
                 overlap[i][f"{wv}_total_FR"] = ol
@@ -127,19 +123,17 @@ def run_raman_cldFreeGrps(data_cube, collect_debug=True):
         for (wv, t, tel), (wv_r, t_r, tel_r) in channels:
             if np.any(data_cube.gf(wv, t, tel)) and np.any(data_cube.gf(wv_r, t_r, tel_r)):
                 print(wv, wv_r, 'both wavelengths available')
-                sig = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres['sigTCor'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
-                bg = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres['BGTCor'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
+                sig = np.squeeze(data_cube.retrievals_profile['sigTCor'][i,:,data_cube.gf(wv, t, tel)])
+                #bg = np.nansum(np.squeeze(
+                #    data_cube.retrievals_highres['BGTCor'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
                 molExt = data_cube.mol_profiles[f'mExt_{wv}'][i,:]
 
                 aerBsc = data_cube.retrievals_profile['raman'][i][f"{wv}_{t}_{tel}"]['aerBsc']
 
-                sig_r = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres['sigTCor'][slice(*cldFree),:,data_cube.gf(wv_r, t, tel)]), axis=0)
-                bg_r = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres['BGTCor'][slice(*cldFree),data_cube.gf(wv_r, t, tel)]), axis=0)
+                sig_r = np.squeeze(data_cube.retrievals_profile['sigTCor'][i,:,data_cube.gf(wv_r, t, tel)])
+                #bg_r = np.nansum(np.squeeze(
+                #    data_cube.retrievals_highres['BGTCor'][slice(*cldFree),data_cube.gf(wv_r, t, tel)]), axis=0)
                 molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i,:]
                 molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i,:]
                 hFullOverlap = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, t, tel)][0]

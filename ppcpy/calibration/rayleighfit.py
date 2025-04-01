@@ -24,12 +24,9 @@ def rayleighfit(data_cube):
             for wv, t, tel in [(532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]:
                 if np.any(data_cube.gf(wv, 'total', 'FR')):
                     print(f'refH for {wv}')
-                    rcs = np.nanmean(np.squeeze(
-                        data_cube.retrievals_highres['RCS'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
-                    sig = np.nansum(np.squeeze(
-                        data_cube.retrievals_highres['sigBGCor'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
-                    bg = np.nansum(np.squeeze(
-                        data_cube.retrievals_highres['BG'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
+                    rcs = np.squeeze(data_cube.retrievals_profile['RCS'][i,:,data_cube.gf(wv, t, tel)])
+                    sig = np.squeeze(data_cube.retrievals_profile['sigBGCor'][i,:,data_cube.gf(wv, t, tel)])
+                    bg = np.squeeze(data_cube.retrievals_profile['BG'][i,data_cube.gf(wv, t, tel)])
 
                     mSig = (
                         data_cube.mol_profiles[f'mBsc_{wv}'][i,:] * \

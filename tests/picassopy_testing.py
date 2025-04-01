@@ -160,6 +160,7 @@ data_cube.clFreeGrps = [
     [1000, 1300],
     [2650, 2870]
 ]
+data_cube.aggregate_profiles()
 
 data_cube.polly_config_dict['meteorDataSource'] = 'nc_cloudnet'
 data_cube.polly_config_dict['meteo_folder'] = '/mnt/c/Users/radenz/localdata/coala/model_ecmwf'
@@ -180,6 +181,8 @@ data_cube.polly_config_dict['flagMolDepolCali'] = False
 data_cube.polarizationCaliMol()
 
 data_cube.transCor()
+data_cube.aggregate_profiles(var='sigTCor')
+data_cube.aggregate_profiles(var='BGTCor')
 
 data_cube.retrievalKlett(nr=True)
 
@@ -192,6 +195,8 @@ data_cube.overlapFixLowestBins()
 data_cube.polly_config_dict['overlapCorMode'] = 2
 data_cube.polly_config_dict['overlapCalMode'] = 2
 data_cube.overlapCor()
+data_cube.aggregate_profiles('sigOLCor')
+data_cube.aggregate_profiles('BGOLCor')
 
 data_cube.retrievalKlett(oc=True)
 

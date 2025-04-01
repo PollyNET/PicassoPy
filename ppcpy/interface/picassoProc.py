@@ -14,6 +14,7 @@ import ppcpy.qc.overlapCor as overlapCor
 import ppcpy.calibration.polarization as polarization
 import ppcpy.cloudmask.cloudscreen as cloudscreen
 import ppcpy.cloudmask.profilesegment as profilesegment
+import ppcpy.preprocess.profiles as preprocprofiles
 import ppcpy.io.readMeteo as readMeteo
 import ppcpy.misc.molecular as molecular
 import ppcpy.calibration.rayleighfit as rayleighfit
@@ -285,6 +286,23 @@ class PicassoProc:
         
         """
         self.clFreeGrps = profilesegment.segment(self)
+
+    def aggregate_profiles(self, var=None):
+        """
+        
+        """
+
+        if var == None:
+            self.retrievals_profile['RCS'] = \
+                preprocprofiles.aggregate_clFreeGrps(self, 'RCS', func=np.nanmean)
+            self.retrievals_profile['sigBGCor'] = \
+                preprocprofiles.aggregate_clFreeGrps(self, 'sigBGCor')
+            self.retrievals_profile['BG'] = \
+                preprocprofiles.aggregate_clFreeGrps(self, 'BG')
+
+        else:
+            self.retrievals_profile[var] = \
+                preprocprofiles.aggregate_clFreeGrps(self, var)
 
 
     def loadMeteo(self):

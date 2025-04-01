@@ -51,18 +51,13 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, 
                 else:
                     key_smooth = 'smoothWin_raman_'
 
-                sig = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
-                print('shape sig', data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)].shape)
-                bg = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
+                sig = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i,:,data_cube.gf(wv, t, tel)])
+                bg = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i,data_cube.gf(wv, t, tel)])
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
                 molExt = data_cube.mol_profiles[f'mExt_{wv}'][i,:]
 
-                sig_r = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv_r, t, tel)]), axis=0)
-                bg_r = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv_r, t, tel)]), axis=0)
+                sig_r = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i,:,data_cube.gf(wv_r, t, tel)])
+                bg_r = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i,data_cube.gf(wv_r, t, tel)])
                 molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i,:]
                 molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i,:]
                 number_density = data_cube.mol_profiles[f'number_density'][i,:]

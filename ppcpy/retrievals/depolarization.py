@@ -29,12 +29,10 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
             if np.any(flagt) and np.any(flagc):
                 logging.info(f'voldepol at channel {wv} cldFree {i} {cldFree}')
 
-                sigt = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,flagt]), axis=0)
+                sigt = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i,:,flagt])
                 #bgt = np.nansum(np.squeeze(
                 #    data_cube.retrievals_highres[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, 'total', tel)]), axis=0)
-                sigc = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,flagc]), axis=0)
+                sigc = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i,:,flagc])
 
                 print(channel, data_cube.pol_cali[int(wv)]['eta_best'])
 

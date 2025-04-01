@@ -36,11 +36,8 @@ def run_cldFreeGrps(data_cube, signal='TCor', nr=False, collect_debug=True):
                 else:
                     key_smooth = 'smoothWin_klett_'
                     key_LR = 'LR'
-                sig = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
-                print(data_cube.retrievals_highres[f'sig{signal}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)].shape)
-                bg = np.nansum(np.squeeze(
-                    data_cube.retrievals_highres[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
+                sig = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i,:,data_cube.gf(wv, t, tel)])
+                bg = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i,data_cube.gf(wv, t, tel)])
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
                 #return None, None, sig, molBsc*1e3, None
 
