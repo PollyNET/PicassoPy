@@ -35,3 +35,64 @@ dependencies = [
 
 [tool.setuptools.packages]
 find = {}
+
+
+[tool.sphinx-pyproject]
+# -- General configuration ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+project = "PicassoPy" # for some reason the project name has to be repeated here
+coverage_show_missing_items = true
+extensions = [
+  #"autoapi.extension", not quite sure yet if to use autoapi, apidoc or autodoc...
+  "sphinx.ext.autodoc",
+  "sphinx.ext.autosummary",
+  #"sphinx_autodoc_typehints",
+  "sphinx.ext.viewcode",
+  "sphinx.ext.coverage",
+  "sphinx_rtd_theme",
+  "sphinx_rtd_size",
+  "sphinx.ext.mathjax",
+  "sphinx.ext.viewcode",
+  "sphinx.ext.todo",
+  "sphinx.ext.napoleon",
+  #"sphinx.ext.autosectionlabel",
+  "recommonmark",
+]
+sphinx_rtd_size_width = "90%"
+source_suffix = {'.rst' = 'restructuredtext', '.md' = 'markdown'}
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+auto_doc_default_options = {'autosummary' = true}
+# -- Options for HTML output -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+html_theme = "sphinx_rtd_theme"
+#html_style = "css/custom.css"
+html_static_path = ["_static"]
+html_theme_options = {'sticky_navigation' = true, 'includehidden' = true, 'titles_only' = false}
+autosummary_generate = true
+autoclass_content = "both"
+
+[tool.sphinx-pyproject.autodoc_default_options]
+# exclude-members = """
+#   __weakref__,
+#   __sizeof__,
+#   __hash__,
+#   __module__,
+#   __dict__,
+#   __annotations__,
+#   __orig_bases__,
+#   __parameters__,
+#   __abstractmethods__,
+#   __non_callable_proto_members__,
+#   __protocol_attrs__,
+#   __subclasshook__,
+#   __dataclass_fields__,
+#   __post_init__,
+#   __dataclass_params__,
+#   __match_args__,
+#   __str__,
+#   __repr__"""
+members = true
+member-order = 'bysource'
+# special-members = true
+undoc-members = false

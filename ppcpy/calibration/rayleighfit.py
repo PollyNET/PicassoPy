@@ -43,7 +43,7 @@ def rayleighfit(data_cube):
                         config_dict[f'maxDecomThickness{wv}'], config_dict[f'decomSmoothWin{wv}']
                         )
 
-                    print('DPInd', DPInd)
+                    #print('DPInd', DPInd)
                     #DPInd = [133,  332,  333,  533,  675,  875,  1075,  1274,  1275,  1333]
                     #print('!!!! overwrite DPInd !!!!!!!!!!!!!!!!!!!!')
                     #print('DPInd', DPInd)
@@ -501,8 +501,6 @@ def fit_profile(height, sig_aer, pc, bg, sig_mol, dpIndx, layerThickConstrain,
         if not (test1 and test2 and test3 and test4 and test5):
             print("one tests failed?")
             continue
-        else:
-            print('all tests succeeded')
 
         # save statistics
         numTest += 1
@@ -535,16 +533,15 @@ def fit_profile(height, sig_aer, pc, bg, sig_mol, dpIndx, layerThickConstrain,
     X_val[X_val == 0] = np.nan
     indxBest_Int = np.nanargmin(X_val)
     
-    print('hIndB_Test', hIndxB_Test)
-    print('hIndT_Test', hIndxT_Test)
-    print('mean_resid', mean_resid)
-    print('std_resid', std_resid)
-    print('slope_resid', slope_resid)
-    print('msre_resid', msre_resid)
-    print('SNR_ref', SNR_ref)
-    print('Astat', Astat)
-
-    print('X_val', X_val)
+    # print('hIndB_Test', hIndxB_Test)
+    # print('hIndT_Test', hIndxT_Test)
+    # print('mean_resid', mean_resid)
+    # print('std_resid', std_resid)
+    # print('slope_resid', slope_resid)
+    # print('msre_resid', msre_resid)
+    # print('SNR_ref', SNR_ref)
+    # print('Astat', Astat)
+    # print('X_val', X_val)
 
     if flagShowDetail:
         print(f'The best interval is {height[int(hIndxB_Test[indxBest_Int])]} - '

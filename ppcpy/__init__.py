@@ -12,3 +12,4 @@ import log.logger as logger
 #from PicassoPy.ppcpy.interface.picassoProc import *
 #import PicassoPy.ppcpy.io.loadConfig
 
+import interface
