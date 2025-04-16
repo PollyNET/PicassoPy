@@ -7,13 +7,13 @@ import json
 from pathlib import Path
 from log import logger
 import logging
-#from lib.io.loadConfigs import *
-import lib.io.loadConfigs as loadConfigs
-import lib.io.readPollyRawData as readPollyRawData
-import lib.interface.picassoProc as picassoProc
-import lib.misc.helper as helper
-import lib.misc.startscreen as startscreen
-import lib.misc.json2nc_mapping as json2nc_mapping
+#from ppcpy.io.loadConfigs import *
+import ppcpy.io.loadConfigs as loadConfigs
+import ppcpy.io.readPollyRawData as readPollyRawData
+import ppcpy.interface.picassoProc as picassoProc
+import ppcpy.misc.helper as helper
+import ppcpy.misc.startscreen as startscreen
+import ppcpy.misc.json2nc_mapping as json2nc_mapping
 
 
 ## getting root dir of PicassoPy
@@ -21,9 +21,9 @@ root_dir0 = Path(__file__).resolve().parent.parent
 root_dir = helper.detect_path_type(root_dir0)
 
 ## setting config files
-picasso_default_config_file = Path(root_dir,'lib','config','pollynet_processing_chain_config.json')
-polly_default_config_file = Path(root_dir,'lib','config','polly_global_config.json')
-polly_default_global_defaults_file = Path(root_dir,'lib','config','polly_global_defaults.json')
+picasso_default_config_file = Path(root_dir,'ppcpy','config','pollynet_processing_chain_config.json')
+polly_default_config_file = Path(root_dir,'ppcpy','config','polly_global_config.json')
+polly_default_global_defaults_file = Path(root_dir,'ppcpy','config','polly_global_defaults.json')
 #picasso_config_file = "/pollyhome/Bildermacher2/experimental/PicassoPy/config/pollynet_processing_chain_config_rsd2_24h_exp.json"
 
 
@@ -45,7 +45,7 @@ my_parser.add_argument('--picasso_config_file',
                        type=str,
                        default=None,
                        #default=picasso_default_config_file,
-                       help='the json-type picasso config-file, default is lib/config/pollynet_processing_chain_config.json')
+                       help='the json-type picasso config-file, default is ppcpy/config/pollynet_processing_chain_config.json')
 my_parser.add_argument('--level0_file_to_process',
                        type=str,
                        default=None,
@@ -145,7 +145,7 @@ data_cube.reset_date_infile()
 ## preprocessing
 data_cube.preprocessing()
 #print(data_cube.rawdata_dict.keys())
-#print(data_cube.data_retrievals.keys())
+#print(data_cube.retrievals_highres.keys())
 
 data_cube.SaturationDetect()
 
@@ -160,6 +160,7 @@ data_cube.clFreeGrps = [
     [1000, 1300],
     [2650, 2870]
 ]
+data_cube.aggregate_profiles()
 
 data_cube.polly_config_dict['meteorDataSource'] = 'nc_cloudnet'
 data_cube.polly_config_dict['meteo_folder'] = '/mnt/c/Users/radenz/localdata/coala/model_ecmwf'
@@ -180,6 +181,8 @@ data_cube.polly_config_dict['flagMolDepolCali'] = False
 data_cube.polarizationCaliMol()
 
 data_cube.transCor()
+data_cube.aggregate_profiles(var='sigTCor')
+data_cube.aggregate_profiles(var='BGTCor')
 
 data_cube.retrievalKlett(nr=True)
 
@@ -192,6 +195,8 @@ data_cube.overlapFixLowestBins()
 data_cube.polly_config_dict['overlapCorMode'] = 2
 data_cube.polly_config_dict['overlapCalMode'] = 2
 data_cube.overlapCor()
+data_cube.aggregate_profiles('sigOLCor')
+data_cube.aggregate_profiles('BGOLCor')
 
 data_cube.retrievalKlett(oc=True)
 
@@ -201,7 +206,7 @@ data_cube.calcDepol()
 
 data_cube.Angstroem()
 
-print('avail_optical_profiles', data_cube.data_retrievals['avail_optical_profiles'])
+print('avail_optical_profiles', data_cube.retrievals_profile['avail_optical_profiles'])
 
 data_cube.LidarCalibration()
 
@@ -225,20 +230,20 @@ prod_ls = ["SNR","BG","RCS"]
 for prod in prod_ls:
     json_nc_mapping_dict = {}
     if prod in polly_config_dict["prodSaveList"]:
-        json_nc_mapping_dict[prod] = json2nc_mapping.read_json_to_dict(Path(root_dir,'lib','config',f'json2nc-mapper_{prod}.json'))
+        json_nc_mapping_dict[prod] = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config',f'json2nc-mapper_{prod}.json'))
 
         """ map channels to variables """
-        helper.channel_2_variable_mapping(data_retrievals=data_cube.data_retrievals, var=prod, channeltags_dict=data_cube.channel_dict)
+        helper.channel_2_variable_mapping(data_retrievals=data_cube.retrievals_highres, var=prod, channeltags_dict=data_cube.channel_dict)
         
         """ set dimension sizes """
         for d in json_nc_mapping_dict[prod]['dimensions']:
-            json_nc_mapping_dict[prod]['dimensions'][d] = len(data_cube.data_retrievals[d])
+            json_nc_mapping_dict[prod]['dimensions'][d] = len(data_cube.retrievals_highres[d])
         
         """ fill variables """
         for v in list(json_nc_mapping_dict[prod]['variables'].keys()):
         #for v in json_nc_mapping_dict[prod]['variables'].keys():
-            if v in data_cube.data_retrievals.keys():
-                json_nc_mapping_dict[prod]['variables'][v]['data'] = data_cube.data_retrievals[v]
+            if v in data_cube.retrievals_highres.keys():
+                json_nc_mapping_dict[prod]['variables'][v]['data'] = data_cube.retrievals_highres[v]
         ### TODO: remove empty key-value-pairs
             if json_nc_mapping_dict[prod]['variables'][v]['data'] is None:
                 json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict[prod], key_to_remove=v)

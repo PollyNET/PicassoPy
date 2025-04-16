@@ -1,0 +1,455 @@
+{
+  "global_attributes": {
+    "Conventions": "CF-1.0",
+    "Licence": "Creative Commons Attribution Share Alike 4.0 International (CC BY-SA 4.0)",
+    "Data_Policy": "Each PollyNET site has Principal Investigator(s) (PI), responsible for deployment, maintenance and data collection. Information on which PI is responsible can be gathered via polly@tropos.de. The PI has priority use of the data collected at the site. The PI is entitled to be informed of any use of that data. Mandatory guidelines for data use and publication: Using PollyNET data or plots (also for presentations/workshops): Please consult with the PI or the PollyNET team (see contact_mail contact) before using data or plots! This will help to avoid misinterpretations of the lidar data and avoid the use of data from periods of malfunction of the instrument. Using PollyNET images/data on external websites: PIs and PollyNET must be asked for agreement and a link directed to polly.tropos.de must be included. Publishing PollyNET data and/or plots data: Offer authorship for the PI(s)! Acknowledge projects which have made the measurements possible according to PI(s) recommendation. PollyNET requests a notification of any published papers or reports or a brief description of other uses (e.g., posters, oral presentations, etc.) of data/plots used from PollyNET. This will help us determine the use of PollyNET data, which is helpful in optimizing product development and acquire new funding for future measurements. It also helps us to keep our product-related references up-to-date.",
+    "location": "",
+    "institute": "Ground-based Remote Sensing Group (TROPOS)",
+    "source": "polly_device_name",
+    "version": "picasso_version",
+    "reference": "https://polly.tropos.de/",
+    "contact": "",
+    "PicassoConfig_Info": "",
+    "PollyConfig_Info": "",
+    "CampaignConfig_Info": "",
+    "PollyData_Info": "",
+    "history": ""
+  },
+  "dimensions": {
+    "height": 0,
+    "time": 0
+  },
+  "variables": {
+    "alt": {
+      "dtype": "f4",
+      "shape": [
+        "height"
+      ],
+      "data": null,
+      "attributes": {
+        "unit": "m",
+        "long_name": "Height of lidar above mean sea level",
+        "standard_name": "altitude"
+      }
+    },
+    "longitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees_east",
+        "long_name": "Longitude of the site",
+        "standard_name": "longitude",
+        "axis": "Y"
+      }
+    },
+    "latitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees_north",
+        "long_name": "Latitude of the site",
+        "standard_name": "latitude",
+        "axis": "Y"
+      }
+    },
+    "height": {
+      "dtype": "f4",
+      "shape": [
+        "height"
+      ],
+      "data": null,
+      "attributes": {
+        "unit": "m",
+        "long_name": "Height above the ground",
+        "standard_name": "height",
+        "axis": "Z"
+      }
+    },
+    "tilt_angle": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees",
+        "long_name": "Tilt angle of lidar device",
+        "standard_name": "tilt_angle"
+      }
+    },
+    "time": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "attributes": {
+        "unit": "seconds since 1970-01-01 00:00:00 UTC",
+        "long_name": "Time UTC",
+        "standard_name": "time",
+        "axis": "T",
+        "calendar": "julian"
+      }
+    },
+    "SNR_FR_total_355nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio FR_total_355nm",
+        "standard_name": "SNR_FR_total_355nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_FR_cross_355nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio FR_cross_355nm",
+        "standard_name": "SNR_FR_cross_355nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_FR_387nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio FR_387nm",
+        "standard_name": "SNR_FR_387nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_FR_407nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio FR_407nm",
+        "standard_name": "SNR_FR_407nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_FR_total_532nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio FR_total_532nm",
+        "standard_name": "SNR_FR_total_532nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_FR_cross_532nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio FR_cross_532nm",
+        "standard_name": "SNR_FR_cross_532nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_FR_parallel_532nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio FR_parallel_532nm",
+        "standard_name": "SNR_FR_parallel_532nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_FR_607nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio FR_607nm",
+        "standard_name": "SNR_FR_607nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_FR_total_1064nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio FR_total_1064nm",
+        "standard_name": "SNR_FR_total_1064nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_1064s": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio 1064s",
+        "standard_name": "SNR_1064s",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_NR_total_355nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio NR_total_355nm",
+        "standard_name": "SNR_NR_total_355nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_NR_387nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio NR_387nm",
+        "standard_name": "SNR_NR_387nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_NR_total_532nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio NR_total_532nm",
+        "standard_name": "SNR_NR_total_532nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_NR_cross_532nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio NR_cross_532nm",
+        "standard_name": "SNR_NR_cross_532nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_NR_607nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio NR_607nm",
+        "standard_name": "SNR_NR_607nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_NR_1064nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio NR_1064nm",
+        "standard_name": "SNR_NR_1064nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_DFOV": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio DFOV",
+        "standard_name": "SNR_DFOV",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_RR_355": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio RR_355",
+        "standard_name": "SNR_RR_355",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_RR_532": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio RR_532",
+        "standard_name": "SNR_RR_532",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "SNR_RR_1064": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "signal to noise ratio RR_1064",
+        "standard_name": "SNR_RR_1064",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    }
+  }
+}
