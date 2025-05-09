@@ -36,6 +36,12 @@ dependencies = [
 [tool.setuptools.packages]
 find = {}
 
+[project.optional-dependencies]
+doc = [
+  "sphinx",
+  "pydata_sphinx_theme",
+]
+
 
 [tool.sphinx-pyproject]
 # -- General configuration ---------------------------------------------------
@@ -49,8 +55,6 @@ extensions = [
   #"sphinx_autodoc_typehints",
   "sphinx.ext.viewcode",
   "sphinx.ext.coverage",
-  "sphinx_rtd_theme",
-  "sphinx_rtd_size",
   "sphinx.ext.mathjax",
   "sphinx.ext.viewcode",
   "sphinx.ext.todo",

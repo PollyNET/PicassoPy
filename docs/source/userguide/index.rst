@@ -8,4 +8,5 @@ User Guide
    :maxdepth: 4
 
    data_flow.rst
+   configfiles.rst
    preprocess.rst
