@@ -28,7 +28,7 @@
     "max_height_bin": 3000,
     "indexing_convention": "1based",
     "first_range_gate_indx": [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 252],
-    "first_range_gate_height": 3.75,
+    "first_range_gate_height": [3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 6.75, 6.75, 6.75, 6.75, 6.75],
     "deltaT": 30,
     "dtCorModeLabel": ["Polynomial coefficients stores in netcdf file", "nonparalyzable correction", "User defined polynomial cofficients"],
     "dtCorMode": 1,
