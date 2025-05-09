@@ -50,6 +50,9 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
             molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
             molExt = data_cube.mol_profiles[f'mExt_{wv}'][i,:]
 
+            if not ('aerExt' in profiles[channel] and 'aerBsc' in profiles[channel]):
+                print(f'skipping {channel} {cldFree}')
+                continue
             aerExt = profiles[channel]['aerExt'].copy()
             aerExt[:hBaseInd] = aerExt[hBaseInd]
             aerBsc = profiles[channel]['aerBsc']

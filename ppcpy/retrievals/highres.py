@@ -34,19 +34,20 @@ def attbsc_2d(data_cube, nr=True):
 
 
     # experimental, the calibration constant requires the OL corrected signal
-    sigOLTCor, _ = transCor.transCorGHK_cube(data_cube, signal='OLCor') 
-    channels = [(355, 'total', 'FR'), (532, 'total', 'FR'), (1064, 'total', 'FR')]
-    for wv, t, tel in channels:
-        channel = f"{wv}_{t}_{tel}"
+    if 'sigOLCor' in data_cube.retrievals_highres:
+        sigOLTCor, _ = transCor.transCorGHK_cube(data_cube, signal='OLCor') 
+        channels = [(355, 'total', 'FR'), (532, 'total', 'FR'), (1064, 'total', 'FR')]
+        for wv, t, tel in channels:
+            channel = f"{wv}_{t}_{tel}"
 
-        #sig = np.squeeze(
-        #    data_cube.retrievals_highres[f'sigOLCor'][:,:,data_cube.gf(wv, t, tel)])
-        sig = np.squeeze(sigOLTCor[:,:,data_cube.gf(wv, t, tel)])
-        
-        attBsc = sig * ranges2d / data_cube.LCused[channel]
-        attBsc[data_cube.retrievals_highres['depCalMask'], :] = np.nan
+            #sig = np.squeeze(
+            #    data_cube.retrievals_highres[f'sigOLCor'][:,:,data_cube.gf(wv, t, tel)])
+            sig = np.squeeze(sigOLTCor[:,:,data_cube.gf(wv, t, tel)])
+            
+            attBsc = sig * ranges2d / data_cube.LCused[channel]
+            attBsc[data_cube.retrievals_highres['depCalMask'], :] = np.nan
 
-        data_cube.retrievals_highres[f"attBsc_{wv}_{t}_OC"] = attBsc
+            data_cube.retrievals_highres[f"attBsc_{wv}_{t}_OC"] = attBsc
     
 
 def voldepol_2d(data_cube):

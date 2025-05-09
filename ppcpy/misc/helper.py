@@ -690,6 +690,8 @@ def mean_stable(x, win, minBin=None, maxBin=None, minRelStd=None):
             relStd.append(np.nan)
 
     relStd = np.array(relStd)
+    if np.all(np.isnan(relStd)):
+        return None, None, None
 
     # Determine index with minimum relative standard deviation
     if minRelStd is None:

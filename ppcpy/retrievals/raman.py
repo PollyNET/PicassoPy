@@ -79,6 +79,13 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, 
                     prof['aerExtStd'] = prof['aerExtStd'] / (1064./532.)**config_dict[f'angstrexp']
 
                 refHInd = data_cube.refH[i][f"{wv}_{t}_{tel}"]['refHInd']
+                if np.any(np.isnan(refHInd)):
+                    print("no refH given")
+                    prof['retrieval'] = 'raman'
+                    prof['signal'] = signal
+                    opt_profiles[i][f"{wv}_{t}_{tel}"] = prof
+                    continue
+
                 refH = height[np.array(refHInd)]
                 hFullOverlap = heightFullOverlap[i][data_cube.gf(wv, t, tel)][0]
                 print(hFullOverlap, config_dict[f'{key_smooth}{wv}'] / 2 * hres)
@@ -109,6 +116,8 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, 
                                    smoothWinExt=config_dict[f'{key_smooth}{wv}'], 
                                    smoothWinBsc=config_dict[f'{key_smooth}{wv}'])
                     )
+                else:
+                    print('SNR threshold too low for raman', SNRRef, config_dict[f'minRamanRefSNR{wv}'], SNRRef_r, config_dict[f'minRamanRefSNR{wv_r}'])
 
                 prof['retrieval'] = 'raman'
                 prof['signal'] = signal

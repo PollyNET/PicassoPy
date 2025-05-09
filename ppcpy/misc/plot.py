@@ -16,12 +16,12 @@ def plot_optical_analysis(profiles, height, times, plot_settings={}, smooth=None
     h_top = 20
     ihtop = np.where(height > h_top)[0][0]
     ax[0].axvline(0, lw=0.8, c='k')
-    if '355_total_NR' in profiles:
+    if '355_total_NR' in profiles and 'aerBsc' in profiles['355_total_NR']:
         ax[0].plot(profiles['355_total_NR']['aerBsc'][:ihtop]*1e6, height[:ihtop], 
                    color='skyblue', label='355NR')
     else:
         print('near range bsc issue 355')
-    if '532_total_NR' in profiles:
+    if '532_total_NR' in profiles and 'aerBsc' in profiles['532_total_NR']:
         ax[0].plot(profiles['532_total_NR']['aerBsc'][:ihtop]*1e6, height[:ihtop], 
                    color='lawngreen', label='532NR')
     else:
@@ -109,12 +109,12 @@ def plot_optical_analysis(profiles, height, times, plot_settings={}, smooth=None
         #print('ind', i_nr_top_355, i_nr_top_532, i_nf_base)
 
         if i_nr_top != i_nf_base:
-            if '355_total_NR' in profiles:
+            if '355_total_NR' in profiles and 'aerBsc' in profiles['355_total_NR']:
                 ax[2].plot(profiles['355_total_NR']['LR'][i_nr_base:i_nr_top], height[i_nr_base:i_nr_top], 
                            color='skyblue', label='355NR')
             else:
                 print('near range LR 355 issue')                
-            if '355_total_NR' in profiles:
+            if '532_total_NR' in profiles and 'aerBsc' in profiles['532_total_NR']:
                 ax[2].plot(profiles['532_total_NR']['LR'][i_nr_base:i_nr_top], height[i_nr_base:i_nr_top], 
                            color='lawngreen', label='532NR')
             else:
@@ -148,8 +148,9 @@ def plot_optical_analysis(profiles, height, times, plot_settings={}, smooth=None
     # angstrom
     h_top = 6
     ihtop = np.where(height > h_top)[0][0]
-    ax[3].plot(profiles['355_total_NR']['AE_Bsc_355_532'][:ihtop], height[:ihtop],
-               color='skyblue', label='355/532NR')
+    if '355_total_NR' in profiles and 'AE_Bsc_355_532' in profiles['355_total_NR']:
+        ax[3].plot(profiles['355_total_NR']['AE_Bsc_355_532'][:ihtop], height[:ihtop],
+                   color='skyblue', label='355/532NR')
 
     ax[3].plot(profiles['355_total_FR']['AE_Bsc_355_532'], height, 
                color='blue', label='355/532')
