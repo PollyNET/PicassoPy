@@ -4,6 +4,7 @@
 import numpy as np
 import ppcpy.qc.transCor as transCor
 import ppcpy.retrievals.depolarization as depolarization
+import logging
 
 
 def attbsc_2d(data_cube, nr=True):
@@ -30,6 +31,7 @@ def attbsc_2d(data_cube, nr=True):
         if channel in data_cube.LCused.keys():
             pass
         else:
+            logging.info(f'{channel} skipped at attbsc_2d')
             continue
         attBsc = sig * ranges2d / data_cube.LCused[channel]
         attBsc[data_cube.retrievals_highres['depCalMask'], :] = np.nan
@@ -51,6 +53,7 @@ def attbsc_2d(data_cube, nr=True):
             if channel in data_cube.LCused.keys():
                 pass
             else:
+                logging.info(f'{channel} skipped at attbsc_2d OL')
                 continue
             
             attBsc = sig * ranges2d / data_cube.LCused[channel]
