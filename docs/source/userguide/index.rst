@@ -8,5 +8,6 @@ User Guide
    :maxdepth: 1
 
    data_flow.rst
+   conventions.rst
    configfiles.rst
    preprocess.rst
