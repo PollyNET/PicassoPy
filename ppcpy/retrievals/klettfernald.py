@@ -42,6 +42,8 @@ def run_cldFreeGrps(data_cube, signal='TCor', nr=False, collect_debug=True):
                 #return None, None, sig, molBsc*1e3, None
 
                 refHInd = data_cube.refH[i][f"{wv}_{t}_{tel}"]['refHInd']
+                if np.isnan(refHInd).any():
+                    continue
                 refH = height[np.array(refHInd)]
                 print('refHInd', refHInd, 'refH', refH)
 

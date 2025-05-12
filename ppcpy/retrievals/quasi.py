@@ -46,6 +46,10 @@ def quasi_pdr(data_cube, wvs=[532], version='V1'):
             data_cube.pol_cali[int(wv)]['eta_best'], config_dict[f'voldepol_error_{wv}'],
             1)
 
+        if f"quasiBsc{version}_{wv}_{t}_{tel}" in data_cube.retrievals_highres.keys():
+            pass
+        else:
+            continue
         quasi_bsc = data_cube.retrievals_highres[f"quasiBsc{version}_{wv}_{t}_{tel}"]
 
         molDepol = default_dict[f'molDepol{wv}']
@@ -62,6 +66,10 @@ def quasi_angstrom(data_cube, version='V1'):
 
     t = 'total'
     tel = 'FR'
+    if f'quasiBsc{version}_532_{t}_{tel}' in data_cube.retrievals_highres.keys() and f'quasiBsc{version}_1064_{t}_{tel}'in data_cube.retrievals_highres.keys():
+        pass
+    else:
+        return None
     ratio_par_bsc = data_cube.retrievals_highres[f'quasiBsc{version}_532_{t}_{tel}'] / \
         data_cube.retrievals_highres[f'quasiBsc{version}_1064_{t}_{tel}']
     ratio_par_bsc[ratio_par_bsc < 0] = np.nan

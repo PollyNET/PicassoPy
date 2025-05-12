@@ -45,6 +45,8 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
                 opt_profiles[i][channel]['vdr'] = vdr
                 opt_profiles[i][channel]['vdrStd'] = vdrStd
 
+                if np.isnan(data_cube.refH[i][f"{wv}_{t}_{tel}"]['refHInd']).any():
+                    continue
                 mdr, mdrStd, flgaDeftMdr = get_MDR(
                     vdr, vdrStd, data_cube.refH[i][f"{wv}_{t}_{tel}"]['refHInd'],
                 )

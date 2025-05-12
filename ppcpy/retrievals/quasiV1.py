@@ -1,6 +1,7 @@
 
 import numpy as np
 import ppcpy.misc.helper as helper
+import logging
 
 from scipy.interpolate import interp1d
 
@@ -18,6 +19,11 @@ def quasi_bsc(data_cube):
     #channels = [(532, 'total', 'FR')]
 
     for wv, t, tel in channels:
+        if f'attBsc_{wv}_{t}_{tel}' in data_cube.retrievals_highres.keys():
+            pass
+        else:
+            logging.info(f'{wv} {t} {tel} skipped at quasi bsc')
+            continue
         att_beta_qsi = data_cube.retrievals_highres[f'attBsc_{wv}_{t}_{tel}'].copy()
 
         # TODO check if halving the window is needed
