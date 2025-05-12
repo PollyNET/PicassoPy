@@ -36,6 +36,12 @@ dependencies = [
 [tool.setuptools.packages]
 find = {}
 
+[project.optional-dependencies]
+doc = [
+  "sphinx",
+  "pydata_sphinx_theme",
+]
+
 
 [tool.sphinx-pyproject]
 # -- General configuration ---------------------------------------------------
@@ -49,14 +55,13 @@ extensions = [
   #"sphinx_autodoc_typehints",
   "sphinx.ext.viewcode",
   "sphinx.ext.coverage",
-  "sphinx_rtd_theme",
-  "sphinx_rtd_size",
   "sphinx.ext.mathjax",
   "sphinx.ext.viewcode",
   "sphinx.ext.todo",
   "sphinx.ext.napoleon",
+  "myst_parser"
   #"sphinx.ext.autosectionlabel",
-  "recommonmark",
+  #"recommonmark",
 ]
 sphinx_rtd_size_width = "90%"
 source_suffix = {'.rst' = 'restructuredtext', '.md' = 'markdown'}
@@ -65,10 +70,12 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 auto_doc_default_options = {'autosummary' = true}
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
-html_theme = "sphinx_rtd_theme"
+#html_theme = "sphinx_rtd_theme"
+html_theme = "pydata_sphinx_theme"
 #html_style = "css/custom.css"
 html_static_path = ["_static"]
-html_theme_options = {'sticky_navigation' = true, 'includehidden' = true, 'titles_only' = false}
+#html_theme_options = {'sticky_navigation' = true, 'includehidden' = true, 'titles_only' = false}
+html_theme_options = {"external_links"= [{"name" = "PollyNET", "url" = "https://polly.tropos.de/"}]}
 autosummary_generate = true
 autoclass_content = "both"
 

@@ -182,7 +182,7 @@ def pardepol_cldFreeGrps(data_cube, ret_prof_name):
             flagc = data_cube.gf(wv, 'cross', tel)
             #indxt = np.where(flagt)[0]
             retrieval = opt_profiles[i][channel]['retrieval']
-            if np.any(flagt) and np.any(flagc):
+            if np.any(flagt) and np.any(flagc) and 'aerBsc' in opt_profiles[i][channel]:
                 logging.info(f'pardepol at channel {wv} cldFree {i} {cldFree}')
 
                 pdr, pdrStd = calc_pdr(
@@ -194,7 +194,7 @@ def pardepol_cldFreeGrps(data_cube, ret_prof_name):
 
                 opt_profiles[i][channel]['pdr'] = pdr
                 opt_profiles[i][channel]['pdrStd'] = pdrStd
-                print(opt_profiles[i][channel].keys())
+                #print('after ', opt_profiles[i][channel].keys())
 
     return opt_profiles
 

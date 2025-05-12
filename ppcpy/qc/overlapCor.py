@@ -51,12 +51,12 @@ def spread(data_cube):
     time_slices = [time[grp] for grp in clFreeGrps]
     print(time_slices, np.ravel(time_slices))
     print(clFreeGrps)
-
     ret = {}
 
     for channel in set(channel_per_profile):
-        olFuncs = [o[channel] for o in ol_profiles]
-        print(channel, 'len(olFuncs)', len(olFuncs))
+        olFuncs = [o[channel] for o in ol_profiles if channel in o.keys()]
+        time_slices_this_channel = [t for i,t in enumerate(time_slices) if channel in ol_profiles[i].keys()]
+        print(channel, 'len(olFuncs)', len(olFuncs), len(time_slices), len(time_slices_this_channel))
 
         if len(olFuncs) > 1:
             logging.debug('overlap function set to time varying')
@@ -68,7 +68,8 @@ def spread(data_cube):
                 olFunc_2d[[2*i, 2*i+1],:] = f['olFunc']
                 #print(f.keys(), f['normRange'])
             finterp = interp1d(
-                np.ravel(time_slices).astype(float), olFunc_2d, axis=0, 
+                np.ravel(time_slices_this_channel).astype(float), 
+                olFunc_2d, axis=0, 
                 fill_value='extrapolate', kind='nearest')
             olFunc_2d = finterp(time.astype(float))
             print(olFunc_2d.shape)

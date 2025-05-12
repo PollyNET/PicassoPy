@@ -517,12 +517,12 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
 #    config.firstBinIndex = 251;
 #end
 #    logging.info(f'Total number of range bin is: {len(rawSignal[0])}\nmaxHeightBin is: {maxHeightBin}\nfirstBinIndex is {firstBinIndex}.')
-    if (maxHeightBin + np.max(firstBinIndex) -1) > len(rawSignal[0]):
-        logging.warning(f'maxHeightBin or firstBinIndex is out of range. Total number of range bin is: {len(rawSignal[0])}\nmaxHeightBin is: {maxHeightBin}\nfirstBinIndex is {firstBinIndex}.')
-        logging.info(f'Set maxHeightBin and firstBinIndex to default values.')
-        maxHeightBin = np.ones(rawSignal.shape[2]) 
-        logging.info(f'maxHeightBin: {maxHeightBin}')
-        firstBinIndex = 251
+    #if (maxHeightBin + np.max(firstBinIndex) -1) > len(rawSignal[0]):
+    #    logging.warning(f'maxHeightBin or firstBinIndex is out of range. Total number of range bin is: {len(rawSignal[0])}\nmaxHeightBin is: {maxHeightBin}\nfirstBinIndex is {firstBinIndex}.')
+    #    logging.info(f'Set maxHeightBin and firstBinIndex to default values.')
+    #    maxHeightBin = np.ones(rawSignal.shape[2]) 
+    #    logging.info(f'maxHeightBin: {maxHeightBin}')
+    #    firstBinIndex = 251
 
     mShotsPerPrf = deltaT * repRate
 #    print(mShotsPerPrf)
@@ -570,9 +570,18 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
     ## Height and first bin height correction
     logging.info('... height bin calculations')
     # TODO first bin hight might change for different telescopes...
-    data_dict['height'] = np.arange(0, sigBGCor.shape[1]) * hRes * np.cos(zenithAng*np.pi/180) + firstBinHeight
+    data_dict['range'] = np.arange(0, sigBGCor.shape[1]) * hRes + firstBinHeight[0]
+    data_dict['height'] = data_dict['range'].copy() * np.cos(zenithAng*np.pi/180)
 
-    data_dict['range'] = np.arange(0, sigBGCor.shape[1]) * hRes + firstBinHeight
+    correction_firstBinHight = ((
+        (np.arange(0, sigBGCor.shape[1]) * hRes)[:,np.newaxis] + firstBinHeight)**2
+        / data_dict['range'][:,np.newaxis]**2)
+    print("correction_firstBinHeight.shape ", correction_firstBinHight.shape)
+    print("correction_firstBinHeight ", correction_firstBinHight[:10,:])
+    print(data_dict['sigBGCor'].shape)
+    data_dict['sigBGCor'] = data_dict['sigBGCor'] * correction_firstBinHight[np.newaxis,:,:]
+    print(data_dict['sigBGCor'].shape)
+
     data_dict['alt'] = data_dict['height'] + float(asl) ## geopotential height
     data_dict['time'] = mTime_unixtimestamp
     data_dict['time64'] = np.array([np.datetime64(t) for t in mTime_obj])
