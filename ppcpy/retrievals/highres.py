@@ -26,7 +26,11 @@ def attbsc_2d(data_cube, nr=True):
 
         sig = np.squeeze(
             data_cube.retrievals_highres[f'sigTCor'][:,:,data_cube.gf(wv, t, tel)])
-        
+       
+        if channel in data_cube.LCused.keys():
+            pass
+        else:
+            continue
         attBsc = sig * ranges2d / data_cube.LCused[channel]
         attBsc[data_cube.retrievals_highres['depCalMask'], :] = np.nan
 
@@ -43,6 +47,11 @@ def attbsc_2d(data_cube, nr=True):
             #sig = np.squeeze(
             #    data_cube.retrievals_highres[f'sigOLCor'][:,:,data_cube.gf(wv, t, tel)])
             sig = np.squeeze(sigOLTCor[:,:,data_cube.gf(wv, t, tel)])
+
+            if channel in data_cube.LCused.keys():
+                pass
+            else:
+                continue
             
             attBsc = sig * ranges2d / data_cube.LCused[channel]
             attBsc[data_cube.retrievals_highres['depCalMask'], :] = np.nan

@@ -1,5 +1,5 @@
 import re
 import logging
 import numpy as np
-from ..misc.pollyChannelTags  import *
+from ppcpy.misc.pollyChannelTags  import *
 

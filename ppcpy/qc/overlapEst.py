@@ -129,6 +129,15 @@ def run_raman_cldFreeGrps(data_cube, collect_debug=True):
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
                 molExt = data_cube.mol_profiles[f'mExt_{wv}'][i,:]
 
+                if f"{wv}_{t}_{tel}" in data_cube.retrievals_profile['raman'][i].keys():
+                    pass
+                else:
+                    continue
+
+                if 'aerBsc' in data_cube.retrievals_profile['raman'][i][f"{wv}_{t}_{tel}"].keys():
+                    pass
+                else:
+                    continue
                 aerBsc = data_cube.retrievals_profile['raman'][i][f"{wv}_{t}_{tel}"]['aerBsc']
 
                 sig_r = np.squeeze(data_cube.retrievals_profile['sigTCor'][i,:,data_cube.gf(wv_r, t, tel)])
