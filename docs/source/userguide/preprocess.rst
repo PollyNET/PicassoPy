@@ -30,10 +30,14 @@ To check the correct setting of the bin height, the ``preproSignal`` and the ``s
 
     height = data_cube.retrievals_highres['height']
     i = 0
-    sig = np.squeeze(data_cube.retrievals_highres['preproSignal'][i,:,data_cube.gf(532,'total', 'FR')])
-    sigNR = np.squeeze(data_cube.retrievals_highres['preproSignal'][i,:,data_cube.gf(532,'total', 'NR')])
-    bin_first_range_gate = np.array(data_cube.polly_config_dict['first_range_gate_indx'])[data_cube.gf(532,'total', 'FR')]
-    bin_first_range_gateNR = np.array(data_cube.polly_config_dict['first_range_gate_indx'])[data_cube.gf(532,'total', 'NR')]
+    sig = np.squeeze(
+        data_cube.retrievals_highres['preproSignal'][i,:,data_cube.gf(532,'total', 'FR')])
+    sigNR = np.squeeze(
+        data_cube.retrievals_highres['preproSignal'][i,:,data_cube.gf(532,'total', 'NR')])
+    bin_first_range_gate = np.array(
+        data_cube.polly_config_dict['first_range_gate_indx'])[data_cube.gf(532,'total', 'FR')]
+    bin_first_range_gateNR = np.array(
+        data_cube.polly_config_dict['first_range_gate_indx'])[data_cube.gf(532,'total', 'NR')]
     
     fig, ax = plt.subplots(1, figsize=(6, 3), sharey=True)
     ax.plot(sig, label='532_total_FR')
@@ -45,8 +49,10 @@ To check the correct setting of the bin height, the ``preproSignal`` and the ``s
     ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(1))
     ax.set_xlabel('Bin'); ax.set_ylabel('preproSignal [a.u.]')
 
-    sig = np.squeeze(data_cube.retrievals_highres['sigBGCor'][i,:,data_cube.gf(532,'total', 'FR')])
-    sigNR = np.squeeze(data_cube.retrievals_highres['sigBGCor'][i,:,data_cube.gf(532,'total', 'NR')])
+    sig = np.squeeze(
+        data_cube.retrievals_highres['sigBGCor'][i,:,data_cube.gf(532,'total', 'FR')])
+    sigNR = np.squeeze(
+        data_cube.retrievals_highres['sigBGCor'][i,:,data_cube.gf(532,'total', 'NR')])
 
     fig, ax = plt.subplots(1, figsize=(6, 3), sharey=True)
     ax.plot(height, sig, label='532_total_FR')
