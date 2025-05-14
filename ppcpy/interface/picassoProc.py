@@ -251,9 +251,9 @@ class PicassoProc:
 
     def SaturationDetect(self):
 
-        self.flagSaturation = pollySaturationDetect.pollySaturationDetect(data_cube = self,
-                                                    hFullOverlap = self.polly_config_dict['heightFullOverlap'],
-                                                    sigSaturateThresh = self.polly_config_dict['saturate_thresh'])
+        self.flagSaturation = pollySaturationDetect.pollySaturationDetect(
+            data_cube = self,
+            sigSaturateThresh = self.polly_config_dict['saturate_thresh'])
 
         return self
 
@@ -345,7 +345,6 @@ class PicassoProc:
         logging.warning(f'Potential for differences to matlab code du to numerical issues (subtraction of two small values)')
 
         self.refH =  rayleighfit.rayleighfit(self)
-        print(self.refH)
         return self.refH
 
 
