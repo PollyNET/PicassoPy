@@ -72,6 +72,7 @@ def create_netcdf_from_dict(nc_file_path, data_dict, compression_level=1):
                 dimensions = var_info['shape']
                 dtype = var_info['dtype']
                 attributes = var_info.get('attributes', {})
+                print(attributes)
                 data = var_info.get('data')
 
                 # Create variable

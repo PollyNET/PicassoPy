@@ -11,5 +11,5 @@ import log.logger as logger
 #from PicassoPy.ppcpy.io.readPollyRawData import *
 #from PicassoPy.ppcpy.interface.picassoProc import *
 #import PicassoPy.ppcpy.io.loadConfig
-
+from _version import __version__
 import interface
