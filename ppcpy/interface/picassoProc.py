@@ -9,6 +9,7 @@ import ppcpy.qc.pollySaturationDetect as pollySaturationDetect
 import ppcpy.qc.transCor as transCor
 import ppcpy.qc.overlapEst as overlapEst
 import ppcpy.qc.overlapCor as overlapCor
+import ppcpy.qc.qualityMask as qualityMask
 
 
 import ppcpy.calibration.polarization as polarization
@@ -469,6 +470,10 @@ class PicassoProc:
                 self, ret_prof_name) 
             self.retrievals_profile[ret_prof_name] = depolarization.pardepol_cldFreeGrps(
                 self, ret_prof_name) 
+
+    def estQualityMask(self):
+
+        self.retrievals_highres['quality_mask'] = qualityMask.qualityMask(self)
 
 
     def Angstroem(self):

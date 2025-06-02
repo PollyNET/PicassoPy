@@ -8,7 +8,8 @@ import logging
 
 
 def attbsc_2d(data_cube, nr=True):
-    """ """
+    """calculate the attbsc using the estimated LCs
+    """
 
     rgs = data_cube.retrievals_highres['range']
     time = data_cube.retrievals_highres['time64']
@@ -63,7 +64,8 @@ def attbsc_2d(data_cube, nr=True):
     
 
 def voldepol_2d(data_cube):
-    """ """
+    """calculate the voldepol
+    """
 
     config_dict = data_cube.polly_config_dict
 
