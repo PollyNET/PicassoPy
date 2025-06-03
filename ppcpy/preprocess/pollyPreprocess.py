@@ -209,6 +209,9 @@ def pollyPolCaliTime(depCalAng, mTime, init_depAng, maskDepCalAng):
     flagDepCal = (np.abs(depCalAng - init_depAng) > 0.0)
     ## the profile will be treated as depol cali profile if it has different
     ## depol_cal_ang than the init_depAng
+    #print(init_depAng)
+    #print(depCalAng)
+    #print(flagDepCal)
     maskDepCal = flagDepCal
 
     ## search the calibration periods
@@ -576,11 +579,7 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
     correction_firstBinHight = ((
         (np.arange(0, sigBGCor.shape[1]) * hRes)[:,np.newaxis] + firstBinHeight)**2
         / data_dict['range'][:,np.newaxis]**2)
-    print("correction_firstBinHeight.shape ", correction_firstBinHight.shape)
-    print("correction_firstBinHeight ", correction_firstBinHight[:10,:])
-    print(data_dict['sigBGCor'].shape)
     data_dict['sigBGCor'] = data_dict['sigBGCor'] * correction_firstBinHight[np.newaxis,:,:]
-    print(data_dict['sigBGCor'].shape)
 
     data_dict['alt'] = data_dict['height'] + float(asl) ## geopotential height
     data_dict['time'] = mTime_unixtimestamp
@@ -601,10 +600,46 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
         #data_dict['lowSNRMask'][:,:,iCh].mask = SNR[:,:,iCh].data < minSNRThresh[iCh]
         #data_dict['lowSNRMask'][:,:,iCh] = np.ma.masked_where(SNR[:,:,iCh].data < minSNRThresh[iCh], SNR[:,:,iCh])
         data_dict['lowSNRMask'][:,:,iCh][SNR[:,:,iCh] < minSNRThresh[iCh]] = True
+    # TODO check the low SNR mask
 
+    # TODO mask for laser shutter?
+    flag532FR = (np.array(flag532nmChannel) & np.array(flagFarRangeChannel) & np.array(flagTotalChannel)).astype(bool)
+    flag355FR = (np.array(flag355nmChannel) & np.array(flagFarRangeChannel) & np.array(flagTotalChannel)).astype(bool)
+    print('flag 532 FR', flag532FR)
+    print('flag 355 FR', flag355FR)
+    if any(flag532FR):
+        data_dict['shutterOnMask'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag532FR]))
+    elif any(flag355FR):
+        data_dict['shutterOnMask'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag355FR]))
+    else:
+        raise ValueError('No suitable channel to determine the shutter status')
 
-    #print(data_dict['lowSNRMask'])
+    # TODO mask for fog?
+    # the original matlab code raises questions. Why 40:120 and why hard coded?
+    # When sum is used (as in matlab), minPC_fog is range resolution dependent
+    fogsum = np.sum(np.squeeze(data_dict['sigBGCor'][:,39:120,flag532FR]), axis=1)
+    data_dict['fogMask'] = fogsum < minPC_fog 
 
+    # TODO mask for single channels on 607, 387, 407, 355RR 532RR 1064RR
+    flag607FR = (np.array(flag607nmChannel) & np.array(flagFarRangeChannel)).astype(bool)
+    print('flag 607 FR', flag607FR)
+    if any(flag607FR):
+        data_dict['mask607Off'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag607FR]))
+    flag387FR = (np.array(flag387nmChannel) & np.array(flagFarRangeChannel)).astype(bool)
+    if any(flag387FR):
+        data_dict['mask387Off'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag387FR]))
+    flag407FR = (np.array(flag407nmChannel) & np.array(flagFarRangeChannel)).astype(bool)
+    if any(flag407FR):
+        data_dict['mask407Off'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag407FR]))
+    flag355RRFR = (np.array(flag355nmRotRaman) & np.array(flagFarRangeChannel)).astype(bool)
+    if any(flag355RRFR):
+        data_dict['mask355_RROff'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag355RRFR]))
+    flag532RRFR = (np.array(flag532nmRotRaman) & np.array(flagFarRangeChannel)).astype(bool)
+    if any(flag532RRFR):
+        data_dict['mask532_RROff'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag532RRFR]))
+    flag1064RRFR = (np.array(flag1064nmRotRaman) & np.array(flagFarRangeChannel)).astype(bool)
+    if any(flag1064RRFR):
+        data_dict['mask1064_RROff'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag1064RRFR]))
 
     ## Mask for polarization calibration
     logging.info('... mask for polarization calibration')
@@ -642,6 +677,35 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
     logging.info('finished data preprocessing.')
 
     return data_dict
+
+
+def any_signal(sig: np.ndarray) -> np.ndarray:
+    """check if there is any signal
+    POLLYISLASERSHUTTERON determine whether the laser shutter is on due to the flying object.
+
+    INPUTS:
+        sig: np.ndarray
+            BGCor signal with shape [height, time].
+
+    OUTPUTS:
+        flag: np.ndarray
+            Boolean array of shape [time,] where True indicates the laser shutter is turned on.
+
+    HISTORY:
+        - 2021-04-21: first edition by Zhenping
+        - 2025-05-14: translated and generalized pollyIsLaserShutterOn, 
+
+    """
+    # Mean and standard deviation over the height dimension (axis 0)
+    mean_sig = np.mean(sig, axis=1)
+    std_sig = np.std(sig, axis=1, ddof=0)
+
+    # Detect when both mean and std dev are below threshold
+    # for some reason had to set the thresholds higher than in matlab version
+    flag = (mean_sig <= 0.02) & (std_sig <= 0.9)
+
+    return flag
+
 
 
 #

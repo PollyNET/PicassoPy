@@ -9,6 +9,7 @@ import ppcpy.qc.pollySaturationDetect as pollySaturationDetect
 import ppcpy.qc.transCor as transCor
 import ppcpy.qc.overlapEst as overlapEst
 import ppcpy.qc.overlapCor as overlapCor
+import ppcpy.qc.qualityMask as qualityMask
 
 
 import ppcpy.calibration.polarization as polarization
@@ -251,9 +252,9 @@ class PicassoProc:
 
     def SaturationDetect(self):
 
-        self.flagSaturation = pollySaturationDetect.pollySaturationDetect(data_cube = self,
-                                                    hFullOverlap = self.polly_config_dict['heightFullOverlap'],
-                                                    sigSaturateThresh = self.polly_config_dict['saturate_thresh'])
+        self.flagSaturation = pollySaturationDetect.pollySaturationDetect(
+            data_cube = self,
+            sigSaturateThresh = self.polly_config_dict['saturate_thresh'])
 
         return self
 
@@ -345,7 +346,6 @@ class PicassoProc:
         logging.warning(f'Potential for differences to matlab code du to numerical issues (subtraction of two small values)')
 
         self.refH =  rayleighfit.rayleighfit(self)
-        print(self.refH)
         return self.refH
 
 
@@ -470,6 +470,10 @@ class PicassoProc:
                 self, ret_prof_name) 
             self.retrievals_profile[ret_prof_name] = depolarization.pardepol_cldFreeGrps(
                 self, ret_prof_name) 
+
+    def estQualityMask(self):
+
+        self.retrievals_highres['quality_mask'] = qualityMask.qualityMask(self)
 
 
     def Angstroem(self):
