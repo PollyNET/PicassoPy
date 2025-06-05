@@ -1,0 +1,131 @@
+
+{ 
+  "profiles": {
+              "variables": {
+                            "aerBsc_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_aerBsc_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "aerBsc_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_aerBsc_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "aerBsc_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_aerBsc_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "aerBsc_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_aerBsc_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "aerBsc_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_aerBsc_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "aerBsc_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_aerBsc_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"1064_total_FR"
+                            }
+              }
+  },
+  "NR_profiles": {
+              "variables": {
+                            "aerBsc_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"355_total_NR"
+                            },
+                            "uncertainty_aerBsc_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"355_total_NR"
+                            },
+                            "aerBsc_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"532_total_NR"
+                            },
+                            "uncertainty_aerBsc_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"532_total_NR"
+                            },
+                            "aerBsc_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"1064_total_NR"
+                            },
+                            "uncertainty_aerBsc_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"1064_total_NR"
+                            },
+                            "aerBsc_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"355_total_NR"
+                            },
+                            "uncertainty_aerBsc_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"355_total_NR"
+                            },
+                            "aerBsc_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"532_total_NR"
+                            },
+                            "uncertainty_aerBsc_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"532_total_NR"
+                            },
+                            "aerBsc_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"1064_total_NR"
+                            },
+                            "uncertainty_aerBsc_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"1064_total_NR"
+                            }
+              }
+  }
+}
