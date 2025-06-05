@@ -61,6 +61,126 @@
                                                  "method":"raman",
                                                  "parameter":"aerBscStd",
                                                  "channel":"1064_total_FR"
+                            },
+                            "volDepol_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"vdr",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_volDepol_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "volDepol_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"vdr",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_volDepol_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "volDepol_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"vdr",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_volDepol_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "volDepol_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"vdr",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_volDepol_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "volDepol_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"vdr",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_volDepol_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "volDepol_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"vdr",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_volDepol_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "parDepol_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"pdr",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_parDepol_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "parDepol_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"pdr",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_parDepol_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "parDepol_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"pdr",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_parDepol_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "parDepol_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"pdr",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_parDepol_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "parDepol_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"pdr",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_parDepol_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "parDepol_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"pdr",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_parDepol_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"1064_total_FR"
                             }
               }
   },

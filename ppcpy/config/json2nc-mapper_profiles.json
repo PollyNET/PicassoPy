@@ -290,6 +290,403 @@
         "retrieving_info": "",
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
+    },
+    "volDepol_klett_355": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "volume linear depolarization ratio at 355 nm with the same smoothing as Klett method",
+        "standard_name": "delta (vol, 355 nm)",
+        "plot_range": [0.0, 0.4],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
+      }
+    },
+    "uncertainty_volDepol_klett_355": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": " uncertainty of volume linear depolarization ratio at 355 nm with the same smoothing as Klett method",
+        "standard_name": "sigma (vol, 355 nm)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
+      }
+    },
+    "volDepol_klett_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "volume linear depolarization ratio at 532 nm with the same smoothing as Klett method",
+        "standard_name": "delta (vol, 532 nm)",
+        "plot_range": [0.0, 0.4],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
+      }
+    },
+    "uncertainty_volDepol_klett_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": " uncertainty of volume linear depolarization ratio at 532 nm with the same smoothing as Klett method",
+        "standard_name": "sigma (vol, 532 nm)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
+      }
+    },
+    "volDepol_klett_1064": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "volume linear depolarization ratio at 1064 nm with the same smoothing as Klett method",
+        "standard_name": "delta (vol, 1064 nm)",
+        "plot_range": [0.0, 0.4],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
+      }
+    },
+    "uncertainty_volDepol_klett_1064": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": " uncertainty of volume linear depolarization ratio at 1064 nm with the same smoothing as Klett method",
+        "standard_name": "sigma (vol, 1064 nm)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
+      }
+    },
+    "volDepol_raman_355": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "volume linear depolarization ratio at 355 nm with the same smoothing as Raman method",
+        "standard_name": "delta (vol, 355 nm)",
+        "plot_range": [0.0, 0.4],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
+      }
+    },
+    "uncertainty_volDepol_raman_355": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": " uncertainty of volume linear depolarization ratio at 355 nm with the same smoothing as Raman method",
+        "standard_name": "sigma (vol, 355 nm)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
+      }
+    },
+    "volDepol_raman_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "volume linear depolarization ratio at 532 nm with the same smoothing as Raman method",
+        "standard_name": "delta (vol, 532 nm)",
+        "plot_range": [0.0, 0.4],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
+      }
+    },
+    "uncertainty_volDepol_raman_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": " uncertainty of volume linear depolarization ratio at 532 nm with the same smoothing as Raman method",
+        "standard_name": "sigma (vol, 532 nm)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
+      }
+    },
+    "volDepol_raman_1064": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "volume linear depolarization ratio at 1064 nm with the same smoothing as Raman method",
+        "standard_name": "delta (vol, 1064 nm)",
+        "plot_range": [0.0, 0.4],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
+      }
+    },
+    "uncertainty_volDepol_raman_1064": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": " uncertainty of volume linear depolarization ratio at 1064 nm with the same smoothing as Raman method",
+        "standard_name": "sigma (vol, 1064 nm)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
+      }
+    },
+    "parDepol_klett_355": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "particle linear depolarization ratio at 355 nm with the same smoothing as Klett method",
+        "standard_name": "delta (par, 355 nm)",
+        "plot_range": [0.0, 0.4],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
+      }
+    },
+    "uncertainty_parDepol_klett_355": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": " uncertainty of particle linear depolarization ratio at 355 nm with the same smoothing as Klett method",
+        "standard_name": "sigma (par, 355 nm)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
+      }
+    },
+    "parDepol_klett_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "particle linear depolarization ratio at 532 nm with the same smoothing as Klett method",
+        "standard_name": "delta (par, 532 nm)",
+        "plot_range": [0.0, 0.4],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
+      }
+    },
+    "uncertainty_parDepol_klett_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": " uncertainty of particle linear depolarization ratio at 532 nm with the same smoothing as Klett method",
+        "standard_name": "sigma (par, 532 nm)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
+      }
+    },
+    "parDepol_klett_1064": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "particle linear depolarization ratio at 1064 nm with the same smoothing as Klett method",
+        "standard_name": "delta (par, 1064 nm)",
+        "plot_range": [0.0, 0.4],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
+      }
+    },
+    "uncertainty_parDepol_klett_1064": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": " uncertainty of particle linear depolarization ratio at 1064 nm with the same smoothing as Klett method",
+        "standard_name": "sigma (par, 1064 nm)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
+      }
+    },
+    "parDepol_raman_355": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "particle linear depolarization ratio at 355 nm with the same smoothing as Raman method",
+        "standard_name": "delta (par, 355 nm)",
+        "plot_range": [0.0, 0.4],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
+      }
+    },
+    "uncertainty_parDepol_raman_355": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": " uncertainty of particle linear depolarization ratio at 355 nm with the same smoothing as Raman method",
+        "standard_name": "sigma (par, 355 nm)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
+      }
+    },
+    "parDepol_raman_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "particle linear depolarization ratio at 532 nm with the same smoothing as Raman method",
+        "standard_name": "delta (par, 532 nm)",
+        "plot_range": [0.0, 0.4],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
+      }
+    },
+    "uncertainty_parDepol_raman_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": " uncertainty of particle linear depolarization ratio at 532 nm with the same smoothing as Raman method",
+        "standard_name": "sigma (par, 532 nm)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
+      }
+    },
+    "parDepol_raman_1064": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "particle linear depolarization ratio at 1064 nm with the same smoothing as Raman method",
+        "standard_name": "delta (par, 1064 nm)",
+        "plot_range": [0.0, 0.4],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
+      }
+    },
+    "uncertainty_parDepol_raman_1064": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": " uncertainty of particle linear depolarization ratio at 1064 nm with the same smoothing as Raman method",
+        "standard_name": "sigma (par, 1064 nm)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
+      }
     }
+
   }
 }
