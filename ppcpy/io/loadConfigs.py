@@ -2,6 +2,7 @@ from . import *
 import json
 import pandas as pd
 import numpy as np
+import traceback
 
 def loadPicassoConfig(picasso_config_file, picasso_default_config_file):
     picasso_default_config_file_path = Path(picasso_default_config_file)
@@ -14,7 +15,7 @@ def loadPicassoConfig(picasso_config_file, picasso_default_config_file):
             picasso_default_config_file_json = open(picasso_default_config_file, "r")
             picasso_default_config_file_dict = json.load(picasso_default_config_file_json)
         except Exception:
-            logging.warning('picasso_default_config_file: {picasso_default_config_file} can not be read.')
+            logging.warning('picasso_default_config_file: {picasso_default_config_file} can not be read.', exc_info=True)
         if picasso_config_file_path.is_file():
             logging.info(f'picasso_config_file: {picasso_config_file}')
             try:
@@ -33,7 +34,7 @@ def loadPicassoConfig(picasso_config_file, picasso_default_config_file):
                         picasso_config_dict[key] = picasso_config_file_dict[key]
                 return picasso_config_dict
             except Exception:
-                logging.critical('picasso_default_config_file: {picasso_default_config_file} can not be read.')
+                logging.critical('picasso_default_config_file: {picasso_default_config_file} can not be read.', exc_info=True)
 
         else:
             logging.warning(f'picasso config file: {picasso_config_file} does not exist')
@@ -100,13 +101,20 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
             polly_default_config_file_json = open(polly_default_config_file, "r")
             polly_default_config_file_dict = json.load(polly_default_config_file_json)
         except Exception:
-            logging.critical(f'polly_default_config_file: {polly_default_config_file} can not be read.')
+            logging.critical(f'polly_default_config_file: {polly_default_config_file} can not be read.', exc_info=True)
         if polly_config_file_path.is_file():
             logging.info(f'polly_config_file: {polly_config_file}')
             try:
                 polly_config_file_json = open(polly_config_file, "r")
                 polly_config_file_dict = json.load(polly_config_file_json)
-
+            except Exception:
+                logging.warning(f'polly_config_file: {polly_config_file} can not be read.', exc_info=True)
+            
+            logging.info('keys default/template file, but not in specific file {}'.format( 
+                  set(polly_default_config_file_dict.keys()) - set(polly_config_file_dict.keys())))
+            logging.info('keys specific file, but not in default/template file {}'.format( 
+                  set(polly_config_file_dict.keys()) - set(polly_default_config_file_dict.keys())))
+            try:
                 ## check if key exists in the polly_config_file, if yes, take that one instead of the one from the polly_default_config_file
                 for key in polly_default_config_file_dict.keys():
                     if key in polly_config_file_dict.keys():
@@ -116,18 +124,23 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                         if key == 'prodSaveList':
                             polly_config_dict[key] = polly_default_config_file_dict[key]
                             continue
-                        channels = len(polly_config_file_dict['isFR']) ## isFR is a key, which has to be in the local-polly-config
-                        if isinstance(polly_default_config_file_dict[key], list) and len(polly_default_config_file_dict[key]) == channels:
-                            polly_config_dict[key] = polly_default_config_file_dict[key]
-                        elif isinstance(polly_default_config_file_dict[key], list) and len(polly_default_config_file_dict[key]) > 4 and len(polly_default_config_file_dict[key]) != channels:
-                            ## number of channels from the default-polly-config has to be adapted to the correct number of channels, taken from the local-polly-config
-                            if len(polly_default_config_file_dict[key]) > channels:
-                                polly_config_dict[key] = polly_default_config_file_dict[key][:channels]
-                            elif len(polly_default_config_file_dict[key]) < channels:
+                        # check if isFR is there -> config file
+                        # if not -> default file
+                        if 'isFR' in polly_config_file_dict:
+                            channels = len(polly_config_file_dict['isFR']) ## isFR is a key, which has to be in the local-polly-config
+                            if isinstance(polly_default_config_file_dict[key], list) and len(polly_default_config_file_dict[key]) == channels:
                                 polly_config_dict[key] = polly_default_config_file_dict[key]
-                                last_element = polly_default_config_file_dict[key][-1]
-                                extension_length = channels - len(polly_default_config_file_dict[key])
-                                polly_config_dict[key].extend([last_element] * extension_length)
+                            elif isinstance(polly_default_config_file_dict[key], list) and len(polly_default_config_file_dict[key]) > 4 and len(polly_default_config_file_dict[key]) != channels:
+                                ## number of channels from the default-polly-config has to be adapted to the correct number of channels, taken from the local-polly-config
+                                if len(polly_default_config_file_dict[key]) > channels:
+                                    polly_config_dict[key] = polly_default_config_file_dict[key][:channels]
+                                elif len(polly_default_config_file_dict[key]) < channels:
+                                    polly_config_dict[key] = polly_default_config_file_dict[key]
+                                    last_element = polly_default_config_file_dict[key][-1]
+                                    extension_length = channels - len(polly_default_config_file_dict[key])
+                                    polly_config_dict[key].extend([last_element] * extension_length)
+                            else:
+                                polly_config_dict[key] = polly_default_config_file_dict[key]
                         else:
                             polly_config_dict[key] = polly_default_config_file_dict[key]
                 ## check if a key in the polly_config_file exists, but not in polly_default_config_file
@@ -142,7 +155,7 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                 return fix_indexing(polly_config_dict,keys=fix_indexing_keys)
                 
             except Exception:
-                logging.warning(f'polly_config_file: {polly_config_file} can not be read.')
+                logging.warning(f'polly_config_file: {polly_config_file} can not be processed.', exc_info=True)
 
         else:
             logging.warning(f'polly_config_file: {polly_config_file} does not exist')
