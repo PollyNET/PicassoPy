@@ -101,7 +101,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "aerosol backscatter coefficient at 355 nm retrieved with Klett method",
+        "long_name": "overlap corrected aerosol backscatter coefficient at 355 nm retrieved with Klett method",
         "standard_name": "beta (aer, 355 nm)",
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
@@ -118,7 +118,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol backscatter coefficient at 355 nm retrieved with Klett method",
+        "long_name": "overlap corrected uncertainty of aerosol backscatter coefficient at 355 nm retrieved with Klett method",
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -134,7 +134,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "aerosol backscatter coefficient at 532 nm retrieved with Klett method",
+        "long_name": "overlap corrected aerosol backscatter coefficient at 532 nm retrieved with Klett method",
         "standard_name": "beta (aer, 532 nm)",
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
@@ -151,7 +151,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol backscatter coefficient at 532 nm retrieved with Klett method",
+        "long_name": "overlap corrected uncertainty of aerosol backscatter coefficient at 532 nm retrieved with Klett method",
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -167,7 +167,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "aerosol backscatter coefficient at 1064 nm retrieved with Klett method",
+        "long_name": "overlap corrected aerosol backscatter coefficient at 1064 nm retrieved with Klett method",
         "standard_name": "beta (aer, 1064 nm)",
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
@@ -184,7 +184,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol backscatter coefficient at 1064 nm retrieved with Klett method",
+        "long_name": "overlap corrected uncertainty of aerosol backscatter coefficient at 1064 nm retrieved with Klett method",
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -200,7 +200,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "aerosol backscatter coefficient at 355 nm retrieved with Raman method",
+        "long_name": "overlap corrected aerosol backscatter coefficient at 355 nm retrieved with Raman method",
         "standard_name": "beta (aer, 355 nm)",
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
@@ -217,7 +217,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol backscatter coefficient at 355 nm retrieved with Raman method",
+        "long_name": "overlap corrected uncertainty of aerosol backscatter coefficient at 355 nm retrieved with Raman method",
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -233,7 +233,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "aerosol backscatter coefficient at 532 nm retrieved with Raman method",
+        "long_name": "overlap corrected aerosol backscatter coefficient at 532 nm retrieved with Raman method",
         "standard_name": "beta (aer, 532 nm)",
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
@@ -250,7 +250,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol backscatter coefficient at 532 nm retrieved with Raman method",
+        "long_name": "overlap corrected uncertainty of aerosol backscatter coefficient at 532 nm retrieved with Raman method",
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -266,7 +266,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "aerosol backscatter coefficient at 1064 nm retrieved with Raman method",
+        "long_name": "overlap corrected aerosol backscatter coefficient at 1064 nm retrieved with Raman method",
         "standard_name": "beta (aer, 1064 nm)",
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
@@ -283,7 +283,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol backscatter coefficient at 1064 nm retrieved with Raman method",
+        "long_name": "overlap corrected uncertainty of aerosol backscatter coefficient at 1064 nm retrieved with Raman method",
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -299,7 +299,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": "volume linear depolarization ratio at 355 nm with the same smoothing as Klett method",
+        "long_name": "overlap corrected volume linear depolarization ratio at 355 nm with the same smoothing as Klett method",
         "standard_name": "delta (vol, 355 nm)",
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
@@ -316,7 +316,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": " uncertainty of volume linear depolarization ratio at 355 nm with the same smoothing as Klett method",
+        "long_name": "overlap corrected  uncertainty of volume linear depolarization ratio at 355 nm with the same smoothing as Klett method",
         "standard_name": "sigma (vol, 355 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -332,7 +332,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": "volume linear depolarization ratio at 532 nm with the same smoothing as Klett method",
+        "long_name": "overlap corrected volume linear depolarization ratio at 532 nm with the same smoothing as Klett method",
         "standard_name": "delta (vol, 532 nm)",
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
@@ -349,7 +349,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": " uncertainty of volume linear depolarization ratio at 532 nm with the same smoothing as Klett method",
+        "long_name": "overlap corrected  uncertainty of volume linear depolarization ratio at 532 nm with the same smoothing as Klett method",
         "standard_name": "sigma (vol, 532 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -365,7 +365,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": "volume linear depolarization ratio at 1064 nm with the same smoothing as Klett method",
+        "long_name": "overlap corrected volume linear depolarization ratio at 1064 nm with the same smoothing as Klett method",
         "standard_name": "delta (vol, 1064 nm)",
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
@@ -382,7 +382,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": " uncertainty of volume linear depolarization ratio at 1064 nm with the same smoothing as Klett method",
+        "long_name": "overlap corrected  uncertainty of volume linear depolarization ratio at 1064 nm with the same smoothing as Klett method",
         "standard_name": "sigma (vol, 1064 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -398,7 +398,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": "volume linear depolarization ratio at 355 nm with the same smoothing as Raman method",
+        "long_name": "overlap corrected volume linear depolarization ratio at 355 nm with the same smoothing as Raman method",
         "standard_name": "delta (vol, 355 nm)",
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
@@ -415,7 +415,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": " uncertainty of volume linear depolarization ratio at 355 nm with the same smoothing as Raman method",
+        "long_name": "overlap corrected  uncertainty of volume linear depolarization ratio at 355 nm with the same smoothing as Raman method",
         "standard_name": "sigma (vol, 355 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -431,7 +431,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": "volume linear depolarization ratio at 532 nm with the same smoothing as Raman method",
+        "long_name": "overlap corrected volume linear depolarization ratio at 532 nm with the same smoothing as Raman method",
         "standard_name": "delta (vol, 532 nm)",
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
@@ -448,7 +448,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": " uncertainty of volume linear depolarization ratio at 532 nm with the same smoothing as Raman method",
+        "long_name": "overlap corrected  uncertainty of volume linear depolarization ratio at 532 nm with the same smoothing as Raman method",
         "standard_name": "sigma (vol, 532 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -464,7 +464,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": "volume linear depolarization ratio at 1064 nm with the same smoothing as Raman method",
+        "long_name": "overlap corrected volume linear depolarization ratio at 1064 nm with the same smoothing as Raman method",
         "standard_name": "delta (vol, 1064 nm)",
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
@@ -481,7 +481,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": " uncertainty of volume linear depolarization ratio at 1064 nm with the same smoothing as Raman method",
+        "long_name": "overlap corrected  uncertainty of volume linear depolarization ratio at 1064 nm with the same smoothing as Raman method",
         "standard_name": "sigma (vol, 1064 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -497,7 +497,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": "particle linear depolarization ratio at 355 nm with the same smoothing as Klett method",
+        "long_name": "overlap corrected particle linear depolarization ratio at 355 nm with the same smoothing as Klett method",
         "standard_name": "delta (par, 355 nm)",
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
@@ -514,7 +514,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": " uncertainty of particle linear depolarization ratio at 355 nm with the same smoothing as Klett method",
+        "long_name": "overlap corrected  uncertainty of particle linear depolarization ratio at 355 nm with the same smoothing as Klett method",
         "standard_name": "sigma (par, 355 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -530,7 +530,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": "particle linear depolarization ratio at 532 nm with the same smoothing as Klett method",
+        "long_name": "overlap corrected particle linear depolarization ratio at 532 nm with the same smoothing as Klett method",
         "standard_name": "delta (par, 532 nm)",
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
@@ -547,7 +547,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": " uncertainty of particle linear depolarization ratio at 532 nm with the same smoothing as Klett method",
+        "long_name": "overlap corrected  uncertainty of particle linear depolarization ratio at 532 nm with the same smoothing as Klett method",
         "standard_name": "sigma (par, 532 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -563,7 +563,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": "particle linear depolarization ratio at 1064 nm with the same smoothing as Klett method",
+        "long_name": "overlap corrected particle linear depolarization ratio at 1064 nm with the same smoothing as Klett method",
         "standard_name": "delta (par, 1064 nm)",
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
@@ -580,7 +580,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": " uncertainty of particle linear depolarization ratio at 1064 nm with the same smoothing as Klett method",
+        "long_name": "overlap corrected  uncertainty of particle linear depolarization ratio at 1064 nm with the same smoothing as Klett method",
         "standard_name": "sigma (par, 1064 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -596,7 +596,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": "particle linear depolarization ratio at 355 nm with the same smoothing as Raman method",
+        "long_name": "overlap corrected particle linear depolarization ratio at 355 nm with the same smoothing as Raman method",
         "standard_name": "delta (par, 355 nm)",
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
@@ -613,7 +613,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": " uncertainty of particle linear depolarization ratio at 355 nm with the same smoothing as Raman method",
+        "long_name": "overlap corrected  uncertainty of particle linear depolarization ratio at 355 nm with the same smoothing as Raman method",
         "standard_name": "sigma (par, 355 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -629,7 +629,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": "particle linear depolarization ratio at 532 nm with the same smoothing as Raman method",
+        "long_name": "overlap corrected particle linear depolarization ratio at 532 nm with the same smoothing as Raman method",
         "standard_name": "delta (par, 532 nm)",
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
@@ -646,7 +646,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": " uncertainty of particle linear depolarization ratio at 532 nm with the same smoothing as Raman method",
+        "long_name": "overlap corrected  uncertainty of particle linear depolarization ratio at 532 nm with the same smoothing as Raman method",
         "standard_name": "sigma (par, 532 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -662,7 +662,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": "particle linear depolarization ratio at 1064 nm with the same smoothing as Raman method",
+        "long_name": "overlap corrected particle linear depolarization ratio at 1064 nm with the same smoothing as Raman method",
         "standard_name": "delta (par, 1064 nm)",
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
@@ -679,7 +679,7 @@
       "attributes": {
         "unit": "",
         "unit_html": "",
-        "long_name": " uncertainty of particle linear depolarization ratio at 1064 nm with the same smoothing as Raman method",
+        "long_name": "overlap corrected  uncertainty of particle linear depolarization ratio at 1064 nm with the same smoothing as Raman method",
         "standard_name": "sigma (par, 1064 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -695,7 +695,7 @@
       "attributes": {
         "unit": "m^-1",
         "unit_html": "m<sup>-1</sup>",
-        "long_name": "aerosol extinction coefficient at 355 nm retrieved with Raman method",
+        "long_name": "overlap corrected aerosol extinction coefficient at 355 nm retrieved with Raman method",
         "standard_name": "alpha (aer, 355 nm)",
         "plot_range": [-1.0e-06, 0.003],
         "plot_scale": "linear",
@@ -712,7 +712,7 @@
       "attributes": {
         "unit": "m^-1",
         "unit_html": "m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol extinction coefficient at 355 nm retrieved with Raman method",
+        "long_name": "overlap corrected uncertainty of aerosol extinction coefficient at 355 nm retrieved with Raman method",
         "standard_name": "sigma (alpha)",
         "plot_range": [-1.0e-06, 0.003],
         "plot_scale": "linear",
@@ -729,7 +729,7 @@
       "attributes": {
         "unit": "m^-1",
         "unit_html": "m<sup>-1</sup>",
-        "long_name": "aerosol extinction coefficient at 532 nm retrieved with Raman method",
+        "long_name": "overlap corrected aerosol extinction coefficient at 532 nm retrieved with Raman method",
         "standard_name": "alpha (aer, 532 nm)",
         "plot_range": [-1.0e-06, 0.003],
         "plot_scale": "linear",
@@ -746,7 +746,7 @@
       "attributes": {
         "unit": "m^-1",
         "unit_html": "m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol extinction coefficient at 532 nm retrieved with Raman method",
+        "long_name": "overlap corrected uncertainty of aerosol extinction coefficient at 532 nm retrieved with Raman method",
         "standard_name": "sigma (alpha)",
         "plot_range": [-1.0e-06, 0.003],
         "plot_scale": "linear",
@@ -763,7 +763,7 @@
       "attributes": {
         "unit": "m^-1",
         "unit_html": "m<sup>-1</sup>",
-        "long_name": "aerosol extinction coefficient at 1064 nm retrieved with Raman method",
+        "long_name": "overlap corrected aerosol extinction coefficient at 1064 nm retrieved with Raman method",
         "standard_name": "alpha (aer, 1064 nm)",
         "plot_range": [-1.0e-06, 0.003],
         "plot_scale": "linear",
@@ -780,7 +780,7 @@
       "attributes": {
         "unit": "m^-1",
         "unit_html": "m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol extinction coefficient at 1064 nm retrieved with Raman method",
+        "long_name": "overlap corrected uncertainty of aerosol extinction coefficient at 1064 nm retrieved with Raman method",
         "standard_name": "sigma (alpha)",
         "plot_range": [-1.0e-06, 0.003],
         "plot_scale": "linear",
@@ -796,7 +796,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "sr",
-        "long_name": "aerosol lidar ratio at 355 nm retrieved with Raman method",
+        "long_name": "overlap corrected aerosol lidar ratio at 355 nm retrieved with Raman method",
         "standard_name": "S (aer, 355 nm)",
         "plot_range": [0.0, 120.0],
         "plot_scale": "linear",
@@ -812,7 +812,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "sr",
-        "long_name": "uncertainty of aerosol lidar ratio at 355 nm retrieved with Raman method",
+        "long_name": "overlap corrected uncertainty of aerosol lidar ratio at 355 nm retrieved with Raman method",
         "standard_name": "sigma (S)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -827,7 +827,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "sr",
-        "long_name": "aerosol lidar ratio at 532 nm retrieved with Raman method",
+        "long_name": "overlap corrected aerosol lidar ratio at 532 nm retrieved with Raman method",
         "standard_name": "S (aer, 532 nm)",
         "plot_range": [0.0, 120.0],
         "plot_scale": "linear",
@@ -843,7 +843,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "sr",
-        "long_name": "uncertainty of aerosol lidar ratio at 532 nm retrieved with Raman method",
+        "long_name": "overlap corrected uncertainty of aerosol lidar ratio at 532 nm retrieved with Raman method",
         "standard_name": "sigma (S)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -858,7 +858,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "sr",
-        "long_name": "aerosol lidar ratio at 1064 nm retrieved with Raman method",
+        "long_name": "overlap corrected aerosol lidar ratio at 1064 nm retrieved with Raman method",
         "standard_name": "S (aer, 1064 nm)",
         "plot_range": [0.0, 120.0],
         "plot_scale": "linear",
@@ -874,7 +874,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "sr",
-        "long_name": "uncertainty of aerosol lidar ratio at 1064 nm retrieved with Raman method",
+        "long_name": "overlap corrected uncertainty of aerosol lidar ratio at 1064 nm retrieved with Raman method",
         "standard_name": "sigma (S)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -889,7 +889,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "",
-        "long_name": "Angström Exponent of ratio from 355 nm / 532 nm Backscatter retrieved with Raman method",
+        "long_name": "overlap corrected Angström Exponent of ratio from 355 nm / 532 nm Backscatter retrieved with Raman method",
         "standard_name": "AE Bsc (355/532)",
         "plot_range": [-1.0, 2.0],
         "plot_scale": "linear",
@@ -905,7 +905,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "",
-        "long_name": "uncertainty of Angström Exponent of ratio from 355 nm / 532 nm Backscatter retrieved with Raman method",
+        "long_name": "overlap corrected uncertainty of Angström Exponent of ratio from 355 nm / 532 nm Backscatter retrieved with Raman method",
         "standard_name": "Sigma AE Bsc",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -920,7 +920,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "",
-        "long_name": "Angström Exponent of ratio from 532 nm / 1064 nm retrieved Backscatter with Raman method",
+        "long_name": "overlap corrected Angström Exponent of ratio from 532 nm / 1064 nm retrieved Backscatter with Raman method",
         "standard_name": "AE Bsc (532/1064)",
         "plot_range": [-1.0, 2.0],
         "plot_scale": "linear",
@@ -936,7 +936,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "",
-        "long_name": "uncertainty of Angström Exponent of ratio from 532 nm / 1064 nm Backscatter retrieved with Raman method",
+        "long_name": "overlap corrected uncertainty of Angström Exponent of ratio from 532 nm / 1064 nm Backscatter retrieved with Raman method",
         "standard_name": "Sigma AE Bsc",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -951,7 +951,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "",
-        "long_name": "Angström Exponent of ratio from 355 nm / 532 nm Extinction retrieved with Raman method",
+        "long_name": "overlap corrected Angström Exponent of ratio from 355 nm / 532 nm Extinction retrieved with Raman method",
         "standard_name": "AE Ext (355/532)",
         "plot_range": [-1.0, 2.0],
         "plot_scale": "linear",
@@ -967,7 +967,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "",
-        "long_name": "uncertainty of Angström Exponent of ratio from 355 nm / 532 nm Extinction retrieved with Raman method",
+        "long_name": "overlap corrected uncertainty of Angström Exponent of ratio from 355 nm / 532 nm Extinction retrieved with Raman method",
         "plot_range": [-1.0, 2.0],
         "plot_scale": "linear",
         "source": "polly_device_name",

@@ -101,7 +101,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "aerosol backscatter coefficient at 355 nm retrieved with Klett method",
+        "long_name": "aerosol backscatter coefficient at near-range 355 nm retrieved with Klett method",
         "standard_name": "beta (aer, 355 nm)",
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
@@ -118,7 +118,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol backscatter coefficient at 355 nm retrieved with Klett method",
+        "long_name": "uncertainty of aerosol backscatter coefficient at near-range 355 nm retrieved with Klett method",
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -134,7 +134,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "aerosol backscatter coefficient at 532 nm retrieved with Klett method",
+        "long_name": "aerosol backscatter coefficient at near-range 532 nm retrieved with Klett method",
         "standard_name": "beta (aer, 532 nm)",
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
@@ -151,7 +151,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol backscatter coefficient at 532 nm retrieved with Klett method",
+        "long_name": "uncertainty of aerosol backscatter coefficient at near-range 532 nm retrieved with Klett method",
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -167,7 +167,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "aerosol backscatter coefficient at 1064 nm retrieved with Klett method",
+        "long_name": "aerosol backscatter coefficient at near-range 1064 nm retrieved with Klett method",
         "standard_name": "beta (aer, 1064 nm)",
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
@@ -184,7 +184,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol backscatter coefficient at 1064 nm retrieved with Klett method",
+        "long_name": "uncertainty of aerosol backscatter coefficient at near-range 1064 nm retrieved with Klett method",
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -200,7 +200,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "aerosol backscatter coefficient at 355 nm retrieved with Raman method",
+        "long_name": "aerosol backscatter coefficient at near-range 355 nm retrieved with Raman method",
         "standard_name": "beta (aer, 355 nm)",
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
@@ -217,7 +217,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol backscatter coefficient at 355 nm retrieved with Raman method",
+        "long_name": "uncertainty of aerosol backscatter coefficient at near-range 355 nm retrieved with Raman method",
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -233,7 +233,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "aerosol backscatter coefficient at 532 nm retrieved with Raman method",
+        "long_name": "aerosol backscatter coefficient at near-range 532 nm retrieved with Raman method",
         "standard_name": "beta (aer, 532 nm)",
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
@@ -250,7 +250,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol backscatter coefficient at 532 nm retrieved with Raman method",
+        "long_name": "uncertainty of aerosol backscatter coefficient at near-range 532 nm retrieved with Raman method",
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -266,7 +266,7 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "aerosol backscatter coefficient at 1064 nm retrieved with Raman method",
+        "long_name": "aerosol backscatter coefficient at near-range 1064 nm retrieved with Raman method",
         "standard_name": "beta (aer, 1064 nm)",
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
@@ -283,13 +283,271 @@
       "attributes": {
         "unit": "sr^-1 m^-1",
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "uncertainty of aerosol backscatter coefficient at 1064 nm retrieved with Raman method",
+        "long_name": "uncertainty of aerosol backscatter coefficient at near-range 1064 nm retrieved with Raman method",
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
         "retrieving_info": "",
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
+    },
+    "aerExt_raman_355": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "m^-1",
+        "unit_html": "m<sup>-1</sup>",
+        "long_name": "aerosol extinction coefficient at near-range 355 nm retrieved with Raman method",
+        "standard_name": "alpha (aer, 355 nm)",
+        "plot_range": [-1.0e-06, 0.003],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
+      }
+    },
+    "uncertainty_aerExt_raman_355": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "m^-1",
+        "unit_html": "m<sup>-1</sup>",
+        "long_name": "uncertainty of aerosol extinction coefficient at near-range 355 nm retrieved with Raman method",
+        "standard_name": "sigma (alpha)",
+        "plot_range": [-1.0e-06, 0.003],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
+      }
+    },
+    "aerExt_raman_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "m^-1",
+        "unit_html": "m<sup>-1</sup>",
+        "long_name": "aerosol extinction coefficient at near-range 532 nm retrieved with Raman method",
+        "standard_name": "alpha (aer, 532 nm)",
+        "plot_range": [-1.0e-06, 0.003],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
+      }
+    },
+    "uncertainty_aerExt_raman_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "m^-1",
+        "unit_html": "m<sup>-1</sup>",
+        "long_name": "uncertainty of aerosol extinction coefficient at near-range 532 nm retrieved with Raman method",
+        "standard_name": "sigma (alpha)",
+        "plot_range": [-1.0e-06, 0.003],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
+      }
+    },
+    "aerExt_raman_1064": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "m^-1",
+        "unit_html": "m<sup>-1</sup>",
+        "long_name": "aerosol extinction coefficient at near-range 1064 nm retrieved with Raman method",
+        "standard_name": "alpha (aer, 1064 nm)",
+        "plot_range": [-1.0e-06, 0.003],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
+      }
+    },
+    "uncertainty_aerExt_raman_1064": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "m^-1",
+        "unit_html": "m<sup>-1</sup>",
+        "long_name": "uncertainty of aerosol extinction coefficient at near-range 1064 nm retrieved with Raman method",
+        "standard_name": "sigma (alpha)",
+        "plot_range": [-1.0e-06, 0.003],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
+      }
+    },
+    "aerLR_raman_355": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "sr",
+        "long_name": "aerosol lidar ratio at near-range 355 nm retrieved with Raman method",
+        "standard_name": "S (aer, 355 nm)",
+        "plot_range": [0.0, 120.0],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
+      }
+    },
+    "uncertainty_aerLR_raman_355": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "sr",
+        "long_name": "uncertainty of aerosol lidar ratio at near-range 355 nm retrieved with Raman method",
+        "standard_name": "sigma (S)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
+      }
+    },
+    "aerLR_raman_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "sr",
+        "long_name": "aerosol lidar ratio at near-range 532 nm retrieved with Raman method",
+        "standard_name": "S (aer, 532 nm)",
+        "plot_range": [0.0, 120.0],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
+      }
+    },
+    "uncertainty_aerLR_raman_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "sr",
+        "long_name": "uncertainty of aerosol lidar ratio at near-range 532 nm retrieved with Raman method",
+        "standard_name": "sigma (S)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
+      }
+    },
+    "aerLR_raman_1064": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "sr",
+        "long_name": "aerosol lidar ratio at near-range 1064 nm retrieved with Raman method",
+        "standard_name": "S (aer, 1064 nm)",
+        "plot_range": [0.0, 120.0],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
+      }
+    },
+    "uncertainty_aerLR_raman_1064": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "sr",
+        "long_name": "uncertainty of aerosol lidar ratio at near-range 1064 nm retrieved with Raman method",
+        "standard_name": "sigma (S)",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
+      }
+    },
+    "AE_Bsc_raman_355_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "long_name": "Angström Exponent of ratio from near-range 355 nm / 532 nm Backscatter retrieved with Raman method",
+        "standard_name": "AE Bsc (355/532)",
+        "plot_range": [-1.0, 2.0],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": ""
+      }
+    },
+    "uncertainty_AE_Bsc_raman_355_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "long_name": "uncertainty of Angström Exponent of ratio from near-range 355 nm / 532 nm Backscatter retrieved with Raman method",
+        "standard_name": "Sigma AE Bsc",
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": ""
+      }
+    },
+    "AE_Ext_raman_355_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "long_name": "Angström Exponent of ratio from near-range 355 nm / 532 nm Extinction retrieved with Raman method",
+        "standard_name": "AE Ext (355/532)",
+        "plot_range": [-1.0, 2.0],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": ""
+      }
+    },
+    "uncertainty_AE_Ext_raman_355_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "long_name": "uncertainty of Angström Exponent of ratio from near-range 355 nm / 532 nm Extinction retrieved with Raman method",
+        "plot_range": [-1.0, 2.0],
+        "plot_scale": "linear",
+        "source": "polly_device_name",
+        "retrieving_info": "",
+        "comment": ""
+      }
     }
+
   }
 }

@@ -11,7 +11,7 @@ import ppcpy.misc.json2nc_mapping as json2nc_mapping
 root_dir0 = Path(__file__).resolve().parent.parent.parent
 root_dir = helper.detect_path_type(root_dir0)
 
-def write2nc_file(data_cube,picasso_config_dict,root_dir=root_dir, prod_ls=[]):
+def write2nc_file(data_cube,root_dir=root_dir, prod_ls=[]):
     ## writes data from products, listed in prod_ls, to nc-file
     #  available products:  prod_ls = ["SNR","BG","RCS","att_bsc","vol_depol"]
     for prod in prod_ls:
@@ -29,6 +29,13 @@ def write2nc_file(data_cube,picasso_config_dict,root_dir=root_dir, prod_ls=[]):
             json_nc_mapping_dict['dimensions'][d] = len(data_cube.retrievals_highres[d])
 
         """ fill variables """
+        ## adding fixed variables
+        json_nc_mapping_dict['variables']['altitude']['data'] = data_cube.polly_config_dict['asl']
+        json_nc_mapping_dict['variables']['latitude']['data'] = data_cube.polly_config_dict['lat']
+        json_nc_mapping_dict['variables']['longitude']['data'] = data_cube.polly_config_dict['lon']
+        json_nc_mapping_dict['variables']['tilt_angle']['data'] = data_cube.rawdata_dict['zenithangle']['var_data']
+
+        ## adding dynamical variables
         for v in list(json_nc_mapping_dict['variables'].keys()):
         #for v in json_nc_mapping_dict['variables'].keys():
             if v in data_cube.retrievals_highres.keys():
@@ -46,17 +53,16 @@ def write2nc_file(data_cube,picasso_config_dict,root_dir=root_dir, prod_ls=[]):
 
 
         """ Create the NetCDF file """
-        output_filename = Path(picasso_config_dict["results_folder"],f"{data_cube.date}_{data_cube.device}_{prod}.nc")
+        output_filename = Path(data_cube.picasso_config_dict["results_folder"],f"{data_cube.date}_{data_cube.device}_{prod}.nc")
         json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict,compression_level=1)
 #        else:
 #            logging.warning(f"No product of type '{prod}' found in prodSaveList-key of polly-config-file")
 
 
-def write_profile2nc_file(data_cube,picasso_config_dict,root_dir=root_dir, prod_ls=[]):
+def write_profile2nc_file(data_cube,root_dir=root_dir, prod_ls=[]):
     ## writes data from products, listed in prod_ls, to nc-file
-    #  available products:  prod_ls = ["SNR","BG","RCS","att_bsc","vol_depol"]
-    # time slice from data_cube.retrievals_highres['time64'][data_cube.clFreeGrps[profile][0]]
-    # until data_cube.retrievals_highres['time64'][data_cube.clFreeGrps[profile][1]]
+    ##  available products:  prod_ls = ["profiles","NR_profeils","OC_profiles"]
+
     json_nc_translator = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config',f'json2nc_translator.json'))
     for prod in prod_ls:
         json_nc_mapping_dict = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config',f'json2nc-mapper_{prod}.json'))
@@ -72,18 +78,22 @@ def write_profile2nc_file(data_cube,picasso_config_dict,root_dir=root_dir, prod_
         #for n,profil in enumerate(data_cube.retrievals_profile[method]):
         for n in range(0,len(data_cube.clFreeGrps)):
             json_nc_mapping_dict = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config',f'json2nc-mapper_{prod}.json'))
+
+            ## adding fixed variables
             starttime = data_cube.retrievals_highres['time64'][data_cube.clFreeGrps[n][0]]
             stoptime = data_cube.retrievals_highres['time64'][data_cube.clFreeGrps[n][1]]
             start = starttime.astype('datetime64[ms]').item().strftime("%H%M")
             stop = stoptime.astype('datetime64[ms]').item().strftime("%H%M")
 
-            #for ch in data_cube.retrievals_profile[method][n].keys():
             json_nc_mapping_dict['variables']['start_time']['data'] = starttime.astype('datetime64[ns]').astype('int64') / 1_000_000_000
             json_nc_mapping_dict['variables']['end_time']['data'] = stoptime.astype('datetime64[ns]').astype('int64') / 1_000_000_000
+            json_nc_mapping_dict['variables']['altitude']['data'] = data_cube.polly_config_dict['asl']
+            json_nc_mapping_dict['variables']['latitude']['data'] = data_cube.polly_config_dict['lat']
+            json_nc_mapping_dict['variables']['longitude']['data'] = data_cube.polly_config_dict['lon']
+            json_nc_mapping_dict['variables']['tilt_angle']['data'] = data_cube.rawdata_dict['zenithangle']['var_data']
+            json_nc_mapping_dict['variables']['height']['data'] = data_cube.retrievals_highres['height']
 
-            #for k in json_nc_mapping_dict['variables'].keys():
-            #    print(k)
-
+            ## adding dynamical variables
             for var in json_nc_translator[prod]['variables'].keys():
                 if var in json_nc_mapping_dict['variables'].keys():
                     pass
@@ -115,7 +125,7 @@ def write_profile2nc_file(data_cube,picasso_config_dict,root_dir=root_dir, prod_
             #print(data_dict_copy['variables'].keys())
 
             """ Create the NetCDF file """
-            output_filename = Path(picasso_config_dict["results_folder"],f"{data_cube.date}_{data_cube.device}_{start}_{stop}_{prod}.nc")
+            output_filename = Path(data_cube.picasso_config_dict["results_folder"],f"{data_cube.date}_{data_cube.device}_{start}_{stop}_{prod}.nc")
             json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict,compression_level=1)
 #            json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict[prod],compression_level=1)
 
