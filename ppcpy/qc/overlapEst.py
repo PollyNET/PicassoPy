@@ -6,7 +6,7 @@ from scipy.ndimage import uniform_filter1d
 from ppcpy.retrievals.collection import calc_snr
 from ppcpy.misc.helper import mean_stable
 
-
+from pathlib import Path
 
 def run_frnr_cldFreeGrps(data_cube, collect_debug=True):
     """
@@ -263,6 +263,7 @@ def overlapCalcRaman(Lambda_el, Lambda_Ra, height, sigFRel, sigFRRa,
             else:
                 olFunc0 /= np.nanmean(olFunc0[fullOverlapIndx + round(150 / hres):fullOverlapIndx + round(1500 / hres)])
 
+            # first bin to start searching full overlap height. % Please replace the 180 by a paramter in future.
             bin_ini = int(np.ceil(180 / hres))
 
             full_ovl_indx = np.argmax(np.diff(olFunc[bin_ini:]) <= 0) + bin_ini
@@ -273,7 +274,7 @@ def overlapCalcRaman(Lambda_el, Lambda_Ra, height, sigFRel, sigFRRa,
             diff_norm.append(np.nansum(np.abs(1 - olFunc[full_ovl_indx:full_ovl_indx + round(1500 / hres)])))
 
             olFunc[full_ovl_indx:] = olFunc[full_ovl_indx]
-            olFunc /= olFunc[full_ovl_indx]
+            olFunc /= olFunc[full_ovl_indx] # renormalization
 
             if (full_ovl_indx - bin_ini) < 1:
                 full_ovl_indx = bin_ini + 1
@@ -286,8 +287,10 @@ def overlapCalcRaman(Lambda_el, Lambda_Ra, height, sigFRel, sigFRRa,
 
             if half_ovl_indx == 0:
                 half_ovl_indx = full_ovl_indx - int(np.floor(180 / hres))
-
+            # smoothing before full overlap to avoid oscilations on that part.
             for _ in range(6):
+                # smoothing before full overlap to avoid S-shape near to the
+                # full overlap.
                 olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)] = uniform_filter1d(olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)], 5)
 
         olFunc[olFunc < 1e-5] = 1e-5
@@ -306,3 +309,39 @@ def load(data_cube):
     read the overlap function from files
     into a structure similar to the others    
     """
+
+    print(data_cube.picasso_config_dict['defaultFile_folder'])
+    print(data_cube.polly_config_dict)
+    print(data_cube.polly_default_dict)
+
+    ovl_files_for = [k for k in data_cube.polly_default_dict.keys() if 'overlapFile_' in k]
+    print(ovl_files_for)
+
+    height = data_cube.retrievals_highres['range']
+    polly_default = data_cube.polly_default_dict
+    folder = Path(data_cube.picasso_config_dict['defaultFile_folder'])
+    #data_cube.retrievals_profile['overlap']['raman'][i][f'{wv}_total_NR']['olFunc']
+    overlap = [{}]
+
+    for k in ovl_files_for:
+        print(k)
+        full_f = folder.joinpath(polly_default[k])
+        print(full_f)
+        if polly_default[k] == "":
+            print('empty string')
+            continue
+        dat = np.loadtxt(full_f, skiprows=1, delimiter=',')
+        print(dat.shape)
+        h_ovl = dat[:,0]
+        ovl = dat[:,1]
+        print(h_ovl.shape, h_ovl[:10], h_ovl[-10:])
+        print(ovl.shape, ovl[:20])
+        if height.shape != h_ovl.shape or not np.all(np.isclose(height, h_ovl)):
+            logging.warning('Heights not equal, need interpolating')
+            ovl = np.interp(height, h_ovl, ovl, left=0, right=1)
+
+        overlap[0][k.replace('overlapFile_', '')] = {}
+        overlap[0][k.replace('overlapFile_', '')]['olFunc'] = ovl
+    
+
+    return overlap
