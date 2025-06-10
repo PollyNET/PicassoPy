@@ -59,10 +59,10 @@ def plot_optical_analysis(profiles, height, times, plot_settings={}, smooth=None
         i_nr_base = np.where(height > h_base)[0][0]
     else:
         i_nr_base = 0
-    if i_nr_top != i_nr_base:
+    if i_nr_top != i_nr_base and '355_total_NR' in profiles and 'aerExt' in profiles['355_total_NR']:
         ax[1].plot(profiles['355_total_NR']['aerExt'][i_nr_base:i_nr_top]*1e6, height[i_nr_base:i_nr_top], 
                    color='skyblue', label='355NR')
-    if i_nr_top != i_nr_base:
+    if i_nr_top != i_nr_base and '532_total_NR' in profiles and 'aerExt' in profiles['532_total_NR']:
         ax[1].plot(profiles['532_total_NR']['aerExt'][i_nr_base:i_nr_top]*1e6, height[i_nr_base:i_nr_top],
                    color='lawngreen', label='532NR')
 
@@ -167,11 +167,9 @@ def plot_optical_analysis(profiles, height, times, plot_settings={}, smooth=None
     if profiles['355_total_FR']['retrieval'] == 'raman' and not np.all(np.isnan(profiles['355_total_FR']['AE_Ext_355_532'])):
         ax[3].plot(profiles['355_total_FR']['AE_Ext_355_532'], height, 
            color='steelblue', label='Ext355/532')
-    if profiles['355_total_NR']['retrieval'] == 'raman' and not np.all(np.isnan(profiles['355_total_NR']['AE_Ext_355_532'])):
+    if '355_total_NR' in profiles and profiles['355_total_NR']['retrieval'] == 'raman' and not np.all(np.isnan(profiles['355_total_NR']['AE_Ext_355_532'])):
         ax[3].plot(profiles['355_total_NR']['AE_Ext_355_532'], height, 
            color='darkblue', label='Ext355/532 NR')
-        
-
 
     # depol
     ax[4].axvline(0, lw=0.8, c='k')
@@ -228,7 +226,7 @@ def plot_optical_analysis(profiles, height, times, plot_settings={}, smooth=None
     string = "{} - {} {}".format(
         times[0].strftime("%Y%m%d %H:%M"), 
         times[1].strftime("%H:%M"),
-        profiles['355_total_NR']['retrieval'])
+        profiles['355_total_FR']['retrieval'])
     fig.suptitle(string, fontsize=14)
 
     #if 'smooth532' in data.keys():
