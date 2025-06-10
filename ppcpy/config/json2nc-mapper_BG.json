@@ -19,6 +19,48 @@
     "time": 0
   },
   "variables": {
+    "altitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "m",
+        "long_name": "Height of lidar above mean sea level",
+        "standard_name": "altitude"
+      }
+    },
+    "longitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees_east",
+        "long_name": "Longitude of the site",
+        "standard_name": "longitude",
+        "axis": "Y"
+      }
+    },
+    "latitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees_north",
+        "long_name": "Latitude of the site",
+        "standard_name": "latitude",
+        "axis": "Y"
+      }
+    },
+    "tilt_angle": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees",
+        "long_name": "Tilt angle of lidar device",
+        "standard_name": "tilt_angle"
+      }
+    },
     "time": {
       "dtype": "f8",
       "shape": [

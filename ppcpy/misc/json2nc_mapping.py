@@ -1,5 +1,6 @@
 import logging
 import json
+import copy
 from netCDF4 import Dataset
 
 def read_json_to_dict(file_path):
@@ -72,7 +73,6 @@ def create_netcdf_from_dict(nc_file_path, data_dict, compression_level=1):
                 dimensions = var_info['shape']
                 dtype = var_info['dtype']
                 attributes = var_info.get('attributes', {})
-                print(attributes)
                 data = var_info.get('data')
 
                 # Create variable
@@ -116,7 +116,6 @@ def add_variable_2_json_dict_mapper(data_dict, new_key, reference_key, new_data 
     # Add the new variable to the dictionary
     data_dict["variables"][new_key] = new_variable
 
-
 def remove_variable_from_json_dict_mapper(data_dict, key_to_remove):
     """
     Removes a specific variable from the 'variables' section of the given dictionary.
@@ -129,6 +128,41 @@ def remove_variable_from_json_dict_mapper(data_dict, key_to_remove):
         del data_dict["variables"][key_to_remove]
     else:
         raise KeyError(f"Variable '{key_to_remove}' does not exist in 'variables'.")
+
+
+#def remove_variable_from_json_dict_mapper(data_dict, key_to_remove):
+#    """
+#    Removes a specific variable from the 'variables' section of the given dictionary.
+#    
+#    Parameters:
+#        data_dict (dict): The original dictionary structure.
+#        key_to_remove (str): The name of the variable to remove.
+#    Output:
+#        data_dict_copy (dict): The dict with removed variables
+#    """
+##    data_dict_copy = data_dict.copy()  ## this kind of copy is not working here
+#    data_dict_copy = copy.deepcopy(data_dict) ## have to use deepcopy to copy nested structures
+#    ## Remove keys with value None (only at second level) - looping through dict is neccessary due to nested structure
+#    if key_to_remove in data_dict_copy["variables"]:
+#        print(f"removing key: {key_to_remove}")
+#       # data_dict_copy["variables"].pop(key_to_remove,None) ## Use .pop('key', None) to avoid KeyError if key is missing
+#        del data_dict_copy["variables"][key_to_remove]
+#    else:
+#        raise KeyError(f"Variable '{key_to_remove}' does not exist in 'variables'.")
+#    return data_dict_copy
+
+def remove_empty_keys_from_dict(data_dict):
+#    data_dict_copy = data_dict.copy()  ## this kind of copy is not working here
+    data_dict_copy = copy.deepcopy(data_dict) ## have to use deepcopy to copy nested structures
+#    for section in data_dict_copy['variables']:
+#        data_dict_copy['variables'][section] = {k: v for k, v in data_dict_copy['variables'][section].items() if v is not None}
+
+    for section, values in data_dict_copy.get("variables", {}).items():
+        if isinstance(values, dict):
+            data_dict_copy["variables"][section] = {
+                k: v for k, v in values.items() if v is not None
+            }
+    return data_dict_copy
 
 
 def update_variable_attribute_of_json_dict_mapper(data_dict, variable_key, attribute_key, new_value):

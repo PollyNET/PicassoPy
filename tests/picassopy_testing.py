@@ -148,7 +148,7 @@ data_cube.preprocessing()
 #print(data_cube.rawdata_dict.keys())
 #print(data_cube.retrievals_highres.keys())
 
-write2nc_file(data_cube=data_cube,picasso_config_dict=picasso_config_dict,prod_ls=["SNR","BG","RCS"])
+write2nc_file(data_cube=data_cube,prod_ls=["SNR","BG","RCS"])
 
 data_cube.SaturationDetect()
 
@@ -212,14 +212,17 @@ data_cube.Angstroem()
 print('avail_optical_profiles', data_cube.retrievals_profile['avail_optical_profiles'])
 
 data_cube.LidarCalibration()
-
 # gives also
 # data_cube.LCused
+
+## saving profiles
+write_profile2nc_file(data_cube=data_cube, prod_ls=["profiles","NR_profiles","OC_profiles"])
 
 data_cube.attBsc_volDepol()
 
 data_cube.molecularHighres()
 
+## saving high-resolution retrievals
 write2nc_file(data_cube=data_cube,picasso_config_dict=picasso_config_dict,prod_ls=["att_bsc","vol_depol","NR_att_bsc"])
 exit()
 
