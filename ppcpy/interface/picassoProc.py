@@ -451,6 +451,8 @@ class PicassoProc:
         logging.info('overlap Correction')
         if self.polly_config_dict['overlapCorMode'] == 1:
             logging.info('overlapCorMode 1 -> need file for overlapfunction')
+            if not 'overlap' in self.retrievals_profile:
+                self.retrievals_profile['overlap'] = {}
             self.retrievals_profile['overlap']['file'] = overlapEst.load(self)
         self.retrievals_highres['overlap2d'] = overlapCor.spread(self)
         ret = overlapCor.apply_cube(self)
