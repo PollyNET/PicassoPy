@@ -41,7 +41,7 @@ def loadGHK(data_cube):
     #print(TR[flag_532_total_FR])
     #print(TR[flag_532_cross_FR])
     #if data_cube.polly_config_dict['H'][0] == -999:
-    if True:
+    if (np.all(np.isclose(H, -999))):
         print('H is empty -> calculate parameters')
 
         K[data_cube.flag_355_total_FR] = 1.0
@@ -67,8 +67,6 @@ def loadGHK(data_cube):
     print('G', G)
     print('H', H)
     print('K', K)
-
-    
     data_cube.polly_config_dict['TR'] = TR
     data_cube.polly_config_dict['G'] = G
     data_cube.polly_config_dict['H'] = H
