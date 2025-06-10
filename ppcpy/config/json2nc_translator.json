@@ -1,0 +1,695 @@
+
+{ 
+  "profiles": {
+              "variables": {
+                            "aerBsc_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_aerBsc_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "aerBsc_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_aerBsc_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "aerBsc_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_aerBsc_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "aerBsc_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_aerBsc_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "aerBsc_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_aerBsc_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "aerBsc_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_aerBsc_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "volDepol_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"vdr",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_volDepol_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "volDepol_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"vdr",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_volDepol_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "volDepol_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"vdr",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_volDepol_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "volDepol_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"vdr",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_volDepol_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "volDepol_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"vdr",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_volDepol_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "volDepol_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"vdr",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_volDepol_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "parDepol_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"pdr",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_parDepol_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "parDepol_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"pdr",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_parDepol_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "parDepol_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"pdr",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_parDepol_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "parDepol_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"pdr",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_parDepol_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "parDepol_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"pdr",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_parDepol_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "parDepol_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"pdr",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_parDepol_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "aerExt_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"aerExt",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_aerExt_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"aerExtStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "aerExt_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"aerExt",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_aerExt_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"aerExtStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "aerExt_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"aerExt",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_aerExt_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"aerExtStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "aerLR_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"LR",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_aerLR_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"LRStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "aerLR_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"LR",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_aerLR_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"LRStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "aerLR_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"LR",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_aerLR_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"LRStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "AE_Bsc_raman_355_532": {
+                                                 "method":"raman",
+                                                 "parameter":"AE_Bsc_355_532",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_AE_Bsc_raman_355_532": {
+                                                 "method":"raman",
+                                                 "parameter":"AEStd_Bsc_355_532",
+                                                 "channel":"355_total_FR"
+                            },
+                            "AE_Bsc_raman_532_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"AE_Bsc_532_1064",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_AE_Bsc_raman_532_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"AEStd_Bsc_532_1064",
+                                                 "channel":"532_total_FR"
+                            },
+                            "AE_Ext_raman_355_532": {
+                                                 "method":"raman",
+                                                 "parameter":"AE_Ext_355_532",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_AE_Ext_raman_355_532": {
+                                                 "method":"raman",
+                                                 "parameter":"AEStd_Ext_355_532",
+                                                 "channel":"355_total_FR"
+                            }
+              }
+  },
+  "NR_profiles": {
+              "variables": {
+                            "aerBsc_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"355_total_NR"
+                            },
+                            "uncertainty_aerBsc_klett_355": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"355_total_NR"
+                            },
+                            "aerBsc_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"532_total_NR"
+                            },
+                            "uncertainty_aerBsc_klett_532": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"532_total_NR"
+                            },
+                            "aerBsc_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"1064_total_NR"
+                            },
+                            "uncertainty_aerBsc_klett_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"1064_total_NR"
+                            },
+                            "aerBsc_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"355_total_NR"
+                            },
+                            "uncertainty_aerBsc_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"355_total_NR"
+                            },
+                            "aerBsc_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"532_total_NR"
+                            },
+                            "uncertainty_aerBsc_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"532_total_NR"
+                            },
+                            "aerBsc_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"1064_total_NR"
+                            },
+                            "uncertainty_aerBsc_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"1064_total_NR"
+                            },
+                            "aerExt_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"aerExt",
+                                                 "channel":"355_total_NR"
+                            },
+                            "uncertainty_aerExt_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"aerExtStd",
+                                                 "channel":"355_total_NR"
+                            },
+                            "aerExt_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"aerExt",
+                                                 "channel":"532_total_NR"
+                            },
+                            "uncertainty_aerExt_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"aerExtStd",
+                                                 "channel":"532_total_NR"
+                            },
+                            "aerExt_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"aerExt",
+                                                 "channel":"1064_total_NR"
+                            },
+                            "uncertainty_aerExt_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"aerExtStd",
+                                                 "channel":"1064_total_NR"
+                            },
+                            "aerLR_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"LR",
+                                                 "channel":"355_total_NR"
+                            },
+                            "uncertainty_aerLR_raman_355": {
+                                                 "method":"raman",
+                                                 "parameter":"LRStd",
+                                                 "channel":"355_total_NR"
+                            },
+                            "aerLR_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"LR",
+                                                 "channel":"532_total_NR"
+                            },
+                            "uncertainty_aerLR_raman_532": {
+                                                 "method":"raman",
+                                                 "parameter":"LRStd",
+                                                 "channel":"532_total_NR"
+                            },
+                            "aerLR_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"LR",
+                                                 "channel":"1064_total_NR"
+                            },
+                            "uncertainty_aerLR_raman_1064": {
+                                                 "method":"raman",
+                                                 "parameter":"LRStd",
+                                                 "channel":"1064_total_NR"
+                            },
+                            "AE_Bsc_raman_355_532": {
+                                                 "method":"raman",
+                                                 "parameter":"AE_Bsc_355_532",
+                                                 "channel":"355_total_NR"
+                            },
+                            "uncertainty_AE_Bsc_raman_355_532": {
+                                                 "method":"raman",
+                                                 "parameter":"AEStd_Bsc_355_532",
+                                                 "channel":"355_total_NR"
+                            },
+                            "AE_Ext_raman_355_532": {
+                                                 "method":"raman",
+                                                 "parameter":"AE_Ext_355_532",
+                                                 "channel":"355_total_NR"
+                            },
+                            "uncertainty_AE_Ext_raman_355_532": {
+                                                 "method":"raman",
+                                                 "parameter":"AEStd_Ext_355_532",
+                                                 "channel":"355_total_NR"
+                            }
+              }
+  },
+  "OC_profiles": {
+              "variables": {
+                            "aerBsc_klett_355": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_aerBsc_klett_355": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "aerBsc_klett_532": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_aerBsc_klett_532": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "aerBsc_klett_1064": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_aerBsc_klett_1064": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "aerBsc_raman_355": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_aerBsc_raman_355": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "aerBsc_raman_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_aerBsc_raman_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "aerBsc_raman_1064": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"aerBsc",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_aerBsc_raman_1064": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"aerBscStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "volDepol_klett_355": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"vdr",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_volDepol_klett_355": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "volDepol_klett_532": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"vdr",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_volDepol_klett_532": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "volDepol_klett_1064": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"vdr",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_volDepol_klett_1064": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "volDepol_raman_355": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"vdr",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_volDepol_raman_355": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "volDepol_raman_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"vdr",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_volDepol_raman_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "volDepol_raman_1064": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"vdr",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_volDepol_raman_1064": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"vdrStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "parDepol_klett_355": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"pdr",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_parDepol_klett_355": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "parDepol_klett_532": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"pdr",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_parDepol_klett_532": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "parDepol_klett_1064": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"pdr",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_parDepol_klett_1064": {
+                                                 "method":"klett_OC",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "parDepol_raman_355": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"pdr",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_parDepol_raman_355": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "parDepol_raman_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"pdr",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_parDepol_raman_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "parDepol_raman_1064": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"pdr",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_parDepol_raman_1064": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"pdrStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "aerExt_raman_355": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"aerExt",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_aerExt_raman_355": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"aerExtStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "aerExt_raman_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"aerExt",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_aerExt_raman_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"aerExtStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "aerExt_raman_1064": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"aerExt",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_aerExt_raman_1064": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"aerExtStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "aerLR_raman_355": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"LR",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_aerLR_raman_355": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"LRStd",
+                                                 "channel":"355_total_FR"
+                            },
+                            "aerLR_raman_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"LR",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_aerLR_raman_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"LRStd",
+                                                 "channel":"532_total_FR"
+                            },
+                            "aerLR_raman_1064": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"LR",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "uncertainty_aerLR_raman_1064": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"LRStd",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "AE_Bsc_raman_355_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"AE_Bsc_355_532",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_AE_Bsc_raman_355_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"AEStd_Bsc_355_532",
+                                                 "channel":"355_total_FR"
+                            },
+                            "AE_Bsc_raman_532_1064": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"AE_Bsc_532_1064",
+                                                 "channel":"532_total_FR"
+                            },
+                            "uncertainty_AE_Bsc_raman_532_1064": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"AEStd_Bsc_532_1064",
+                                                 "channel":"532_total_FR"
+                            },
+                            "AE_Ext_raman_355_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"AE_Ext_355_532",
+                                                 "channel":"355_total_FR"
+                            },
+                            "uncertainty_AE_Ext_raman_355_532": {
+                                                 "method":"raman_OC",
+                                                 "parameter":"AEStd_Ext_355_532",
+                                                 "channel":"355_total_FR"
+                            }
+              }
+  }
+}

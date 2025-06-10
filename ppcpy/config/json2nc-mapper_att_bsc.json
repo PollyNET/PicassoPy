@@ -20,11 +20,9 @@
     "time": 0
   },
   "variables": {
-    "alt": {
+    "altitude": {
       "dtype": "f4",
-      "shape": [
-        "height"
-      ],
+      "shape": [],
       "data": null,
       "attributes": {
         "unit": "m",
