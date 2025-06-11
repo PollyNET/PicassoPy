@@ -8,7 +8,7 @@
     "source": "polly_device_name",
     "version": "picasso_version",
     "reference": "https://polly.tropos.de/",
-    "contact": "",
+    "contact": "baars@tropos.de",
     "PicassoConfig_Info": "",
     "PollyConfig_Info": "",
     "CampaignConfig_Info": "",
@@ -89,7 +89,7 @@
         "calendar": "julian"
       }
     },
-    "volume_depolarization_ratio_355nm": {
+    "attenuated_backscatter_355nm": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -98,17 +98,17 @@
       "data": null,
       "_FillValue": -999999999,
       "attributes": {
-        "unit": "a.u.",
-        "unit_html": "a.u.",
-        "long_name": "volume depolarization ratio at 355 nm",
-        "standard_name": "voldepol_532",
-        "plot_range": "0.0, 0.3",
+        "unit": "sr^-1 m^-1",
+        "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
+        "long_name": "overlap corrected attenuated backscatter at 355 nm",
+        "standard_name": "att_beta_355nm",
+        "plot_range": "0.0, 2.0e-05",
         "plot_scale": "linear",
-	"eta": "",
-        "comment": "The depolarization ratio was calibrated with \\Delta 90\\circ method."
+	"Lidar_calibration_constant_used": "",
+        "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
       }
     },
-    "volume_depolarization_ratio_532nm": {
+    "attenuated_backscatter_532nm": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -117,17 +117,17 @@
       "data": null,
       "_FillValue": -999999999,
       "attributes": {
-        "unit": "a.u.",
-        "unit_html": "a.u.",
-        "long_name": "volume depolarization ratio at 532 nm",
-        "standard_name": "voldepol_532",
-        "plot_range": "0.0, 0.3",
+        "unit": "sr^-1 m^-1",
+        "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
+        "long_name": "overlap corrected attenuated backscatter at 532 nm",
+        "standard_name": "att_beta_532nm",
+        "plot_range": "0.0, 2.0e-05",
         "plot_scale": "linear",
-	"eta": "",
-        "comment": "The depolarization ratio was calibrated with \\Delta 90\\circ method."
+	"Lidar_calibration_constant_used": "",
+        "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
       }
     },
-    "volume_depolarization_ratio_1064nm": {
+    "attenuated_backscatter_1064nm": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -136,14 +136,14 @@
       "data": null,
       "_FillValue": -999999999,
       "attributes": {
-        "unit": "a.u.",
-        "unit_html": "a.u.",
-        "long_name": "volume depolarization ratio at 1064 nm",
-        "standard_name": "voldepol_1064",
-        "plot_range": "0.0, 0.3",
+        "unit": "sr^-1 m^-1",
+        "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
+        "long_name": "overlap corrected attenuated backscatter at 1064 nm",
+        "standard_name": "att_beta_532nm",
+        "plot_range": "0.0, 1.5.e-05",
         "plot_scale": "linear",
-	"eta": "",
-        "comment": "The depolarization ratio was calibrated with \\Delta 90\\circ method."
+	"Lidar_calibration_constant_used": "",
+        "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
       }
     }
   }

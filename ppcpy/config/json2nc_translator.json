@@ -728,5 +728,71 @@
                                                  "parameter":"flag_1064_total_FR"
 			    }
 		}
+  },
+  "NR_att_bsc": {
+              "variables": {
+		            "time": {
+				    "parameter":"time"
+			    },
+		            "height": {
+				    "parameter":"height"
+			    },
+                            "attenuated_backscatter_355nm": {
+                                                 "parameter":"attBsc_355_total_NR"
+                            },
+                            "attenuated_backscatter_532nm": {
+                                                 "parameter":"attBsc_532_total_NR"
+                            },
+                            "SNR_355nm": {
+                                                 "parameter":"SNR_NR_total_355nm"
+                            },
+                            "SNR_532nm": {
+                                                 "parameter":"SNR_NR_total_532nm"
+                            },
+			    "quality_mask_355nm": {
+                                                 "parameter":"flag_355_total_NR"
+			    },
+			    "quality_mask_532nm": {
+                                                 "parameter":"flag_532_total_NR"
+			    }
+		}
+  },
+  "OC_att_bsc": {
+              "variables": {
+		            "time": {
+				    "parameter":"time"
+			    },
+		            "height": {
+				    "parameter":"height"
+			    },
+                            "attenuated_backscatter_355nm": {
+                                                 "parameter":"attBsc_355_total_OC"
+                            },
+                            "attenuated_backscatter_532nm": {
+                                                 "parameter":"attBsc_532_total_OC"
+                            },
+                            "attenuated_backscatter_1064nm": {
+                                                 "parameter":"attBsc_1064_total_OC"
+                            }
+		}
+  },
+  "vol_depol": {
+              "variables": {
+		            "time": {
+				    "parameter":"time"
+			    },
+		            "height": {
+				    "parameter":"height"
+			    },
+                            "volume_depolarization_ratio_355nm": {
+                                                 "parameter":"voldepol_355_total_FR"
+                            },
+                            "volume_depolarization_ratio_532nm": {
+                                                 "parameter":"voldepol_532_total_FR"
+                            },
+                            "volume_depolarization_ratio_1064nm": {
+                                                 "parameter":"voldepol_1064_total_FR"
+                            }
+	      }
   }
 }

@@ -127,7 +127,12 @@ def write2nc_file(data_cube,root_dir=root_dir, prod_ls=[]):
                 if "eta" in json_nc_mapping_dict['variables'][var]['attributes'].keys():
                     wv = re.search(r'_([0-9]{3,4})_', parameter).group(1)
                     json_nc_mapping_dict['variables'][var]['attributes']['eta'] = data_cube.pol_cali[int(wv)]['eta_best']
+                    json_nc_mapping_dict['variables'][var]['attributes']['comment'] += f" (eta: {data_cube.pol_cali[int(wv)]['eta_best']})"
                 if "Lidar_calibration_constant_used" in json_nc_mapping_dict['variables'][var]['attributes'].keys():
+                    if "OC" in parameter:
+                        parameter = parameter.replace("OC", "FR")
+                    else:
+                        pass
                     LC_used_key = parameter.split("attBsc_")[-1]
                     json_nc_mapping_dict['variables'][var]['attributes']['Lidar_calibration_constant_used'] = data_cube.LCused[LC_used_key]
             

@@ -102,7 +102,7 @@
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
         "long_name": "attenuated backscatter at 355 nm",
         "standard_name": "att_beta_355nm",
-        "plot_range": "0., 1.5e-05",
+        "plot_range": "0.0, 2.0e-05",
         "plot_scale": "linear",
 	"Lidar_calibration_constant_used": "",
         "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
@@ -121,7 +121,7 @@
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
         "long_name": "attenuated backscatter at 532 nm",
         "standard_name": "att_beta_532nm",
-        "plot_range": "0., 5.e-06",
+        "plot_range": "0.0, 2.0e-05",
         "plot_scale": "linear",
 	"Lidar_calibration_constant_used": "",
         "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
@@ -140,7 +140,7 @@
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
         "long_name": "attenuated backscatter at 1064 nm",
         "standard_name": "att_beta_1064nm",
-        "plot_range": "0., 2.e-06",
+        "plot_range": "0.0, 1.5e-05",
         "plot_scale": "linear",
 	"Lidar_calibration_constant_used": "",
         "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
