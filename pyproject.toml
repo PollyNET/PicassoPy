@@ -31,6 +31,7 @@ dependencies = [
   "xarray",
   "pandas",
   "openpyxl", # might be an optional dependency
+  "GitPython",
 ]
 
 [tool.setuptools.packages]
