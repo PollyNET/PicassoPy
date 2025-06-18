@@ -8,7 +8,7 @@
     "source": "polly_device_name",
     "version": "picasso_version",
     "reference": "https://polly.tropos.de/",
-    "contact": "",
+    "contact": "baars@tropos.de",
     "PicassoConfig_Info": "",
     "PollyConfig_Info": "",
     "CampaignConfig_Info": "",
@@ -89,7 +89,7 @@
         "calendar": "julian"
       }
     },
-    "attBsc_355_total_FR": {
+    "attenuated_backscatter_355nm": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -102,13 +102,13 @@
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
         "long_name": "attenuated backscatter at 355 nm",
         "standard_name": "att_beta_355nm",
-        "plot_range": "0., 1.5e-05",
+        "plot_range": "0.0, 2.0e-05",
         "plot_scale": "linear",
 	"Lidar_calibration_constant_used": "",
         "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
       }
     },
-    "attBsc_532_total_FR": {
+    "attenuated_backscatter_532nm": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -121,13 +121,13 @@
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
         "long_name": "attenuated backscatter at 532 nm",
         "standard_name": "att_beta_532nm",
-        "plot_range": "0., 5.e-06",
+        "plot_range": "0.0, 2.0e-05",
         "plot_scale": "linear",
 	"Lidar_calibration_constant_used": "",
         "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
       }
     },
-    "attBsc_1064_total_FR": {
+    "attenuated_backscatter_1064nm": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -140,10 +140,100 @@
         "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
         "long_name": "attenuated backscatter at 1064 nm",
         "standard_name": "att_beta_1064nm",
-        "plot_range": "0., 2.e-06",
+        "plot_range": "0.0, 1.5e-05",
         "plot_scale": "linear",
 	"Lidar_calibration_constant_used": "",
         "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
+      }
+    },
+    "quality_mask_355nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "quality mask for attenuated backscatter at 355 nm",
+        "standard_name": "quality_mask_355",
+        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 355 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog)"
+      }
+    },
+    "quality_mask_532nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "quality mask for attenuated backscatter at 532 nm",
+        "standard_name": "quality_mask_532",
+        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 532 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog)"
+      }
+    },
+    "quality_mask_1064nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "quality mask for attenuated backscatter at 1064 nm",
+        "standard_name": "quality_mask_1064",
+        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 1064 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog)"
+      }
+    },
+    "SNR_355nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "SNR at 355 nm",
+        "standard_name": "signal-noise-ratio 355 nm",
+        "comment": ""
+      }
+    },
+    "SNR_532nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "SNR at 532 nm",
+        "standard_name": "signal-noise-ratio 532 nm",
+        "comment": ""
+      }
+    },
+    "SNR_1064nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "SNR at 1064 nm",
+        "standard_name": "signal-noise-ratio 1064 nm",
+        "comment": ""
       }
     }
   }

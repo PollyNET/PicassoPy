@@ -14,7 +14,7 @@ import ppcpy.interface.picassoProc as picassoProc
 import ppcpy.misc.helper as helper
 import ppcpy.misc.startscreen as startscreen
 #import ppcpy.misc.json2nc_mapping as json2nc_mapping
-from ppcpy.io.write2nc import write2nc_file
+from ppcpy.io.write2nc import write_channelwise_2_nc_file, write2nc_file, write_profile2nc_file
 from ppcpy._version import __version__
 
 ## getting root dir of PicassoPy
@@ -148,7 +148,7 @@ data_cube.preprocessing()
 #print(data_cube.rawdata_dict.keys())
 #print(data_cube.retrievals_highres.keys())
 
-write2nc_file(data_cube=data_cube,prod_ls=["SNR","BG","RCS"])
+write_channelwise_2_nc_file(data_cube=data_cube,prod_ls=["SNR","BG","RCS"])
 
 data_cube.SaturationDetect()
 
@@ -222,8 +222,10 @@ data_cube.attBsc_volDepol()
 
 data_cube.molecularHighres()
 
+data_cube.estQualityMask()
+
 ## saving high-resolution retrievals
-write2nc_file(data_cube=data_cube,picasso_config_dict=picasso_config_dict,prod_ls=["att_bsc","vol_depol","NR_att_bsc"])
+write2nc_file(data_cube=data_cube,prod_ls=["att_bsc","NR_att_bsc","OC_att_bsc","vol_depol"])
 exit()
 
 data_cube.quasiV1()
