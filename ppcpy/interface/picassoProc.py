@@ -541,7 +541,7 @@ class PicassoProc:
         quasi.quasi_angstrom(self, version='V2')
         quasi.target_cat(self, version='V2')
 
-    def write_2_sql_db(self,db_path,parameter,method):
+    def write_2_sql_db(self,db_path,parameter,method=None):
         """ write LC or eta to sqlite db table
         parameters:
         - parameter (str): can be LC (Lidar-calibration-constant) or DC (Depol-calibration-constant)
@@ -552,14 +552,14 @@ class PicassoProc:
         if parameter == 'LC':
             table_name = 'lidar_calibration_constant'
             column_names = ['cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
-            rows_to_insert = sql_db.prepare_for_sql_db_writing(self,'raman')
         elif parameter == 'DC':
             table_name = 'depol_calibration_constant'
-            #column_names = ['cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
-            #rows_to_insert = sql_db.prepare_for_sql_db_writing(self,'raman')
+            column_names = ['cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'wavelength', 'nc_zip_file', 'polly_type']
 
         logging.info(f'writing to sqlite-db: {db_path}')
         logging.info(f'writing {parameter} to table: {table_name}')
+        
+        rows_to_insert = sql_db.prepare_for_sql_db_writing(self,parameter,method)
 
         sql_db.write_rows_to_sql_db(db_path, table_name, column_names, rows_to_insert)
 

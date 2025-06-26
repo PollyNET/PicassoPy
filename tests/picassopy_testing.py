@@ -221,6 +221,7 @@ data_cube.LidarCalibration()
 db_path="C:\_data\Picasso_IO\pollyxt_cpv_calibration_v3.db"
 
 data_cube.write_2_sql_db(db_path=str(db_path),parameter='LC',method='Raman')
+data_cube.write_2_sql_db(db_path=str(db_path),parameter='DC')
 
 ## saving profiles
 write_profile2nc_file(data_cube=data_cube, prod_ls=["profiles","NR_profiles","OC_profiles"])

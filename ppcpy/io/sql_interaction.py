@@ -51,12 +51,13 @@ def get_LC_from_sql_db(db_path,table_name,wavelength,method,telescope,timestamp)
     conn.close()
     return LC
 
-def prepare_for_sql_db_writing(data_cube,method):
+def prepare_for_sql_db_writing(data_cube,parameter,method=None):
     """
     Collect all necessary variable and save it to a list of tuples for inserting into a SQLite table.
 
     Parameters:
-    - data_cube (object):
+    - data_cube (object)
+    - parameter (str): LC or DC
     - method (str): klett or raman
     Output:
     - rows_to_insert (list of tuples)
@@ -68,20 +69,31 @@ def prepare_for_sql_db_writing(data_cube,method):
     elif method == 'klett':
         method_db = 'Klett_Method'
 
-    for n in range(0,len(data_cube.clFreeGrps)):
-        starttime = data_cube.retrievals_highres['time64'][data_cube.clFreeGrps[n][0]]
-        stoptime = data_cube.retrievals_highres['time64'][data_cube.clFreeGrps[n][1]]
-        start = starttime.astype('datetime64[ms]').item().strftime("%Y-%m-%d %H:%M:%S")
-        stop = stoptime.astype('datetime64[ms]').item().strftime("%Y-%m-%d %H:%M:%S")
-        for ch in data_cube.LC[method][n].keys():
-            wv,pol,tel =  helper.get_wv_pol_telescope_from_dictkeyname(ch)
-            if tel == 'FR':
-                tel_db = 'far_range'
-            elif tel == 'NR':
-                tel_db = 'near_range'
-            LC = data_cube.LC[method][n][ch]['LC']
-            LCStd = data_cube.LC[method][n][ch]['LCStd']
-            rows_to_insert.append((str(start),str(stop),float(LC),float(LCStd),wv,str(data_cube.rawfile),data_cube.device,method_db,tel_db))
+    if parameter == 'LC':
+        for n in range(0,len(data_cube.clFreeGrps)):
+            starttime = data_cube.retrievals_highres['time64'][data_cube.clFreeGrps[n][0]]
+            stoptime = data_cube.retrievals_highres['time64'][data_cube.clFreeGrps[n][1]]
+            start = starttime.astype('datetime64[ms]').item().strftime("%Y-%m-%d %H:%M:%S")
+            stop = stoptime.astype('datetime64[ms]').item().strftime("%Y-%m-%d %H:%M:%S")
+            for ch in data_cube.LC[method][n].keys():
+                wv,pol,tel =  helper.get_wv_pol_telescope_from_dictkeyname(ch)
+                if tel == 'FR':
+                    tel_db = 'far_range'
+                elif tel == 'NR':
+                    tel_db = 'near_range'
+                LC = data_cube.LC[method][n][ch]['LC']
+                LCStd = data_cube.LC[method][n][ch]['LCStd']
+                rows_to_insert.append((str(start),str(stop),float(LC),float(LCStd),wv,str(data_cube.rawfile),data_cube.device,method_db,tel_db))
+    elif parameter == 'DC':
+        for ch in data_cube.pol_cali.keys():
+            wv = ch
+            eta = data_cube.pol_cali[ch]['eta'][0]
+            eta_std = data_cube.pol_cali[ch]['eta_std'][0]
+            start_unix = data_cube.pol_cali[ch]['time_start'][0]
+            stop_unix = data_cube.pol_cali[ch]['time_end'][0]
+            start = datetime.utcfromtimestamp(start_unix).strftime("%Y-%m-%d %H:%M:%S")
+            stop = datetime.utcfromtimestamp(stop_unix).strftime("%Y-%m-%d %H:%M:%S")
+            rows_to_insert.append((str(start),str(stop),float(eta),float(eta_std),wv,str(data_cube.rawfile),data_cube.device))
     return rows_to_insert
 
 def write_rows_to_sql_db(db_path, table_name, column_names, rows_to_insert):
