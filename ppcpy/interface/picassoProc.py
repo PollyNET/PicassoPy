@@ -30,11 +30,14 @@ import ppcpy.retrievals.quasiV1 as quasiV1
 import ppcpy.retrievals.quasiV2 as quasiV2
 import ppcpy.retrievals.quasi as quasi
 
+import ppcpy.io.sql_interaction as sql_db
+
 class PicassoProc:
     counter = 0
 
-    def __init__(self, rawdata_dict, polly_config_dict, picasso_config_dict, polly_default_dict):
+    def __init__(self, rawdata_dict, polly_config_dict, picasso_config_dict, polly_default_dict,rawfile):
         type(self).counter += 1
+        self.rawfile = rawfile
         self.rawdata_dict = rawdata_dict
         self.polly_config_dict = polly_config_dict
         self.picasso_config_dict = picasso_config_dict
@@ -537,6 +540,29 @@ class PicassoProc:
         quasi.quasi_pdr(self, version='V2')
         quasi.quasi_angstrom(self, version='V2')
         quasi.target_cat(self, version='V2')
+
+    def write_2_sql_db(self,db_path,parameter,method):
+        """ write LC or eta to sqlite db table
+        parameters:
+        - parameter (str): can be LC (Lidar-calibration-constant) or DC (Depol-calibration-constant)
+        - method (str): 'raman' or 'klett'
+        - db_path (str): location of the sqlite db-file
+
+        """
+        if parameter == 'LC':
+            table_name = 'lidar_calibration_constant'
+            column_names = ['cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
+            rows_to_insert = sql_db.prepare_for_sql_db_writing(self,'raman')
+        elif parameter == 'DC':
+            table_name = 'depol_calibration_constant'
+            #column_names = ['cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
+            #rows_to_insert = sql_db.prepare_for_sql_db_writing(self,'raman')
+
+        logging.info(f'writing to sqlite-db: {db_path}')
+        logging.info(f'writing {parameter} to table: {table_name}')
+
+        sql_db.write_rows_to_sql_db(db_path, table_name, column_names, rows_to_insert)
+
 
 
 #    def __str__(self):

@@ -121,7 +121,7 @@ else:
 rawdata_dict = readPollyRawData.readPollyRawData(filename=rawfile)
 
 ## initate picasso-object from class PicassoProc
-data_cube = picassoProc.PicassoProc(rawdata_dict,polly_config_dict,picasso_config_dict, polly_default_dict)
+data_cube = picassoProc.PicassoProc(rawdata_dict,polly_config_dict,picasso_config_dict, polly_default_dict,rawfile)
 
 #print(data_cube.device)
 #print(data_cube.location)
@@ -215,6 +215,13 @@ data_cube.LidarCalibration()
 # gives also
 # data_cube.LCused
 
+## write to sqlite-db
+#base_dir = Path(data_cube.picasso_config_dict['results_folder'])
+#db_path = base_dir.joinpath(polly_device,polly_config_dict['calibrationDB'])
+db_path="C:\_data\Picasso_IO\pollyxt_cpv_calibration_v3.db"
+
+data_cube.write_2_sql_db(db_path=str(db_path),parameter='LC',method='Raman')
+
 ## saving profiles
 write_profile2nc_file(data_cube=data_cube, prod_ls=["profiles","NR_profiles","OC_profiles"])
 
@@ -226,6 +233,8 @@ data_cube.estQualityMask()
 
 ## saving high-resolution retrievals
 write2nc_file(data_cube=data_cube,prod_ls=["att_bsc","NR_att_bsc","OC_att_bsc","vol_depol"])
+
+
 exit()
 
 data_cube.quasiV1()

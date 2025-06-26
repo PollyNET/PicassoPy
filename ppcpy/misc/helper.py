@@ -765,4 +765,17 @@ def smooth2a(matrix_in, Nr, Nc=None):
 
     return matrix_out
 
+def get_wv_pol_telescope_from_dictkeyname(keyname):
+    """
+    translate `{wavelength}_{total|cross|parallel|rr}_{NR|FR|DFOV}` to wavelength,polarisation,telescope separataly.
+
+    Parameters:
+    - keyname (str): e.g.: 532_total_FR.
+    Output:
+    - wavelength,polarisation,telescope
+    """
+    wv = re.split(r'_',keyname)[0]
+    pol = re.split(r'_',keyname)[1]
+    tel = re.split(r'_',keyname)[2]
+    return wv,pol,tel
 
