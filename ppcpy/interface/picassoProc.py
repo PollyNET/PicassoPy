@@ -167,6 +167,34 @@ class PicassoProc:
             pass
 
     def setChannelTags(self):
+        """set the channel tags
+
+        they are stored as dictionary in
+        ```
+        data_cube.channel_dict
+        ```
+
+        and as list in 
+        ```
+        data_cube.retrievals_highres['channel']
+        data_cube.polly_config_dict['channelTags']
+        ```
+
+        as an array of boolean flags in
+        ```
+        data_cube.flags
+        ```
+
+        as flags per channel in 
+        ```
+        data_cube.flag_355_total_FR
+        ```
+
+        Returns
+        -------
+        self
+        
+        """
         ChannelTags = pollyChannelTags.pollyChannelTags(self.polly_config_dict['channelTag'],flagFarRangeChannel=self.polly_config_dict['isFR'], ##TODO key: channelTags vs channelTag???
                                                                                flagNearRangeChannel=self.polly_config_dict['isNR'],
                                                                                flagRotRamanChannel=self.polly_config_dict['isRR'],
@@ -409,7 +437,7 @@ class PicassoProc:
             self.retrievals_profile['avail_optical_profiles'].append(retrievalname)
 
 
-    def retrievalRaman(self, oc=False, nr=False):
+    def retrievalRaman(self, oc=False, nr=False, collect_debug=False):
         """
         """
 
@@ -426,6 +454,7 @@ class PicassoProc:
                  cF in self.clFreeGrps]
         if nr:
             kwargs['nr'] = True
+        kwargs['collect_debug'] = collect_debug
 
         self.retrievals_profile[retrievalname] = \
             raman.run_cldFreeGrps(self, **kwargs)

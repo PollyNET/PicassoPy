@@ -464,11 +464,11 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
     MM = int(date_string[4:6])
     DD = int(date_string[6:8])
     datetime_obj = datetime.datetime(YYYY,MM,DD)
-    mTime_obj = [datetime_obj + datetime.timedelta(seconds=int(s)) for s in seconds_of_day]
+    mTime_obj = [
+        datetime_obj.replace(tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=int(s)) for s in seconds_of_day]
     mTime_str = [dt.strftime('%Y%m%d %H:%M:%S') for dt in mTime_obj]
     # Convert to Unix timestamp
-    mTime_unixtimestamp = [int(time.mktime(dt.timetuple())) for dt in mTime_obj]
-
+    mTime_unixtimestamp = [int(datetime.datetime.timestamp(dt)) for dt in mTime_obj]
 
     ## Defining default values for param keys (key initialization), if not explictly defined when calling the function
     deltaT = param.get('deltaT', 30)
