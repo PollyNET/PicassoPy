@@ -96,6 +96,21 @@ def prepare_for_sql_db_writing(data_cube,parameter,method=None):
             rows_to_insert.append((str(start),str(stop),float(eta),float(eta_std),wv,str(data_cube.rawfile),data_cube.device))
     return rows_to_insert
 
+def setup_empty(db_path, table_name, column_names, data_types):
+    """
+    """
+
+    column_names = ['id'] + column_names
+    data_types = ['INTEGER PRIMARY KEY'] + data_types
+    columns = ', '.join([f"{c} {d}" for c, d in zip(column_names, data_types)])
+    sql = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns}) "
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        conn.commit()
+    conn.close()
+
+
 def write_rows_to_sql_db(db_path, table_name, column_names, rows_to_insert):
     """
     Insert multiple rows into a SQLite table.
@@ -113,6 +128,7 @@ def write_rows_to_sql_db(db_path, table_name, column_names, rows_to_insert):
     ## IGNORE means: skipping rows with
     ## identical entries for 'cali_start_time' & 'cali_stop_time' & 'wavelength' & 
     ## 'polly_type' & 'cali_method' & 'telescope' which are already in the db
+    # MR: not sure if newer values should be actually overwritten
 
     try:
         with sqlite3.connect(db_path) as conn:

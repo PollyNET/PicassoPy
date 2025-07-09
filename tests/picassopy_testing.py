@@ -121,7 +121,7 @@ else:
 rawdata_dict = readPollyRawData.readPollyRawData(filename=rawfile)
 
 ## initate picasso-object from class PicassoProc
-data_cube = picassoProc.PicassoProc(rawdata_dict,polly_config_dict,picasso_config_dict, polly_default_dict,rawfile)
+data_cube = picassoProc.PicassoProc(rawdata_dict,polly_config_dict,picasso_config_dict, polly_default_dict)
 
 #print(data_cube.device)
 #print(data_cube.location)
