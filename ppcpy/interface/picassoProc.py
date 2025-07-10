@@ -30,11 +30,29 @@ import ppcpy.retrievals.quasiV1 as quasiV1
 import ppcpy.retrievals.quasiV2 as quasiV2
 import ppcpy.retrievals.quasi as quasi
 
+import ppcpy.io.sql_interaction as sql_db
+
 class PicassoProc:
     counter = 0
 
     def __init__(self, rawdata_dict, polly_config_dict, picasso_config_dict, polly_default_dict):
+        """initialize the data_cube
+
+        Parameters
+        ----------
+        rawdata_dict
+            the dict returned by readPollyRawData.readPollyRawData(filename=rawfile)
+        polly_config_dict
+            the configuration specific to the specific polly loadConfigs.loadPollyConfig(polly_config_file_fullname, polly_default_config_file)
+        picasso_config_dict
+            the general picasso config loadConfigs.loadPicassoConfig(args.picasso_config_file,picasso_default_config_file)
+        polly_default_dict
+            default values for some of the retrievals loadConfigs.loadPollyConfig(polly_default_file_fullname, polly_default_global_defaults_file)
+        
+        
+        """
         type(self).counter += 1
+        self.rawfile = rawdata_dict['filename_path']
         self.rawdata_dict = rawdata_dict
         self.polly_config_dict = polly_config_dict
         self.picasso_config_dict = picasso_config_dict
@@ -537,6 +555,32 @@ class PicassoProc:
         quasi.quasi_pdr(self, version='V2')
         quasi.quasi_angstrom(self, version='V2')
         quasi.target_cat(self, version='V2')
+
+    def write_2_sql_db(self,db_path,parameter,method=None):
+        """ write LC or eta to sqlite db table
+        parameters:
+        - parameter (str): can be LC (Lidar-calibration-constant) or DC (Depol-calibration-constant)
+        - method (str): 'raman' or 'klett'
+        - db_path (str): location of the sqlite db-file
+
+        """
+        if parameter == 'LC':
+            table_name = 'lidar_calibration_constant'
+            column_names = ['cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
+            data_types = ['text', 'text', 'real', 'real', 'text', 'text', 'text', 'text', 'text']
+        elif parameter == 'DC':
+            table_name = 'depol_calibration_constant'
+            column_names = ['cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'wavelength', 'nc_zip_file', 'polly_type']
+            data_types = ['text', 'text', 'real', 'real', 'text', 'text', 'text']
+
+        logging.info(f'writing to sqlite-db: {db_path}')
+        logging.info(f'writing {parameter} to table: {table_name}')
+        
+        sql_db.setup_empty(db_path, table_name, column_names, data_types)
+        rows_to_insert = sql_db.prepare_for_sql_db_writing(self,parameter,method)
+
+        sql_db.write_rows_to_sql_db(db_path, table_name, column_names, rows_to_insert)
+
 
 
 #    def __str__(self):

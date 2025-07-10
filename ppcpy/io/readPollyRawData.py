@@ -68,6 +68,7 @@ def readPollyRawData(filename=str) -> dict:
 
     filename_no_path = filename_path.name
     data_dict['filename'] = str(filename_no_path)
+    data_dict['filename_path'] = str(filename_path)
     ## get global attributes from nc-file
     data_dict['global_attributes'] = {}
     for nc_attr in nc_file_ds.ncattrs():
