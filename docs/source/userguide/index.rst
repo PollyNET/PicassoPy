@@ -11,3 +11,5 @@ User Guide
    conventions.rst
    configfiles.rst
    preprocess.rst
+
+   meteodata.rst
