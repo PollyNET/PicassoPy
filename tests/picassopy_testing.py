@@ -81,6 +81,8 @@ polly_default_file = str(polly_config_array['Default file'].to_string(index=Fals
 polly_device = str(polly_config_array['Instrument'].to_string(index=False)).strip()
 polly_location = str(polly_config_array['Location'].to_string(index=False)).strip()
 polly_asl = str(polly_config_array['asl.'].to_string(index=False)).strip()
+polly_latitude = str(polly_config_array['Latitude'].to_string(index=False)).strip()
+polly_longitude = str(polly_config_array['Longitude'].to_string(index=False)).strip()
 polly_default_file = str(polly_config_array['Default file'].to_string(index=False)).strip()
 
 output_path = Path(picasso_config_dict["fileinfo_new"]).parent
@@ -100,6 +102,8 @@ polly_config_dict = loadConfigs.loadPollyConfig(polly_config_file_fullname, poll
 polly_config_dict['name'] = polly_device
 polly_config_dict['site'] = polly_location
 polly_config_dict['asl'] = polly_asl
+polly_config_dict['lat'] = polly_latitude
+polly_config_dict['lon'] = polly_longitude
 polly_default_dict = loadConfigs.loadPollyConfig(polly_default_file_fullname, polly_default_global_defaults_file)
 
 
