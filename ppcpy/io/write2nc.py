@@ -198,7 +198,7 @@ def write_profile2nc_file(data_cube,root_dir=root_dir, prod_ls=[]):
 
                 #print(ch)
 
-                if ch in data_cube.retrievals_profile[method][n].keys():
+                if method in data_cube.retrievals_profile.keys() and ch in data_cube.retrievals_profile[method][n].keys():
                     if parameter in data_cube.retrievals_profile[method][n][ch].keys():
                         json_nc_mapping_dict['variables'][var]['data'] = data_cube.retrievals_profile[method][n][ch][parameter]
                     else:

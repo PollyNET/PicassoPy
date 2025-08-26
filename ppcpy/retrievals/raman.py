@@ -109,7 +109,8 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, 
                         raman_bsc(height, sig, sig_r, aerExt_tmp, config_dict['angstrexp'], 
                               molExt, molBsc, molExt_r, molBsc_r,
                               refH, config_dict[f'refBeta{wv}'], config_dict[f'{key_smooth}{wv}'],
-                              True, wv, wv_r, bg, bg_r, prof['aerExtStd'], sigma_angstroem, MC_count, 'monte-carlo'))      
+                              True, wv, wv_r, bg, bg_r, prof['aerExtStd'], sigma_angstroem, MC_count, 'monte-carlo',
+                              collect_debug=collect_debug))      
                     prof.update(
                         lidarratio(aerExt_tmp, prof['aerBsc'], hRes=hres, 
                                    aerExtStd=prof['aerExtStd'], aerBscStd=prof['aerBscStd'],
@@ -236,7 +237,7 @@ def raman_ext(height, sig, lambda_emit, lambda_Raman,
 def raman_bsc(height, sigElastic, sigVRN2, ext_aer, angstroem, ext_mol, beta_mol, ext_mol_raman,
               beta_mol_inela, HRef, betaRef, window_size=40, flagSmoothBefore=True, el_lambda=None,
               inel_lambda=None, bgElastic=None, bgVRN2=None, sigma_ext_aer=None, sigma_angstroem=None,
-              MC_count=3, method='monte-carlo'):
+              MC_count=3, method='monte-carlo', collect_debug=False):
     """Calculate uncertainty of aerosol backscatter coefficient with Monte-Carlo simulation.
 
     Parameters:
@@ -275,9 +276,10 @@ def raman_bsc(height, sigElastic, sigVRN2, ext_aer, angstroem, ext_mol, beta_mol
         print('Warning: Too large sampling for Monte-Carlo simulation.')
         return np.nan * np.ones_like(sigElastic), None, None
 
-    beta_aer, LR = calc_raman_bsc(height, sigElastic, sigVRN2, ext_aer, angstroem, ext_mol, beta_mol,
-                                  ext_mol_raman, beta_mol_inela, HRef, el_lambda, betaRef, window_size,
-                                  flagSmoothBefore, el_lambda, inel_lambda)
+    beta_aer, LR, ODs, signalratio = calc_raman_bsc(
+        height, sigElastic, sigVRN2, ext_aer, angstroem, ext_mol, beta_mol,
+        ext_mol_raman, beta_mol_inela, HRef, el_lambda, betaRef, window_size,
+        flagSmoothBefore, el_lambda, inel_lambda)
 
     if method.lower() == 'monte-carlo':
         hRefIdx = (height >= HRef[0]) & (height < HRef[1])
@@ -307,7 +309,11 @@ def raman_bsc(height, sigElastic, sigVRN2, ext_aer, angstroem, ext_mol, beta_mol
         aerBscStd = np.full(len(beta_aer), np.nan)
         raise ValueError('Unknown method to estimate the uncertainty.')
 
-    return {'aerBsc': beta_aer, 'aerBscStd': aerBscStd, 'LR': LR}
+    if collect_debug:
+        # [mol_el_OD, mol_vr_OD, aer_el_OD, aer_vr_OD]
+        return {'aerBsc': beta_aer, 'aerBscStd': aerBscStd, 'LR': LR, 'ODs': ODs, 'signalratio': signalratio}
+    else:
+        return {'aerBsc': beta_aer, 'aerBscStd': aerBscStd, 'LR': LR}
 
 
 def calc_raman_bsc(height, sigElastic, sigVRN2, ext_aer, angstroem, ext_mol, beta_mol, ext_mol_raman, beta_mol_inela, 
@@ -367,6 +373,7 @@ def calc_raman_bsc(height, sigElastic, sigVRN2, ext_aer, angstroem, ext_mol, bet
     - 2018-09-04: Changed smoothing order for signal ridge stability.
     - 2024-11-12: Modified by HB for consistency in 2024.
     """
+    ext_aer[~np.isfinite(ext_aer)] = 0
 
     if HRef[0] >= height[-1] or HRef[1] <= height[0]:
         raise ValueError("HRef is out of range.")
@@ -382,10 +389,12 @@ def calc_raman_bsc(height, sigElastic, sigVRN2, ext_aer, angstroem, ext_mol, bet
     ext_aer_raman = ext_aer * ext_aer_factor
 
     # Optical depths
-    mol_el_OD = np.nansum(ext_mol[:refIndx]) * dH - np.cumsum(ext_mol) * dH
-    mol_vr_OD = np.nansum(ext_mol_raman[:refIndx]) * dH - np.cumsum(ext_mol_raman) * dH
-    aer_el_OD = np.nansum(ext_aer[:refIndx]) * dH - np.cumsum(ext_aer) * dH
-    aer_vr_OD = np.nansum(ext_aer_raman[:refIndx]) * dH - np.cumsum(ext_aer_raman) * dH
+    mol_el_OD = np.nansum(ext_mol[:refIndx]) * dH - np.nancumsum(ext_mol) * dH
+    mol_vr_OD = np.nansum(ext_mol_raman[:refIndx]) * dH - np.nancumsum(ext_mol_raman) * dH
+    aer_el_OD = np.nansum(ext_aer[:refIndx]) * dH - np.nancumsum(ext_aer) * dH
+    aer_vr_OD = np.nansum(ext_aer_raman[:refIndx]) * dH - np.nancumsum(ext_aer_raman) * dH
+    #print('aer_el_OD', aer_el_OD[:350])
+    #print('aer_vr_OD', aer_vr_OD[:350])
 
     hIndx = np.zeros(len(height), dtype=bool)
     hIndx[HRefIndx[0]:HRefIndx[1]] = True
@@ -396,30 +405,24 @@ def calc_raman_bsc(height, sigElastic, sigVRN2, ext_aer, angstroem, ext_mol, bet
 
     # Compute aerosol backscatter coefficient
     if not flagSmoothBefore:
-        beta_aer = smoothWin(
-            (
-                (sigElastic / sigVRN2)
-                * (np.nanmean(vrMean) / np.nanmean(elMean))
-                * np.exp(mol_vr_OD - mol_el_OD + aer_vr_OD - aer_el_OD)
-                - 1
-            )
-            * beta_mol,
-            window_size,
-            method="moving",
-        )
-    else:
+        signalratio = (sigElastic / sigVRN2)
         beta_aer = (
-            (
-                smoothWin(sigElastic, window_size, method="moving")
-                / smoothWin(sigVRN2, window_size, method="moving")
-            )
-            * (np.nanmean(vrMean) / np.nanmean(elMean))
-            * np.exp(mol_vr_OD - mol_el_OD + aer_vr_OD - aer_el_OD)
-            - 1
-        ) * beta_mol
-
+            signalratio 
+             * (np.nanmean(vrMean) / np.nanmean(elMean))
+             * np.exp(mol_vr_OD - mol_el_OD + aer_vr_OD - aer_el_OD)
+             - 1) * beta_mol
+        beta_aer[(np.isnan(beta_aer)) | (~np.isfinite(beta_aer))] = 0
+        beta_aer = smoothWin(beta_aer, window_size, method='moving')
+    else:
+        signalratio = (smoothWin(sigElastic, window_size, method="moving")
+                / smoothWin(sigVRN2, window_size, method="moving"))
+        beta_aer = (
+            signalratio
+             * (np.nanmean(vrMean) / np.nanmean(elMean))
+             * np.exp(mol_vr_OD - mol_el_OD + aer_vr_OD - aer_el_OD)
+             - 1) * beta_mol
     LR = ext_aer / beta_aer
-    return beta_aer, LR
+    return beta_aer, LR, [mol_el_OD, mol_vr_OD, aer_el_OD, aer_vr_OD], signalratio
 
 
 def smoothWin(signal, win, method="moving"):

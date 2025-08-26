@@ -7,15 +7,8 @@ def aggregate_clFreeGrps(data_cube, var, func=np.nansum):
 
     """
 
-
-    print('aggregate ', var)
-    print(data_cube.clFreeGrps)
-    
     shp = list(data_cube.retrievals_highres[var].shape)
-    print(shp)
     shp[0] = len(data_cube.clFreeGrps)
-
-    print(shp)
     out = np.empty(shp)
     
     for i, cldFree in enumerate(data_cube.clFreeGrps):

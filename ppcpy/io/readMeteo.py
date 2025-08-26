@@ -133,14 +133,14 @@ class MeteoNcCloudnet:
     def find_path_for_time(self, time):
 
         candidates = glob.glob(self.basepath + "**/*")
-        print('candidates ', candidates)
+        #print('candidates ', candidates)
 
         dt = datetime.datetime.fromtimestamp(time)
         regex = re.compile(self.filepattern.format(dt))
-        print('regex ', regex)
+        #print('regex ', regex)
 
         filename = [s for s in candidates if regex.search(s) ]
-        print('filename ', filename)
+        #print('filename ', filename)
 
         assert len(filename) == 1
 

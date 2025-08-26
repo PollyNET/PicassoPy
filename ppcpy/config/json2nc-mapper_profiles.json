@@ -889,7 +889,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "",
-        "long_name": "Angström Exponent of ratio from 355 nm / 532 nm Backscatter retrieved with Raman method",
+        "long_name": "AngstrÃ¶m Exponent of ratio from 355 nm / 532 nm Backscatter retrieved with Raman method",
         "standard_name": "AE Bsc (355/532)",
         "plot_range": [-1.0, 2.0],
         "plot_scale": "linear",
@@ -905,7 +905,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "",
-        "long_name": "uncertainty of Angström Exponent of ratio from 355 nm / 532 nm Backscatter retrieved with Raman method",
+        "long_name": "uncertainty of AngstrÃ¶m Exponent of ratio from 355 nm / 532 nm Backscatter retrieved with Raman method",
         "standard_name": "Sigma AE Bsc",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -920,7 +920,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "",
-        "long_name": "Angström Exponent of ratio from 532 nm / 1064 nm retrieved Backscatter with Raman method",
+        "long_name": "AngstrÃ¶m Exponent of ratio from 532 nm / 1064 nm retrieved Backscatter with Raman method",
         "standard_name": "AE Bsc (532/1064)",
         "plot_range": [-1.0, 2.0],
         "plot_scale": "linear",
@@ -936,7 +936,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "",
-        "long_name": "uncertainty of Angström Exponent of ratio from 532 nm / 1064 nm Backscatter retrieved with Raman method",
+        "long_name": "uncertainty of AngstrÃ¶m Exponent of ratio from 532 nm / 1064 nm Backscatter retrieved with Raman method",
         "standard_name": "Sigma AE Bsc",
         "plot_scale": "linear",
         "source": "polly_device_name",
@@ -951,7 +951,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "",
-        "long_name": "Angström Exponent of ratio from 355 nm / 532 nm Extinction retrieved with Raman method",
+        "long_name": "AngstrÃ¶m Exponent of ratio from 355 nm / 532 nm Extinction retrieved with Raman method",
         "standard_name": "AE Ext (355/532)",
         "plot_range": [-1.0, 2.0],
         "plot_scale": "linear",
@@ -967,7 +967,7 @@
       "_FillValue": -999,
       "attributes": {
         "unit": "",
-        "long_name": "uncertainty of Angström Exponent of ratio from 355 nm / 532 nm Extinction retrieved with Raman method",
+        "long_name": "uncertainty of AngstrÃ¶m Exponent of ratio from 355 nm / 532 nm Extinction retrieved with Raman method",
         "plot_range": [-1.0, 2.0],
         "plot_scale": "linear",
         "source": "polly_device_name",
