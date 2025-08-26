@@ -96,6 +96,9 @@ def polly_config_channel_corrections(chTagsOut_ls,polly_config_dict):
     nChs_orig = len(chTagsOut_ls)
     # Find indices where "none" is in the list
     none_indices = [i for i, x in enumerate(chTagsOut_ls) if x == "none"]
+    if len(none_indices) > 0:
+        logging.warning(f'removed none tag from channel list {none_indices}')
+
     # Remove all occurrences of "none"
     chTagsOut_ls = [x for x in chTagsOut_ls if x != "none"]
     # remove entries from polly-config of  'none' - channel
