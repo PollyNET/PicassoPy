@@ -1,5 +1,18 @@
 ## PollynetProcessingChain python version
 
+[Documentation](https://pollynet.github.io/PicassoPy-doc/html/index.html)
+
+### Installation
+
+```
+# setup a virtual environment (either conda or venv)
+git clone https://github.com/ulysses78/PicassoPy.git
+
+cd PicassoPy
+python -m pip install -e .
+```
+
+
 ### Usage
 
 ```
