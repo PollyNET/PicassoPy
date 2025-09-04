@@ -7,7 +7,7 @@ def read_json_to_dict(file_path):
     """
     Reads in an existing json-file and outputs a dict-structure
     """
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf-8") as file:
         data = json.load(file)  # Parse JSON into a dictionary
     return data
 
