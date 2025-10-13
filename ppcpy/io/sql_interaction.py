@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 import ppcpy.misc.helper as helper
 
-def get_LC_from_sql_db(db_path,table_name,wavelength,method,telescope,timestamp):
+def get_LC_from_sql_db(db_path:str, table_name:str, wavelength:int|str, method:str, telescope:str, timestamp:str) -> dict:
     """
     Accesses the sqlite db table and returns LC for all cloud-free-regions )profiles)
 
@@ -51,7 +51,7 @@ def get_LC_from_sql_db(db_path,table_name,wavelength,method,telescope,timestamp)
     conn.close()
     return LC
 
-def prepare_for_sql_db_writing(data_cube,parameter,method=None):
+def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tuple]:
     """
     Collect all necessary variable and save it to a list of tuples for inserting into a SQLite table.
 
@@ -76,28 +76,37 @@ def prepare_for_sql_db_writing(data_cube,parameter,method=None):
             start = starttime.astype('datetime64[ms]').item().strftime("%Y-%m-%d %H:%M:%S")
             stop = stoptime.astype('datetime64[ms]').item().strftime("%Y-%m-%d %H:%M:%S")
             for ch in data_cube.LC[method][n].keys():
-                wv,pol,tel =  helper.get_wv_pol_telescope_from_dictkeyname(ch)
+                wv, pol, tel =  helper.get_wv_pol_telescope_from_dictkeyname(ch)
                 if tel == 'FR':
                     tel_db = 'far_range'
                 elif tel == 'NR':
                     tel_db = 'near_range'
                 LC = data_cube.LC[method][n][ch]['LC']
                 LCStd = data_cube.LC[method][n][ch]['LCStd']
-                rows_to_insert.append((str(start),str(stop),float(LC),float(LCStd),wv,str(data_cube.rawfile),data_cube.device,method_db,tel_db))
+                rows_to_insert.append((str(start), str(stop), float(LC), float(LCStd), wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
     elif parameter == 'DC':
         for ch in data_cube.pol_cali.keys():
             wv = ch
-            eta = data_cube.pol_cali[ch]['eta'][0]
-            eta_std = data_cube.pol_cali[ch]['eta_std'][0]
-            start_unix = data_cube.pol_cali[ch]['time_start'][0]
-            stop_unix = data_cube.pol_cali[ch]['time_end'][0]
-            start = datetime.utcfromtimestamp(start_unix).strftime("%Y-%m-%d %H:%M:%S")
-            stop = datetime.utcfromtimestamp(stop_unix).strftime("%Y-%m-%d %H:%M:%S")
-            rows_to_insert.append((str(start),str(stop),float(eta),float(eta_std),wv,str(data_cube.rawfile),data_cube.device))
+            for i in range(len(data_cube.pol_cali[ch]['eta'])):
+                eta = data_cube.pol_cali[ch]['eta'][i]
+                eta_std = data_cube.pol_cali[ch]['eta_std'][i]
+                eta_used = True if eta == data_cube.pol_cali[ch]['eta_best'] else False
+                start_unix = data_cube.pol_cali[ch]['time_start'][i]
+                stop_unix = data_cube.pol_cali[ch]['time_end'][i]
+                start = datetime.utcfromtimestamp(start_unix).strftime("%Y-%m-%d %H:%M:%S")
+                stop = datetime.utcfromtimestamp(stop_unix).strftime("%Y-%m-%d %H:%M:%S")
+                rows_to_insert.append((str(start), str(stop), float(eta), float(eta_std), eta_used, wv, str(data_cube.rawfile), data_cube.device))
     return rows_to_insert
 
-def setup_empty(db_path, table_name, column_names, data_types):
+def setup_empty(db_path:str, table_name:str, column_names:list[str], data_types:list[str]):
     """
+    Create/Initialise an empty database.
+
+    Parameters:
+    - db_path (str): Path to the SQLite database file.
+    - table_name (str): Name of the target table.
+    - column_names (list of str): List of column names to insert values into (e.g. ['col1', 'col2']).
+    - data_types (list of str): List of SQLite data types for each respective columns (e.g. ['text', 'real'])
     """
 
     column_names = ['id'] + column_names
@@ -111,7 +120,7 @@ def setup_empty(db_path, table_name, column_names, data_types):
     conn.close()
 
 
-def write_rows_to_sql_db(db_path, table_name, column_names, rows_to_insert):
+def write_rows_to_sql_db(db_path:str, table_name:str, column_names:list[str], rows_to_insert:list[str]):
     """
     Insert multiple rows into a SQLite table.
 

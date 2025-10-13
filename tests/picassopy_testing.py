@@ -97,6 +97,7 @@ if polly_default_file:
 else:
     polly_default_file_fullname = polly_default_global_defaults_file
 polly_config_dict = loadConfigs.loadPollyConfig(polly_config_file_fullname, polly_default_config_file)
+polly_config_dict = loadConfigs.checkPollyConfigDict(polly_config_dict)
 
 ## adding some information from pollynet_config_link_file (xlsx-file) to polly_config_dict
 polly_config_dict['name'] = polly_device

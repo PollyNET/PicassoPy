@@ -153,40 +153,59 @@ def pollyDTCor(rawSignal,mShots,hRes, **varargin):
     #return PCR_Cor, signalDTCor
     return signalDTCor
 
-def pollyRemoveBG(rawSignal,**varargin):
-    maxHeightBin = varargin.get('maxHeightBin', 3000)
-    firstBinIndex = varargin.get('firstBinIndex', 1)
-    bgCorrectionIndex = varargin.get('bgCorrectionIndex', [1, 2])
+def pollyRemoveBG(rawSignal:np.ndarray, bgCorrectionIndexLow:list, bgCorrectionIndexHigh:list, maxHeightBin:int=3000, firstBinIndex:list|None=None) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Background correction. Remove mean background noise from signal.
 
+    Parameters:
+    - rawSignal (np.ndarray): Lidar Signal to be processed
+    - bgCorrectionIndexLow (list of int): lower index of background noise per channel
+    - bgCorrectionIndexHigh (list of int): upper index of background noise per channel
+    - maxHeightBin (int): maximum height bin index (default: 3000)
+    - firstBinIndex (list of int): first height bin index per channel (default: 0 per chanel)
+    Output:
+    - signal_out (np.ndarray): Background corrected signal
+    - bg (np.ndarray): Removed background noise
+    """
     logging.info(f'... removing background from signal')
 
-    #print(maxHeightBin,firstBinIndex,bgCorrectionIndex)
+    if firstBinIndex is None:
+        logging.warning('No firstBinIndex value were given, default value 0 is used', exc_info=True)
+        firstBinIndex = [0]*rawSignal.shape[2]
 
-    ## Calculate the mean across the specified column range for each row and page
-    mean_matrix = np.mean(rawSignal[:, bgCorrectionIndex[0]:bgCorrectionIndex[1], :], axis=1, keepdims=True)
+    # Calculate the mean across the channel specific column range for each row and page
+    mean_matrix = np.empty((rawSignal.shape[0], 1, rawSignal.shape[2]), dtype=rawSignal.dtype)
+    for iCh in range(rawSignal.shape[2]):
+        mean_matrix[:, :, iCh] = np.mean(rawSignal[:, bgCorrectionIndexLow[iCh]:bgCorrectionIndexHigh[iCh], iCh], axis=1, keepdims=True)
 
-    #Replicate the mean matrix along the second dimension
+    # Replicate the mean matrix along the second dimension
     bg = np.tile(mean_matrix, (1, maxHeightBin, 1))
     signal_out = slicerange(rawSignal, maxHeightBin, firstBinIndex) - bg
     return signal_out, bg
 
+def slicerange(array:np.ndarray, maxHeightBin:int, firstBinIndex:list) -> np.ndarray:
+    """
+    Slice a given array across the height/range dimension from firstBinIndex to maxHeightBin + firstBinIndex.
 
-def slicerange(array, maxHeightBin, firstBinIndex):
-    """slice a give array from firstBinIndex to maxHeightBin + firstBinIndex"""
-    out = np.full((array.shape[0], maxHeightBin, array.shape[2]), np.nan)
-    
-    for iCh in range(0, array.shape[2]):
-        out[:, :, iCh] = array[:,firstBinIndex[iCh]:(maxHeightBin+firstBinIndex[iCh]),iCh]
+    Parameters:
+    - array (np.ndarray): array to be sliced
+    - maxHeightBin (int): length of slice
+    - firstBinIndex (list of int): start hight/range index of slice per channel
+    Output:
+    - out (np.ndarray): sliced array
+    """
+    firstBinIndex = np.asarray(firstBinIndex)
+    heightBins = np.arange(maxHeightBin)[:, None] + firstBinIndex[None, :]
+    out = array[:, heightBins, np.arange(array.shape[2])]
     return out
 
-
 def pollyPolCaliTime(depCalAng, mTime, init_depAng, maskDepCalAng):
-
+    """ """
     depCal_P_Ang_time_start = []
     depCal_P_Ang_time_end = []
     depCal_N_Ang_time_start = []
     depCal_N_Ang_time_end = []
-    maskDepCal = np.zeros(len(mTime),dtype=bool)
+    maskDepCal = np.zeros(len(mTime), dtype=bool)
 
     if len(depCalAng) == 0:
         ## if depCalAng is empty, which means the polly does not support auto depol calibration
@@ -254,7 +273,7 @@ def pollyPolCaliTime(depCalAng, mTime, init_depAng, maskDepCalAng):
 
     return depCal_P_Ang_time_start, depCal_P_Ang_time_end, depCal_N_Ang_time_start, depCal_N_Ang_time_end, maskDepCal
 
-def calculate_rcs(datasignal,ranges):
+def calculate_rcs(datasignal, ranges):
     """
     Function for calculating RCS.
 
@@ -357,9 +376,12 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
             file type of the radiosonde file.
             - 1: radiosonde file for MOSAiC (default)
             - 2: radiosonde file for MUA
-        bgCorrectionIndex: 2-element array
-            base and top index of bins for background estimation.
-            (defaults: [1, 2])
+        bgCorrectionIndexLow: 1-dim. array
+            base indecis of bins for background estimation.
+            (defults: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10])
+        bgCorrectionIndexHigh: 1-dim. array
+            top index of bins for background estimation.
+            (defults: [240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240])
         asl: numeric
             above sea level in meters. (default: 0)
         initialPolAngle: numeric
@@ -463,7 +485,7 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
     YYYY = int(date_string[:4])
     MM = int(date_string[4:6])
     DD = int(date_string[6:8])
-    datetime_obj = datetime.datetime(YYYY,MM,DD)
+    datetime_obj = datetime.datetime(YYYY, MM, DD)
     mTime_obj = [
         datetime_obj.replace(tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=int(s)) for s in seconds_of_day]
     mTime_str = [dt.strftime('%Y%m%d %H:%M:%S') for dt in mTime_obj]
@@ -488,7 +510,8 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
     radiosondeSitenum = param.get('radiosondeSitenum', False)
     radiosondeFolder = param.get('radiosondeFolder', False)
     radiosondeType = param.get('radiosondeType', False)
-    bgCorrectionIndex = param.get('bgCorrectionIndex', False)
+    bgCorrectionIndexLow = param.get('bgCorrectionIndexLow', False)
+    bgCorrectionIndexHigh = param.get('bgCorrectionIndexHigh', False)
     asl = param.get('asl', 10)
     initialPolAngle = param.get('initialPolAngle', False)
     maskPolCalAngle = param.get('maskPolCalAngle', False)
@@ -545,14 +568,15 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
 
     ## Deadtime correction
     #PCR_Cor, preproSignal = pollyDTCor(rawSignal = rawSignal,
-    preproSignal = pollyDTCor(rawSignal = rawSignal,
-            mShots = mShots,
-            hRes = hRes, 
-            polly_device = pollyType,
-            flagDeadTimeCorrection = flagDeadTimeCorrection, 
-            DeadTimeCorrectionMode = deadtimeCorrectionMode,
-            deadtimeParams = deadtimeParams,
-            deadtime = rawdata_dict['deadtime_polynomial']['var_data']
+    preproSignal = pollyDTCor(
+        rawSignal = rawSignal,
+        mShots = mShots,
+        hRes = hRes, 
+        polly_device = pollyType,
+        flagDeadTimeCorrection = flagDeadTimeCorrection, 
+        DeadTimeCorrectionMode = deadtimeCorrectionMode,
+        deadtimeParams = deadtimeParams,
+        deadtime = rawdata_dict['deadtime_polynomial']['var_data']
     )
     # most likely the preprocesssed deadtime corrected signal can be omitted
     if collect_debug:
@@ -561,10 +585,12 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
     #data_dict['PCR_slice'] = slicerange(PCR_Cor, maxHeightBin, firstBinIndex)
 
     ## Background Substraction
-    sigBGCor, bg =  pollyRemoveBG(rawSignal = preproSignal,
-                       bgCorrectionIndex = bgCorrectionIndex,
-                       maxHeightBin = maxHeightBin,
-                       firstBinIndex = firstBinIndex
+    sigBGCor, bg =  pollyRemoveBG(
+        rawSignal = preproSignal,
+        bgCorrectionIndexLow = bgCorrectionIndexLow,
+        bgCorrectionIndexHigh = bgCorrectionIndexHigh, 
+        maxHeightBin = maxHeightBin,
+        firstBinIndex = firstBinIndex
     )
     data_dict['BG'] = bg[:, 1, :] ## reshaping the3-dim. BG-matrix to 2-dim matrix
     # Store the background corrected signal
@@ -670,7 +696,7 @@ def pollyPreprocess(rawdata_dict, collect_debug=False, **param):
     #RCS_masked = np.ma.masked_array(sigBGCor+bg,mask=mask)
 #    data_dict['RCS'] = calculate_rcs(datasignal=preproSignal,data_dict=data_dict,mShots=mShots,hRes=hRes)
     mShots_norm = np.repeat(np.mean(mShots, axis=0)[np.newaxis,:], mShots.shape[0], axis=0)
-    data_dict['PCR_slice'] = data_dict['sigBGCor']*(150/hRes)/mShots_norm[:,np.newaxis,:]
+    data_dict['PCR_slice'] = data_dict['sigBGCor']*(150/hRes)/mShots_norm[:, np.newaxis, :]
     data_dict['RCS'] = calculate_rcs(data_dict['PCR_slice'], data_dict['range'])
 
 

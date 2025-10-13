@@ -195,19 +195,21 @@ class PicassoProc:
         self
         
         """
-        ChannelTags = pollyChannelTags.pollyChannelTags(self.polly_config_dict['channelTag'],flagFarRangeChannel=self.polly_config_dict['isFR'], ##TODO key: channelTags vs channelTag???
-                                                                               flagNearRangeChannel=self.polly_config_dict['isNR'],
-                                                                               flagRotRamanChannel=self.polly_config_dict['isRR'],
-                                                                               flagTotalChannel=self.polly_config_dict['isTot'],
-                                                                               flagCrossChannel=self.polly_config_dict['isCross'],
-                                                                               flagParallelChannel=self.polly_config_dict['isParallel'],
-                                                                               flag355nmChannel=self.polly_config_dict['is355nm'],
-                                                                               flag387nmChannel=self.polly_config_dict['is387nm'],
-                                                                               flag407nmChannel=self.polly_config_dict['is407nm'],
-                                                                               flag532nmChannel=self.polly_config_dict['is532nm'],
-                                                                               flag607nmChannel=self.polly_config_dict['is607nm'],
-                                                                               flag1064nmChannel=self.polly_config_dict['is1064nm']
-                                                                               )
+        ChannelTags = pollyChannelTags.pollyChannelTags( 
+            self.polly_config_dict['channelTag'],   # TODO key: channelTags vs channelTag???
+            flagFarRangeChannel=self.polly_config_dict['isFR'],
+            flagNearRangeChannel=self.polly_config_dict['isNR'],
+            flagRotRamanChannel=self.polly_config_dict['isRR'],
+            flagTotalChannel=self.polly_config_dict['isTot'],
+            flagCrossChannel=self.polly_config_dict['isCross'],
+            flagParallelChannel=self.polly_config_dict['isParallel'],
+            flag355nmChannel=self.polly_config_dict['is355nm'],
+            flag387nmChannel=self.polly_config_dict['is387nm'],
+            flag407nmChannel=self.polly_config_dict['is407nm'],
+            flag532nmChannel=self.polly_config_dict['is532nm'],
+            flag607nmChannel=self.polly_config_dict['is607nm'],
+            flag1064nmChannel=self.polly_config_dict['is1064nm']
+        )
 
         ChannelTags, self.polly_config_dict = pollyChannelTags.polly_config_channel_corrections(chTagsOut_ls=ChannelTags,polly_config_dict=self.polly_config_dict)
 
@@ -215,20 +217,22 @@ class PicassoProc:
         self.polly_config_dict['channelTags'] = ChannelTags
         self.channel_dict = {i: item for i, item in enumerate(ChannelTags)}
 
-        ChannelFlags =  pollyChannelTags.pollyChannelflags(channel_dict_length=len(self.channel_dict),flagFarRangeChannel=self.polly_config_dict['isFR'],
-                                                                               flagNearRangeChannel=self.polly_config_dict['isNR'],
-                                                                               flagRotRamanChannel=self.polly_config_dict['isRR'],
-                                                                               flagTotalChannel=self.polly_config_dict['isTot'],
-                                                                               flagCrossChannel=self.polly_config_dict['isCross'],
-                                                                               flagParallelChannel=self.polly_config_dict['isParallel'],
-                                                                               flag355nmChannel=self.polly_config_dict['is355nm'],
-                                                                               flag387nmChannel=self.polly_config_dict['is387nm'],
-                                                                               flag407nmChannel=self.polly_config_dict['is407nm'],
-                                                                               flag532nmChannel=self.polly_config_dict['is532nm'],
-                                                                               flag607nmChannel=self.polly_config_dict['is607nm'],
-                                                                               flag1064nmChannel=self.polly_config_dict['is1064nm']
-                                                                               )
-        
+        ChannelFlags = pollyChannelTags.pollyChannelflags(
+            channel_dict_length=len(self.channel_dict),
+            flagFarRangeChannel=self.polly_config_dict['isFR'],
+            flagNearRangeChannel=self.polly_config_dict['isNR'],
+            flagRotRamanChannel=self.polly_config_dict['isRR'],
+            flagTotalChannel=self.polly_config_dict['isTot'],
+            flagCrossChannel=self.polly_config_dict['isCross'],
+            flagParallelChannel=self.polly_config_dict['isParallel'],
+            flag355nmChannel=self.polly_config_dict['is355nm'],
+            flag387nmChannel=self.polly_config_dict['is387nm'],
+            flag407nmChannel=self.polly_config_dict['is407nm'],
+            flag532nmChannel=self.polly_config_dict['is532nm'],
+            flag607nmChannel=self.polly_config_dict['is607nm'],
+            flag1064nmChannel=self.polly_config_dict['is1064nm']
+        )
+
         self.flags = ChannelFlags
         self.flag_355_total_FR = ChannelFlags[0]
         self.flag_355_cross_FR = ChannelFlags[1]
@@ -255,43 +259,45 @@ class PicassoProc:
         return self
 
     def preprocessing(self, collect_debug=False):
-        preproc_dict = pollyPreprocess.pollyPreprocess(self.rawdata_dict,
-                deltaT=self.polly_config_dict['deltaT'],
-                flagForceMeasTime = self.polly_config_dict['flagForceMeasTime'],
-                maxHeightBin = self.polly_config_dict['max_height_bin'],
-                firstBinIndex = self.polly_config_dict['first_range_gate_indx'],
-                firstBinHeight = self.polly_config_dict['first_range_gate_height'],
-                pollyType = self.polly_config_dict['name'],
-                flagDeadTimeCorrection = self.polly_config_dict['flagDTCor'],
-                deadtimeCorrectionMode = self.polly_config_dict['dtCorMode'],
-                deadtimeParams = self.polly_config_dict['dt'],
-                flagSigTempCor = self.polly_config_dict['flagSigTempCor'],
-                tempCorFunc = self.polly_config_dict['tempCorFunc'],
-                meteorDataSource = self.polly_config_dict['meteorDataSource'],
-                gdas1Site = self.polly_config_dict['gdas1Site'],
-                gdas1_folder = self.picasso_config_dict['gdas1_folder'],
-                radiosondeSitenum = self.polly_config_dict['radiosondeSitenum'],
-                radiosondeFolder = self.polly_config_dict['radiosondeFolder'],
-                radiosondeType = self.polly_config_dict['radiosondeType'],
-                bgCorrectionIndex = self.polly_config_dict['bgCorRangeIndx'],
-                asl = self.polly_config_dict['asl'],
-                initialPolAngle = self.polly_config_dict['init_depAng'],
-                maskPolCalAngle = self.polly_config_dict['maskDepCalAng'],
-                minSNRThresh = self.polly_config_dict['mask_SNRmin'],
-                minPC_fog = self.polly_config_dict['minPC_fog'],
-                flagFarRangeChannel = self.polly_config_dict['isFR'],
-                flag532nmChannel = self.polly_config_dict['is532nm'],
-                flagTotalChannel = self.polly_config_dict['isTot'],
-                flag355nmChannel = self.polly_config_dict['is355nm'],
-                flag607nmChannel = self.polly_config_dict['is607nm'],
-                flag387nmChannel = self.polly_config_dict['is387nm'],
-                flag407nmChannel = self.polly_config_dict['is407nm'],
-                flag355nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is355nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
-                flag532nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is532nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
-                flag1064nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is1064nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
-                isUseLatestGDAS = self.polly_config_dict['flagUseLatestGDAS'],
-                collect_debug=collect_debug,
-                )
+        preproc_dict = pollyPreprocess.pollyPreprocess(
+            self.rawdata_dict,
+            deltaT=self.polly_config_dict['deltaT'],
+            flagForceMeasTime = self.polly_config_dict['flagForceMeasTime'],
+            maxHeightBin = self.polly_config_dict['max_height_bin'],
+            firstBinIndex = self.polly_config_dict['first_range_gate_indx'],
+            firstBinHeight = self.polly_config_dict['first_range_gate_height'],
+            pollyType = self.polly_config_dict['name'],
+            flagDeadTimeCorrection = self.polly_config_dict['flagDTCor'],
+            deadtimeCorrectionMode = self.polly_config_dict['dtCorMode'],
+            deadtimeParams = self.polly_config_dict['dt'],
+            flagSigTempCor = self.polly_config_dict['flagSigTempCor'],
+            tempCorFunc = self.polly_config_dict['tempCorFunc'],
+            meteorDataSource = self.polly_config_dict['meteorDataSource'],
+            gdas1Site = self.polly_config_dict['gdas1Site'],
+            gdas1_folder = self.picasso_config_dict['gdas1_folder'],
+            radiosondeSitenum = self.polly_config_dict['radiosondeSitenum'],
+            radiosondeFolder = self.polly_config_dict['radiosondeFolder'],
+            radiosondeType = self.polly_config_dict['radiosondeType'],
+            bgCorrectionIndexLow = self.polly_config_dict['bgCorRangeIndxLow'],
+            bgCorrectionIndexHigh = self.polly_config_dict['bgCorRangeIndxHigh'],
+            asl = self.polly_config_dict['asl'],
+            initialPolAngle = self.polly_config_dict['init_depAng'],
+            maskPolCalAngle = self.polly_config_dict['maskDepCalAng'],
+            minSNRThresh = self.polly_config_dict['mask_SNRmin'],
+            minPC_fog = self.polly_config_dict['minPC_fog'],
+            flagFarRangeChannel = self.polly_config_dict['isFR'],
+            flag532nmChannel = self.polly_config_dict['is532nm'],
+            flagTotalChannel = self.polly_config_dict['isTot'],
+            flag355nmChannel = self.polly_config_dict['is355nm'],
+            flag607nmChannel = self.polly_config_dict['is607nm'],
+            flag387nmChannel = self.polly_config_dict['is387nm'],
+            flag407nmChannel = self.polly_config_dict['is407nm'],
+            flag355nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is355nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
+            flag532nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is532nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
+            flag1064nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is1064nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
+            isUseLatestGDAS = self.polly_config_dict['flagUseLatestGDAS'],
+            collect_debug=collect_debug,
+        )
         self.retrievals_highres.update(preproc_dict)
 
         return self
@@ -585,7 +591,7 @@ class PicassoProc:
         quasi.quasi_angstrom(self, version='V2')
         quasi.target_cat(self, version='V2')
 
-    def write_2_sql_db(self,db_path,parameter,method=None):
+    def write_2_sql_db(self, db_path, parameter, method=None):
         """ write LC or eta to sqlite db table
         parameters:
         - parameter (str): can be LC (Lidar-calibration-constant) or DC (Depol-calibration-constant)
@@ -599,14 +605,14 @@ class PicassoProc:
             data_types = ['text', 'text', 'real', 'real', 'text', 'text', 'text', 'text', 'text']
         elif parameter == 'DC':
             table_name = 'depol_calibration_constant'
-            column_names = ['cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'wavelength', 'nc_zip_file', 'polly_type']
-            data_types = ['text', 'text', 'real', 'real', 'text', 'text', 'text']
+            column_names = ['cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'used_for_processing', 'wavelength', 'nc_zip_file', 'polly_type']
+            data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text']
 
         logging.info(f'writing to sqlite-db: {db_path}')
         logging.info(f'writing {parameter} to table: {table_name}')
         
         sql_db.setup_empty(db_path, table_name, column_names, data_types)
-        rows_to_insert = sql_db.prepare_for_sql_db_writing(self,parameter,method)
+        rows_to_insert = sql_db.prepare_for_sql_db_writing(self, parameter, method)
 
         sql_db.write_rows_to_sql_db(db_path, table_name, column_names, rows_to_insert)
 
