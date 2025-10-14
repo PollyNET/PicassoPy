@@ -211,7 +211,7 @@ class PicassoProc:
             flag1064nmChannel=self.polly_config_dict['is1064nm']
         )
 
-        ChannelTags, self.polly_config_dict = pollyChannelTags.polly_config_channel_corrections(chTagsOut_ls=ChannelTags,polly_config_dict=self.polly_config_dict)
+        ChannelTags, self.polly_config_dict = pollyChannelTags.polly_config_channel_corrections(chTagsOut_ls=ChannelTags, polly_config_dict=self.polly_config_dict)
 
         self.retrievals_highres['channel'] = ChannelTags
         self.polly_config_dict['channelTags'] = ChannelTags
@@ -254,7 +254,6 @@ class PicassoProc:
         self.flag_1064_total_FR = ChannelFlags[17]
         self.flag_1064_cross_FR = ChannelFlags[18]
         self.flag_1064_total_NR = ChannelFlags[19]
-
 
         return self
 
@@ -591,7 +590,7 @@ class PicassoProc:
         quasi.quasi_angstrom(self, version='V2')
         quasi.target_cat(self, version='V2')
 
-    def write_2_sql_db(self, db_path, parameter, method=None):
+    def write_2_sql_db(self, db_path:str, parameter:str, method:str|None=None):
         """ write LC or eta to sqlite db table
         parameters:
         - parameter (str): can be LC (Lidar-calibration-constant) or DC (Depol-calibration-constant)
@@ -601,8 +600,8 @@ class PicassoProc:
         """
         if parameter == 'LC':
             table_name = 'lidar_calibration_constant'
-            column_names = ['cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
-            data_types = ['text', 'text', 'real', 'real', 'text', 'text', 'text', 'text', 'text']
+            column_names = ['cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'used_for_processing', 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
+            data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text', 'text']
         elif parameter == 'DC':
             table_name = 'depol_calibration_constant'
             column_names = ['cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'used_for_processing', 'wavelength', 'nc_zip_file', 'polly_type']

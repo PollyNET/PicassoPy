@@ -8,7 +8,7 @@ elastic2raman = {355: 387, 532: 607}
 
 
 def lc_for_cldFreeGrps(data_cube, retrieval):
-    """estimate the lidar constant from the optical profiles 
+    """ estimate the lidar constant from the optical profiles 
 
 
     Updates:
@@ -46,9 +46,9 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
 
             sig = profiles[channel]['signal']
             signal = np.nanmean(np.squeeze(
-                data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree),:,data_cube.gf(wv, t, tel)]), axis=0)
-            molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
-            molExt = data_cube.mol_profiles[f'mExt_{wv}'][i,:]
+                data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree), :, data_cube.gf(wv, t, tel)]), axis=0)
+            molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
+            molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :]
 
             if not ('aerExt' in profiles[channel] and 'aerBsc' in profiles[channel]):
                 print(f'skipping {channel} {cldFree}')
@@ -75,9 +75,9 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
             if retrieval == 'raman' and int(wv) in elastic2raman.keys():
                 wv_r = elastic2raman[int(wv)] 
                 signal_r = np.nanmean(np.squeeze(
-                    data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree),:,data_cube.gf(wv_r, t, tel)]), axis=0)
-                #molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i,:]
-                molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i,:]
+                    data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree), :, data_cube.gf(wv_r, t, tel)]), axis=0)
+                #molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i, :]
+                molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i, :]
                 aerExt_r = aerExt * (int(wv)/int(wv_r))**config_dict['angstrexp'] 
                 aerOD_r = np.cumsum(aerExt_r * np.concatenate(([height[0]], np.diff(height))))
                 molOD_r = np.cumsum(molExt_r * np.concatenate(([height[0]], np.diff(height))))
@@ -94,7 +94,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
 
 
 def get_best_LC(LCs):
-    """get lidar constant with the lowest standarddeviation
+    """ get lidar constant with the lowest standard deviation
      
     """
 

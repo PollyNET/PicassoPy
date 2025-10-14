@@ -70,7 +70,7 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
         method_db = 'Klett_Method'
 
     if parameter == 'LC':
-        for n in range(0,len(data_cube.clFreeGrps)):
+        for n in range(0, len(data_cube.clFreeGrps)):
             starttime = data_cube.retrievals_highres['time64'][data_cube.clFreeGrps[n][0]]
             stoptime = data_cube.retrievals_highres['time64'][data_cube.clFreeGrps[n][1]]
             start = starttime.astype('datetime64[ms]').item().strftime("%Y-%m-%d %H:%M:%S")
@@ -82,20 +82,21 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                 elif tel == 'NR':
                     tel_db = 'near_range'
                 LC = data_cube.LC[method][n][ch]['LC']
-                LCStd = data_cube.LC[method][n][ch]['LCStd']
-                rows_to_insert.append((str(start), str(stop), float(LC), float(LCStd), wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
+                LC_std = data_cube.LC[method][n][ch]['LCStd']
+                LC_is_used = True if LC == data_cube.LCused[ch] else False
+                rows_to_insert.append((str(start), str(stop), float(LC), float(LC_std), LC_is_used, wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
     elif parameter == 'DC':
         for ch in data_cube.pol_cali.keys():
             wv = ch
             for i in range(len(data_cube.pol_cali[ch]['eta'])):
                 eta = data_cube.pol_cali[ch]['eta'][i]
                 eta_std = data_cube.pol_cali[ch]['eta_std'][i]
-                eta_used = True if eta == data_cube.pol_cali[ch]['eta_best'] else False
+                eta_is_used = True if eta == data_cube.pol_cali[ch]['eta_best'] else False
                 start_unix = data_cube.pol_cali[ch]['time_start'][i]
                 stop_unix = data_cube.pol_cali[ch]['time_end'][i]
                 start = datetime.utcfromtimestamp(start_unix).strftime("%Y-%m-%d %H:%M:%S")
                 stop = datetime.utcfromtimestamp(stop_unix).strftime("%Y-%m-%d %H:%M:%S")
-                rows_to_insert.append((str(start), str(stop), float(eta), float(eta_std), eta_used, wv, str(data_cube.rawfile), data_cube.device))
+                rows_to_insert.append((str(start), str(stop), float(eta), float(eta_std), eta_is_used, wv, str(data_cube.rawfile), data_cube.device))
     return rows_to_insert
 
 def setup_empty(db_path:str, table_name:str, column_names:list[str], data_types:list[str]):
