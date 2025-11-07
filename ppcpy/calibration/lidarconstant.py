@@ -2,7 +2,6 @@
 
 import numpy as np
 from ppcpy.misc.helper import mean_stable
-import pandas as pd
 
 elastic2raman = {355: 387, 532: 607}
 
@@ -15,15 +14,6 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
     Updates:
         For NR done directly form the optical profiles,
         whereas in the matlab version, the LC*olAttri387.sigRatio is taken
-
-        TODO: Change back to Picasso version to check if lidar calibration
-        constatns get more similar
-
-        TODO: Check if LC's are normalized with respect to the mean of 
-        the profiles
-
-        TODO 03/11/2025-Håvard: Examin, understand and plot all parts of LC calulations
-
     """
 
     print("retival", retrieval)
