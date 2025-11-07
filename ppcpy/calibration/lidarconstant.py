@@ -2,22 +2,64 @@
 
 import numpy as np
 from ppcpy.misc.helper import mean_stable
+import pandas as pd
 
-
+toRecord = True
 elastic2raman = {355: 387, 532: 607}
+
+def idx2time(cldFreeIdx:np.ndarray[int, int], nIdx:int, nHour:int) -> str:
+    """
+    Convert cloud free indecis to cloud free times
+
+    Parameters:
+        - cldFreeIdx (np.ndarray): ...
+        - nIdx (int): ...
+        - nHour (int): ...
+    
+    Output:
+        - out (str): ...
+    """
+    minPerIdx = (nHour*60)/nIdx
+    cldFreeMin = cldFreeIdx*minPerIdx
+    cldFreeHour = cldFreeMin//60
+    cldFreeMin -= cldFreeHour*60
+    cldFreeHour = cldFreeHour.astype(int).astype(str)
+    cldFreeMin = cldFreeMin.astype(int).astype(str)
+    for i in range(len(cldFreeIdx)):
+        if len(cldFreeHour[i]) < 2:
+            cldFreeHour[i] = "0" + cldFreeHour[i]
+        if len(cldFreeMin[i]) < 2:
+            cldFreeMin[i] = "0" + cldFreeMin[i]
+    out = cldFreeHour[0] + cldFreeMin[0] + "_" + cldFreeHour[1] + cldFreeMin[1]
+    return out
 
 
 def lc_for_cldFreeGrps(data_cube, retrieval):
-    """ estimate the lidar constant from the optical profiles 
+    """ 
+    Estimate the lidar constant from the optical profiles.
 
 
     Updates:
         For NR done directly form the optical profiles,
         whereas in the matlab version, the LC*olAttri387.sigRatio is taken
-         
+
+        TODO: Change back to Picasso version to check if lidar calibration
+        constatns get more similar
+
+        TODO: Check if LC's are normalized with respect to the mean of 
+        the profiles
+
+        TODO 03/11/2025-Håvard: Examin, understand and plot all parts of LC calulations
+
     """
 
+    print("retival", retrieval)
     height = data_cube.retrievals_highres['range']
+    # Recording -------------------------------------------------------------------------------------------------------------------------------------------
+    if toRecord:
+        recorder = pd.DataFrame()
+        recorder["height"] = pd.Series(height)
+    # ----------------------------------------------------------------------------------------------------------------------------------------------------
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
     config_dict = data_cube.polly_config_dict
     heightFullOverlap = [np.array(config_dict['heightFullOverlap']) for i in data_cube.clFreeGrps]
@@ -41,7 +83,8 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
             hBaseInd = np.argmax(
                 height >= (hFullOverlap + config_dict[f'{key_smooth}{wv}'] / 2 * hres))
 
-            sig = profiles[channel]['signal']
+            # sig = profiles[channel]['signal']
+            sig = "BGCor"
             signal = np.nanmean(np.squeeze(
                 data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree), :, data_cube.gf(wv, t, tel)]), axis=0)
             molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
@@ -52,9 +95,16 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
                 continue
 
             aerExt = profiles[channel]['aerExt'].copy()
-            aerExt[:hBaseInd] = aerExt[hBaseInd]
+            aerExt[:hBaseInd] = aerExt[hBaseInd]           # <-- This is the interpolation btw. # TODO: Change to Picasso vs (aExt355 = aBsc355 * PollyConfig.LR355)
             aerBsc = profiles[channel]['aerBsc']
-            
+
+            # # Experimental ----------------------------------------------------------------------------------------------------------------------------------------
+            # # Experimental / Testing (remove in future) # TODO: This is the implemented change. see if it works for all channels
+            # aerExt = aerBsc * config_dict[f'LR{wv}']
+            # if tel == 'NR':
+            #     aerExt = aerBsc * config_dict[f'LR_NR_{wv}']
+            # # -----------------------------------------------------------------------------------------------------------------------------------------------------
+
             aerOD = np.cumsum(aerExt * np.concatenate(([height[0]], np.diff(height))))
             molOD = np.cumsum(molExt * np.concatenate(([height[0]], np.diff(height))))
 
@@ -63,11 +113,29 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
 
             LC = signal * height**2 / bsc / trans
             LC_stable, _, LCStd = mean_stable(
-                LC, config_dict['LCMeanWindow'], 
-                minBin=config_dict['LCMeanMinIndx'], maxBin=config_dict['LCMeanMaxIndx'])
+                x=LC,
+                win=config_dict['LCMeanWindow'], 
+                minBin=config_dict['LCMeanMinIndx'],
+                maxBin=config_dict['LCMeanMaxIndx']
+            )
 
-            #print('LC ', LC_stable)
             LCs[i][channel] = {'LC': LC_stable, 'LCStd': LC_stable * LCStd}
+
+            # Recording -------------------------------------------------------------------------------------------------------------------------------------------
+            if toRecord:
+                recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv}_{t}_{tel}_sig{sig}"] = pd.Series(signal)
+                recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv}_{t}_{tel}_aerExt"] = pd.Series(aerExt)
+                recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv}_{t}_{tel}_aerBsc"] = pd.Series(aerBsc)
+                recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv}_{t}_{tel}_molExt"] = pd.Series(molExt)
+                recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv}_{t}_{tel}_molBsc"] = pd.Series(molBsc)
+                recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv}_{t}_{tel}_aerOD"] = pd.Series(aerOD)
+                recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv}_{t}_{tel}_molOD"] = pd.Series(molOD)
+                recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv}_{t}_{tel}_trans"] = pd.Series(trans)
+                recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv}_{t}_{tel}_bsc"] = pd.Series(bsc)
+                recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv}_{t}_{tel}_LC"] = pd.Series(LC)
+                recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv}_{t}_{tel}_LCStable"] = pd.Series(np.ones_like(height)*LC_stable)
+                recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv}_{t}_{tel}_LCStd"] = pd.Series(np.ones_like(height)*LCStd)
+            # ----------------------------------------------------------------------------------------------------------------------------------------------------
 
             if retrieval == 'raman' and int(wv) in elastic2raman.keys():
                 wv_r = elastic2raman[int(wv)] 
@@ -88,6 +156,25 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
                     minBin=config_dict['LCMeanMinIndx'], maxBin=config_dict['LCMeanMaxIndx'])
                 LCs[i][f"{wv_r}_{t}_{tel}"] = {'LC': LC_r_stable, 'LCStd': LC_r_stable * LCStd_r}
 
+                # Recording -------------------------------------------------------------------------------------------------------------------------------------------
+                if toRecord:
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_sig{sig}"] = pd.Series(signal_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_aerExt"] = pd.Series(aerExt_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_molExt"] = pd.Series(molExt_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_aerOD"] = pd.Series(aerOD_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_molOD"] = pd.Series(molOD_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_trans"] = pd.Series(trans_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_bsc"] = pd.Series(bsc)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_LC"] = pd.Series(LC_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_LCStable"] = pd.Series(np.ones_like(height)*LC_r_stable)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_LCStd"] = pd.Series(np.ones_like(height)*LCStd_r)
+                # ----------------------------------------------------------------------------------------------------------------------------------------------------
+    
+    # Recording -------------------------------------------------------------------------------------------------------------------------------------------
+    if toRecord:
+        recorder = recorder.set_index("height")
+        recorder.to_pickle(f"C:\\Users\\buholdt\\Documents\\PicassoPy\\tests\\debug\\recorded_LC_calc_variables_{retrieval}.pkl")
+    # ----------------------------------------------------------------------------------------------------------------------------------------------------
     return LCs
 
 
@@ -104,7 +191,7 @@ def get_best_LC(LCs):
         lcs = np.array([e[channel]['LC'] for e in LCs if channel in e])
         lcsstd = np.array([e[channel]['LCStd'] for e in LCs if channel in e])
 
-        LCused[channel] = lcs[np.argmin(lcsstd)]
+        LCused[channel] = lcs[np.argmin(lcsstd)]    # TODO: Check if the order is correct here as we are using set
     return LCused
 
 
