@@ -389,21 +389,30 @@ def calibrateMol(data_cube):
             if np.any(data_cube.gf(wv, t, tel)) and np.any(data_cube.gf(wv, 'cross', tel)):
                 logging.info(f'and even a {wv} channel')
     
-                sigBGCor_total = np.squeeze(data_cube.retrievals_highres['sigBGCor'][slice(*cldFree),:,data_cube.gf(wv, 'total', 'FR')])
-                bg_total = np.squeeze(data_cube.retrievals_highres['BG'][slice(*cldFree),data_cube.gf(wv, 'total', 'FR')])
-                sigBGCor_cross = np.squeeze(data_cube.retrievals_highres['sigBGCor'][slice(*cldFree),:,data_cube.gf(wv, 'cross', 'FR')])
-                bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][slice(*cldFree),data_cube.gf(wv, 'cross', 'FR')])
+                sigBGCor_total = np.squeeze(data_cube.retrievals_highres['sigBGCor'][slice(*cldFree), :, data_cube.gf(wv, 'total', 'FR')])
+                bg_total = np.squeeze(data_cube.retrievals_highres['BG'][slice(*cldFree), data_cube.gf(wv, 'total', 'FR')])
+                sigBGCor_cross = np.squeeze(data_cube.retrievals_highres['sigBGCor'][slice(*cldFree), :, data_cube.gf(wv, 'cross', 'FR')])
+                bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][slice(*cldFree), data_cube.gf(wv, 'cross', 'FR')])
 
                 refHInd = data_cube.refH[i][f'{wv}_{t}_{tel}']['refHInd']
                 print(f'referenceH {wv} {t} {tel}', refHInd)
 
+                if np.any(np.isnan(refHInd)):
+                    logging.info(f"skiping {wv} channel")
+                    continue
+
                 ret = depol_cali_mol(
-                    sigBGCor_total[:, slice(*refHInd)], bg_total, 
-                    sigBGCor_cross[:, slice(*refHInd)], bg_cross,
-                    np.squeeze(data_cube.polly_config_dict['TR'][data_cube.gf(wv, t, tel)]), 0,
-                    np.squeeze(data_cube.polly_config_dict['TR'][data_cube.gf(wv, 'cross', tel)]), 0,
-                    10,
-                    default_dict[f'molDepol{wv}'], default_dict[f'molDepolStd{wv}'],
+                    signal_t=sigBGCor_total[:, slice(*refHInd)], 
+                    background_t=bg_total, 
+                    signal_c=sigBGCor_cross[:, slice(*refHInd)],
+                    background_c=bg_cross,
+                    TR_t=np.squeeze(data_cube.polly_config_dict['TR'][data_cube.gf(wv, t, tel)]),
+                    TR_t_std=0,
+                    TR_c=np.squeeze(data_cube.polly_config_dict['TR'][data_cube.gf(wv, 'cross', tel)]),
+                    TR_c_std=0,
+                    minSNR=10,
+                    mdr=default_dict[f'molDepol{wv}'],
+                    mdrStd=default_dict[f'molDepolStd{wv}'],
                 )
                 if not ret['status'] == 0:
                     pol_cali[f'{wv}_{t}_{tel}']['eta'].append(ret['eta'])

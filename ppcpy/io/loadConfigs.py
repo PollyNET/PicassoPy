@@ -46,6 +46,8 @@ def loadPicassoConfig(picasso_config_file, picasso_default_config_file):
 
 
 def readPollyNetConfigLinkTable(polly_config_table_file, timestamp, device):
+    """
+    """
     polly_config_table_file_path = Path(polly_config_table_file)
 
     if polly_config_table_file_path.is_file():
@@ -91,6 +93,8 @@ def fix_indexing(config_dict, keys=['first_range_gate_indx',]):
 
 
 def loadPollyConfig(polly_config_file, polly_default_config_file):
+    """
+    """
     polly_default_config_file_path = Path(polly_default_config_file)
     polly_config_file_path = Path(polly_config_file)
     polly_config_dict = {}
@@ -152,7 +156,7 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                     fix_indexing_keys = ['first_range_gate_indx']
                 elif 'LC' in polly_default_config_file_dict.keys():
                     fix_indexing_keys = ['LC']
-                return fix_indexing(polly_config_dict,keys=fix_indexing_keys)
+                return fix_indexing(polly_config_dict, keys=fix_indexing_keys)
                 
             except Exception:
                 logging.warning(f'polly_config_file: {polly_config_file} can not be processed.', exc_info=True)
@@ -169,3 +173,49 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
         logging.critical(f'polly_default_config_file:  {polly_default_config_file} can not be found. Aborting')
         return None
 
+def checkPollyConfigDict(polly_config_dict:dict) -> dict:
+    """
+    Check and potentially modify polly config dict
+
+    Parameters:
+    - polly_config_dict (dict): polly config dict to be checked
+    Output:
+    - new_polly_config_dict (dict): checked (and modified) polly config dict
+    """
+    logging.info(".. checking polly config dict")
+    new_polly_config_dict = polly_config_dict.copy()
+
+    # Checking Background correction values:
+    variables = ['bgCorRangeIndxLow', 'bgCorRangeIndxHigh']
+    channels = len(polly_config_dict['isFR'])
+
+    for i, var in enumerate(variables):
+        if var in polly_config_dict.keys():
+            if isinstance(polly_config_dict[var], list):
+                # check length, shorten if to long, raise an error if to short
+                if len(polly_config_dict[var]) > channels:
+                    logging.warning(f'length of {var} exceeds the number of channels ({len(polly_config_dict[var])} vs {channels}). Only the first {channels} values will be considered.', exc_info=True)
+                    new_polly_config_dict[var] = polly_config_dict[var][:channels]
+                elif len(polly_config_dict[var]) < channels:
+                    logging.critical(f'length of {var} is less than the number of channels ({len(polly_config_dict[var])} vs {channels}).')
+                    raise IndexError(f'length of {var} is less than the number of channels ({len(polly_config_dict[var])} vs {channels}). Check polly config.')
+            else:
+                # Raise an error
+                logging.critical(f'only support {var} of type list not {type(polly_config_dict[var])}.')
+                raise TypeError(f"only support {var} of type list not {type(polly_config_dict[var])}. Check polly config")
+        else:
+            if 'bgCorRangeIndx' in polly_config_dict.keys():
+                # make an list out of the i'th value of 'bgCorRangeIndx'
+                logging.warning(f"no {var} was given. Uses the {"second" if i else "first"} value of 'bgCorRangeIndx' for all channels.", exc_info=True)
+                new_polly_config_dict[var] = [int(polly_config_dict['bgCorRangeIndx'][i])]*channels
+            else:
+                # Raise an error
+                logging.critical(f"no {var} or 'bgCorRangeIndx' was given.")
+                raise KeyError(f"no {var} or 'bgCorRangeIndx' was given. Check polly config.")
+        
+    # Remove bgCorRangeIndx
+    if 'bgCorRangeIndx' in new_polly_config_dict:
+        new_polly_config_dict.pop('bgCorRangeIndx')
+    
+    # Can add additional checks to this function.
+    return new_polly_config_dict

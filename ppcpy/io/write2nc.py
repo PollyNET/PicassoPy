@@ -23,14 +23,14 @@ def get_git_info(path="."):
     except Exception:
         return None, None
 
-def adding_fixed_vars(data_cube,json_nc_mapping_dict):
+def adding_fixed_vars(data_cube, json_nc_mapping_dict):
         ## adding fixed variables
         json_nc_mapping_dict['variables']['altitude']['data'] = data_cube.polly_config_dict['asl']
         json_nc_mapping_dict['variables']['latitude']['data'] = data_cube.polly_config_dict['lat']
         json_nc_mapping_dict['variables']['longitude']['data'] = data_cube.polly_config_dict['lon']
         json_nc_mapping_dict['variables']['tilt_angle']['data'] = data_cube.rawdata_dict['zenithangle']['var_data']
 
-def adding_global_attr(data_cube,json_nc_mapping_dict):
+def adding_global_attr(data_cube, json_nc_mapping_dict):
         ## adding global attributes
         json_nc_mapping_dict['global_attributes']['location'] = data_cube.polly_config_dict['site']
         json_nc_mapping_dict['global_attributes']['source'] = data_cube.polly_config_dict['name']
@@ -45,9 +45,9 @@ def adding_global_attr(data_cube,json_nc_mapping_dict):
         json_nc_mapping_dict['global_attributes']['history'] = f'Last processing time at {now_utc} UTC, git branch: {gitbranch}, git commit: {gitcommit}'
 
 
-def write_channelwise_2_nc_file(data_cube,root_dir=root_dir, prod_ls=[]):
+def write_channelwise_2_nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
     ## writes data from products, listed in prod_ls, to nc-file
-    #  available products:  prod_ls = ["SNR","BG","RCS","att_bsc","vol_depol"]
+    #  available products:  prod_ls = ["SNR", "BG", "RCS", "att_bsc", "vol_depol"]
     for prod in prod_ls:
         logging.info(f"saving product: {prod}")
 #        json_nc_mapping_dict = {}
@@ -63,10 +63,10 @@ def write_channelwise_2_nc_file(data_cube,root_dir=root_dir, prod_ls=[]):
             json_nc_mapping_dict['dimensions'][d] = len(data_cube.retrievals_highres[d])
 
         ## adding fixed variables
-        adding_fixed_vars(data_cube,json_nc_mapping_dict)
+        adding_fixed_vars(data_cube, json_nc_mapping_dict)
 
         ## adding global attributes
-        adding_global_attr(data_cube,json_nc_mapping_dict)
+        adding_global_attr(data_cube, json_nc_mapping_dict)
 
         ## adding dynamical variables
         for v in list(json_nc_mapping_dict['variables'].keys()): ## use list here to suppress RuntimeError: dictionary changed size during iteration
@@ -86,27 +86,27 @@ def write_channelwise_2_nc_file(data_cube,root_dir=root_dir, prod_ls=[]):
 
 
         """ Create the NetCDF file """
-        output_filename = Path(data_cube.picasso_config_dict["results_folder"],f"{data_cube.date}_{data_cube.device}_{prod}.nc")
-        json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict,compression_level=1)
+        output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{prod}.nc")
+        json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict, compression_level=1)
 
-def write2nc_file(data_cube,root_dir=root_dir, prod_ls=[]):
+def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
     ## writes data from products, listed in prod_ls, to nc-file
     for prod in prod_ls:
         logging.info(f"saving product: {prod}")
-        json_nc_mapping_dict = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config',f'json2nc-mapper_{prod}.json'))
+        json_nc_mapping_dict = json2nc_mapping.read_json_to_dict(Path(root_dir, 'ppcpy', 'config', f'json2nc-mapper_{prod}.json'))
 
         """ set dimension sizes """
         for d in json_nc_mapping_dict['dimensions']:
             json_nc_mapping_dict['dimensions'][d] = len(data_cube.retrievals_highres[d])
 
         ## adding fixed variables
-        adding_fixed_vars(data_cube,json_nc_mapping_dict)
+        adding_fixed_vars(data_cube, json_nc_mapping_dict)
 
         ## adding global attributes
-        adding_global_attr(data_cube,json_nc_mapping_dict)
+        adding_global_attr(data_cube, json_nc_mapping_dict)
 
         ## adding dynamical variables
-        json_nc_translator = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config',f'json2nc_translator.json'))
+        json_nc_translator = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config', f'json2nc_translator.json'))
         for var in json_nc_translator[prod]['variables'].keys():
             if var in json_nc_mapping_dict['variables'].keys():
                 pass
@@ -144,17 +144,17 @@ def write2nc_file(data_cube,root_dir=root_dir, prod_ls=[]):
 
 
         """ Create the NetCDF file """
-        output_filename = Path(data_cube.picasso_config_dict["results_folder"],f"{data_cube.date}_{data_cube.device}_{prod}.nc")
-        json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict,compression_level=1)
+        output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{prod}.nc")
+        json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict, compression_level=1)
 
 
-def write_profile2nc_file(data_cube,root_dir=root_dir, prod_ls=[]):
+def write_profile2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
     ## writes data from products, listed in prod_ls, to nc-file
-    ##  available products:  prod_ls = ["profiles","NR_profeils","OC_profiles"]
+    ##  available products:  prod_ls = ["profiles", "NR_profeils", "OC_profiles"]
 
-    json_nc_translator = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config',f'json2nc_translator.json'))
+    json_nc_translator = json2nc_mapping.read_json_to_dict(Path(root_dir, 'ppcpy', 'config', f'json2nc_translator.json'))
     for prod in prod_ls:
-        json_nc_mapping_dict = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config',f'json2nc-mapper_{prod}.json'))
+        json_nc_mapping_dict = json2nc_mapping.read_json_to_dict(Path(root_dir, 'ppcpy', 'config', f'json2nc-mapper_{prod}.json'))
         logging.info(f"saving product: {prod}")
 #        json_nc_mapping_dict = {}
 #        if prod in polly_config_dict["prodSaveList"]:
@@ -164,12 +164,12 @@ def write_profile2nc_file(data_cube,root_dir=root_dir, prod_ls=[]):
             json_nc_mapping_dict['dimensions'][d] = len(data_cube.retrievals_highres[d])
 
         """ fill variables """
-        #for n,profil in enumerate(data_cube.retrievals_profile[method]):
-        for n in range(0,len(data_cube.clFreeGrps)):
-            json_nc_mapping_dict = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config',f'json2nc-mapper_{prod}.json'))
+        #for n, profil in enumerate(data_cube.retrievals_profile[method]):
+        for n in range(0, len(data_cube.clFreeGrps)):
+            json_nc_mapping_dict = json2nc_mapping.read_json_to_dict(Path(root_dir, 'ppcpy', 'config', f'json2nc-mapper_{prod}.json'))
 
             ## adding fixed variables
-            adding_fixed_vars(data_cube,json_nc_mapping_dict)
+            adding_fixed_vars(data_cube, json_nc_mapping_dict)
 
             starttime = data_cube.retrievals_highres['time64'][data_cube.clFreeGrps[n][0]]
             stoptime = data_cube.retrievals_highres['time64'][data_cube.clFreeGrps[n][1]]
@@ -181,7 +181,7 @@ def write_profile2nc_file(data_cube,root_dir=root_dir, prod_ls=[]):
             json_nc_mapping_dict['variables']['height']['data'] = data_cube.retrievals_highres['height']
 
             ## adding global attributes
-            adding_global_attr(data_cube,json_nc_mapping_dict)
+            adding_global_attr(data_cube, json_nc_mapping_dict)
 
             ## adding dynamical variables
             for var in json_nc_translator[prod]['variables'].keys():
@@ -209,9 +209,9 @@ def write_profile2nc_file(data_cube,root_dir=root_dir, prod_ls=[]):
             ### remove empty key-value-pairs
             for var in list(json_nc_mapping_dict['variables'].keys()): ## use list here to suppress RuntimeError: dictionary changed size during iteration
                 if json_nc_mapping_dict['variables'][var]['data'] is None:
-                    json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict,key_to_remove=var)
+                    json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict, key_to_remove=var)
             #print(data_dict_copy['variables'].keys())
 
             """ Create the NetCDF file """
-            output_filename = Path(data_cube.picasso_config_dict["results_folder"],f"{data_cube.date}_{data_cube.device}_{start}_{stop}_{prod}.nc")
-            json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict,compression_level=1)
+            output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{start}_{stop}_{prod}.nc")
+            json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict, compression_level=1)
