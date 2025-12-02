@@ -206,7 +206,7 @@ def checkPollyConfigDict(polly_config_dict:dict) -> dict:
         else:
             if 'bgCorRangeIndx' in polly_config_dict.keys():
                 # make an list out of the i'th value of 'bgCorRangeIndx'
-                logging.warning(f"no {var} was given. Uses the {"second" if i else "first"} value of 'bgCorRangeIndx' for all channels.", exc_info=True)
+                logging.warning(f"no {var} was given. Uses the {'second' if i else 'first'} value of 'bgCorRangeIndx' for all channels.", exc_info=True)
                 new_polly_config_dict[var] = [int(polly_config_dict['bgCorRangeIndx'][i])]*channels
             else:
                 # Raise an error
