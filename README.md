@@ -6,7 +6,7 @@
 
 ```
 # setup a virtual environment (either conda or venv)
-git clone https://github.com/ulysses78/PicassoPy.git
+git clone https://github.com/PollyNET/PicassoPy.git
 
 cd PicassoPy
 python -m pip install -e .
@@ -26,3 +26,4 @@ python3 tests\picassopy_testing.py --picasso_config_file "pollynet_processing_ch
 ### History
 
 ### License
+GNU GPL (see LICENSE)
