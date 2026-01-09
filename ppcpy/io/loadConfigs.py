@@ -74,7 +74,8 @@ def readPollyNetConfigLinkTable(polly_config_table_file, timestamp, device):
         return pd.DataFrame()
 
 
-def fix_indexing(config_dict, keys=['first_range_gate_indx',]):
+# def fix_indexing(config_dict, keys=['first_range_gate_indx', ]):
+def fix_indexing(config_dict, keys=['first_range_gate_indx', 'bgCorRangeIndx', 'bgCorRangeIndxLow', 'bgCorRangeIndxHigh', 'LCMeanMinIndx', 'LCMeanMaxIndx', ]):
     """
     """
 
@@ -82,13 +83,14 @@ def fix_indexing(config_dict, keys=['first_range_gate_indx',]):
         logging.warning(f'indexing_convention not given, assuming 1based')
         config_dict['indexing_convention'] = '1based'
 
-    for k in keys:
-        if k in config_dict.keys():
-            if isinstance(config_dict[k], list):
-                config_dict[k] = (np.array(config_dict[k])-1).tolist()
-            else:
-                config_dict[k] = config_dict[k] - 1
-            
+    if config_dict['indexing_convention'] == '1based':
+        for k in keys:
+            if k in config_dict.keys():
+                if isinstance(config_dict[k], list):
+                    config_dict[k] = (np.array(config_dict[k])-1).tolist()
+                else:
+                    config_dict[k] = config_dict[k] - 1
+    
     return config_dict
 
 
@@ -156,7 +158,7 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                     fix_indexing_keys = ['first_range_gate_indx']
                 elif 'LC' in polly_default_config_file_dict.keys():
                     fix_indexing_keys = ['LC']
-                return fix_indexing(polly_config_dict, keys=fix_indexing_keys)
+                return fix_indexing(polly_config_dict, keys=fix_indexing_keys + ['bgCorRangeIndx', 'bgCorRangeIndxLow', 'bgCorRangeIndxHigh', 'LCMeanMinIndx', 'LCMeanMaxIndx'])
                 
             except Exception:
                 logging.warning(f'polly_config_file: {polly_config_file} can not be processed.', exc_info=True)
@@ -168,7 +170,7 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                 fix_indexing_keys = ['first_range_gate_indx']
             elif 'LC' in polly_default_config_file_dict.keys():
                 fix_indexing_keys = ['LC']
-            return fix_indexing(polly_default_config_file_dict)
+            return fix_indexing(polly_default_config_file_dict, keys=fix_indexing_keys + ['bgCorRangeIndx', 'bgCorRangeIndxLow', 'bgCorRangeIndxHigh', 'LCMeanMinIndx', 'LCMeanMaxIndx'])
     else:
         logging.critical(f'polly_default_config_file:  {polly_default_config_file} can not be found. Aborting')
         return None
