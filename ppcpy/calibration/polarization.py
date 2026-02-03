@@ -18,22 +18,13 @@ def smooth_signal(signal, window_len):
 
 
 def loadGHK(data_cube):
+    """ prepare the GHK parameters, especially if given in TR convert them into GHK """
 
     print('starting loadGHK')
-
-    sigma_angstroem=0.2
-    MC_count=3
-
-    pcd = data_cube.polly_config_dict
-
     #print('flag_532_total', flag_532_total_FR)
     #print('flag_532_cross', flag_532_cross_FR)
 
     print('data_cube keys ', data_cube.__dict__.keys())
-    print('======================================')
-    #pprint.pprint(data_cube.polly_config_dict)
-    #print(data_cube.polly_config_dict.keys())
-    print('======================================')
     G = np.array(data_cube.polly_config_dict['G']).astype(float)
     H = np.array(data_cube.polly_config_dict['H']).astype(float)
     K = np.array(data_cube.polly_config_dict['K']).astype(float)
@@ -63,14 +54,16 @@ def loadGHK(data_cube):
         H[data_cube.flag_1064_cross_FR] = onemx_onepx(TR[data_cube.flag_1064_cross_FR])
     else:
         print("Using GHK from config file")
+        #print('TR', TR)
+        #print('TR from H', (1-H)/(1+H))
     print('TR', TR)
     print('G', G)
     print('H', H)
     print('K', K)
-    data_cube.polly_config_dict['TR'] = TR
-    data_cube.polly_config_dict['G'] = G
-    data_cube.polly_config_dict['H'] = H
-    data_cube.polly_config_dict['K'] = K
+    data_cube.polly_config_dict.pop('TR', None) # remove the TR from the config to avoid inconsistencies
+    data_cube.polly_config_dict['G'] = np.array(G)
+    data_cube.polly_config_dict['H'] = np.array(H)
+    data_cube.polly_config_dict['K'] = np.array(K)
     data_cube.polly_config_dict['voldepol_error_355'] = np.array(data_cube.polly_config_dict['voldepol_error_355'])
     data_cube.polly_config_dict['voldepol_error_532'] = np.array(data_cube.polly_config_dict['voldepol_error_532'])
     data_cube.polly_config_dict['voldepol_error_1064'] = np.array(data_cube.polly_config_dict['voldepol_error_1064'])
@@ -212,10 +205,11 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
         return {'status': 0}
 
     # the iteration of days can be omitted if unixtimestamps are used
+    print('pol_cali_nang_start_time', pol_cali_nang_start_time)
 
     time = np.array(time)
     for i_depol_cal in range(len(pol_cali_nang_start_time)):
-        #print('i_depol_cal', i_depol_cal)
+        print('i_depol_cal', i_depol_cal)
         indx_45p = np.where(
             (time >= pol_cali_pang_start_time[i_depol_cal]) &
             (time <= pol_cali_pang_stop_time[i_depol_cal]))[0]

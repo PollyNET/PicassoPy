@@ -84,6 +84,6 @@ def voldepol_2d(data_cube):
                 sigt, sigc, config_dict['G'][flagt], config_dict['G'][flagc],
                 config_dict['H'][flagt], config_dict['H'][flagc],
                 data_cube.pol_cali[int(wv)]['eta_best'], config_dict[f'voldepol_error_{wv}'],
-                1)
+                window=1)
             vdr[data_cube.retrievals_highres['depCalMask'], :] = np.nan
             data_cube.retrievals_highres[f"voldepol_{wv}_total_FR"] = vdr

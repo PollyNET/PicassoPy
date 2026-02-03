@@ -2,6 +2,8 @@
 import logging
 import numpy as np
 
+import ppcpy.retrievals.depolarization as depolarization 
+
 
 def transCorGHK_cube(data_cube, signal='BGCor'):
     """ """
@@ -16,7 +18,7 @@ def transCorGHK_cube(data_cube, signal='BGCor'):
         flagt = data_cube.gf(wv, 'total', 'FR')
         flagc = data_cube.gf(wv, 'cross', 'FR')
         indxt = np.where(flagt)[0]
-        print(flagt, indxt)
+        #print(flagt, indxt)
         if np.any(flagt) and np.any(flagc):
             logging.info(f'and even a {wv} channel')
 
@@ -29,16 +31,73 @@ def transCorGHK_cube(data_cube, signal='BGCor'):
             print('H', config_dict['H'][flagt], config_dict['H'][flagc])
             print('polCaliEta', data_cube.pol_cali[wv]['eta_best'])
 
-            sigTCor_total, bgTCor_total = transCorGHK_channel(
-                sigBGCor_total, bg_total, sigBGCor_cross, bg_cross,
-                transGT=config_dict['G'][flagt], transGR=config_dict['G'][flagc],
-                transHT=config_dict['H'][flagt], transHR=config_dict['H'][flagc],
-                polCaliEta=data_cube.pol_cali[wv]['eta_best'],
+            # similar to voldepol_2d
+            vdr, vdrStd = depolarization.calc_profile_vdr(
+                sigBGCor_total, sigBGCor_cross, 
+                config_dict['G'][flagt], config_dict['G'][flagc],
+                config_dict['H'][flagt], config_dict['H'][flagc],
+                data_cube.pol_cali[int(wv)]['eta_best'], config_dict[f'voldepol_error_{wv}'],
+            )
+
+            sigTCor_total, bgTCor_total = transCor_E16_channel(
+                sigBGCor_total, bg_total, vdr,
+                config_dict['H'][flagt], 
             )
             sigTCor[:,:,indxt] = np.expand_dims(sigTCor_total, -1)
             BGTCor[:,indxt] = np.expand_dims(bgTCor_total, -1)
     
     return sigTCor, BGTCor
+
+def transCor_E16_channel(sigT, bgT, voldepol, HT):
+    """ transmission correction for the total channel using the Mattis 2009/Engelmann 2016 method
+    
+    Parameters
+    ----------
+    sigT : array
+        Signal in total channel (background-corrected)
+    bgT : array
+        Background in total channel
+    voldepol : array
+        Volume depolarization ratio
+    HT : float
+        Transmission ratio of total channel in GHK notation
+    
+    Returns
+    -------
+    sigTCor : array
+        Signal in total channel corrected for polarization induced transmission effects
+    bgTCor : array
+        Background of total signal 
+    
+
+    Notes
+    -----
+    Following [1]_ in the notation of [2]_
+        
+    .. math:: P_{i, \text{corr}} = P_i \frac{1 + R_i\delta^V}{1+\delta^V}    
+    
+    with the signal :math:`P_i`, the transmission ratio :math:`R_i` and the volume depolarization ratio :math:`delta^V`
+    
+
+    ToDo
+    ----
+    Clarify the background treatment. The bgTCor should not change (i.e. assuming the vdr is 0?
+
+    
+    References
+    ----------
+    
+    .. [1] Mattis et al 2009
+    .. [2] Engelmann et al 2016
+    
+    """
+
+    R_t = (1 - HT) / (1 + HT)
+    print('calculated R_t', R_t)
+    sigTCor = sigT * (1 + R_t*voldepol) / (1+voldepol)
+    bgTCor = bgT 
+
+    return sigTCor, bgTCor
 
 
 def transCorGHK_channel(sigT, bgT, sigC, bgC, transGT=1, transGR=1, transHT=0, transHR=-1, polCaliEta=1, polCaliEtaStd=0):
