@@ -14,9 +14,10 @@ def transCorGHK_cube(data_cube, signal='BGCor'):
     # Store the background corrected signal
     sigTCor = data_cube.retrievals_highres[f'sig{signal}'].copy() 
 
+    tel = 'FR'
     for wv in [355, 532, 1064]:
-        flagt = data_cube.gf(wv, 'total', 'FR')
-        flagc = data_cube.gf(wv, 'cross', 'FR')
+        flagt = data_cube.gf(wv, 'total', tel)
+        flagc = data_cube.gf(wv, 'cross', tel)
         indxt = np.where(flagt)[0]
         #print(flagt, indxt)
         if np.any(flagt) and np.any(flagc):
@@ -29,14 +30,14 @@ def transCorGHK_cube(data_cube, signal='BGCor'):
 
             print('G', config_dict['G'][flagt], config_dict['G'][flagc])
             print('H', config_dict['H'][flagt], config_dict['H'][flagc])
-            print('polCaliEta', data_cube.pol_cali[wv]['eta_best'])
+            print('polCaliEta', data_cube.pol_cali[f'{wv}_{tel}']['eta_best'])
 
             # similar to voldepol_2d
             vdr, vdrStd = depolarization.calc_profile_vdr(
                 sigBGCor_total, sigBGCor_cross, 
                 config_dict['G'][flagt], config_dict['G'][flagc],
                 config_dict['H'][flagt], config_dict['H'][flagc],
-                data_cube.pol_cali[int(wv)]['eta_best'], config_dict[f'voldepol_error_{wv}'],
+                data_cube.pol_cali[f'{wv}_{tel}']['eta_best'], config_dict[f'voldepol_error_{wv}'],
             )
 
             sigTCor_total, bgTCor_total = transCor_E16_channel(

@@ -208,7 +208,8 @@ class PicassoProc:
             flag407nmChannel=self.polly_config_dict['is407nm'],
             flag532nmChannel=self.polly_config_dict['is532nm'],
             flag607nmChannel=self.polly_config_dict['is607nm'],
-            flag1064nmChannel=self.polly_config_dict['is1064nm']
+            flag1064nmChannel=self.polly_config_dict['is1064nm'],
+            flagDFOVChannel=self.polly_config_dict['isDFOV'],
         )
 
         ChannelTags, self.polly_config_dict = pollyChannelTags.polly_config_channel_corrections(chTagsOut_ls=ChannelTags, polly_config_dict=self.polly_config_dict)
@@ -230,7 +231,8 @@ class PicassoProc:
             flag407nmChannel=self.polly_config_dict['is407nm'],
             flag532nmChannel=self.polly_config_dict['is532nm'],
             flag607nmChannel=self.polly_config_dict['is607nm'],
-            flag1064nmChannel=self.polly_config_dict['is1064nm']
+            flag1064nmChannel=self.polly_config_dict['is1064nm'],
+            flagDFOVChannel=self.polly_config_dict['isDFOV'],
         )
 
         self.flags = ChannelFlags
@@ -600,12 +602,17 @@ class PicassoProc:
         """
         if parameter == 'LC':
             table_name = 'lidar_calibration_constant'
-            column_names = ['cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'used_for_processing', 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
+            column_names = [
+                'cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'used_for_processing', 
+                'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
             data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text', 'text']
         elif parameter == 'DC':
             table_name = 'depol_calibration_constant'
-            column_names = ['cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'used_for_processing', 'wavelength', 'nc_zip_file', 'polly_type']
-            data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text']
+            column_names = [
+                'cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'used_for_processing', 
+                'wavelength', 'telescope', 'nc_zip_file', 'polly_type']
+            data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text']
+        assert len(column_names) == len(data_types), 'column names do not match data types'
 
         logging.info(f'writing to sqlite-db: {db_path}')
         logging.info(f'writing {parameter} to table: {table_name}')

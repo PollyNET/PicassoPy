@@ -43,7 +43,7 @@ def quasi_pdr(data_cube, wvs=[532], version='V1'):
         vdr, _ = depolarization.calc_profile_vdr(
             sigt, sigc, config_dict['G'][flagt], config_dict['G'][flagc],
             config_dict['H'][flagt], config_dict['H'][flagc],
-            data_cube.pol_cali[int(wv)]['eta_best'], config_dict[f'voldepol_error_{wv}'],
+            data_cube.pol_cali[f'{wv}_{tel}']['eta_best'], config_dict[f'voldepol_error_{wv}'],
             window=1)
 
         if f"quasiBsc{version}_{wv}_{t}_{tel}" in data_cube.retrievals_highres.keys():

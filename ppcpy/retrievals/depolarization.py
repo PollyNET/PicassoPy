@@ -34,12 +34,12 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
                 #    data_cube.retrievals_highres[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, 'total', tel)]), axis=0)
                 sigc = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i,:,flagc])
 
-                print(channel, data_cube.pol_cali[int(wv)]['eta_best'])
+                print(channel, data_cube.pol_cali[f'{wv}_{tel}']['eta_best'])
 
                 vdr, vdrStd = calc_profile_vdr(
                     sigt, sigc, config_dict['G'][flagt], config_dict['G'][flagc],
                     config_dict['H'][flagt], config_dict['H'][flagc],
-                    data_cube.pol_cali[int(wv)]['eta_best'], config_dict[f'voldepol_error_{wv}'],
+                    data_cube.pol_cali[f'{wv}_{tel}']['eta_best'], config_dict[f'voldepol_error_{wv}'],
                     window=config_dict[f'smoothWin_{retrieval}_{wv}']
                     )
                 opt_profiles[i][channel]['vdr'] = vdr
@@ -61,7 +61,7 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
                 vdr, vdrStd = calc_profile_vdr(
                     sigt, sigc, config_dict['G'][flagt], config_dict['G'][flagc],
                     config_dict['H'][flagt], config_dict['H'][flagc],
-                    data_cube.pol_cali[int(wv)]['eta_best'], config_dict[f'voldepol_error_{wv}'],
+                    data_cube.pol_cali[f'{wv}_{tel}']['eta_best'], config_dict[f'voldepol_error_{wv}'],
                     window=1
                     )
                 mdr, mdrStd, flgaDeftMdr = get_MDR(
