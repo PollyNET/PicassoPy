@@ -377,7 +377,6 @@ def calibrateMol(data_cube):
     pol_cali = defaultdict(lambda: defaultdict(list))
 
     config_dict = data_cube.polly_config_dict
-    default_dict = data_cube.polly_default_dict
 
     for i, cldFree in enumerate(data_cube.clFreeGrps):
         print(i, cldFree)
@@ -411,8 +410,8 @@ def calibrateMol(data_cube):
                     TR_c=np.squeeze(data_cube.polly_config_dict['TR'][data_cube.gf(wv, 'cross', tel)]),
                     TR_c_std=0,
                     minSNR=10,
-                    mdr=default_dict[f'molDepol{wv}'],
-                    mdrStd=default_dict[f'molDepolStd{wv}'],
+                    mdr=config_dict[f'molDepol{wv}'],
+                    mdrStd=config_dict[f'molDepolStd{wv}'],
                 )
                 if not ret['status'] == 0:
                     pol_cali[f'{wv}_{t}_{tel}']['eta'].append(ret['eta'])
