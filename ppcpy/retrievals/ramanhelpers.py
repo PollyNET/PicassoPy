@@ -1,9 +1,8 @@
 
 import numpy as np
-from scipy.ndimage import uniform_filter1d
 from scipy.stats import norm, poisson
 
-def movingslope_variedWin(signal, winWidth):
+def movingslope_variedWin(signal:np.ndarray, winWidth:int|np.ndarray) -> np.ndarray:
     """
     MOVINGSLOPE_VARIEDWIN calculates the slope of the signal with a moving slope.
     This is a wrapper for the `movingslope` function to make it compatible with
@@ -51,7 +50,15 @@ def movingslope_variedWin(signal, winWidth):
 
     return slope
 
-def movingslope(vec, supportlength=3, modelorder=1, dt=1):
+def moving_smooth_varied_win(signal, winWidth):
+    """ """
+    raise NotImplementedError
+
+def moving_linfit_varied_win(height, signal, winWidth):
+    """ """
+    raise NotImplementedError
+
+def movingslope(vec:np.ndarray, supportlength:int=3, modelorder:int=1, dt:float=1) -> np.ndarray:
     """
     MOVINGSLOPE estimates the local slope of a sequence of points using a sliding window.
 
@@ -123,9 +130,8 @@ def movingslope(vec, supportlength=3, modelorder=1, dt=1):
     # Scale by spacing
     return Dvec / dt
 
-def _getcoef(t, supportlength, modelorder):
-    """
-    Helper function to compute the filter coefficients.
+def _getcoef(t:np.ndarray, supportlength:int, modelorder:int) -> np.ndarray:
+    """Helper function to compute the filter coefficients.
 
     Parameters
     ----------
@@ -146,10 +152,8 @@ def _getcoef(t, supportlength, modelorder):
     return pinvA[1]  # Only the linear term
 
 
-def sigGenWithNoise(signal, noise=None, nProfile=1, method='norm'):
-    """
-    SIGGENWITHNOISE generate noise-containing signal with a certain noise-adding 
-    algorithm.
+def sigGenWithNoise(signal:np.ndarray, noise:np.ndarray=None, nProfile:int=1, method:str='norm') -> np.ndarray:
+    """SIGGENWITHNOISE generate noise-containing signal with a certain noise-adding algorithm.
 
     Parameters
     ----------
@@ -172,6 +176,7 @@ def sigGenWithNoise(signal, noise=None, nProfile=1, method='norm'):
     History
     -------
     - 2021-06-13: First edition by Zhenping.
+    - 2026-02-04: Modifications to reduce computational time, Buholdt
     """
     if noise is None:
         noise = np.sqrt(signal)
@@ -180,13 +185,13 @@ def sigGenWithNoise(signal, noise=None, nProfile=1, method='norm'):
     noise = np.array(noise).reshape(1, -1)
     noise[np.isnan(noise)] = 0
 
-    signalGen = np.full((len(signal.flatten()), nProfile), np.nan)
+    signalGen = np.full((np.prod(signal.shape), nProfile), np.nan)
 
     if method == 'norm':
-        for iBin in range(len(signal.flatten())):
+        for iBin in range(np.prod(signal.shape)):
             signalGen[iBin, :] = signal[0, iBin] + norm.rvs(scale=noise[0, iBin], size=nProfile)
     elif method == 'poisson':
-        for iBin in range(len(signal.flatten())):
+        for iBin in range(np.prod(signal.shape)):
             signalGen[iBin, :] = poisson.rvs(signal[0, iBin], size=nProfile)
     else:
         raise ValueError('A valid method should be provided.')

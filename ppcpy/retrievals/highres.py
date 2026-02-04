@@ -7,14 +7,22 @@ import ppcpy.retrievals.depolarization as depolarization
 import logging
 
 
-def attbsc_2d(data_cube, nr=True):
-    """calculate the attbsc using the estimated LCs
+def attbsc_2d(data_cube, nr:bool=True, collect_debug:bool=False):
+    """Attenuated Backscatter
+
+    Parameters
+    ----------
+    nr : bool, optional
+        If Ture, calculate the attbsc for FR and NR channels. Default: True
+    collect_debug : bool, optional
+        If True, collects debug information. Default: False
+    
     """
 
     rgs = data_cube.retrievals_highres['range']
     time = data_cube.retrievals_highres['time64']
     ranges_squared = rgs**2
-    ranges2d = np.repeat(ranges_squared[np.newaxis,:], time.shape[0], axis=0)
+    ranges2d = np.repeat(ranges_squared[np.newaxis, :], time.shape[0], axis=0)
 
     channels = [(355, 'total', 'FR'), (387, 'total', 'FR'),
                 (532, 'total', 'FR'), (607, 'total', 'FR'),
@@ -27,8 +35,8 @@ def attbsc_2d(data_cube, nr=True):
         channel = f"{wv}_{t}_{tel}"
 
         sig = np.squeeze(
-            data_cube.retrievals_highres[f'sigTCor'][:,:,data_cube.gf(wv, t, tel)])
-       
+            data_cube.retrievals_highres[f'sigTCor'][:, :, data_cube.gf(wv, t, tel)])
+        
         if channel in data_cube.LCused.keys():
             pass
         else:
@@ -42,14 +50,15 @@ def attbsc_2d(data_cube, nr=True):
 
     # experimental, the calibration constant requires the OL corrected signal
     if 'sigOLCor' in data_cube.retrievals_highres:
+        print(f"Exprimental, attenuated backscatter solution for {channel}")
         sigOLTCor, _ = transCor.transCorGHK_cube(data_cube, signal='OLCor') 
         channels = [(355, 'total', 'FR'), (532, 'total', 'FR'), (1064, 'total', 'FR')]
         for wv, t, tel in channels:
             channel = f"{wv}_{t}_{tel}"
 
             #sig = np.squeeze(
-            #    data_cube.retrievals_highres[f'sigOLCor'][:,:,data_cube.gf(wv, t, tel)])
-            sig = np.squeeze(sigOLTCor[:,:,data_cube.gf(wv, t, tel)])
+            #    data_cube.retrievals_highres[f'sigOLCor'][:, :, data_cube.gf(wv, t, tel)])
+            sig = np.squeeze(sigOLTCor[:, :, data_cube.gf(wv, t, tel)])
 
             if channel in data_cube.LCused.keys():
                 pass
@@ -75,15 +84,21 @@ def voldepol_2d(data_cube):
 
         if np.any(flagt) and np.any(flagc):
             sigt = np.squeeze(
-                data_cube.retrievals_highres[f'sigBGCor'][:,:,flagt])
+                data_cube.retrievals_highres[f'sigBGCor'][:, :, flagt])
             sigc = np.squeeze(
-                data_cube.retrievals_highres[f'sigBGCor'][:,:,flagc])
+                data_cube.retrievals_highres[f'sigBGCor'][:, :, flagc])
 
 
             vdr, vdrStd = depolarization.calc_profile_vdr(
-                sigt, sigc, config_dict['G'][flagt], config_dict['G'][flagc],
-                config_dict['H'][flagt], config_dict['H'][flagc],
-                data_cube.pol_cali[int(wv)]['eta_best'], config_dict[f'voldepol_error_{wv}'],
-                1)
+                sigt,
+                sigc,
+                Gt=config_dict['G'][flagt],
+                Gr=config_dict['G'][flagc],
+                Ht=config_dict['H'][flagt],
+                Hr=config_dict['H'][flagc],
+                eta=data_cube.pol_cali[int(wv)]['eta_best'],
+                voldepol_error=config_dict[f'voldepol_error_{wv}'],
+                window=1
+            )
             vdr[data_cube.retrievals_highres['depCalMask'], :] = np.nan
             data_cube.retrievals_highres[f"voldepol_{wv}_total_FR"] = vdr

@@ -93,8 +93,10 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
 
 
 def get_best_LC(LCs):
-    """ get lidar constant with the lowest standard deviation
-     
+    """
+    Get lidar constant with the lowest standard deviation
+    
+    TODO: write docsting
     """
 
     # list comprehension for nested list

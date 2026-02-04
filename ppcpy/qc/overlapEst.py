@@ -1,15 +1,18 @@
 
 import logging
 import numpy as np
-from scipy.ndimage import uniform_filter1d
 
 from ppcpy.retrievals.collection import calc_snr
-from ppcpy.misc.helper import mean_stable
+from ppcpy.misc.helper import mean_stable, uniform_filter
 
 from pathlib import Path
 
-def run_frnr_cldFreeGrps(data_cube, collect_debug=True):
+def run_frnr_cldFreeGrps(data_cube, collect_debug:bool=True):
     """
+    The matlab version preforms some convertio from PC to PCR after calculating the overlap function (this might just be relevent at all)
+    The matlab version also uses calculates 1 overlap function for each channel while we calculate 1 per clFreeGrp per channel...
+
+    The frnr overlap calculations are very unstable and frequently results in values outside the range [0,1].
     """
 
     height = data_cube.retrievals_highres['range']
@@ -21,25 +24,24 @@ def run_frnr_cldFreeGrps(data_cube, collect_debug=True):
 
     print('Starting Overlap retrieval')
     for i, cldFree in enumerate(data_cube.clFreeGrps):
-        print('cldFree ', i, cldFree)
+        print('cldFree', i, cldFree)
         cldFree = cldFree[0], cldFree[1] + 1
         print('cldFree mod', cldFree)
         for wv in [355, 387, 532, 607]:
             if np.any(data_cube.gf(wv, 'total', 'FR')) and np.any(data_cube.gf(wv, 'total', 'NR')):
                 print(wv, 'both telescopes available')
-                sigFR = np.squeeze(data_cube.retrievals_profile['sigTCor'][i,:,data_cube.gf(wv, 'total', 'FR')])
-                bgFR = np.squeeze(data_cube.retrievals_profile['BGTCor'][i,data_cube.gf(wv, 'total', 'FR')])
-                sigNR = np.squeeze(data_cube.retrievals_profile['sigTCor'][i,:,data_cube.gf(wv, 'total', 'NR')])
-                bgNR = np.squeeze(data_cube.retrievals_profile['BGTCor'][i,data_cube.gf(wv, 'total', 'NR')])
+                sigFR = np.squeeze(data_cube.retrievals_profile['sigTCor'][i, :, data_cube.gf(wv, 'total', 'FR')])
+                bgFR = np.squeeze(data_cube.retrievals_profile['BGTCor'][i, data_cube.gf(wv, 'total', 'FR')])
+                sigNR = np.squeeze(data_cube.retrievals_profile['sigTCor'][i, :, data_cube.gf(wv, 'total', 'NR')])
+                bgNR = np.squeeze(data_cube.retrievals_profile['BGTCor'][i, data_cube.gf(wv, 'total', 'NR')])
                 hFullOverlap = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, 'total', 'FR')][0]
-                ol = overlapCalc(height, sigFR, bgFR, sigNR, bgNR, hFullOverlap=hFullOverlap)
+                ol = overlapCalc(height=height, sigFR=sigFR, bgFR=bgFR, sigNR=sigNR, bgNR=bgNR, hFullOverlap=hFullOverlap, collect_debug=collect_debug)
                 overlap[i][f"{wv}_total_FR"] = ol
     
     return overlap
 
 
-
-def overlapCalc(height, sigFR, bgFR, sigNR, bgNR, hFullOverlap=600):
+def overlapCalc(height:np.ndarray, sigFR:np.ndarray, bgFR:np.ndarray, sigNR:np.ndarray, bgNR:np.ndarray, hFullOverlap:float=600, collect_debug=False) -> dict:
     """Calculate overlap function.
 
     Parameters
@@ -87,9 +89,16 @@ def overlapCalc(height, sigFR, bgFR, sigNR, bgNR, hFullOverlap=600):
         # Calculate the channel ratio of near and far range total signals
         sigRatio, normRange, _ = mean_stable(sigNR / sigFR , 40, full_overlap_index, len(sigNR), 0.1)
 
-        #print('is normRange index or slice?', normRange) # -> is list of indices
+        # print('is normRange index or slice?', normRange) # -> is list of indices
         # Calculate the overlap of the far-range channel
         if normRange.shape[0] > 0:
+            if collect_debug:
+                print("bgFR.shape", bgFR.shape)
+                print("bgNR.shape", bgNR.shape)
+                print("normRange.shape", normRange.shape)
+                print("normRange", normRange)
+                print("bgFR*normRange.shape[0]", bgFR*normRange.shape[0])
+                print("bgFR*normRange.shape[0]", bgFR*normRange.shape[0])
             SNRnormRangeFR = calc_snr(np.sum(sigFR[normRange], keepdims=True), bgFR*normRange.shape[0])
             SNRnormRangeNR = calc_snr(np.sum(sigNR[normRange], keepdims=True), bgNR*normRange.shape[0])
             sigRatioStd = sigRatio * np.sqrt(1 / (SNRnormRangeFR**2) + 1 / (SNRnormRangeNR**2))
@@ -102,7 +111,7 @@ def overlapCalc(height, sigFR, bgFR, sigNR, bgNR, hFullOverlap=600):
 
 
 
-def run_raman_cldFreeGrps(data_cube, collect_debug=True):
+def run_raman_cldFreeGrps(data_cube, collect_debug:bool=True):
     """
     """
 
@@ -123,11 +132,11 @@ def run_raman_cldFreeGrps(data_cube, collect_debug=True):
         for (wv, t, tel), (wv_r, t_r, tel_r) in channels:
             if np.any(data_cube.gf(wv, t, tel)) and np.any(data_cube.gf(wv_r, t_r, tel_r)):
                 print(wv, wv_r, 'both wavelengths available')
-                sig = np.squeeze(data_cube.retrievals_profile['sigTCor'][i,:,data_cube.gf(wv, t, tel)])
+                sig = np.squeeze(data_cube.retrievals_profile['sigTCor'][i, :, data_cube.gf(wv, t, tel)])
                 #bg = np.nansum(np.squeeze(
                 #    data_cube.retrievals_highres['BGTCor'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
-                molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i,:]
-                molExt = data_cube.mol_profiles[f'mExt_{wv}'][i,:]
+                molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
+                molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :]
 
                 if f"{wv}_{t}_{tel}" in data_cube.retrievals_profile['raman'][i].keys():
                     pass
@@ -140,16 +149,16 @@ def run_raman_cldFreeGrps(data_cube, collect_debug=True):
                     continue
                 aerBsc = data_cube.retrievals_profile['raman'][i][f"{wv}_{t}_{tel}"]['aerBsc']
 
-                sig_r = np.squeeze(data_cube.retrievals_profile['sigTCor'][i,:,data_cube.gf(wv_r, t, tel)])
+                sig_r = np.squeeze(data_cube.retrievals_profile['sigTCor'][i, :, data_cube.gf(wv_r, t, tel)])
                 #bg_r = np.nansum(np.squeeze(
-                #    data_cube.retrievals_highres['BGTCor'][slice(*cldFree),data_cube.gf(wv_r, t, tel)]), axis=0)
-                molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i,:]
-                molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i,:]
+                #    data_cube.retrievals_highres['BGTCor'][slice(*cldFree), data_cube.gf(wv_r, t, tel)]), axis=0)
+                molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i, :]
+                molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i, :]
                 hFullOverlap = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, t, tel)][0]
                 ol = overlapCalcRaman(wv, wv_r, height, sig, sig_r,
                                  molExt, molBsc_r, molExt_r, aerBsc,
-                                 hFullOverlap=hFullOverlap, smoothbins=config_dict['overlapSmoothBins']-3,
-                                 AE=config_dict['angstrexp'], hres=hres)
+                                 hFullOverlap=hFullOverlap, smoothbins=config_dict['overlapSmoothBins']-3,  # -3??? looks very hard coded....
+                                 AE=config_dict['angstrexp'], hres=hres, collect_debug=collect_debug)
 
                 overlap[i][f"{wv}_{t}_{tel}"] = ol
     
@@ -203,6 +212,7 @@ def overlapCalcRaman(Lambda_el, Lambda_Ra, height, sigFRel, sigFRRa,
     History
     -------
     - 2023-06-06: First edition by Cristofer
+    - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
 
     """
 
@@ -210,8 +220,8 @@ def overlapCalcRaman(Lambda_el, Lambda_Ra, height, sigFRel, sigFRRa,
 
         sigFRRa0 = sigFRRa.copy()
         for _ in range(5):
-            sigFRRa = uniform_filter1d(sigFRRa, smoothbins)
-            sigFRel = uniform_filter1d(sigFRel, smoothbins)
+            sigFRRa = uniform_filter(sigFRRa, smoothbins)
+            sigFRel = uniform_filter(sigFRel, smoothbins)
 
         aerBsc = aerBsc.copy()
         if len(aerBsc) > 0:
@@ -220,7 +230,7 @@ def overlapCalcRaman(Lambda_el, Lambda_Ra, height, sigFRel, sigFRRa,
             aerBsc = 0
 
         aerBsc0 = aerBsc.copy()
-        aerBsc = uniform_filter1d(aerBsc, smoothbins)
+        aerBsc = uniform_filter(aerBsc, smoothbins)
 
         LR0 = np.arange(30, 82, 2)  # LR array to search best LR.
 
@@ -234,10 +244,10 @@ def overlapCalcRaman(Lambda_el, Lambda_Ra, height, sigFRel, sigFRRa,
                 LR = LR0[ii]
 
             # Overlap calculation (direct version)
-            transRa = np.exp(-np.cumsum((molExt_r + LR * aerBsc * (Lambda_el / Lambda_Ra) ** AE) * np.concatenate(([height[0]], np.diff(height)))))
-            transel = np.exp(-np.cumsum((molExt + LR * aerBsc) * np.concatenate(([height[0]], np.diff(height)))))
-            transRa0 = np.exp(-np.cumsum((molExt_r + LR * aerBsc0 * (Lambda_el / Lambda_Ra) ** AE) * np.concatenate(([height[0]], np.diff(height)))))
-            transel0 = np.exp(-np.cumsum((molExt + LR * aerBsc0) * np.concatenate(([height[0]], np.diff(height)))))
+            transRa = np.exp(-np.nancumsum((molExt_r + LR * aerBsc * (Lambda_el / Lambda_Ra) ** AE) * np.concatenate(([height[0]], np.diff(height)))))
+            transel = np.exp(-np.nancumsum((molExt + LR * aerBsc) * np.concatenate(([height[0]], np.diff(height)))))
+            transRa0 = np.exp(-np.nancumsum((molExt_r + LR * aerBsc0 * (Lambda_el / Lambda_Ra) ** AE) * np.concatenate(([height[0]], np.diff(height)))))
+            transel0 = np.exp(-np.nancumsum((molExt + LR * aerBsc0) * np.concatenate(([height[0]], np.diff(height)))))
 
             if sigFRRa.shape[0] > 0 and sigFRel.shape[0] > 0:
                 fullOverlapIndx = np.searchsorted(height, hFullOverlap)
@@ -248,7 +258,7 @@ def overlapCalcRaman(Lambda_el, Lambda_Ra, height, sigFRel, sigFRRa,
             olFunc0 = sigFRRa0 * height ** 2 / molBsc_r / transel0 / transRa0
 
             for _ in range(5):
-                olFunc = uniform_filter1d(olFunc, 3)
+                olFunc = uniform_filter(olFunc, 3)
 
             ovl_norm, normRange, _ = mean_stable(olFunc, 40, fullOverlapIndx - round(37.5 / hres), fullOverlapIndx + round(2250 / hres), 0.1)
             ovl_norm0, normRange0, _ = mean_stable(olFunc0, 40, fullOverlapIndx - round(37.5 / hres), fullOverlapIndx + round(2250 / hres), 0.1)
@@ -291,7 +301,7 @@ def overlapCalcRaman(Lambda_el, Lambda_Ra, height, sigFRel, sigFRRa,
             for _ in range(6):
                 # smoothing before full overlap to avoid S-shape near to the
                 # full overlap.
-                olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)] = uniform_filter1d(olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)], 5)
+                olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)] = uniform_filter(olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)], 5)
 
         olFunc[olFunc < 1e-5] = 1e-5
 
@@ -332,8 +342,8 @@ def load(data_cube):
             continue
         dat = np.loadtxt(full_f, skiprows=1, delimiter=',')
         print(dat.shape)
-        h_ovl = dat[:,0]
-        ovl = dat[:,1]
+        h_ovl = dat[:, 0]
+        ovl = dat[:, 1]
         print(h_ovl.shape, h_ovl[:10], h_ovl[-10:])
         print(ovl.shape, ovl[:20])
         if height.shape != h_ovl.shape or not np.all(np.isclose(height, h_ovl)):

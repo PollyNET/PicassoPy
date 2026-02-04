@@ -1,32 +1,5 @@
 """
-Debuging Info:
-
-Config parameters set to equal in Picasso and PicassoPy: 
-(PicassoPy values aer overwritten to match Picasso's)
-+-------------------------------+---------------+---------------+
-|   "Name"                      |   "Picasso"   |   "PicassoPy" |
-+-------------------------------+---------------+---------------+
-|   "minRamanRefSNR355":        |   "40"        |   "40"        |
-|   "minRamanRefSNR532":        |   "10"        |   "10"        |
-|   "minRamanRefSNR1064":       |   "10"        |   "10"        |
-|   "minRamanRefSNR387":        |   "40"        |   "40"        |
-|   "minRamanRefSNR607":        |   "20"        |   "20"        |
-|   "minRamanRefSNR_NR_355":    |   "2"         |   "50"        |
-|   "minRamanRefSNR_NR_532":    |   "4"         |   "20"        |
-|   "minRamanRefSNR_NR_387":    |   "2"         |   "40"        |
-|   "minRamanRefSNR_NR_607":    |   "2"         |   "20"        |
-|   "angstrexp":                |   "0.3"       |   "0.3"       |
-|   "angstrexp_NR":             |   "1"         |   "0.9"       |
-+-------------------------------+---------------+---------------+
-
-Parameters that are different between Picasso and PicassoPy:
-+-------------------------------+---------------+---------------+
-|   "Name"                      |   "Picasso"   |   "PicassoPy" |
-+-------------------------------+---------------+---------------+
-|   "dtCorMode":                |   "3"         |   "1"         |
-+-------------------------------+---------------+---------------+
-
-Cheked:
+Checked:
     - run_cldFreeGrps:  False
     - raman_ext:        False
     - raman_bsc:        True
@@ -39,14 +12,13 @@ import logging
 import numpy as np
 from ppcpy.retrievals.ramanhelpers import *
 from scipy.stats import norm
-from scipy.ndimage import uniform_filter1d
 from scipy.signal import savgol_filter
+from ppcpy.misc.helper import idx2time
 
 from ppcpy.retrievals.collection import calc_snr
 
-sigma_angstroem = 0.2     # Original
-# sigma_angstroem = 0.3   # Testing
-MC_count = 3
+sigma_angstroem:float = 0.2
+MC_count:int = 3
 
 
 def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, collect_debug=True):
@@ -115,22 +87,34 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, 
 
                 print(f"refBeta_{wv}_{t}_{tel}", refBeta)
                 print(f"minRamanRefSNR{wv}_{t}_{tel}", config_dict[f'{keyminSNR}{wv}'], f"minRamanRefSNR{wv_r}_{t_r}_{tel_r}", config_dict[f'{keyminSNR}{wv_r}'])
+                print(f"smoothWin_raman_{wv}_{t}_{tel}", config_dict[f"{key_smooth}{wv}"])
+                print("angstrexp", angstrexp)
 
-                sig = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, : ,data_cube.gf(wv, t, tel)])
-                bg = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv, t, tel)])
+                sig = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv, t, tel)])      # Original  sigTCor
+                # sig *= height**2                                                                                  # Testing   RCS (PC)
+                # sig = np.squeeze(data_cube.retrievals_profile[f'RCS'][i, :, data_cube.gf(wv, t, tel)])            # Testing   RCS (PCR)
+
+                bg = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv, t, tel)])           # Original  sigTCor
+                # bg = np.squeeze(data_cube.retrievals_profile[f'BG'][i, data_cube.gf(wv, t, tel)])                 # Testing   sigBGCor
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
                 molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :]
 
-                sig_r = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, : ,data_cube.gf(wv_r, t, tel)])
-                bg_r = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv_r, t, tel)])
+                sig_r = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv_r, t, tel)])  # Original  sigTCor
+                # sig_r *= height**2                                                                                # Testing   RCS (PC)
+                # sig_r = np.squeeze(data_cube.retrievals_profile[f'RCS'][i, :, data_cube.gf(wv_r, t, tel)])        # Testing   RCS (PCR)
+
+                bg_r = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv_r, t, tel)])       # Original  sigTCor
+                # bg_r = np.squeeze(data_cube.retrievals_profile[f'BG'][i, data_cube.gf(wv_r, t, tel)])             # Testing   sigBGCor
                 molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i, :]
                 molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i, :]
                 number_density = data_cube.mol_profiles[f'number_density'][i, :]
 
                 if wv == 1064 and wv_r == 607:
-                    molExt_mod = data_cube.mol_profiles[f'mExt_532'][i, :]
+                    # calculate the extinction based on the 532nm, 607nm molecular profiles and a correction factor
+                    molExt_mod = data_cube.mol_profiles[f'mExt_532'][i, :]  # one per cloud free group (shape (22, 4096))
                     wv_mod = 532
                 else:
+                    # calculate normally
                     wv_mod = wv
                     molExt_mod = molExt
 
@@ -145,11 +129,12 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, 
                     angstrom=angstrexp,
                     window_size=config_dict[f'{key_smooth}{wv}'],
                     method='moving',
-                    MC_count=15,                        # <-- More Hardcoded values, also different from the global parameter MC_count...
-                    bg=bg_r
+                    MC_count=15,
+                    bg=bg_r,
                 )
                 
                 if wv == 1064 and wv_r == 607:
+                    # Apply correction factor based on the angstroem exponent
                     prof['aerExt'] = prof['aerExt'] / (1064./532.)**angstrexp
                     prof['aerExtStd'] = prof['aerExtStd'] / (1064./532.)**angstrexp
 
@@ -175,7 +160,7 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, 
                         # TODO: find a better way of handeling NR cases where we have no FR values that follows the same logic as the rest of the code i.e. try to do it without continue statments...
                         if f"{wv}_{t}_FR" in opt_profiles[i]:
                             if "aerBsc" in opt_profiles[i][f"{wv}_{t}_FR"]:
-                                refBeta = np.nanmean(opt_profiles[i][f"{wv}_{t}_FR"]["aerBsc"][refHInd[0]:refHInd[1]+1])
+                                refBeta = np.nanmean(opt_profiles[i][f"{wv}_{t}_FR"]["aerBsc"][refHInd[0]:refHInd[1] + 1])
                             else:
                                 print('No valid refBeta found, skipping Raman retrieval for this channel')
                                 prof['retrieval'] = 'raman'
@@ -192,7 +177,7 @@ def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, 
                     if SNRRef > config_dict[f'{keyminSNR}{wv}'] and SNRRef_r > config_dict[f'{keyminSNR}{wv_r}']:
                         print('high enough to continue')
                         aerExt_tmp = prof['aerExt'].copy()                  # This is done the other way in matlab i.e. aerExt_tmp is only a copy of aerExt while the original aerExt is interpolated...
-                        aerExt_tmp[:hBaseInd] = aerExt_tmp[hBaseInd]        # <----- interpolation below fulloverlap
+                        aerExt_tmp[:hBaseInd + 1] = aerExt_tmp[hBaseInd]
                         #prof['aerExt'][:hBaseInd] = aerExt_tmp[hBaseInd]   # Yes exacly like this (the other way)
                         print('filling below overlap with', aerExt_tmp[hBaseInd])
                         prof.update(
@@ -593,14 +578,14 @@ def calc_raman_bsc(
     ext_aer_raman = ext_aer * ext_aer_factor
 
     # Optical depths
-    mol_el_OD = np.nansum(ext_mol[:refIndx]) * dH - np.nancumsum(ext_mol) * dH
-    mol_vr_OD = np.nansum(ext_mol_raman[:refIndx]) * dH - np.nancumsum(ext_mol_raman) * dH
-    aer_el_OD = np.nansum(ext_aer[:refIndx]) * dH - np.nancumsum(ext_aer) * dH
-    aer_vr_OD = np.nansum(ext_aer_raman[:refIndx]) * dH - np.nancumsum(ext_aer_raman) * dH
+    mol_el_OD = np.nansum(ext_mol[:refIndx + 1]) * dH - np.nancumsum(ext_mol) * dH                  
+    mol_vr_OD = np.nansum(ext_mol_raman[:refIndx + 1]) * dH - np.nancumsum(ext_mol_raman) * dH      
+    aer_el_OD = np.nansum(ext_aer[:refIndx + 1]) * dH - np.nancumsum(ext_aer) * dH                   
+    aer_vr_OD = np.nansum(ext_aer_raman[:refIndx + 1]) * dH - np.nancumsum(ext_aer_raman) * dH      
 
     # Index array for reference region  # Why are we doing this?????? we could just use HRefIndx[0] and HRefIndx[1] directly...
     hIndx = np.zeros(len(height), dtype=bool)
-    hIndx[HRefIndx[0]:HRefIndx[1]] = True
+    hIndx[HRefIndx[0]:HRefIndx[1] + 1] = True
     
     # Calculate signal ratios at reference height
     elMean = sigElastic[hIndx] / (beta_mol[hIndx] + betaRef)
@@ -623,7 +608,7 @@ def calc_raman_bsc(
     return beta_aer, LR, [mol_el_OD, mol_vr_OD, aer_el_OD, aer_vr_OD], signalratio
 
 
-def smoothWin(signal:np.ndarray, win:int|np.ndarray, method:str="moving") -> np.ndarray:
+def smoothWin(signal:np.ndarray, win:int|np.ndarray, method:str="moving", filter:str="uniform") -> np.ndarray:
     """
     Smooth signal with a height-dependent window.
 
@@ -651,18 +636,27 @@ def smoothWin(signal:np.ndarray, win:int|np.ndarray, method:str="moving") -> np.
     - !!!! matlab slice indexing is end-inclusive while python's is end-exclusive !!!! <--- This may caus a lott of small bugs around....
     """
     if isinstance(win, int):
-        return uniform_filter1d(signal, size=win, mode="nearest")
+        if filter == "uniform":
+            f = np.ones(win)/win
+        elif filter == "gaussian":
+            f = np.exp(-0.5 * ((np.arange(win) - (win - 1)/2) / (0.3 * (win - 1)/2))**2 )
+            f /= np.sum(f)
+        elif filter == "noSmoothing":
+            return signal
+        else:
+            raise ValueError("Invalid filter type.")
+        smooth_signal = np.convolve(signal, f, mode='valid')
+        fill = np.full(int((win - 1)/2), np.nan)
+        # if window size is even fill one more element at the start.
+        if win % 2 == 0:
+            out = np.hstack((np.append(fill, np.nan), smooth_signal, fill))
+        else:
+            out = np.hstack((fill, smooth_signal, fill))
+            
+        return out
     
-    # This part is not in use as far as I can see... We allways use a fixed (int) window size.
-    if isinstance(win, np.ndarray) and win.shape[1] == 3:
-        signalSM = np.full_like(signal, np.nan)
-        for i in range(win.shape[0]):
-            startIndx = max(0, win[i, 0] - (win[i, 2] - 1) // 2)
-            endIndx = min(len(signal), win[i, 1] + win[i, 2] // 2)
-            temp = uniform_filter1d(signal[startIndx:endIndx], size=win[i, 2], mode="nearest")
-            signalSM[win[i, 0]:win[i, 1]] = temp[(win[i, 0] - startIndx):(win[i, 1] - startIndx)]
-            # signalSM[win[i, 0]:win[i, 1]] = temp[(win[i, 0] - startIndx + 1):(win[i, 1] - startIndx + 1)]         # <-- +1 as done in matlab version
-        return signalSM
+    if isinstance(win, np.ndarray):
+        raise NotImplementedError("Variable window size smoothing is not implemented yet.")
 
     raise ValueError("Invalid window configuration.")
 
@@ -714,6 +708,13 @@ def lidarratio(
     History
     -------
     2021-07-20: First edition by Zhenping (translated to Python)
+
+    Notes
+    -----
+    Though savgol_filter with mode 'interp' do not apply padding on the edges while
+    smoothing it does preform an interpolation to add in the edges removed by
+    the smoothing/convolution operation.
+
     """
 
     # Adjust smoothing window for backscatter to match extinction resolution
@@ -724,8 +725,22 @@ def lidarratio(
         print("Warning: Smoothing for backscatter is larger than smoothing for extinction.")
         smoothWinBsc2 = 3
 
-    # Smooth the backscatter using Savitzky-Golay filter
-    aerBscSm = savgol_filter(aerBsc, window_length=smoothWinBsc2, polyorder=2, mode='interp')
+    # # Smooth the backscatter using Savitzky-Golay filter
+    # aerBscSm = savgol_filter(aerBsc, window_length=smoothWinBsc2, polyorder=2, mode='interp')   # Original
+
+    # Adjust for NaN values at the edges due to reduced dimension from smoothing.
+    start = int((smoothWinBsc - 1)/2)
+    end = int((smoothWinBsc - 1)/2)
+    if smoothWinBsc % 2 == 0:
+        start += 1
+
+    # Smooth adjusted (non-NaN part of) the backscatter using Savitzky-Golay filter and add in the NaN edges again.
+    aerBscSm = savgol_filter(aerBsc[start:-end], window_length=smoothWinBsc2, polyorder=2, mode='interp')
+    aerBscSm = np.hstack((
+        np.full(start, np.nan),
+        aerBscSm,
+        np.full(end, np.nan)
+    ))
 
     # Lidar ratio
     aerLR = aerExt / aerBscSm

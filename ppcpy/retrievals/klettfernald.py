@@ -1,7 +1,8 @@
 
 import logging
 import numpy as np
-from scipy.ndimage import uniform_filter1d
+
+from ppcpy.misc.helper import uniform_filter
 
 
 def run_cldFreeGrps(data_cube, signal='TCor', nr=False, collect_debug=True):
@@ -158,6 +159,7 @@ def fernald(
     -------
     - 2021-05-30: First edition by Zhenping.
     - 2025-01-03: AI Translation
+    - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
 
     TODO:
     - Define m
@@ -212,8 +214,8 @@ def fernald(
     # Smoothing signal
     # indRefMid = int(np.ceil(np.mean(indRefH)))
     indRefMid = int(np.round(np.mean(indRefH)))                 # Changed to round to match matlab implementation more closely      | Matlab code: indRefMid = int32(mean(indRefAlt));
-    RCS = uniform_filter1d(RCS, size=window_size)
-    RCS[indRefMid] = np.mean(RCS[indRefH[0]:indRefH[1] + 1])
+    RCS = uniform_filter(RCS, window_size)
+    RCS[indRefMid] = np.nanmean(RCS[indRefH[0]:indRefH[1] + 1])
     
     print('indRefH', indRefH, indRefMid)
     print('refH slice shape ', RCS[indRefH[0]:indRefH[1] + 1].shape)

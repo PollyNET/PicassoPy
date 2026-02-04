@@ -10,12 +10,9 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 
 import numpy as np
-from scipy.ndimage import uniform_filter1d
 
 def detect_path_type(fullpath):
-    """
-    Detect the type of path (Windows or Linux) based on the input.
-    """
+    """Detect the type of path (Windows or Linux) based on the input."""
     def is_windows_path(fullpath):
         if '\\' in str(fullpath):
             return True
@@ -43,25 +40,27 @@ def detect_path_type(fullpath):
         return Path(fullpath)
 
 def os_name():
+    """"""
     return platform.system()
 
-def get_input_path(timestamp,device,raw_folder):
+def get_input_path(timestamp, device, raw_folder):
+    """"""
     YYYY=timestamp[0:4]
     MM=timestamp[4:6]
     DD=timestamp[6:8]
-    input_path = Path(raw_folder,device,"data_zip",f"{YYYY}{MM}")
+    input_path = Path(raw_folder, device, "data_zip", f"{YYYY}{MM}")
     logging.info(f'checking data availability for {device} at {YYYY}-{MM}-{DD}')
     return input_path
 
 
-def get_pollyxt_files(timestamp,device,raw_folder,output_path):
-    '''
+def get_pollyxt_files(timestamp, device, raw_folder, output_path):
+    """
         This function locates multiple pollyxt level0 nc-zip files from one day measurements,
         unzipps the files to output_path
         and returns a list of files to be merged
         and the title of the new merged nc-file
-    '''
-    input_path = get_input_path(timestamp,device,raw_folder)
+    """
+    input_path = get_input_path(timestamp, device, raw_folder)
     path_exist = Path(input_path)
 
     if path_exist.exists() == True:
@@ -73,7 +72,7 @@ def get_pollyxt_files(timestamp,device,raw_folder,output_path):
 
         zip_searchpattern = str(YYYY)+'_'+str(MM)+'_'+str(DD)+'*_*[0-9].nc.zip'
 
-        polly_files       = Path(r'{}'.format(input_path)).glob('{}'.format(zip_searchpattern))
+        polly_files = Path(r'{}'.format(input_path)).glob('{}'.format(zip_searchpattern))
         polly_zip_files_list0 = [x for x in polly_files if x.is_file()]
 
 
@@ -117,7 +116,7 @@ def get_pollyxt_files(timestamp,device,raw_folder,output_path):
                 to_unzip_list.append(zip_file)
 
         ## unzipping
-        date_pattern = str(YYYY)+'_'+str(MM)+'_'+str(DD)
+        date_pattern = str(YYYY) + '_' + str(MM) + '_' + str(DD)
         if len(to_unzip_list) > 0:
             ## if working remotly on windows, copy zipped files first, than unzip
             if os_name().lower() == 'windows':
@@ -129,7 +128,7 @@ def get_pollyxt_files(timestamp,device,raw_folder,output_path):
                 for zip_file in Path(output_path).iterdir():
                     if zip_file.is_file() and date_pattern in zip_file.stem and zip_file.suffix == '.zip':
                         with ZipFile(zip_file, 'r') as zip_ref:
-                            print("unzipping "+str(zip_file))
+                            print("unzipping " + str(zip_file))
                             zip_ref.extractall(output_path)
                         print("Removing .zip file...")
                         os.remove(zip_file)
@@ -138,7 +137,7 @@ def get_pollyxt_files(timestamp,device,raw_folder,output_path):
                 print("\nUnzipping...")
                 for zip_file in to_unzip_list:
                     with ZipFile(zip_file, 'r') as zip_ref:
-                        print("unzipping "+zip_file)
+                        print("unzipping " + zip_file)
                         zip_ref.extractall(output_path)
 
 
@@ -156,13 +155,13 @@ def get_pollyxt_files(timestamp,device,raw_folder,output_path):
     return polly_files_list
 
 
-def get_pollyxt_logbook_files(timestamp,device,raw_folder,output_path):
-    '''
+def get_pollyxt_logbook_files(timestamp, device, raw_folder, output_path):
+    """
         This function locates multiple pollyxt logbook-zip files from one day measurements,
         unzipps the files to output_path
         and  merge them to one file
-    '''
-    input_path = get_input_path(timestamp,device,raw_folder)
+    """
+    input_path = get_input_path(timestamp, device, raw_folder)
     path_exist = Path(input_path)
 
     if path_exist.exists() == True:
@@ -192,7 +191,7 @@ def get_pollyxt_logbook_files(timestamp,device,raw_folder,output_path):
         for zip_file in polly_laserlog_zip_files_list:
             unzipped_logtxt = Path(zip_file).name
             unzipped_logtxt = Path(unzipped_logtxt).stem
-            unzipped_logtxt = Path(output_path,unzipped_logtxt)
+            unzipped_logtxt = Path(output_path, unzipped_logtxt)
             polly_laserlog_files_list.append(unzipped_logtxt)
             path = Path(unzipped_logtxt)
 
@@ -203,18 +202,18 @@ def get_pollyxt_logbook_files(timestamp,device,raw_folder,output_path):
         if len(to_unzip_list) > 0:
             for zip_file in to_unzip_list:
                 with ZipFile(zip_file, 'r') as zip_ref:
-                    print("unzipping "+zip_file)
+                    print("unzipping " + zip_file)
                     zip_ref.extractall(output_path)
 
         ## sort lists
         polly_laserlog_files_list.sort()
 
-        print("\n"+str(len(polly_laserlog_files_list))+" laserlogfiles found:\n")
+        print("\n" + str(len(polly_laserlog_files_list)) + " laserlogfiles found:\n")
         print(polly_laserlog_files_list)
         print("\n")
 
         ## concat the txt files
-        result_file = Path(output_path,"result.txt")
+        result_file = Path(output_path, "result.txt")
         with open(result_file, "wb") as outfile:
             for logf in polly_laserlog_files_list:
                 with open(logf, "rb") as infile:
@@ -242,6 +241,7 @@ def get_pollyxt_logbook_files(timestamp,device,raw_folder,output_path):
 
 
 def add_to_list(element, from_list, to_list):
+    """"""
     if from_list[element] in to_list:
         pass
     else:
@@ -249,7 +249,8 @@ def add_to_list(element, from_list, to_list):
 
 
 
-def checking_vars(timestamp,device,raw_folder,output_path):
+def checking_vars(timestamp, device, raw_folder, output_path):
+    """"""
     ## select only those nc-files where the values of some specific variables haven't changed
     vars_of_interest = [
                         'measurement_height_resolution',
@@ -270,13 +271,13 @@ def checking_vars(timestamp,device,raw_folder,output_path):
                         'zenithangle'
                         ]
 
-    polly_files_list = get_pollyxt_files(timestamp,device,raw_folder,output_path)
+    polly_files_list = get_pollyxt_files(timestamp, device, raw_folder, output_path)
     if len(polly_files_list) == 1:
         return polly_files_list
 
     polly_file_ds_ls = []
     for files in polly_files_list:
-        polly_file_ds = Dataset(files,"r")
+        polly_file_ds = Dataset(files, "r")
         polly_file_ds_ls.append(polly_file_ds)
 
     selected_var_nc_ls=[]
@@ -294,30 +295,30 @@ def checking_vars(timestamp,device,raw_folder,output_path):
     #            print(var + ": " + var_value_2)
                 if var_value_1 == var_value_2 and diff_var==0:
                     # print('no difference found ...')
-                    add_to_list(ds,polly_files_list,selected_var_nc_ls)
+                    add_to_list(ds, polly_files_list, selected_var_nc_ls)
                 elif var_value_1 != var_value_2 and diff_var==0:
                     print('difference found in var:')
                     print(var)
                     #print(var + ": " + var_value_1)
                     #print(var + ": " + var_value_2)
                     diff_var=1
-                    add_to_list(ds,polly_files_list,selected_var_nc_ls) if force == True else None
-                elif var_value_1 == var_value_2 and diff_var!=0:
-                    add_to_list(ds,polly_files_list,selected_var_nc_ls) if force == True else None
-                elif var_value_1 != var_value_2 and diff_var!=0:
-                    diff_var=diff_var+1
+                    add_to_list(ds, polly_files_list, selected_var_nc_ls) if force == True else None
+                elif var_value_1 == var_value_2 and diff_var != 0:
+                    add_to_list(ds, polly_files_list, selected_var_nc_ls) if force == True else None
+                elif var_value_1 != var_value_2 and diff_var != 0:
+                    diff_var = diff_var + 1
                     print('difference found!')
-                    add_to_list(ds,polly_files_list,selected_var_nc_ls) if force == True else None
+                    add_to_list(ds, polly_files_list, selected_var_nc_ls) if force == True else None
         polly_file_ds_ls[ds].close()
 
-    if diff_var==0:
-        add_to_list(-1,polly_files_list,selected_var_nc_ls)
+    if diff_var == 0:
+        add_to_list(-1, polly_files_list, selected_var_nc_ls)
         print('\nno differences found in selected variables!\n')
-    elif diff_var!=0:
+    elif diff_var != 0:
 #        add_to_list(-1,polly_files_list,selected_var_nc_ls) if force == True else None
         ## if force==true, merge, but if force==false: the whole day will not be in list anymore
         if force == True:
-            add_to_list(-1,polly_files_list,selected_var_nc_ls)
+            add_to_list(-1, polly_files_list, selected_var_nc_ls)
             print('\ndifferences found in selected variables! But will be force-merged.\n')
         else:
             print('\ndifferences found in selected variables! Selected Date will be skipped.\n')
@@ -328,48 +329,67 @@ def checking_vars(timestamp,device,raw_folder,output_path):
     return selected_var_nc_ls
 
 
-def checking_attr(timestamp,device,raw_folder,output_path):
+def checking_attr(timestamp, device, raw_folder, output_path):
+    """...
+    
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : ...
+        ...
+    raw_folder : ...
+        ...
+    output_path : ...
+        ...
+    
+    Returns
+    -------
+    ...
+    
+    TODO: Variables 'force' and 'polly_files_list' are not defined anywhere
+    """
     ## select only those nc-files where the global attributes and the var-attributes haven't changed
-    selected_var_nc_ls = checking_vars(timestamp,device,raw_folder,output_path)
+    selected_var_nc_ls = checking_vars(timestamp, device, raw_folder, output_path)
     if len(selected_var_nc_ls) == 1:
         return selected_var_nc_ls
 
     polly_file_ds_ls = []
     for files in selected_var_nc_ls:
         print(files)
-        polly_file_ds = Dataset(files,"r")
+        polly_file_ds = Dataset(files, "r")
         polly_file_ds_ls.append(polly_file_ds)
 
     selected_att_nc_ls = []
-    diff_att=0
-    diff_var_att=0
+    diff_att = 0
+    diff_var_att = 0
     print('\n')
     print('checking differences in attributes ...')
-    for ds in range(0,len(polly_file_ds_ls)-1):
+    for ds in range(0, len(polly_file_ds_ls) - 1):
         ## get global attributes as a list of strings
 #        print(selected_var_nc_ls[ds] + '   vs.   ' + selected_var_nc_ls[ds+1])
 #        print('\nglobal attributes:')
         for nc_attr in polly_file_ds_ls[0].ncattrs():
             # att_value=repr(input_nc_file.getncattr(nc_attr))
-            att_value_1=polly_file_ds_ls[ds].getncattr(nc_attr)
-            att_value_2=polly_file_ds_ls[ds+1].getncattr(nc_attr)
+            att_value_1 = polly_file_ds_ls[ds].getncattr(nc_attr)
+            att_value_2 = polly_file_ds_ls[ds+1].getncattr(nc_attr)
 #            print(nc_attr)
 #            print("   " + att_value_1)
 #            print("   " + att_value_2)
             if att_value_1 == att_value_2 and diff_att==0:
-                add_to_list(ds,selected_var_nc_ls,selected_att_nc_ls)
+                add_to_list(ds, selected_var_nc_ls, selected_att_nc_ls)
             elif att_value_1 != att_value_2 and diff_att==0:
                 print('difference found!')
                 print(nc_attr)
                 print("   " + att_value_1)
                 print("   " + att_value_2)
                 diff_att=1
-                add_to_list(ds,selected_var_nc_ls,selected_att_nc_ls) if force == True else None
-            elif att_value_1 == att_value_2 and diff_att!=0:
-                add_to_list(ds,selected_var_nc_ls,selected_att_nc_ls) if force == True else None
-            elif att_value_1 != att_value_2 and diff_att!=0:
+                add_to_list(ds, selected_var_nc_ls, selected_att_nc_ls) if force == True else None
+            elif att_value_1 == att_value_2 and diff_att != 0:
+                add_to_list(ds, selected_var_nc_ls, selected_att_nc_ls) if force == True else None
+            elif att_value_1 != att_value_2 and diff_att != 0:
                 print('difference found!')
-                add_to_list(ds,selected_var_nc_ls,selected_att_nc_ls) if force == True else None
+                add_to_list(ds, selected_var_nc_ls, selected_att_nc_ls) if force == True else None
 
 #        print("\nvariable attributes:")
         for var in polly_file_ds_ls[0].variables.keys():
@@ -380,32 +400,32 @@ def checking_attr(timestamp,device,raw_folder,output_path):
 #                print("   " + var_att)
 #                print("      " + var_att_value_1)
 #                print("      " + var_att_value_2)
-                if var_att_value_1 == var_att_value_2 and diff_var_att==0:
+                if var_att_value_1 == var_att_value_2 and diff_var_att == 0:
                     pass
-                elif var_att_value_1 != var_att_value_2 and diff_var_att==0:
+                elif var_att_value_1 != var_att_value_2 and diff_var_att == 0:
                     print('difference found!')
                     print("   " + var_att)
                     print("      " + var_att_value_1)
                     print("      " + var_att_value_2)
-                    diff_var_att=1
-                elif var_att_value_1 == var_att_value_2 and diff_var_att!=0:
+                    diff_var_att = 1
+                elif var_att_value_1 == var_att_value_2 and diff_var_att != 0:
                     pass
-                elif var_att_value_1 != var_att_value_2 and diff_var_att!=0:
+                elif var_att_value_1 != var_att_value_2 and diff_var_att != 0:
                     print('difference found!')
 
-    for ds in range(0,len(polly_file_ds_ls)-1):
+    for ds in range(0, len(polly_file_ds_ls) - 1):
         polly_file_ds_ls[ds].close()
 
 
-    if diff_att==0:
-        add_to_list(-1,selected_var_nc_ls,selected_att_nc_ls)
+    if diff_att == 0:
+        add_to_list(-1, selected_var_nc_ls, selected_att_nc_ls)
         print('\nno differences found in global attributes!\n')
-    elif diff_att!=0:
+    elif diff_att != 0:
 #        add_to_list(-1,selected_var_nc_ls,selected_att_nc_ls) if force == True else None
 
         ## if force==true, merge, but if force==false: the whole day will not be in list anymore
         if force == True:
-            add_to_list(-1,selected_var_nc_ls,selected_att_nc_ls)
+            add_to_list(-1, selected_var_nc_ls, selected_att_nc_ls)
             print('\ndifferences found in global attributes! But will be force-merged.\n')
         else:
             print('\ndifferences found in global attributes! Selected Date will be skipped.\n')
@@ -413,7 +433,7 @@ def checking_attr(timestamp,device,raw_folder,output_path):
                 os.remove(el)
             sys.exit()
 
-    if diff_var_att==0:
+    if diff_var_att == 0:
         print('\nno differences found in variable attributes!\n')
 #   elif diff_var_att != 0:
 #        ## if force==true, merge, but if force==false: the whole day will not be in list anymore
@@ -429,15 +449,16 @@ def checking_attr(timestamp,device,raw_folder,output_path):
     return selected_att_nc_ls
 
 
-def checking_timestamp(timestamp,device,raw_folder,output_path):
-    selected_timestamp_nc_ls = checking_attr(timestamp,device,raw_folder,output_path)
+def checking_timestamp(timestamp, device, raw_folder, output_path):
+    """"""
+    selected_timestamp_nc_ls = checking_attr(timestamp, device, raw_folder, output_path)
     if len(selected_timestamp_nc_ls) == 1:
         return selected_timestamp_nc_ls
     selected_cor_timestamp_nc_ls = []
     polly_file_ds_ls = []
     print('checking for correct timestamps...')
     for files in selected_timestamp_nc_ls:
-        polly_file_ds = Dataset(files,"r")
+        polly_file_ds = Dataset(files, "r")
         polly_file_ds_ls.append(polly_file_ds)
 
     for elementNR,ds in enumerate(polly_file_ds_ls):
@@ -464,7 +485,7 @@ def checking_timestamp(timestamp,device,raw_folder,output_path):
             else:
                 measurement_shots_average = sum(measurement_shots_nonzero) / len(measurement_shots_nonzero)
                 deltaT = measurement_shots_average / laser_rep_rate
-                deltaT = int(round(deltaT,0)) ## unit in seconds
+                deltaT = int(round(deltaT, 0)) ## unit in seconds
                 ## calc. the correct seconds of day for this dataset
                 start_seconds = int(timestamp_filename[0])*3600 + int(timestamp_filename[1])*60 + int(timestamp_filename[2])
                 ## length of measurement_list
@@ -507,7 +528,7 @@ def checking_timestamp(timestamp,device,raw_folder,output_path):
                     ds.close()
                     new_dataset.close()
                     os.remove(selected_timestamp_nc_ls[elementNR]) ### remove unzipped nc-file with incorrect timestamps
-                    os.rename(f'{selected_timestamp_nc_ls[elementNR]}_dummy',selected_timestamp_nc_ls[elementNR])
+                    os.rename(f'{selected_timestamp_nc_ls[elementNR]}_dummy', selected_timestamp_nc_ls[elementNR])
                     print('timestamps corrected.')
                     selected_cor_timestamp_nc_ls.append(selected_timestamp_nc_ls[elementNR])
         else:
@@ -518,12 +539,13 @@ def checking_timestamp(timestamp,device,raw_folder,output_path):
             ds.close()
 
 
-    print('\nthe following '+str(len(selected_cor_timestamp_nc_ls))+' files can be merged:')
+    print('\nthe following ' + str(len(selected_cor_timestamp_nc_ls)) + ' files can be merged:')
     print(selected_cor_timestamp_nc_ls)
     return selected_cor_timestamp_nc_ls
 
 
-def concat_files(timestamp,device,raw_folder,output_path):
+def concat_files(timestamp, device, raw_folder, output_path):
+    """"""
     ## merge selected files
 
 #    concat='concat'
@@ -585,7 +607,19 @@ def concat_files(timestamp,device,raw_folder,output_path):
     print('done!')
     return destination_file
 
-def remove_whitespaces_and_replace_dash_with_underscore(string):
+def remove_whitespaces_and_replace_dash_with_underscore(string:str) -> str:
+    """remove whitespaces and replace dashes with underscores
+    
+    Parameters
+    ----------
+    string : str
+        String to be modified 
+    
+    Returns
+    -------
+    new_string : str
+        Modified string
+    """
     new_string  = string.replace(" ", "").replace("-", "_")
     return new_string
 
@@ -625,9 +659,45 @@ def channel_2_variable_mapping(data_retrievals, var, channeltags_dict):
                 data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:,ch]
 
 
+def uniform_filter(x:np.ndarray, win:int, fill_val:float=np.nan) -> np.ndarray:
+    """Simple smoothing filter
 
+    The smoothing is applied without padding and the original dimension of the
+    input is recreated by filling the reduced edges with a fill value.
 
-def mean_stable(x, win, minBin=None, maxBin=None, minRelStd=None):
+    Parameters
+    ----------
+    x : (N,) ndarray
+        One dimensional input signal.
+    win : int
+        (M,) Width of the filter.
+    fill_val : float, optional
+        The value to be used for filling edges, 
+        in order to recreate the input dimension. 
+        Default: np.nan.
+    
+    Returns
+    -------
+    out : ndarray
+        Smoothed signal.
+    
+    History
+    -------
+    - 2026-02-02: First edition by Buholdt
+    """
+    f = np.ones(win)/win
+    x_smoothed = np.convolve(x, f, mode='valid')
+    fill = np.full(int((win - 1)/2), fill_val)
+
+    # if window size is even fill one more element at the start.
+    if win % 2 == 0:
+        out = np.hstack((np.append(fill, fill_val), x_smoothed, fill))
+    else:
+        out = np.hstack((fill, x_smoothed, fill))
+
+    return out
+
+def mean_stable(x:np.ndarray, win:int, minBin:int=None, maxBin:int=None, minRelStd:float=None) -> tuple:
     """Calculate the mean value of x based on the least fluctuated 
     segment of x. The searching is based on the std inside each window of x.
 
@@ -656,6 +726,7 @@ def mean_stable(x, win, minBin=None, maxBin=None, minRelStd=None):
     History
     -------
     - 2021-05-30: First edition by Zhenping
+    - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to uniform_filter
 
     .. Authors: - zhenping@tropos.de
     """
@@ -667,7 +738,7 @@ def mean_stable(x, win, minBin=None, maxBin=None, minRelStd=None):
 
     # Handle NaN values and smooth the array
     flagNaN = np.isnan(x)
-    x_smoothed = uniform_filter1d(x, size=win, mode='nearest')
+    x_smoothed = uniform_filter(x, win)
     x_smoothed[flagNaN] = np.nan
 
     # If the range between maxBin and minBin is less than or equal to the window size
@@ -714,9 +785,8 @@ def mean_stable(x, win, minBin=None, maxBin=None, minRelStd=None):
 
 from scipy.sparse import diags
 
-def smooth2a(matrix_in, Nr, Nc=None):
-    """
-    Smooths 2D array data while ignoring NaNs.
+def smooth2a(matrix_in:np.ndarray, Nr:int, Nc:int=None) -> np.ndarray:
+    """Smooths 2D array data while ignoring NaNs.
 
     This function smooths the data in `matrix_in` using a mean filter over a
     rectangle of size (2*Nr+1)-by-(2*Nc+1). Each element is replaced by the mean
@@ -724,16 +794,23 @@ def smooth2a(matrix_in, Nr, Nc=None):
     it remains NaN in the output. At the edges, as much of the rectangle as fits
     is used.
 
-    Parameters:
-        matrix_in (ndarray): Original matrix to be smoothed.
-        Nr (int): Number of points used to smooth rows.
-        Nc (int, optional): Number of points used to smooth columns.
-                            If not specified, Nc = Nr.
+    Parameters
+    ----------
+    matrix_in : ndarray
+        Original matrix to be smoothed.
+    Nr : int
+        Number of points used to smooth rows.
+    Nc : int, optional
+        Number of points used to smooth columns.
+        If not specified, Nc = Nr.
 
-    Returns:
-        ndarray: Smoothed version of the input matrix.
+    Returns
+    -------
+    matrix_out : ndarray
+        Smoothed version of the input matrix.
 
-    References:
+    References
+    ----------
         - Written by Greg Reeves, March 2009, Division of Biology, Caltech.
         - Inspired by "smooth2" by Kelly Hilands, October 2004, Applied Research Laboratory, Penn State University.
         - Developed from code by Olof Liungman, 1997, Dept. of Oceanography, Earth Sciences Centre, Göteborg University.
@@ -765,17 +842,57 @@ def smooth2a(matrix_in, Nr, Nc=None):
 
     return matrix_out
 
-def get_wv_pol_telescope_from_dictkeyname(keyname):
-    """
-    translate `{wavelength}_{total|cross|parallel|rr}_{NR|FR|DFOV}` to wavelength,polarisation,telescope separataly.
+def get_wv_pol_telescope_from_dictkeyname(keyname:str) -> tuple:
+    """translate `{wavelength}_{total|cross|parallel|rr}_{NR|FR|DFOV}` to wavelength, polarisation, telescope separataly.
 
-    Parameters:
-    - keyname (str): e.g.: 532_total_FR.
-    Output:
-    - wavelength,polarisation,telescope
+    Parameters
+    ----------
+    keyname : str
+        e.g. 532_total_FR.
+        
+    Returns
+    -------
+    wavelength : str
+        eg. '532'
+    polarisation : str
+        eg. 'total'
+    telescope : str
+        eg. 'FR'
     """
-    wv = re.split(r'_',keyname)[0]
-    pol = re.split(r'_',keyname)[1]
-    tel = re.split(r'_',keyname)[2]
-    return wv,pol,tel
+    channel = re.split(r'_', keyname)
+    wv = channel[0]
+    pol = channel[1]
+    tel = channel[2]
+    return wv, pol, tel
 
+
+def idx2time(cldFreeIdx:np.ndarray[int, int], nIdx:int, nHour:int) -> str:
+    """Convert cloud free indecis to cloud free times.
+
+    Parameters
+    ----------
+    cldFreeIdx : np.ndarray
+        Cloud free group (start idx, end idx).
+    nIdx : int
+        Number of idx / length of time dimension.
+    nHour : int
+        Number of hours represented in the time dimension.
+    
+    Returns
+    -------
+    out : str
+        Time stamps of cldFreeIdx as a string (eg. 0920_1020)
+    """
+    minPerIdx = (nHour*60)/nIdx
+    cldFreeMin = cldFreeIdx*minPerIdx
+    cldFreeHour = cldFreeMin//60
+    cldFreeMin -= cldFreeHour*60
+    cldFreeHour = cldFreeHour.astype(int).astype(str)
+    cldFreeMin = cldFreeMin.astype(int).astype(str)
+    for i in range(len(cldFreeIdx)):
+        if len(cldFreeHour[i]) < 2:
+            cldFreeHour[i] = '0' + cldFreeHour[i]
+        if len(cldFreeMin[i]) < 2:
+            cldFreeMin[i] = '0' + cldFreeMin[i]
+    out = cldFreeHour[0] + cldFreeMin[0] + '_' + cldFreeHour[1] + cldFreeMin[1]
+    return out
