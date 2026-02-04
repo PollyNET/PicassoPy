@@ -1,13 +1,3 @@
-"""
-Checked:
-    - run_cldFreeGrps:  False
-    - raman_ext:        False
-    - raman_bsc:        True
-    - calc_raman_bsc:   True
-    - smoothWin:        True (need to recheck the smoothing functions used)
-    - lidarratio:       True
-"""
-
 import logging
 import numpy as np
 from ppcpy.retrievals.ramanhelpers import *
@@ -22,20 +12,27 @@ MC_count:int = 3
 
 
 def run_cldFreeGrps(data_cube, signal='TCor', heightFullOverlap=None, nr=False, collect_debug=True):
-    """
-    Run raman retrival for each cloud free region ...
+    """Run raman retrival for each cloud free region ...
 
-    Parameters:
-        - data_cube (object): ...
-        - signal (str): ...
-        - heightFullOverlap (): ...
-        - nr (bool): ...
-        - collect_debug (bool): ...
+    Parameters
+    ----------
+    data_cube : object
+        ...
+    signal : str
+        ...
+    heightFullOverlap : ...
+        ...
+    nr : bool
+        ...
+    collect_debug : bool
+        ...
     
-    Outputs:
-        - opt_profiles (): ...
+    Returns
+    -------
+    opt_profiles : dict
+        ...
     
-    TODO
+    TODO's
     ------
     - Find out which refBeta value is used for the FR and NR
     - sigma_angstroem and MC_count seams to be hardcoded is this correct and how can we automate it
@@ -246,8 +243,7 @@ def raman_ext(
         MC_count:int=1,
         bg:float=0
     ) -> dict[str, np.ndarray]:
-    """
-    Retrieve the aerosol extinction coefficient with the Raman method.
+    """Retrieve the aerosol extinction coefficient with the Raman method.
 
     Parameters
     ----------
@@ -609,8 +605,7 @@ def calc_raman_bsc(
 
 
 def smoothWin(signal:np.ndarray, win:int|np.ndarray, method:str="moving", filter:str="uniform") -> np.ndarray:
-    """
-    Smooth signal with a height-dependent window.
+    """Smooth signal with a height-dependent window.
 
     Parameters
     ----------
@@ -626,14 +621,12 @@ def smoothWin(signal:np.ndarray, win:int|np.ndarray, method:str="moving", filter
     signalSM : array
         Smoothed signal.
     
-    TODO:
-    --------
-    - The input method is not used in the function. instead we are using mode 'nearest' insted of 'moving' which is inputed. Is these modes equvilent?
-    - The python version uses // operators in the calulation of startIndx and endIndx while matlab uses fix( ... /2). Is these equvilent?
-    - also the matlab version uses (startIndx + 1) in temp (last line)....      <--- this may be a bug (looks like all values are shifted one index to the right in matlab...)
-    - can change to a if, elif, else statment here if I want. However, I do not know if it makes much sense.
-
-    - !!!! matlab slice indexing is end-inclusive while python's is end-exclusive !!!! <--- This may caus a lott of small bugs around....
+    TODO's
+    ------
+    - The added NaN values at the edges causes the savgol filter in Lidar Ratio calculations to fail.
+      Make your own version of the savgol filter to fix this. A temporary quickfix is implemented 
+      where the savgol filter is only applied to the non-NaN part of the aerBsc (removed NaN edges).
+    
     """
     if isinstance(win, int):
         if filter == "uniform":
@@ -670,8 +663,7 @@ def lidarratio(
         smoothWinExt:int=1,
         smoothWinBsc:int=1
     ) -> dict[np.ndarray, float]:
-    """
-    Calculate aerosol lidar ratio.
+    """Calculate aerosol lidar ratio.
     
     Parameters
     ----------
