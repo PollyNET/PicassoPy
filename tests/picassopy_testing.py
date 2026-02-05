@@ -183,8 +183,8 @@ data_cube.rayleighFit()
 
 # Use config values for refH in NR channels (similar approch to Picasso)
 for e in data_cube.refH:
-    e['532_total_NR'] = tuple(np.searchsorted(data_cube.retrievals_highres["height"], data_cube.polly_config_dict["refH_NR_532"]) - [0, 1])
-    e['355_total_NR'] = tuple(np.searchsorted(data_cube.retrievals_highres["height"], data_cube.polly_config_dict["refH_NR_355"]) - [0, 1])
+    e['532_total_NR'] = {'DPInd':None, 'refHInd':tuple(np.searchsorted(data_cube.retrievals_highres["height"], data_cube.polly_config_dict["refH_NR_532"]) - [0, 1])}     # - [0, 1] --> make sure all values lay inside the designeted range
+    e['355_total_NR'] = {'DPInd':None, 'refHInd':tuple(np.searchsorted(data_cube.retrievals_highres["height"], data_cube.polly_config_dict["refH_NR_355"]) - [0, 1])}     # - [0, 1] --> make sure all values lay inside the designeted range
 
 data_cube.polly_config_dict['flagMolDepolCali'] = False
 data_cube.polarizationCaliMol()
