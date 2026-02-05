@@ -1,21 +1,35 @@
-
-
 import numpy as np
 from ppcpy.misc.helper import mean_stable
 
 elastic2raman = {355: 387, 532: 607}
 
 
-def lc_for_cldFreeGrps(data_cube, retrieval):
-    """ 
-    Estimate the lidar constant from the optical profiles.
+def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
+    """ Estimate the lidar constant from the optical profiles.
+
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
+    retrieval : str
+        Retrieval type. 'raman' or 'klett'.
+    
+    Returns
+    -------
+    LCs : list
+        Lidar constant for retrieval type per channel per cloud free period.
 
 
-    Updates:
-        For NR done directly form the optical profiles,
-        whereas in the matlab version, the LC*olAttri387.sigRatio is taken
+    Notes
+    -----
+    - For NR, done directly form the optical profiles, whereas in the matlab
+      version, the LC*olAttri387.sigRatio is taken.
+    - TODO: Change back to Picasso version to check if lidar calibration
+      constatns get more similar.
+    - TODO: Check if LC's are normalized with respect to the mean of 
+      the profiles.
+
     """
-
     print("retival", retrieval)
     height = data_cube.retrievals_highres['range']
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
@@ -85,18 +99,49 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
 
                 LC_r = signal_r * height**2 / bsc / trans_r
                 LC_r_stable, _, LCStd_r = mean_stable(
-                    LC_r, config_dict['LCMeanWindow'], 
-                    minBin=config_dict['LCMeanMinIndx'], maxBin=config_dict['LCMeanMaxIndx'])
+                    x=LC_r,
+                    win=config_dict['LCMeanWindow'], 
+                    minBin=config_dict['LCMeanMinIndx'],
+                    maxBin=config_dict['LCMeanMaxIndx']
+                )
+                print(f"cldFreGrp {i}, Channel {wv_r} {t} {tel}, LC_stable {LC_r_stable}, LCStd {LCStd_r}")
                 LCs[i][f"{wv_r}_{t}_{tel}"] = {'LC': LC_r_stable, 'LCStd': LC_r_stable * LCStd_r}
 
-                return LCs
-
-
-def get_best_LC(LCs):
-    """
-    Get lidar constant with the lowest standard deviation
+                # Recording -------------------------------------------------------------------------------------------------------------------------------------------
+                if toRecord:
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_sig{sig}"] = pd.Series(signal_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_aerExt"] = pd.Series(aerExt_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_molExt"] = pd.Series(molExt_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_aerOD"] = pd.Series(aerOD_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_molOD"] = pd.Series(molOD_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_trans"] = pd.Series(trans_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_bsc"] = pd.Series(bsc)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_LC"] = pd.Series(LC_r)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_LCStable"] = pd.Series(np.ones_like(height)*LC_r_stable)
+                    recorder[f"{idx2time(np.asarray(cldFree), data_cube.flagCloudFree.shape[0], 24)}_{wv_r}_{t}_{tel}_LCStd"] = pd.Series(np.ones_like(height)*LCStd_r)
+                # ----------------------------------------------------------------------------------------------------------------------------------------------------
     
-    TODO: write docsting
+    # Recording -------------------------------------------------------------------------------------------------------------------------------------------
+    if toRecord:
+        recorder = recorder.set_index("height")
+        recorder.to_pickle(f"C:\\Users\\buholdt\\Documents\\PicassoPy\\tests\\debug\\recorded_LC_calc_variables_{retrieval}.pkl")
+    # ----------------------------------------------------------------------------------------------------------------------------------------------------
+    return LCs
+
+
+def get_best_LC(LCs:list) -> dict:
+    """Get lidar constant with the lowest standard deviation.
+
+    Parameters
+    ----------
+    LCs : list
+        Lidar constant for each channel per cloud free period.
+    
+    Returns
+    -------
+    LCused : dict
+        Lidar constants with lowest standard deviation per channel.
+        
     """
 
     # list comprehension for nested list

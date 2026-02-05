@@ -588,7 +588,6 @@ class PicassoProc:
 
     def LidarCalibration(self):
         """
-        TODO: There is no implementation for klett method if raman values are not usable.
         TODO: Add option to read constants from database.
         TODO: Find out how we prioritise raman, klett, and database retrieved LC...
         """
