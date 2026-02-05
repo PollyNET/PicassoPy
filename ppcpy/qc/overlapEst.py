@@ -7,14 +7,37 @@ from ppcpy.misc.helper import mean_stable, uniform_filter
 
 from pathlib import Path
 
-def run_frnr_cldFreeGrps(data_cube, collect_debug:bool=True):
-    """
-    The matlab version preforms some convertio from PC to PCR after calculating the overlap function (this might just be relevent at all)
-    The matlab version also uses calculates 1 overlap function for each channel while we calculate 1 per clFreeGrp per channel...
+def run_frnr_cldFreeGrps(data_cube, collect_debug:bool=True) -> list:
+    """Estimate overlap function using far-range-near-range method.
 
-    The frnr overlap calculations are very unstable and frequently results in values outside the range [0,1].
-    """
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
+    collect_debug : bool
+        If true, collect debug information. Default is True.
+    
+    Returns
+    -------
+    overlap : list of dicts
+        Per channel per cloud free period:
+        - overlap : ndarray
+            Overlap function.
+        - overlapStd : ndarray
+            Standard deviation of overlap function.
+        - sigRatio : float
+            Signal ratio between near-range and far-range signals.
+        - normRange : list
+            Height index of the signal normalization range.
 
+    
+    Notes
+    -----
+    - The matlab version preforms some convertio from PC to PCR after calculating the overlap function (this might just be relevent at all)
+    - The matlab version also uses calculates 1 overlap function for each channel while we calculate 1 per clFreeGrp per channel...
+    - The frnr overlap calculations are very unstable and frequently results in values outside the range [0,1].
+
+    """
     height = data_cube.retrievals_highres['range']
     logging.warning(f'rayleighfit seems to use range in matlab, but the met data should be in height >> RECHECK!')
     logging.warning(f'at 10km height this is a difference of about 4 indices')
@@ -78,7 +101,6 @@ def overlapCalc(height:np.ndarray, sigFR:np.ndarray, bgFR:np.ndarray, sigNR:np.n
     - 2021-05-18: First edition by Zhenping
 
     """
-
     if sigNR.shape[0] > 0 and sigFR.shape[0] > 0:
         # Find the height index with full overlap
         full_overlap_index = np.where(height >= hFullOverlap)[0]
@@ -111,10 +133,28 @@ def overlapCalc(height:np.ndarray, sigFR:np.ndarray, bgFR:np.ndarray, sigNR:np.n
 
 
 
-def run_raman_cldFreeGrps(data_cube, collect_debug:bool=True):
-    """
-    """
+def run_raman_cldFreeGrps(data_cube, collect_debug:bool=True) -> list:
+    """Estimate overlap function using Raman method.
 
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
+    collect_debug : bool
+        If true, collect debug information. Default is True.
+    
+    Returns
+    -------
+    overlap : list of dicts
+        Per channel per cloud free period:
+        - olFunc : ndarray
+            Overlap function.
+        - olStd : float
+            Standard deviation of overlap function.
+        - olFunc0 : ndarray
+            Overlap function with no smoothing.
+        
+    """
     height = data_cube.retrievals_highres['range']
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
     logging.warning(f'rayleighfit seems to use range in matlab, but the met data should be in height >> RECHECK!')
@@ -133,8 +173,7 @@ def run_raman_cldFreeGrps(data_cube, collect_debug:bool=True):
             if np.any(data_cube.gf(wv, t, tel)) and np.any(data_cube.gf(wv_r, t_r, tel_r)):
                 print(wv, wv_r, 'both wavelengths available')
                 sig = np.squeeze(data_cube.retrievals_profile['sigTCor'][i, :, data_cube.gf(wv, t, tel)])
-                #bg = np.nansum(np.squeeze(
-                #    data_cube.retrievals_highres['BGTCor'][slice(*cldFree),data_cube.gf(wv, t, tel)]), axis=0)
+                # bg = np.nansum(np.squeeze(data_cube.retrievals_highres['BGTCor'][slice(*cldFree), data_cube.gf(wv, t, tel)]), axis=0)
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
                 molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :]
 
@@ -150,24 +189,48 @@ def run_raman_cldFreeGrps(data_cube, collect_debug:bool=True):
                 aerBsc = data_cube.retrievals_profile['raman'][i][f"{wv}_{t}_{tel}"]['aerBsc']
 
                 sig_r = np.squeeze(data_cube.retrievals_profile['sigTCor'][i, :, data_cube.gf(wv_r, t, tel)])
-                #bg_r = np.nansum(np.squeeze(
-                #    data_cube.retrievals_highres['BGTCor'][slice(*cldFree), data_cube.gf(wv_r, t, tel)]), axis=0)
+                # bg_r = np.nansum(np.squeeze(data_cube.retrievals_highres['BGTCor'][slice(*cldFree), data_cube.gf(wv_r, t, tel)]), axis=0)
                 molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i, :]
                 molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i, :]
                 hFullOverlap = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, t, tel)][0]
-                ol = overlapCalcRaman(wv, wv_r, height, sig, sig_r,
-                                 molExt, molBsc_r, molExt_r, aerBsc,
-                                 hFullOverlap=hFullOverlap, smoothbins=config_dict['overlapSmoothBins']-3,  # -3??? looks very hard coded....
-                                 AE=config_dict['angstrexp'], hres=hres, collect_debug=collect_debug)
+                ol = overlapCalcRaman(
+                    Lambda_el=wv,
+                    Lambda_Ra=wv_r,
+                    height=height,
+                    sigFRel=sig,
+                    sigFRRa=sig_r,
+                    molExt=molExt,
+                    molBsc_r=molBsc_r,
+                    molExt_r=molExt_r,
+                    aerBsc=aerBsc,
+                    hFullOverlap=hFullOverlap,
+                    smoothbins=config_dict['overlapSmoothBins']-3, # Hardcoded????
+                    AE=config_dict['angstrexp'],
+                    hres=hres,
+                    collect_debug=collect_debug
+                )
 
                 overlap[i][f"{wv}_{t}_{tel}"] = ol
     
     return overlap
 
 
-def overlapCalcRaman(Lambda_el, Lambda_Ra, height, sigFRel, sigFRRa, 
-                     molExt, molBsc_r, molExt_r,
-                     aerBsc, hFullOverlap=600, smoothbins=1, AE=1, hres=150):
+def overlapCalcRaman(
+        Lambda_el:float,
+        Lambda_Ra:float,
+        height:np.ndarray,
+        sigFRel:np.ndarray,
+        sigFRRa:np.ndarray, 
+        molExt:np.ndarray,
+        molBsc_r:np.ndarray,
+        molExt_r:np.ndarray,
+        aerBsc:np.ndarray,
+        hFullOverlap:float=600,
+        smoothbins:float=1,
+        AE:float=1,
+        hres:float=150,
+        collect_debug=False
+    ) -> dict:
     """Calculate overlap function from Polly measurements
     based on Wandinger and Ansmann 2002 https://doi.org/10.1364/AO.41.000511
 
@@ -178,27 +241,27 @@ def overlapCalcRaman(Lambda_el, Lambda_Ra, height, sigFRel, sigFRRa,
     Lambda_Ra : float
         Raman wavelength.
     height : ndarray
-        Height above ground (m).
+        Height above ground [m].
     sigFRel : ndarray
         Far-field elastic signal.
     sigFRRa : ndarray
         Far-field Raman signal.
-    bgFRel : ndarray
-        Far-field elastic signal background.
-    bgFRRa : ndarray
-        Far-field Raman signal background.
-    kwargs : dict
-        Additional parameters:
-        - hFullOverlap : float, optional
-            Minimum height with complete overlap (default: 600).
-        - aerBsc : ndarray, optional
-            Particle backscattering derived with the Raman method (m^-1).
-        - AE : float, optional
-            Angström exponent.
-        - smoothbins : int, optional
-            Number of bins for smoothing (default: 1).
-        - hres : float, optional
-            Instrument height resolution.
+    molExt : ndarray
+        Molecular extinction (elastic).
+    molBsc_r : ndarray
+        Molecular Backscatter (inelastic).
+    molExt_r : ndarray
+        Molecular extinction (inelastic).
+    aerBsc : ndarray
+        Particle backscattering derived with the Raman method [m^{-1}].
+    hFullOverlap : float, optional
+        Minimum height with complete overlap [m]. Default is 600.
+    smoothbins : int, optional
+        Number of bins for smoothing. Default is 1.
+    AE : float, optional
+        Angström exponent. Default is 1.
+    hres : float, optional
+        Instrument height resolution [m]. Default is 150.
 
     Returns
     -------
@@ -214,8 +277,11 @@ def overlapCalcRaman(Lambda_el, Lambda_Ra, height, sigFRel, sigFRRa,
     - 2023-06-06: First edition by Cristofer
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
 
-    """
+    Notes
+    -----
+    - TODO: What is returned by the function and what is described in the docstring does not corresponed. 
 
+    """
     if len(aerBsc) > 0:
 
         sigFRRa0 = sigFRRa.copy()
@@ -313,13 +379,19 @@ def overlapCalcRaman(Lambda_el, Lambda_Ra, height, sigFRel, sigFRRa,
 
 
 
-def load(data_cube):
-    """
+def load(data_cube) -> list:
+    """read the overlap function from files into a structure similar to the others.
 
-    read the overlap function from files
-    into a structure similar to the others    
-    """
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
 
+    Returns
+    -------
+    overlap : list of dicts
+
+    """
     print(data_cube.picasso_config_dict['defaultFile_folder'])
     print(data_cube.polly_config_dict)
     print(data_cube.polly_default_dict)
