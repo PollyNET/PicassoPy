@@ -35,7 +35,7 @@ import ppcpy.io.sql_interaction as sql_db
 class PicassoProc:
     counter = 0
 
-    def __init__(self, rawdata_dict, polly_config_dict, picasso_config_dict, polly_default_dict):
+    def __init__(self, rawdata_dict, polly_config_dict, picasso_config_dict):
         """initialize the data_cube
 
         Parameters
@@ -46,9 +46,11 @@ class PicassoProc:
             the configuration specific to the specific polly loadConfigs.loadPollyConfig(polly_config_file_fullname, polly_default_config_file)
         picasso_config_dict
             the general picasso config loadConfigs.loadPicassoConfig(args.picasso_config_file,picasso_default_config_file)
-        polly_default_dict
-            default values for some of the retrievals loadConfigs.loadPollyConfig(polly_default_file_fullname, polly_default_global_defaults_file)
-        
+
+
+        Notes
+        -----
+        The `polly_default_dict` is not longer available as a separate variable, but is included into the `polly_config_dict`
         
         """
         type(self).counter += 1
@@ -56,7 +58,6 @@ class PicassoProc:
         self.rawdata_dict = rawdata_dict
         self.polly_config_dict = polly_config_dict
         self.picasso_config_dict = picasso_config_dict
-        self.polly_default_dict = polly_default_dict
         self.device = self.polly_config_dict['name']
         self.location = self.polly_config_dict['site']
         self.date = self.mdate_filename()
@@ -65,6 +66,7 @@ class PicassoProc:
         self.retrievals_highres = {}
         self.retrievals_profile = {}
         self.retrievals_profile['avail_optical_profiles'] = []
+
 
     def mdate_filename(self):
         filename = self.rawdata_dict['filename']

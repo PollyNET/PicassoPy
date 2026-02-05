@@ -52,7 +52,7 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
                 )
                 if config_dict["flagUseTheoreticalMDR"]:
                     logging.info("use the theoretical MDR value")
-                    mdr = data_cube.polly_default_dict[f"molDepol{wv}"]
+                    mdr = data_cube.polly_config_dict[f"molDepol{wv}"]
                 print(f"est. mdr {channel}  {mdr} {mdrStd}")
                 opt_profiles[i][channel]['mdr'] = mdr
                 opt_profiles[i][channel]['mdrStd'] = mdrStd

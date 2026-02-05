@@ -8,7 +8,7 @@
     "results_folder": "/pollyhome/Bildermacher2/experimental", 
     "pic_folder": "/pollyhome/Bildermacher2/experimental", 
     "pollynet_config_link_file": "/pollyhome/Bildermacher2/Pollynet_Processing_Chain/config/pollynet_processing_chain_config_links_rsd2.xlsx",
-    "polly_global_config": "/pollyhome/Bildermacher2/experimental/PicassoPy/config/polly_global_config.json",
+    "polly_global_config": "config/polly_global_config.json",
 
     "figDPI": 96,
     "fontname": "DejaVu Serif",
