@@ -69,6 +69,7 @@ def create_netcdf_from_dict(nc_file_path, data_dict, compression_level=1):
         # Define variables and add data
         if 'variables' in data_dict:
             for var_name, var_info in data_dict['variables'].items():
+                #print(var_name)
                 # Extract variable metadata
                 dimensions = var_info['shape']
                 dtype = var_info['dtype']

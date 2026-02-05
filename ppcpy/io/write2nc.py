@@ -161,7 +161,10 @@ def write_profile2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
 
         """ set dimension sizes """
         for d in json_nc_mapping_dict['dimensions']:
-            json_nc_mapping_dict['dimensions'][d] = len(data_cube.retrievals_highres[d])
+            if d == "reference_height":
+                json_nc_mapping_dict['dimensions'][d] = 2
+            else:
+                json_nc_mapping_dict['dimensions'][d] = len(data_cube.retrievals_highres[d])
 
         """ fill variables """
         #for n, profil in enumerate(data_cube.retrievals_profile[method]):
@@ -179,6 +182,44 @@ def write_profile2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
             json_nc_mapping_dict['variables']['start_time']['data'] = starttime.astype('datetime64[ns]').astype('int64') / 1_000_000_000
             json_nc_mapping_dict['variables']['end_time']['data'] = stoptime.astype('datetime64[ns]').astype('int64') / 1_000_000_000
             json_nc_mapping_dict['variables']['height']['data'] = data_cube.retrievals_highres['height']
+
+            ## adding reference heights
+            ## 355
+            refHindex0_355 = data_cube.refH[n]['355_total_FR']['refHInd'][0]
+            refHindex1_355 = data_cube.refH[n]['355_total_FR']['refHInd'][1]
+            if np.isnan(refHindex0_355):
+                refH0_355 = np.nan
+            else:
+                refH0_355 = data_cube.retrievals_highres['height'][refHindex0_355]
+            if np.isnan(refHindex1_355):
+                refH1_355 = np.nan
+            else:
+                refH1_355 = data_cube.retrievals_highres['height'][refHindex1_355]
+            json_nc_mapping_dict['variables']['reference_height_355']['data'] = [refH0_355,refH1_355]
+            ## 532
+            refHindex0_532 = data_cube.refH[n]['532_total_FR']['refHInd'][0]
+            refHindex1_532 = data_cube.refH[n]['532_total_FR']['refHInd'][1]
+            if np.isnan(refHindex0_532):
+                refH0_532 = np.nan
+            else:
+                refH0_532 = data_cube.retrievals_highres['height'][refHindex0_532]
+            if np.isnan(refHindex1_532):
+                refH1_532 = np.nan
+            else:
+                refH1_532 = data_cube.retrievals_highres['height'][refHindex1_532]
+            json_nc_mapping_dict['variables']['reference_height_532']['data'] = [refH0_532,refH1_532]
+            ## 1064
+            refHindex0_1064 = data_cube.refH[n]['1064_total_FR']['refHInd'][0]
+            refHindex1_1064 = data_cube.refH[n]['1064_total_FR']['refHInd'][1]
+            if np.isnan(refHindex0_1064):
+                refH0_1064 = np.nan
+            else:
+                refH0_1064 = data_cube.retrievals_highres['height'][refHindex0_1064]
+            if np.isnan(refHindex1_1064):
+                refH1_1064 = np.nan
+            else:
+                refH1_1064 = data_cube.retrievals_highres['height'][refHindex1_1064]
+            json_nc_mapping_dict['variables']['reference_height_1064']['data'] = [refH0_1064,refH1_1064]
 
             ## adding global attributes
             adding_global_attr(data_cube, json_nc_mapping_dict)
