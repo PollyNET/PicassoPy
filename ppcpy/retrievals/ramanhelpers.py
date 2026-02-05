@@ -1,6 +1,7 @@
 
 import numpy as np
 from scipy.stats import norm, poisson
+from scipy.signal import savgol_coeffs
 
 def movingslope_variedWin(signal:np.ndarray, winWidth:int|np.ndarray) -> np.ndarray:
     """
