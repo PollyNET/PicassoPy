@@ -197,3 +197,61 @@ def sigGenWithNoise(signal:np.ndarray, noise:np.ndarray=None, nProfile:int=1, me
         raise ValueError('A valid method should be provided.')
 
     return signalGen
+
+
+def savgol_filter(x:np.ndarray, window_length:int, polyorder:int=2, deriv:int=0, delta:float=1.0, fill_val:float=np.nan) -> np.ndarray:
+    """Savitzky-Golay filter
+
+    A Savitzky-Golay filter that works with NaN values.
+
+    Parameters
+    ----------
+    x : ndarray
+        Signal to be smoothed
+    window_length : int
+        Width of savgol filter
+    polyorder : int, optional
+        The order of the polynomial used to make the filter. 
+        must be less than 'window_length'. Default is 2.
+    deriv : int, optional
+        The order of the derivative to compute for the filter. Default is 0.
+    delta : float, optional
+        The spacing of which the filter will be applied. This is only used 
+        if 'deriv' > 0. Defualt is 1.0.
+    fill_val : float, optional
+        Value to be used for filling edges in order to recreate the input 
+        dimension. Default is np.nan. 
+    
+    Returns
+    -------
+    out : ndarray
+        Smoothed signal
+    
+    Notes
+    -----
+    This function is inspiered by scipy.signal's Savitzky-Golay filter [1].
+
+    References
+    ----------
+    [1] Virtanen, et al., Scipy 1.0: Fundamental Algorithms for Scientific
+    Computing in Python, Nature Methods, 2020, 17, 261-272, https://rdcu.be/b08Wh,
+    10.1038/s41592-019-0686-2
+    [2] A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of Data by
+    Simplified Least Squares Procedures. Analytical Chemistry, 1964, 36 (8),
+    pp 1627-1639.
+    [3] Jianwen Luo, Kui Ying, and Jing Bai. 2005. Savitzky-Golay smoothing and
+    differentiation filter for even number data. Signal Process.
+    85, 7 (July 2005), 1429-1434.
+
+    """
+    f = savgol_coeffs(window_length, polyorder, deriv=deriv, delta=delta)
+    x_smooth = np.convolve(x, f, mode='valid')
+    fill = np.full(int((window_length - 1)/2), fill_val)
+
+    # if window_length is even fill one more element at the start.
+    if window_length % 2 == 0:
+        out = np.hstack((np.append(fill, fill_val), x_smooth, fill))
+    else:
+        out = np.hstack((fill, x_smooth, fill))
+    
+    return out

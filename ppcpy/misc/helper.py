@@ -8,8 +8,8 @@ import platform
 import xarray
 from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
-
 import numpy as np
+
 
 def detect_path_type(fullpath):
     """Detect the type of path (Windows or Linux) based on the input."""
@@ -39,9 +39,11 @@ def detect_path_type(fullpath):
         # that happens if no folders are given
         return Path(fullpath)
 
+
 def os_name():
     """"""
     return platform.system()
+
 
 def get_input_path(timestamp, device, raw_folder):
     """"""
@@ -607,6 +609,7 @@ def concat_files(timestamp, device, raw_folder, output_path):
     print('done!')
     return destination_file
 
+
 def remove_whitespaces_and_replace_dash_with_underscore(string:str) -> str:
     """remove whitespaces and replace dashes with underscores
     
@@ -622,6 +625,7 @@ def remove_whitespaces_and_replace_dash_with_underscore(string:str) -> str:
     """
     new_string  = string.replace(" ", "").replace("-", "_")
     return new_string
+
 
 def find_matching_dimension(array, reference_list):
     """
@@ -640,6 +644,7 @@ def find_matching_dimension(array, reference_list):
             return dim_index
     return -1  # No matching dimension found
 
+
 def channel_2_variable_mapping(data_retrievals, var, channeltags_dict):
     ## check length of channeltags_dict vs. length of data_retrievals[var].shape
     channel_dim = find_matching_dimension(array=data_retrievals[var], reference_list=channeltags_dict)
@@ -647,16 +652,16 @@ def channel_2_variable_mapping(data_retrievals, var, channeltags_dict):
         ch_mod =remove_whitespaces_and_replace_dash_with_underscore(string=channeltags_dict[ch])
         if len(data_retrievals[var].shape) == 3:
             if channel_dim == 0:
-                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][ch,:,:]
+                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][ch, :, :]
             elif channel_dim == 1:
-                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:,ch,:]
+                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:, ch, :]
             elif channel_dim == 2:
-                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:,:,ch]
+                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:, :, ch]
         elif len(data_retrievals[var].shape) == 2:
             if channel_dim == 0:
-                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][ch,:]
+                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][ch, :]
             elif channel_dim == 1:
-                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:,ch]
+                data_retrievals[f'{var}_{ch_mod}'] =  data_retrievals[var][:, ch]
 
 
 def uniform_filter(x:np.ndarray, win:int, fill_val:float=np.nan) -> np.ndarray:
@@ -672,9 +677,8 @@ def uniform_filter(x:np.ndarray, win:int, fill_val:float=np.nan) -> np.ndarray:
     win : int
         (M,) Width of the filter.
     fill_val : float, optional
-        The value to be used for filling edges, 
-        in order to recreate the input dimension. 
-        Default: np.nan.
+        Value to be used for filling edges, in order to recreate the input 
+        dimension. Default is np.nan.
     
     Returns
     -------
@@ -696,6 +700,7 @@ def uniform_filter(x:np.ndarray, win:int, fill_val:float=np.nan) -> np.ndarray:
         out = np.hstack((fill, x_smoothed, fill))
 
     return out
+
 
 def mean_stable(x:np.ndarray, win:int, minBin:int=None, maxBin:int=None, minRelStd:float=None) -> tuple:
     """Calculate the mean value of x based on the least fluctuated 
@@ -841,6 +846,7 @@ def smooth2a(matrix_in:np.ndarray, Nr:int, Nc:int=None) -> np.ndarray:
     matrix_out = (eL @ matrix_in_filled @ eR) / normalize
 
     return matrix_out
+
 
 def get_wv_pol_telescope_from_dictkeyname(keyname:str) -> tuple:
     """translate `{wavelength}_{total|cross|parallel|rr}_{NR|FR|DFOV}` to wavelength, polarisation, telescope separataly.

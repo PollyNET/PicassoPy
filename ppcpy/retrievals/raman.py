@@ -2,7 +2,6 @@ import logging
 import numpy as np
 from ppcpy.retrievals.ramanhelpers import *
 from scipy.stats import norm
-from scipy.signal import savgol_filter
 from ppcpy.misc.helper import idx2time
 
 from ppcpy.retrievals.collection import calc_snr
@@ -485,7 +484,6 @@ def raman_bsc(
         ext_mol_raman=ext_mol_raman,
         beta_mol_inela=beta_mol_inela,
         HRef=HRef,
-        wavelength=el_lambda,
         betaRef=betaRef,
         window_size=window_size,
         flagSmoothBefore=flagSmoothBefore,
@@ -520,7 +518,6 @@ def raman_bsc(
                                 ext_mol_raman=ext_mol_raman,
                                 beta_mol_inela=beta_mol_inela,
                                 HRef=HRef,
-                                wavelength=el_lambda,
                                 betaRef=betaRefSample[iM],
                                 window_size=window_size,
                                 flagSmoothBefore=flagSmoothBefore,
@@ -772,22 +769,8 @@ def lidarratio(
         print("Warning: Smoothing for backscatter is larger than smoothing for extinction.")
         smoothWinBsc2 = 3
 
-    # # Smooth the backscatter using Savitzky-Golay filter
-    # aerBscSm = savgol_filter(aerBsc, window_length=smoothWinBsc2, polyorder=2, mode='interp')   # Original
-
-    # Adjust for NaN values at the edges due to reduced dimension from smoothing.
-    start = int((smoothWinBsc - 1)/2)
-    end = int((smoothWinBsc - 1)/2)
-    if smoothWinBsc % 2 == 0:
-        start += 1
-
-    # Smooth adjusted (non-NaN part of) the backscatter using Savitzky-Golay filter and add in the NaN edges again.
-    aerBscSm = savgol_filter(aerBsc[start:-end], window_length=smoothWinBsc2, polyorder=2, mode='interp')
-    aerBscSm = np.hstack((
-        np.full(start, np.nan),
-        aerBscSm,
-        np.full(end, np.nan)
-    ))
+    # Smooth the backscatter using Savitzky-Golay filter
+    aerBscSm = savgol_filter(aerBsc, window_length=smoothWinBsc2, polyorder=2)
 
     # Lidar ratio
     aerLR = aerExt / aerBscSm
