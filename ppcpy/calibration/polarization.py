@@ -18,30 +18,21 @@ def smooth_signal(signal, window_len):
 
 
 def loadGHK(data_cube):
+    """ prepare the GHK parameters, especially if given in TR convert them into GHK """
 
     print('starting loadGHK')
-
-    sigma_angstroem=0.2
-    MC_count=3
-
-    pcd = data_cube.polly_config_dict
-
     #print('flag_532_total', flag_532_total_FR)
     #print('flag_532_cross', flag_532_cross_FR)
 
     print('data_cube keys ', data_cube.__dict__.keys())
-    print('======================================')
-    #pprint.pprint(data_cube.polly_config_dict)
-    #print(data_cube.polly_config_dict.keys())
-    print('======================================')
     G = np.array(data_cube.polly_config_dict['G']).astype(float)
     H = np.array(data_cube.polly_config_dict['H']).astype(float)
     K = np.array(data_cube.polly_config_dict['K']).astype(float)
-    TR = np.array(data_cube.polly_config_dict['TR']).astype(float)
     #print(TR[flag_532_total_FR])
     #print(TR[flag_532_cross_FR])
     #if data_cube.polly_config_dict['H'][0] == -999:
     if (np.all(np.isclose(H, -999))):
+        TR = np.array(data_cube.polly_config_dict['TR']).astype(float)
         print('H is empty -> calculate parameters')
 
         K[data_cube.flag_355_total_FR] = 1.0
@@ -61,16 +52,18 @@ def loadGHK(data_cube):
         H[data_cube.flag_532_cross_FR] = onemx_onepx(TR[data_cube.flag_532_cross_FR])
         H[data_cube.flag_1064_total_FR] = onemx_onepx(TR[data_cube.flag_1064_total_FR])
         H[data_cube.flag_1064_cross_FR] = onemx_onepx(TR[data_cube.flag_1064_cross_FR])
+        print('TR', TR)
     else:
         print("Using GHK from config file")
-    print('TR', TR)
+        #print('TR', TR)
+        #print('TR from H', (1-H)/(1+H))
     print('G', G)
     print('H', H)
     print('K', K)
-    data_cube.polly_config_dict['TR'] = TR
-    data_cube.polly_config_dict['G'] = G
-    data_cube.polly_config_dict['H'] = H
-    data_cube.polly_config_dict['K'] = K
+    data_cube.polly_config_dict.pop('TR', None) # remove the TR from the config to avoid inconsistencies
+    data_cube.polly_config_dict['G'] = np.array(G)
+    data_cube.polly_config_dict['H'] = np.array(H)
+    data_cube.polly_config_dict['K'] = np.array(K)
     data_cube.polly_config_dict['voldepol_error_355'] = np.array(data_cube.polly_config_dict['voldepol_error_355'])
     data_cube.polly_config_dict['voldepol_error_532'] = np.array(data_cube.polly_config_dict['voldepol_error_532'])
     data_cube.polly_config_dict['voldepol_error_1064'] = np.array(data_cube.polly_config_dict['voldepol_error_1064'])
@@ -92,42 +85,53 @@ def loadGHK(data_cube):
 
 
 def calibrateGHK(data_cube):
-    """
+    """estimate the polarization calibration from the delta 90 Method 
+
+    Parameters
+    ----------
+    data_cube
+        the input data cube
     
-    Returns:
-    --------
+    Returns
+    -------
     pol_cali : dict
         polarization factors from delta 90 for each wavelength containing 
         sub-dicts with 'eta', 'eta_std', 'time_start', 'time_end', 'status'
 
-    History:
-    --------
+    History
+    -------
 
     Function is called here https://github.com/PollyNET/Pollynet_Processing_Chain/blob/5f5e4d0fd3dcebe7f87220cf802fcd6f414fe235/lib/interface/picassoProcV3.m#L548
     The two most relevant functions here are https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/pollyPolCaliGHK.m
     which also calls https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/depolCaliGHK.m
 
+    References
+    -----------
+    
+    .. [1] Freudenthaler 2016
+
     """
 
     pol_cali = {}
 
+    tel = 'FR' # currently only implemented in the far range receiver
     for wv in [355, 532, 1064]:
-        if np.any(data_cube.gf(wv, 'total', 'FR')) and np.any(data_cube.gf(wv, 'cross', 'FR')):
+        if np.any(data_cube.gf(wv, 'total', tel)) and np.any(data_cube.gf(wv, 'cross', tel)):
             logging.info(f'and even a {wv} channel')
 
-            sigBGCor_total = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:,:,data_cube.gf(wv, 'total', 'FR')])
-            bg_total = np.squeeze(data_cube.retrievals_highres['BG'][:,data_cube.gf(wv, 'total', 'FR')])
-            sigBGCor_cross = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:,:,data_cube.gf(wv, 'cross', 'FR')])
-            bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][:,data_cube.gf(wv, 'cross', 'FR')])
+            sigBGCor_total = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:,:,data_cube.gf(wv, 'total', tel)])
+            bg_total = np.squeeze(data_cube.retrievals_highres['BG'][:,data_cube.gf(wv, 'total', tel)])
+            sigBGCor_cross = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:,:,data_cube.gf(wv, 'cross', tel)])
+            bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][:,data_cube.gf(wv, 'cross', tel)])
 
-            pol_cali[wv] = depol_cali_ghk(
+            pol_cali[f"{wv}_{tel}"] = depol_cali_ghk(
                 sigBGCor_total, bg_total, sigBGCor_cross, bg_cross, data_cube.retrievals_highres['time'],
                 data_cube.retrievals_highres['depol_cal_ang_p_time_start'],
                 data_cube.retrievals_highres['depol_cal_ang_p_time_end'],
                 data_cube.retrievals_highres['depol_cal_ang_n_time_start'],
                 data_cube.retrievals_highres['depol_cal_ang_n_time_end'],
                 # K should be 0d?
-                np.squeeze(data_cube.polly_config_dict['K'][data_cube.gf(wv, 'total', 'FR')]),
+                np.squeeze(data_cube.polly_config_dict['K'][data_cube.gf(wv, 'total', tel)]),
                 [data_cube.polly_config_dict[f'depol_cal_minbin_{wv}'], data_cube.polly_config_dict[f'depol_cal_maxbin_{wv}']],
                 data_cube.polly_config_dict[f'depol_cal_SNRmin_{wv}'],
                 data_cube.polly_config_dict[f'depol_cal_sigMax_{wv}'],
@@ -135,7 +139,7 @@ def calibrateGHK(data_cube):
                 data_cube.polly_config_dict[f'rel_std_dminus_{wv}'],
                 data_cube.polly_config_dict[f'depol_cal_segmentLen_{wv}'],
                 data_cube.polly_config_dict[f'depol_cal_smoothWin_{wv}'], collect_debug=False)
-            logging.info(f'pol_cali_{wv}   {pol_cali[wv]}')
+            logging.info(f'pol_cali_{wv}',  pol_cali[f'{wv}_{tel}'])
         else:
             logging.warning(f'calibrateGHK no {wv} channel')
 
@@ -212,10 +216,10 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
         return {'status': 0}
 
     # the iteration of days can be omitted if unixtimestamps are used
+    print('pol_cali_nang_start_time', pol_cali_nang_start_time)
 
     time = np.array(time)
     for i_depol_cal in range(len(pol_cali_nang_start_time)):
-        #print('i_depol_cal', i_depol_cal)
         indx_45p = np.where(
             (time >= pol_cali_pang_start_time[i_depol_cal]) &
             (time <= pol_cali_pang_stop_time[i_depol_cal]))[0]
@@ -223,9 +227,8 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
         indx_45m = np.where(
             (time >= pol_cali_nang_start_time[i_depol_cal]) &
             (time <= pol_cali_nang_stop_time[i_depol_cal]))[0]
-        #print(indx_45p)
-        #print(indx_45m)
         if len(indx_45p) < 4 or len(indx_45m) < 4:
+            logging.warning(f'calibrateGHK array to short {len(indx_45p)}{len(indx_45m)} in period {i_depol_cal}')
             break
         this_cali_start_time = min(pol_cali_pang_start_time[i_depol_cal],
                                    pol_cali_nang_start_time[i_depol_cal])
@@ -265,12 +268,33 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
         dminus = np.where(np.isfinite(dminus), dminus, np.nan)
         dplus[indx_bad_t_p | indx_bad_x_p] = np.nan
         dminus[indx_bad_t_m | indx_bad_x_m] = np.nan
+
         # Subset the calibration range
         dplus = dplus[cali_h_indx_range[0]:cali_h_indx_range[1]]
         dminus = dminus[cali_h_indx_range[0]:cali_h_indx_range[1]]
+
+        if np.all(np.isnan(dplus)) or np.all(np.isnan(dminus)):
+            logging.warning(f'calibrateGHK all values in dplus or dminus masked in period {i_depol_cal}')
+            print(f'calibrateGHK all values in dplus or dminus masked in period {i_depol_cal}, len(dplus) {len(dplus)}')
+            print('  snr_t_p ', np.sum((snr_t_p <= SNRmin[0])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
+            print('  sig_t_p ', np.sum((sig_t_p >= sig_max[0])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
+            print('> indx_bad_t_p in height interval', np.sum(indx_bad_t_p[cali_h_indx_range[0]:cali_h_indx_range[1]]))
+            print('  snr_t_m ', np.sum((snr_t_m <= SNRmin[1])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
+            print('  sig_t_m ', np.sum((sig_t_m >= sig_max[1])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
+            print('> indx_bad_t_m in height interval', np.sum(indx_bad_t_m[cali_h_indx_range[0]:cali_h_indx_range[1]]))
+            print('  snr_x_p ', np.sum((snr_x_p <= SNRmin[2])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
+            print('  sig_x_p ', np.sum((sig_x_p >= sig_max[2])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
+            print('> indx_bad_x_p in height interval', np.sum(indx_bad_x_p[cali_h_indx_range[0]:cali_h_indx_range[1]]))
+            print('  snr_x_m ', np.sum((snr_x_m <= SNRmin[3])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
+            print('  sig_x_m ', np.sum((sig_x_m >= sig_max[3])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
+            print('> indx_bad_x_m in height interval', np.sum(indx_bad_x_m[cali_h_indx_range[0]:cali_h_indx_range[1]]))
+            continue
+            
         # Analyze segments for stability
+        #print('before analyze segments', len(dplus), segment_len)
         seg = analyze_segments(dplus, dminus, segment_len, rel_std_dplus, rel_std_dminus)
         if seg.shape[0] == 0:
+            logging.warning(f'calibrateGHK no stable segment found in period {i_depol_cal}')
             continue
 
         # translate manually 
@@ -329,8 +353,9 @@ def analyze_segments(dplus, dminus, segment_len, rel_std_dplus, rel_std_dminus):
         std_dp = np.nanstd(seg_dplus)
         mean_dm = np.nanmean(seg_dminus)
         std_dm = np.nanstd(seg_dminus)
-        #print('mean_dp', mean_dp, 'std_dp', std_dp)
-        #print('mean_dm', mean_dm, 'std_dm', std_dm)
+        #print('mean_dp', mean_dp, 'std_dp', std_dp, '-> ', std_dp / mean_dp, rel_std_dplus)
+        #print('mean_dm', mean_dm, 'std_dm', std_dm, '-> ', std_dm / mean_dm, rel_std_dminus)
+        
         if std_dp / mean_dp <= rel_std_dplus and std_dm / mean_dm <= rel_std_dminus:
             results.append([mean_dp, std_dp, mean_dm, std_dm])
     return np.array(results)
@@ -415,13 +440,13 @@ def calibrateMol(data_cube):
                     mdrStd=default_dict[f'molDepolStd{wv}'],
                 )
                 if not ret['status'] == 0:
-                    pol_cali[f'{wv}_{t}_{tel}']['eta'].append(ret['eta'])
-                    pol_cali[f'{wv}_{t}_{tel}']['eta_std'].append(ret['eta_std'])
-                    pol_cali[f'{wv}_{t}_{tel}']['fac'].append(ret['fac'])
-                    pol_cali[f'{wv}_{t}_{tel}']['fac_std'].append(ret['fac_std'])
-                    pol_cali[f'{wv}_{t}_{tel}']['time_start'].append(int(cldFreeTime[0]))
-                    pol_cali[f'{wv}_{t}_{tel}']['time_end'].append(int(cldFreeTime[1]))
-                    pol_cali[f'{wv}_{t}_{tel}']['status'] = 1
+                    pol_cali[f'{wv}_{tel}']['eta'].append(ret['eta'])
+                    pol_cali[f'{wv}_{tel}']['eta_std'].append(ret['eta_std'])
+                    pol_cali[f'{wv}_{tel}']['fac'].append(ret['fac'])
+                    pol_cali[f'{wv}_{tel}']['fac_std'].append(ret['fac_std'])
+                    pol_cali[f'{wv}_{tel}']['time_start'].append(int(cldFreeTime[0]))
+                    pol_cali[f'{wv}_{tel}']['time_end'].append(int(cldFreeTime[1]))
+                    pol_cali[f'{wv}_{tel}']['status'] = 1
 
     return default_to_regular(pol_cali)
     

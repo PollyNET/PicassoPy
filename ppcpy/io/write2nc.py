@@ -75,8 +75,8 @@ def write_channelwise_2_nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
                 json_nc_mapping_dict['variables'][v]['data'] = data_cube.retrievals_highres[v]
                 ## update variable attribute
                 if "eta" in json_nc_mapping_dict['variables'][v]['attributes'].keys():
-                    wv = re.search(r'_([0-9]{3,4})_', v).group(1)
-                    json_nc_mapping_dict['variables'][v]['attributes']['eta'] = data_cube.pol_cali[int(wv)]['eta_best']
+                    wv, t, tel = re.findall(r"(\d{3,4})_(\w+)_(\w+)", v)[0]
+                    json_nc_mapping_dict['variables'][v]['attributes']['eta'] = data_cube.pol_cali[f'{wv}_{tel}']['eta_best']
                 if "Lidar_calibration_constant_used" in json_nc_mapping_dict['variables'][v]['attributes'].keys():
                     LC_used_key = v.split("attBsc_")[-1]
                     json_nc_mapping_dict['variables'][v]['attributes']['Lidar_calibration_constant_used'] = data_cube.LCused[LC_used_key]
@@ -125,9 +125,9 @@ def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
                 json_nc_mapping_dict['variables'][var]['data'] = data_cube.retrievals_highres[parameter]
                 ## update variable attribute
                 if "eta" in json_nc_mapping_dict['variables'][var]['attributes'].keys():
-                    wv = re.search(r'_([0-9]{3,4})_', parameter).group(1)
-                    json_nc_mapping_dict['variables'][var]['attributes']['eta'] = data_cube.pol_cali[int(wv)]['eta_best']
-                    json_nc_mapping_dict['variables'][var]['attributes']['comment'] += f" (eta: {data_cube.pol_cali[int(wv)]['eta_best']})"
+                    wv, t, tel = re.findall(r"(\d{3,4})_(\w+)_(\w+)", parameter)[0]
+                    json_nc_mapping_dict['variables'][var]['attributes']['eta'] = data_cube.pol_cali[f'{wv}_{tel}']['eta_best']
+                    json_nc_mapping_dict['variables'][var]['attributes']['comment'] += f" (eta: {data_cube.pol_cali[f'{wv}_{tel}']['eta_best']})"
                 if "Lidar_calibration_constant_used" in json_nc_mapping_dict['variables'][var]['attributes'].keys():
                     if "OC" in parameter:
                         parameter = parameter.replace("OC", "FR")

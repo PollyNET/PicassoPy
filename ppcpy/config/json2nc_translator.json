@@ -792,6 +792,9 @@
                             },
                             "volume_depolarization_ratio_1064nm": {
                                                  "parameter":"voldepol_1064_total_FR"
+                            },
+                            "volume_depolarization_ratio_532nm_DFOV": {
+                                                 "parameter":"voldepol_532_total_DFOV"
                             }
 	      }
   }
