@@ -1,7 +1,7 @@
 
 import logging
 import numpy as np
-from scipy.ndimage import uniform_filter1d
+from ppcpy.misc.helper import uniform_filter
 
 #import fastrdp
 
