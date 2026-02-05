@@ -11,6 +11,7 @@ version = "0.1.1"
 authors = [
   { name="Andi Klamt", email="klamt@tropos.de" },
   { name="Martin Radenz", email="radenz@tropos.de" },
+  { name="Håvard Buholdt", email="buholdt@tropos.de" },
 ]
 description='Data cube for handling atmospheric observations of profiling remote sensing instruments.'
 requires-python = ">=3.8"
@@ -32,6 +33,7 @@ dependencies = [
   "pandas",
   "openpyxl", # might be an optional dependency
   "GitPython",
+  "matplotlib",
 ]
 
 [tool.setuptools.packages]
