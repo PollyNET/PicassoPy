@@ -1,4 +1,3 @@
-
 import logging
 import numpy as np
 
@@ -32,6 +31,8 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
     """
     TODO: Should the GHK-Transmission corrected (TCor) or the Background corrected (BGCor)
     signal be used for calculating the volume depolarisation ratio?
+    >>> With the GHK formula the BGCor signal has to be used (in the current implementation, the voldepol is even 
+    >>> needed to perform the polarization-transmission-correction
     """
 
     config_dict = data_cube.polly_config_dict
@@ -53,18 +54,18 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
             if np.any(flagt) and np.any(flagc):
                 logging.info(f'voldepol at channel {wv} cldFree {i} {cldFree}')
 
-                sigt = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, flagt])
+                sigt = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i,:,flagt])
                 #bgt = np.nansum(np.squeeze(
-                #    data_cube.retrievals_highres[f'BG{signal}'][slice(*cldFree), data_cube.gf(wv, 'total', tel)]), axis=0)
-                sigc = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, flagc])
+                #    data_cube.retrievals_highres[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, 'total', tel)]), axis=0)
+                sigc = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i,:,flagc])
 
-                print(channel, data_cube.pol_cali[int(wv)]['eta_best'])
+                print(channel, data_cube.pol_cali[f'{wv}_{tel}']['eta_best'])
 
                 vdr, vdrStd = calc_profile_vdr(
                     sigt, sigc, config_dict['G'][flagt], config_dict['G'][flagc],
                     config_dict['H'][flagt], config_dict['H'][flagc],
-                    data_cube.pol_cali[int(wv)]['eta_best'], config_dict[f'voldepol_error_{wv}'],
-                    config_dict[f'smoothWin_{retrieval}_{wv}']
+                    data_cube.pol_cali[f'{wv}_{tel}']['eta_best'], config_dict[f'voldepol_error_{wv}'],
+                    window=config_dict[f'smoothWin_{retrieval}_{wv}']
                     )
                 opt_profiles[i][channel]['vdr'] = vdr
                 opt_profiles[i][channel]['vdrStd'] = vdrStd
@@ -76,17 +77,17 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
                 )
                 if config_dict["flagUseTheoreticalMDR"]:
                     logging.info("use the theoretical MDR value")
-                    mdr = data_cube.polly_default_dict[f"molDepol{wv}"]
+                    mdr = data_cube.polly_config_dict[f"molDepol{wv}"]
                 print(f"est. mdr {channel}  {mdr} {mdrStd}")
                 opt_profiles[i][channel]['mdr'] = mdr
                 opt_profiles[i][channel]['mdrStd'] = mdrStd
                 
-                # experimental code
+                # experimental code to calculate the mdr without smoothing(?)
                 vdr, vdrStd = calc_profile_vdr(
                     sigt, sigc, config_dict['G'][flagt], config_dict['G'][flagc],
                     config_dict['H'][flagt], config_dict['H'][flagc],
-                    data_cube.pol_cali[int(wv)]['eta_best'], config_dict[f'voldepol_error_{wv}'],
-                    1
+                    data_cube.pol_cali[f'{wv}_{tel}']['eta_best'], config_dict[f'voldepol_error_{wv}'],
+                    window=1
                     )
                 mdr, mdrStd, flgaDeftMdr = get_MDR(
                     vdr, vdrStd, data_cube.refH[i][f"{wv}_{t}_{tel}"]['refHInd'],
@@ -99,7 +100,7 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
 
 
 def calc_profile_vdr(sigt, sigc, Gt, Gr, Ht, Hr, eta, 
-                     voldepol_error, window, flag_smooth_before=True):
+                     voldepol_error, window=1, flag_smooth_before=True):
 #def polly_vdr_ghk(sig_tot, sig_cross, GT, GR, HT, HR, eta, 
 #                  voldepol_error_a0, voldepol_error_a1, voldepol_error_a2, 
 #                  smooth_window=1, flag_smooth_before=True):
@@ -171,11 +172,10 @@ def calc_profile_vdr(sigt, sigc, Gt, Gr, Ht, Hr, eta,
 
     # Calculate systematic uncertainty
     vol_depol_std = (voldepol_error[0] + 
-                     voldepol_error[1]*vol_depol + 
-                     voldepol_error[1]*vol_depol**2)
+                     voldepol_error[1] * vol_depol + 
+                     voldepol_error[1] * vol_depol**2)
 
     return vol_depol, vol_depol_std
-
 
 def get_MDR(vdr, vdrStd, refHInd):
     """get the vdr at reference height
@@ -219,7 +219,7 @@ def pardepol_cldFreeGrps(data_cube, ret_prof_name):
                 pdr, pdrStd = calc_pdr(
                     opt_profiles[i][channel]['vdr'], opt_profiles[i][channel]['vdrStd'],
                     opt_profiles[i][channel]['aerBsc'], np.ones_like(opt_profiles[i][channel]['aerBscStd'])*1e-7,
-                    data_cube.mol_profiles[f'mBsc_{wv}'][i, :], opt_profiles[i][channel]['mdr'],
+                    data_cube.mol_profiles[f'mBsc_{wv}'][i,:], opt_profiles[i][channel]['mdr'],
                     opt_profiles[i][channel]['mdrStd'],
                 )
 

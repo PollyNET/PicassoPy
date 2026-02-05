@@ -14,16 +14,12 @@ import numpy as np
 def detect_path_type(fullpath):
     """Detect the type of path (Windows or Linux) based on the input."""
     def is_windows_path(fullpath):
-        if '\\' in str(fullpath):
-            return True
-        else:
-            return False
+        """returns True or False"""
+        return '\\' in str(fullpath)
 
     def is_linux_path(fullpath):
-        if '/' in str(fullpath):
-            return True
-        else:
-            return False
+        """returns True or False"""
+        return '/' in str(fullpath)
         
     if is_windows_path(fullpath):
         # Parse the drive letter and path

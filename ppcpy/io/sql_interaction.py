@@ -1,6 +1,6 @@
 import sqlite3
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 import ppcpy.misc.helper as helper
 
 def get_LC_from_sql_db(db_path:str, table_name:str, wavelength:int|str, method:str, telescope:str, timestamp:str) -> dict:
@@ -84,19 +84,29 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                 LC = data_cube.LC[method][n][ch]['LC']
                 LC_std = data_cube.LC[method][n][ch]['LCStd']
                 LC_is_used = True if LC == data_cube.LCused[ch] else False
-                rows_to_insert.append((str(start), str(stop), float(LC), float(LC_std), LC_is_used, wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
+                rows_to_insert.append(
+                    (str(start), str(stop), float(LC), float(LC_std), LC_is_used, 
+                     wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
     elif parameter == 'DC':
-        for ch in data_cube.pol_cali.keys():
-            wv = ch
-            for i in range(len(data_cube.pol_cali[ch]['eta'])):
-                eta = data_cube.pol_cali[ch]['eta'][i]
-                eta_std = data_cube.pol_cali[ch]['eta_std'][i]
-                eta_is_used = True if eta == data_cube.pol_cali[ch]['eta_best'] else False
-                start_unix = data_cube.pol_cali[ch]['time_start'][i]
-                stop_unix = data_cube.pol_cali[ch]['time_end'][i]
-                start = datetime.utcfromtimestamp(start_unix).strftime("%Y-%m-%d %H:%M:%S")
-                stop = datetime.utcfromtimestamp(stop_unix).strftime("%Y-%m-%d %H:%M:%S")
-                rows_to_insert.append((str(start), str(stop), float(eta), float(eta_std), eta_is_used, wv, str(data_cube.rawfile), data_cube.device))
+        for e in data_cube.pol_cali.keys():
+            wv, tel = e.split('_')
+            if tel == 'FR':
+                tel_db = 'far_range'
+            elif tel == 'NR':
+                tel_db = 'near_range'
+            elif tel == 'DFOV':
+                tel_db = 'dfov'
+            for i in range(len(data_cube.pol_cali[e]['eta'])):
+                eta = data_cube.pol_cali[e]['eta'][i]
+                eta_std = data_cube.pol_cali[e]['eta_std'][i]
+                eta_is_used = True if eta == data_cube.pol_cali[e]['eta_best'] else False
+                start_unix = data_cube.pol_cali[e]['time_start'][i]
+                stop_unix = data_cube.pol_cali[e]['time_end'][i]
+                start = datetime.fromtimestamp(start_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+                stop = datetime.fromtimestamp(stop_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+                rows_to_insert.append(
+                    (str(start), str(stop), float(eta), float(eta_std), eta_is_used, 
+                     wv, tel_db, str(data_cube.rawfile), data_cube.device))
     return rows_to_insert
 
 def setup_empty(db_path:str, table_name:str, column_names:list[str], data_types:list[str]):

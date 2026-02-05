@@ -4,7 +4,19 @@ import numpy as np
 #from pathlib import Path
 #import logging
 #import sys
-def readPollyRawData(filename=str) -> dict:
+def readPollyRawData(filename: str) -> dict:
+    """read the Polly raw file
+    
+    Parameters
+    ----------
+    
+    
+    Returns
+    -------
+    data_dict : dict
+
+    
+    """
 
 #% READPOLLYRAWDATA Read polly raw data.
 #%
@@ -101,7 +113,10 @@ def readPollyRawData(filename=str) -> dict:
             data_dict[var_name]['var_data'] = data_dict[var_name]['var_data'].data
         #print(var_name, type(data_dict[var_name]['var_data']))
 
-    data_dict['measurement_height_resolution']['var_data'] = data_dict['measurement_height_resolution']['var_data']*0.15
+    assert data_dict['measurement_height_resolution']['var_att']['units'] == 'ns'
+    # measurement height resolution should be given in ns
+    two_way_c_ns = 2.99e8 / 2. / 1e9
+    data_dict['measurement_height_resolution']['var_data'] *= two_way_c_ns
 
     nc_file_ds.close()
 

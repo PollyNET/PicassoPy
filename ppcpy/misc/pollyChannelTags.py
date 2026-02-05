@@ -2,7 +2,7 @@ import logging
 import numpy as np
 
 def pollyChannelTags(chTagsIn:list, **Channels) -> list:
-    chTagsOut = {}
+    chTags = {}
     chTagsOut_ls = []
     chLabels = {}
     nChs = len(Channels['flagFarRangeChannel'])
@@ -17,19 +17,8 @@ def pollyChannelTags(chTagsIn:list, **Channels) -> list:
     elif len(chTagsIn) == 0:
 
         for iCh in range(nChs):
-            chTagsOut[iCh] = sum(2 ** i * b for i, b in enumerate([Channels['flagFarRangeChannel'][iCh],
-                                                                      Channels['flagNearRangeChannel'][iCh],
-                                                                      Channels['flagRotRamanChannel'][iCh],
-                                                                      Channels['flagTotalChannel'][iCh],
-                                                                      Channels['flagCrossChannel'][iCh],
-                                                                      Channels['flagParallelChannel'][iCh],
-                                                                      Channels['flag355nmChannel'][iCh],
-                                                                      Channels['flag387nmChannel'][iCh],
-                                                                      Channels['flag407nmChannel'][iCh],
-                                                                      Channels['flag532nmChannel'][iCh],
-                                                                      Channels['flag607nmChannel'][iCh],
-                                                                      Channels['flag1064nmChannel'][iCh]
-                                                                      ]))
+            print([c[iCh] for c in Channels])
+            chTags[iCh] = sum(2 ** i * b for i, b in enumerate([c[iCh] for c in Channels]))
             if chTags[iCh] == 73:
                 ch_label = 'far-range total 355 nm'
                 chTagsOut_ls.append(ch_label)
@@ -60,7 +49,7 @@ def pollyChannelTags(chTagsIn:list, **Channels) -> list:
             elif chTags[iCh] == 529:
                 ch_label = 'far-range cross 532 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 530:
+            elif chTags[iCh] == 4624:
                 ch_label = 'near-range cross 532 nm'
                 chTagsOut_ls.append(ch_label)
             elif chTags[iCh] == 545:
@@ -125,7 +114,7 @@ def pollyChannelflags(channel_dict_length,**Channels):
     flag_532_cross_FR    = np.full(nChs, False, dtype=bool)
     flag_532_parallel_FR = np.full(nChs, False, dtype=bool)
     flag_532_total_NR    = np.full(nChs, False, dtype=bool)
-    flag_532_cross_NR    = np.full(nChs, False, dtype=bool)
+    flag_532_cross_DFOV  = np.full(nChs, False, dtype=bool)
     flag_532_total_RR    = np.full(nChs, False, dtype=bool)
     flag_607_total_FR    = np.full(nChs, False, dtype=bool)
     flag_607_total_NR    = np.full(nChs, False, dtype=bool)
@@ -137,19 +126,7 @@ def pollyChannelflags(channel_dict_length,**Channels):
 
     chTags = {}
     for iCh in range(nChs):
-        chTags[iCh] = sum(2 ** i * b for i, b in enumerate([Channels['flagFarRangeChannel'][iCh],
-                                                                  Channels['flagNearRangeChannel'][iCh],
-                                                                  Channels['flagRotRamanChannel'][iCh],
-                                                                  Channels['flagTotalChannel'][iCh],
-                                                                  Channels['flagCrossChannel'][iCh],
-                                                                  Channels['flagParallelChannel'][iCh],
-                                                                  Channels['flag355nmChannel'][iCh],
-                                                                  Channels['flag387nmChannel'][iCh],
-                                                                  Channels['flag407nmChannel'][iCh],
-                                                                  Channels['flag532nmChannel'][iCh],
-                                                                  Channels['flag607nmChannel'][iCh],
-                                                                  Channels['flag1064nmChannel'][iCh]
-                                                                  ]))
+        chTags[iCh] = sum(2 ** i * b for i, b in enumerate([c[iCh] for c in Channels.values()]))
         if chTags[iCh] == 73:
             ch_label = 'far-range total 355 nm'
             flag_355_total_FR[iCh] = True
@@ -180,9 +157,9 @@ def pollyChannelflags(channel_dict_length,**Channels):
         elif chTags[iCh] == 529:
             ch_label = 'far-range cross 532 nm'
             flag_532_cross_FR[iCh] = True
-        elif chTags[iCh] == 530:
+        elif chTags[iCh] == 4624:
             ch_label = 'near-range cross 532 nm'
-            flag_532_cross_NR[iCh] = True
+            flag_532_cross_DFOV[iCh] = True
         elif chTags[iCh] == 545:
             ch_label = 'far-range parallel 532 nm'
             flag_532_parallel_FR[iCh] = True
@@ -216,7 +193,7 @@ def pollyChannelflags(channel_dict_length,**Channels):
              flag_532_cross_FR,
              flag_532_parallel_FR,
              flag_532_total_NR,
-             flag_532_cross_NR,
+             flag_532_cross_DFOV,
              flag_532_total_RR,
              flag_607_total_FR,
              flag_607_total_NR,

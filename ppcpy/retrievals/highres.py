@@ -78,9 +78,18 @@ def voldepol_2d(data_cube):
 
     config_dict = data_cube.polly_config_dict
 
-    for wv in [355, 532, 1064]:
-        flagt = data_cube.gf(wv, 'total', 'FR')
-        flagc = data_cube.gf(wv, 'cross', 'FR')
+    channels = [
+            (532, 'FR'), (355, 'FR'), (1064, 'FR')]
+    if '532_DFOV' in data_cube.pol_cali:
+        channels += [(532, 'DFOV')]
+        print('voldepol also for DFOV')
+
+    for wv, tel in channels:
+        if tel == 'DFOV':
+            flagt = data_cube.gf(wv, 'total', 'NR')
+        else:
+            flagt = data_cube.gf(wv, 'total', tel)
+        flagc = data_cube.gf(wv, 'cross', tel)
 
         if np.any(flagt) and np.any(flagc):
             sigt = np.squeeze(
@@ -90,15 +99,9 @@ def voldepol_2d(data_cube):
 
 
             vdr, vdrStd = depolarization.calc_profile_vdr(
-                sigt,
-                sigc,
-                Gt=config_dict['G'][flagt],
-                Gr=config_dict['G'][flagc],
-                Ht=config_dict['H'][flagt],
-                Hr=config_dict['H'][flagc],
-                eta=data_cube.pol_cali[int(wv)]['eta_best'],
-                voldepol_error=config_dict[f'voldepol_error_{wv}'],
-                window=1
-            )
+                sigt, sigc, config_dict['G'][flagt], config_dict['G'][flagc],
+                config_dict['H'][flagt], config_dict['H'][flagc],
+                data_cube.pol_cali[f'{wv}_{tel}']['eta_best'], config_dict[f'voldepol_error_{wv}'],
+                window=1)
             vdr[data_cube.retrievals_highres['depCalMask'], :] = np.nan
-            data_cube.retrievals_highres[f"voldepol_{wv}_total_FR"] = vdr
+            data_cube.retrievals_highres[f"voldepol_{wv}_total_{tel}"] = vdr

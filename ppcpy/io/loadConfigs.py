@@ -5,22 +5,36 @@ import numpy as np
 import traceback
 
 def loadPicassoConfig(picasso_config_file, picasso_default_config_file):
+    """load the general Picasso config file
+
+    Parameters
+    ----------
+    picasso_config_file : str or path
+        the specific config file
+    picasso_default_config_fil : str or path
+        the default (template) file
+        
+    Returns
+    -------
+    picasso_config_dict
+    """
     picasso_default_config_file_path = Path(picasso_default_config_file)
     picasso_config_file_path = Path(picasso_config_file)
     picasso_config_dict = {}
+    picasso_config_dict['path_config'] = picasso_default_config_file.parent
 
     if picasso_default_config_file_path.is_file():
         logging.info(f'picasso_default_config_file: {picasso_default_config_file}')
         try:
-            picasso_default_config_file_json = open(picasso_default_config_file, "r")
-            picasso_default_config_file_dict = json.load(picasso_default_config_file_json)
+            with open(picasso_default_config_file) as f:
+                picasso_default_config_file_dict = json.load(f)
         except Exception:
             logging.warning('picasso_default_config_file: {picasso_default_config_file} can not be read.', exc_info=True)
         if picasso_config_file_path.is_file():
             logging.info(f'picasso_config_file: {picasso_config_file}')
             try:
-                picasso_config_file_json = open(picasso_config_file, "r")
-                picasso_config_file_dict = json.load(picasso_config_file_json)
+                with open(picasso_config_file) as f:
+                    picasso_config_file_dict = json.load(f)
 
                 ## check if key exists in the picasso_config_file, if yes, take that one instead of the one from the picasso_default_config_file
                 for key in picasso_default_config_file_dict.keys():
@@ -94,6 +108,47 @@ def fix_indexing(config_dict, keys=['first_range_gate_indx', 'bgCorRangeIndx', '
     return config_dict
 
 
+def getPollyConfigfromArray(polly_config_array, picasso_config_dict):
+    """function to load the config for the time identified
+    
+    aim is to declutter the runscript
+
+    
+    Parameters
+    ----------
+    polly_config_array : pandas dataframe
+        selected line form the links.xlsx
+    picasso_config_dict : dict
+        general picasso config
+
+    Returns
+    -------
+    polly_config_dict : dict
+    
+    """
+    assert len(polly_config_array) == 1, 'given config array has more than one value'
+
+    polly_config_file = Path(
+        picasso_config_dict['polly_config_folder'],
+        polly_config_array['Config file'].item())
+    #print(polly_config_file)
+    polly_default_config_file = Path(
+        picasso_config_dict['path_config'],
+        'polly_global_config.json'
+    )
+    #print(polly_default_config_file)
+    polly_config_dict = loadPollyConfig(
+        polly_config_file, polly_default_config_file)
+
+    polly_config_dict['name'] = polly_config_array['Instrument'].item()
+    polly_config_dict['site'] = polly_config_array['Location'].item()
+    polly_config_dict['asl'] = polly_config_array['asl.'].item()
+    polly_config_dict['lat'] = polly_config_array['Latitude'].item()
+    polly_config_dict['lon'] = polly_config_array['Longitude'].item()
+    
+    return polly_config_dict
+
+
 def loadPollyConfig(polly_config_file, polly_default_config_file):
     """
     """
@@ -104,15 +159,15 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
     if polly_default_config_file_path.is_file():
         logging.info(f'polly_default_config_file: {polly_default_config_file}')
         try:
-            polly_default_config_file_json = open(polly_default_config_file, "r")
-            polly_default_config_file_dict = json.load(polly_default_config_file_json)
+            with open(polly_default_config_file, "r") as f:
+                polly_default_config_file_dict = json.load(f)
         except Exception:
             logging.critical(f'polly_default_config_file: {polly_default_config_file} can not be read.', exc_info=True)
         if polly_config_file_path.is_file():
             logging.info(f'polly_config_file: {polly_config_file}')
             try:
-                polly_config_file_json = open(polly_config_file, "r")
-                polly_config_file_dict = json.load(polly_config_file_json)
+                with open(polly_config_file, "r") as f:
+                    polly_config_file_dict = json.load(f)
             except Exception:
                 logging.warning(f'polly_config_file: {polly_config_file} can not be read.', exc_info=True)
             
