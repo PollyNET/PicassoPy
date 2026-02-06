@@ -13,7 +13,6 @@ def quasi_pdr(data_cube, wvs=[532], version='V1'):
     rgs = data_cube.retrievals_highres['range']
     time = data_cube.retrievals_highres['time64']
     config_dict = data_cube.polly_config_dict
-    default_dict = data_cube.polly_default_dict
     #hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
     
     t = 'total'
@@ -43,8 +42,8 @@ def quasi_pdr(data_cube, wvs=[532], version='V1'):
         vdr, _ = depolarization.calc_profile_vdr(
             sigt, sigc, config_dict['G'][flagt], config_dict['G'][flagc],
             config_dict['H'][flagt], config_dict['H'][flagc],
-            data_cube.pol_cali[int(wv)]['eta_best'], config_dict[f'voldepol_error_{wv}'],
-            1)
+            data_cube.pol_cali[f'{wv}_{tel}']['eta_best'], config_dict[f'voldepol_error_{wv}'],
+            window=1)
 
         if f"quasiBsc{version}_{wv}_{t}_{tel}" in data_cube.retrievals_highres.keys():
             pass
@@ -52,7 +51,7 @@ def quasi_pdr(data_cube, wvs=[532], version='V1'):
             continue
         quasi_bsc = data_cube.retrievals_highres[f"quasiBsc{version}_{wv}_{t}_{tel}"]
 
-        molDepol = default_dict[f'molDepol{wv}']
+        molDepol = config_dict[f'molDepol{wv}']
         #quasi_pdr = (vdr + 1) / \jjj
         #    (mBsc * (molDepol - vdr)) * (quasi_bsc * (1 + molDepol) + 1) - 1
         quasi_pdr = (vdr + 1) / (mBsc * (molDepol - vdr) / quasi_bsc / (1 + molDepol) + 1) - 1

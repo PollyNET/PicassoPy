@@ -35,9 +35,8 @@ import ppcpy.io.sql_interaction as sql_db
 class PicassoProc:
     counter = 0
 
-    def __init__(self, rawdata_dict, polly_config_dict, picasso_config_dict, polly_default_dict):
-        """
-        initialize the data_cube
+    def __init__(self, rawdata_dict, polly_config_dict, picasso_config_dict):
+        """initialize the data_cube
 
         Parameters
         ----------
@@ -46,10 +45,12 @@ class PicassoProc:
         polly_config_dict
             the configuration specific to the specific polly loadConfigs.loadPollyConfig(polly_config_file_fullname, polly_default_config_file)
         picasso_config_dict
-            the general picasso config loadConfigs.loadPicassoConfig(args.picasso_config_file, picasso_default_config_file)
-        polly_default_dict
-            default values for some of the retrievals loadConfigs.loadPollyConfig(polly_default_file_fullname, polly_default_global_defaults_file)
-        
+            the general picasso config loadConfigs.loadPicassoConfig(args.picasso_config_file,picasso_default_config_file)
+
+
+        Notes
+        -----
+        The `polly_default_dict` is not longer available as a separate variable, but is included into the `polly_config_dict`
         
         """
         type(self).counter += 1
@@ -57,7 +58,6 @@ class PicassoProc:
         self.rawdata_dict = rawdata_dict
         self.polly_config_dict = polly_config_dict
         self.picasso_config_dict = picasso_config_dict
-        self.polly_default_dict = polly_default_dict
         self.device = self.polly_config_dict['name']
         self.location = self.polly_config_dict['site']
         self.date = self.mdate_filename()
@@ -66,6 +66,7 @@ class PicassoProc:
         self.retrievals_highres = {}
         self.retrievals_profile = {}
         self.retrievals_profile['avail_optical_profiles'] = []
+
 
     def mdate_filename(self):
         filename = self.rawdata_dict['filename']
@@ -207,7 +208,8 @@ class PicassoProc:
             flag407nmChannel=self.polly_config_dict['is407nm'],
             flag532nmChannel=self.polly_config_dict['is532nm'],
             flag607nmChannel=self.polly_config_dict['is607nm'],
-            flag1064nmChannel=self.polly_config_dict['is1064nm']
+            flag1064nmChannel=self.polly_config_dict['is1064nm'],
+            flagDFOVChannel=self.polly_config_dict['isDFOV'],
         )
 
         ChannelTags, self.polly_config_dict = pollyChannelTags.polly_config_channel_corrections(chTagsOut_ls=ChannelTags, polly_config_dict=self.polly_config_dict)
@@ -229,7 +231,8 @@ class PicassoProc:
             flag407nmChannel=self.polly_config_dict['is407nm'],
             flag532nmChannel=self.polly_config_dict['is532nm'],
             flag607nmChannel=self.polly_config_dict['is607nm'],
-            flag1064nmChannel=self.polly_config_dict['is1064nm']
+            flag1064nmChannel=self.polly_config_dict['is1064nm'],
+            flagDFOVChannel=self.polly_config_dict['isDFOV'],
         )
 
         self.flags = ChannelFlags
@@ -651,12 +654,17 @@ class PicassoProc:
         """
         if parameter == 'LC':
             table_name = 'lidar_calibration_constant'
-            column_names = ['cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'used_for_processing', 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
+            column_names = [
+                'cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'used_for_processing', 
+                'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
             data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text', 'text']
         elif parameter == 'DC':
             table_name = 'depol_calibration_constant'
-            column_names = ['cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'used_for_processing', 'wavelength', 'nc_zip_file', 'polly_type']
-            data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text']
+            column_names = [
+                'cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'used_for_processing', 
+                'wavelength', 'telescope', 'nc_zip_file', 'polly_type']
+            data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text']
+        assert len(column_names) == len(data_types), 'column names do not match data types'
 
         logging.info(f'writing to sqlite-db: {db_path}')
         logging.info(f'writing {parameter} to table: {table_name}')

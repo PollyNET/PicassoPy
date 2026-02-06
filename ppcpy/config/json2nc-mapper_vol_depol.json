@@ -145,6 +145,25 @@
 	"eta": "",
         "comment": "The depolarization ratio was calibrated with \\Delta 90\\circ method."
       }
+    },
+    "volume_depolarization_ratio_532nm_DFOV": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "volume depolarization ratio at 532 nm DFOV channel",
+        "standard_name": "voldepol_532",
+        "plot_range": "0.0, 0.3",
+        "plot_scale": "linear",
+	"eta": "",
+        "comment": "The depolarization ratio was calibrated in reference to the FR channel."
+      }
     }
   }
 }
