@@ -532,7 +532,8 @@ class PicassoProc:
             return
         height = self.retrievals_highres['range']
         for k in self.retrievals_profile['overlap']:
-            overlapCor.fixLowest(self.retrievals_profile['overlap'][k], np.where(height > 800)[0][0], k)
+            print(f"Fixing lower bins for {k} overlap functions")
+            overlapCor.fixLowest(self.retrievals_profile['overlap'][k], np.where(height > 800)[0][0])
 
 
     def overlapCor(self):

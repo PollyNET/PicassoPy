@@ -69,8 +69,8 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
             aerExt[:hBaseInd] = aerExt[hBaseInd]
             aerBsc = profiles[channel]['aerBsc']
 
-            aerOD = np.cumsum(aerExt * np.concatenate(([height[0]], np.diff(height))))
-            molOD = np.cumsum(molExt * np.concatenate(([height[0]], np.diff(height))))
+            aerOD = np.nancumsum(aerExt * np.concatenate(([height[0]], np.diff(height))))
+            molOD = np.nancumsum(molExt * np.concatenate(([height[0]], np.diff(height))))
 
             trans = np.exp(-2 * (aerOD + molOD))
             bsc = molBsc + aerBsc
@@ -82,6 +82,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
                 minBin=config_dict['LCMeanMinIndx'],
                 maxBin=config_dict['LCMeanMaxIndx']
             )
+            print(f"cldFreGrp {i}, Channel {wv} {t} {tel}, LC_stable {LC_stable}, LCStd {LCStd}")
             LCs[i][channel] = {'LC': LC_stable, 'LCStd': LC_stable * LCStd}
 
             if retrieval == 'raman' and int(wv) in elastic2raman.keys():

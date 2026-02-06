@@ -3,7 +3,8 @@ import logging
 import numpy as np
 
 from ppcpy.retrievals.collection import calc_snr
-from ppcpy.misc.helper import mean_stable, uniform_filter
+from ppcpy.misc.helper import mean_stable
+from scipy.ndimage import uniform_filter1d
 
 from pathlib import Path
 
@@ -259,7 +260,7 @@ def overlapCalcRaman(
     smoothbins : int, optional
         Number of bins for smoothing. Default is 1.
     AE : float, optional
-        Angström exponent. Default is 1.
+        Angstroem exponent. Default is 1.
     hres : float, optional
         Instrument height resolution [m]. Default is 150.
 
@@ -275,19 +276,25 @@ def overlapCalcRaman(
     History
     -------
     - 2023-06-06: First edition by Cristofer
-    - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
 
     Notes
     -----
-    - TODO: What is returned by the function and what is described in the docstring does not corresponed. 
+    - TODO: What is returned by the function and what is described in the docstring does not corresponed.
+    - TODO: Be cearfull with NaN values! scipy.ndimage.uniform_filter1d used for smoothing in this module
+            will propagate any NaN values present in the signal throughot the rest of the smoothed signal.
+            Additionaly, here we are using mode 'reflect' for padding (see scipy.ndimage.uniform_filter1d
+            documentation). This might not be the most optimal mode, the other availabel mode should also
+            be considered. Optimally, should we designe our own filter for this purpuse that do not have
+            the issue with propagating NaN values, Like what is used in the rest of the modules. However,
+            without reducing dimension or fillin in NaN values.
 
     """
     if len(aerBsc) > 0:
 
         sigFRRa0 = sigFRRa.copy()
         for _ in range(5):
-            sigFRRa = uniform_filter(sigFRRa, smoothbins)
-            sigFRel = uniform_filter(sigFRel, smoothbins)
+            sigFRRa = uniform_filter1d(sigFRRa, smoothbins)
+            sigFRel = uniform_filter1d(sigFRel, smoothbins)
 
         aerBsc = aerBsc.copy()
         if len(aerBsc) > 0:
@@ -296,7 +303,7 @@ def overlapCalcRaman(
             aerBsc = 0
 
         aerBsc0 = aerBsc.copy()
-        aerBsc = uniform_filter(aerBsc, smoothbins)
+        aerBsc = uniform_filter1d(aerBsc, smoothbins)
 
         LR0 = np.arange(30, 82, 2)  # LR array to search best LR.
 
@@ -310,10 +317,10 @@ def overlapCalcRaman(
                 LR = LR0[ii]
 
             # Overlap calculation (direct version)
-            transRa = np.exp(-np.nancumsum((molExt_r + LR * aerBsc * (Lambda_el / Lambda_Ra) ** AE) * np.concatenate(([height[0]], np.diff(height)))))
-            transel = np.exp(-np.nancumsum((molExt + LR * aerBsc) * np.concatenate(([height[0]], np.diff(height)))))
-            transRa0 = np.exp(-np.nancumsum((molExt_r + LR * aerBsc0 * (Lambda_el / Lambda_Ra) ** AE) * np.concatenate(([height[0]], np.diff(height)))))
-            transel0 = np.exp(-np.nancumsum((molExt + LR * aerBsc0) * np.concatenate(([height[0]], np.diff(height)))))
+            transRa = np.exp(-np.cumsum((molExt_r + LR * aerBsc * (Lambda_el / Lambda_Ra) ** AE) * np.concatenate(([height[0]], np.diff(height)))))
+            transel = np.exp(-np.cumsum((molExt + LR * aerBsc) * np.concatenate(([height[0]], np.diff(height)))))
+            transRa0 = np.exp(-np.cumsum((molExt_r + LR * aerBsc0 * (Lambda_el / Lambda_Ra) ** AE) * np.concatenate(([height[0]], np.diff(height)))))
+            transel0 = np.exp(-np.cumsum((molExt + LR * aerBsc0) * np.concatenate(([height[0]], np.diff(height)))))
 
             if sigFRRa.shape[0] > 0 and sigFRel.shape[0] > 0:
                 fullOverlapIndx = np.searchsorted(height, hFullOverlap)
@@ -324,7 +331,7 @@ def overlapCalcRaman(
             olFunc0 = sigFRRa0 * height ** 2 / molBsc_r / transel0 / transRa0
 
             for _ in range(5):
-                olFunc = uniform_filter(olFunc, 3)
+                olFunc = uniform_filter1d(olFunc, 3)
 
             ovl_norm, normRange, _ = mean_stable(olFunc, 40, fullOverlapIndx - round(37.5 / hres), fullOverlapIndx + round(2250 / hres), 0.1)
             ovl_norm0, normRange0, _ = mean_stable(olFunc0, 40, fullOverlapIndx - round(37.5 / hres), fullOverlapIndx + round(2250 / hres), 0.1)
@@ -367,7 +374,7 @@ def overlapCalcRaman(
             for _ in range(6):
                 # smoothing before full overlap to avoid S-shape near to the
                 # full overlap.
-                olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)] = uniform_filter(olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)], 5)
+                olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)] = uniform_filter1d(olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)], 5)
 
         olFunc[olFunc < 1e-5] = 1e-5
 
