@@ -1,6 +1,7 @@
 #from pathlib import Path
 import sys
 import os
+import numpy as np
 import argparse
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import json
@@ -180,10 +181,10 @@ data_cube.calcMolecular()
 
 data_cube.rayleighFit()
 
-# for now, take the FR refH to the NR
+# Use config values for refH in NR channels (similar approch to Picasso)
 for e in data_cube.refH:
-    e['532_total_NR'] = e['532_total_FR']
-    e['355_total_NR'] = e['355_total_FR']
+    e['532_total_NR'] = {'DPInd':None, 'refHInd':tuple(np.searchsorted(data_cube.retrievals_highres["height"], data_cube.polly_config_dict["refH_NR_532"]) - [0, 1])}     # - [0, 1] --> make sure all values lay inside the designeted range
+    e['355_total_NR'] = {'DPInd':None, 'refHInd':tuple(np.searchsorted(data_cube.retrievals_highres["height"], data_cube.polly_config_dict["refH_NR_355"]) - [0, 1])}     # - [0, 1] --> make sure all values lay inside the designeted range
 
 data_cube.polly_config_dict['flagMolDepolCali'] = False
 data_cube.polarizationCaliMol()

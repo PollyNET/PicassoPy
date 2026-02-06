@@ -1,7 +1,7 @@
 
 import logging
 import numpy as np
-from scipy.ndimage import uniform_filter1d
+from ppcpy.misc.helper import uniform_filter
 
 #import fastrdp
 
@@ -86,8 +86,27 @@ def rayleighfit(data_cube):
     return refH
 
 
-def smooth_signal(signal, window_len):
-    return uniform_filter1d(signal, size=window_len, mode='nearest')
+def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
+    """Uniformly smooth the input signal
+    
+    Parameters
+    ----------
+    singal : ndarray
+        Signal to be smooth
+    window_len : int
+        Width of the applied uniform filter
+
+    Returns
+    -------
+    ndarray
+        Smoothed signal
+    
+    History
+    -------
+    - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
+    
+    """
+    return uniform_filter(signal, window_len)
 
 
 def DouglasPeucker(signal, height, epsilon, heightBase, heightTop, maxHThick, window_size=1):

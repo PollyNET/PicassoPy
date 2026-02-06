@@ -50,8 +50,8 @@ def write_channelwise_2_nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
     #  available products:  prod_ls = ["SNR", "BG", "RCS", "att_bsc", "vol_depol"]
     for prod in prod_ls:
         logging.info(f"saving product: {prod}")
-#        json_nc_mapping_dict = {}
-#        if prod in polly_config_dict["prodSaveList"]:
+        # json_nc_mapping_dict = {}
+        # if prod in polly_config_dict["prodSaveList"]:
         json_nc_mapping_dict = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config',f'json2nc-mapper_{prod}.json'))
 
         if prod == "SNR" or prod == "BG" or prod == "RCS":
@@ -148,7 +148,26 @@ def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
         json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict, compression_level=1)
 
 
-def write_profile2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
+def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[]):
+    """
+    Saving profile data to NetCDF4 files
+
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object
+    root_dir : str
+        ....
+    prod_ls : list
+        List of product names
+
+    TODO: attribute['source'] = ""polly_device_name" and not the name. 
+    TODO: Missing comment in variable attributes.
+    TODO: Missing retrieval info, ie. reference value, Lidar ratio, smoothing win etc. for both klett and raman retrievals
+    TODO: Add reference height variable for each channel and cldFreeGroup in the saved profiles (netCDF).
+    TODO: Not all retrievals / information needed for the profiles are in data_cube.retrivals_highres...
+    TODO: write docstring
+    """
     ## writes data from products, listed in prod_ls, to nc-file
     ##  available products:  prod_ls = ["profiles", "NR_profeils", "OC_profiles"]
 
@@ -156,12 +175,12 @@ def write_profile2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
     for prod in prod_ls:
         json_nc_mapping_dict = json2nc_mapping.read_json_to_dict(Path(root_dir, 'ppcpy', 'config', f'json2nc-mapper_{prod}.json'))
         logging.info(f"saving product: {prod}")
-#        json_nc_mapping_dict = {}
-#        if prod in polly_config_dict["prodSaveList"]:
+        # json_nc_mapping_dict = {}
+        # if prod in polly_config_dict["prodSaveList"]:
 
         """ set dimension sizes """
         for d in json_nc_mapping_dict['dimensions']:
-            json_nc_mapping_dict['dimensions'][d] = len(data_cube.retrievals_highres[d])
+            json_nc_mapping_dict['dimensions'][d] = len(data_cube.retrievals_highres[d])    # TODO: set to config value "max_height_bin" instead
 
         """ fill variables """
         #for n, profil in enumerate(data_cube.retrievals_profile[method]):
@@ -194,9 +213,6 @@ def write_profile2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
                 method = json_nc_translator[prod]['variables'][var]['method']
                 ch = json_nc_translator[prod]['variables'][var]['channel']
 
-                #print(var)
-
-                #print(ch)
 
                 if method in data_cube.retrievals_profile.keys() and ch in data_cube.retrievals_profile[method][n].keys():
                     if parameter in data_cube.retrievals_profile[method][n][ch].keys():
@@ -205,6 +221,9 @@ def write_profile2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
                         continue
                 else:
                     continue
+            
+            ### Add reference hight variable:
+            adding_refH_vars(data_cube, json_nc_mapping_dict, n, prod)
 
             ### remove empty key-value-pairs
             for var in list(json_nc_mapping_dict['variables'].keys()): ## use list here to suppress RuntimeError: dictionary changed size during iteration
@@ -215,3 +234,32 @@ def write_profile2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
             """ Create the NetCDF file """
             output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{start}_{stop}_{prod}.nc")
             json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict, compression_level=1)
+
+
+def adding_refH_vars(data_cube, json_nc_mapping_dict:dict, cldFreeGrp, prod:str) -> dict:
+    """
+    Temporarily quick fix for adding Reference heights as a variable to the NetCDF profile outputs.
+    In the future this should be included in the json2nc mapping scheme.
+    """
+    # Define which telescope the retrivals are from
+    tel = "NR" if "NR" in prod else "FR"
+
+    # This is sub-optimal as the dimension will get rewriten for each cldFreeGrp.
+    json_nc_mapping_dict['dimensions']['reference_height'] = 2
+
+    # Add refH variable for each channel (1064NR will be deleted by the remove empty key-value-pairs process later on).
+    for wv in [355, 532, 1064]:
+        # print(f"cldFreeGroup {cldFreeGrp}, channel {wv}_total_{tel}")
+        json_nc_mapping_dict['variables'][f'reference_height_{wv}'] = {}
+        json_nc_mapping_dict['variables'][f'reference_height_{wv}']['dtype'] = 'f4'
+        json_nc_mapping_dict['variables'][f'reference_height_{wv}']['shape'] = ['reference_height']
+        json_nc_mapping_dict['variables'][f'reference_height_{wv}']['data'] = \
+            data_cube.retrievals_highres["height"][list(data_cube.refH[cldFreeGrp][f'{wv}_total_{tel}']['refHInd'])] if f'{wv}_total_{tel}' in data_cube.refH[cldFreeGrp] and ~np.any(np.isnan(data_cube.refH[cldFreeGrp][f'{wv}_total_{tel}']['refHInd'])) else None
+        json_nc_mapping_dict['variables'][f'reference_height_{wv}']['attributes'] = {
+            'unit':'m',
+            'long_name':f'Reference height for {"near" if tel == "NR" else "far"}-range {wv} nm',
+            'standard_name':f'ref_h_{wv}',
+            'plot_scale':'linear',
+            'source':'pollyxt_tjk',
+            'comment':'The reference height is searched by Rayleigh Fitting algorithm. It is through comparing the correlation of the slope between molecule backscatter and range-corrected signal and find the segement with best agreement.'
+            }
