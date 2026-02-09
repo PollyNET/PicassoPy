@@ -3,16 +3,58 @@ import logging
 import numpy as np
 
 from ppcpy.misc.helper import uniform_filter
+from ppcpy.retrievals.collection import calc_snr
 
 
-def run_cldFreeGrps(data_cube, signal='TCor', nr=False, collect_debug=True):
-    """
+def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:bool=True) -> dict:
+    """Run klett retrieval for each cloud free region.
+
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
+    signal : str, optional
+        Name of the signal to be used for the Klett retrievals. Default is 'TCor'.
+    nr : bool, optional
+        If true, preform Klett retrieval for FR and NR channels. Otherwise only FR channels. Default is False.
+    collect_debug : bool, optional
+        If true, collect debug information. Default is True.
+
+    Returns
+    -------
+    aerExt : ndarray
+        Aerosol extinction coefficient [m^{-1}].
+    aerExtStd : ndarray
+        Uncertainty of aerosol extinction coefficient [m^{-1}].
+    aerBsc : ndarray
+        Aerosol backscatter coefficient [m^{-1}Sr^{-1}].
+    aerBscStd : ndarray
+        Uncertainty of aerosol backscatter coefficient [m^{-1}Sr^{-1}].
+    aerBR : ndarray
+        Aerosol backscatter ratio.
+    aerBRStd : ndarray
+        Statistical uncertainty of aerosol backscatter ratio.
+    retrieval : str
+        Name of retrieval type, eg. 'klett'.
+    signal : str
+        Name of the signal used for the retrievals, eg. 'TCor'.
+    
+    History
+    -------
+    - xxxx-xx-xx: ...
+    - 2026-02-09: Modified and cleaned by Buholdt
+    
+    TODO's
+    ------
+    - Should sigBGCor, sigTCor or RCS be used for the Klett retrievals?
+
     """
 
     height = data_cube.retrievals_highres['range']
+    config_dict = data_cube.polly_config_dict
+
     logging.warning(f'rayleighfit seems to use range in matlab, but the met data should be in height >> RECHECK!')
     logging.warning(f'at 10km height this is a difference of about 4 indices')
-    config_dict = data_cube.polly_config_dict
 
     opt_profiles = [{} for i in range(len(data_cube.clFreeGrps))]
 
@@ -22,6 +64,7 @@ def run_cldFreeGrps(data_cube, signal='TCor', nr=False, collect_debug=True):
         cldFree = cldFree[0], cldFree[1] + 1
         print('cldFree mod', cldFree)
 
+        # Define channels to run the retrieval for
         channels = [(532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]
         if nr:
             channels += [(532, 'total', 'NR'), (355, 'total', 'NR')]
@@ -29,57 +72,60 @@ def run_cldFreeGrps(data_cube, signal='TCor', nr=False, collect_debug=True):
         for wv, t, tel in channels:
             if np.any(data_cube.gf(wv, t, tel)):
                 print(f'== {wv}, {t}, {tel} klett =================================')
+
+                # Telescope type dependent configurations
                 if tel == 'NR':
-                    # TODO refBeta is calculate from the far field in the Matlab version     |      this is correct. It should only be calulated from the far range mean over the reference heights. However, in the currant version the config values are taken but in matlab they are overwritten with the calulated values.
                     key_smooth = 'smoothWin_klett_NR_'
+                    keyminSNR = 'minRefSNR_NR_'
                     key_LR = 'LR_NR_'
-                    # refBeta = config_dict[f"refBeta_NR_{wv}"] if f"refBeta_NR_{wv}" in config_dict else None
-                    refBeta = config_dict[f"refBeta_NR_klett_{wv}"] if f"refBeta_NR_klett_{wv}" in config_dict else None
+                    refBeta = config_dict[f"refBeta_NR_{wv}"] if f"refBeta_NR_{wv}" in config_dict else None
+                    # TODO seperate klett and raman refBeta in config file?
+                    # refBeta = config_dict[f"refBeta_NR_klett_{wv}"] if f"refBeta_NR_klett_{wv}" in config_dict else None
                 else:
                     key_smooth = 'smoothWin_klett_'
+                    keyminSNR = 'minRefSNR'
                     key_LR = 'LR'
-                    refBeta = config_dict[f"refBeta{wv}"] # For tesing vs labview profiles. However should implement a way of seting the NR refvalues in the future
+                    refBeta = config_dict[f'refBeta{wv}']
 
+                # Elastic signals
                 sig = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv, t, tel)])
                 bg = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv, t, tel)])
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
 
-                refHInd = data_cube.refH[i][f"{wv}_{t}_{tel}"]['refHInd']
+                # Reference height
+                refHInd = data_cube.refH[i][f'{wv}_{t}_{tel}']['refHInd']
                 if np.isnan(refHInd).any():
-                    print('No valid refHInd found, skipping Klett retrieval for this channel')
-                    # No retrieval performed --> no need to store empty profile
-                    # prof = {}
-                    # prof['retrieval'] = 'klett'
-                    # prof['signal'] = signal
-                    # opt_profiles[i][f"{wv}_{t}_{tel}"] = prof
+                    print('No valid refHInd found, skipping Klett retrieval for this channel.')
                     continue
 
                 refH = height[np.array(refHInd)]
                 print('refHInd', refHInd, 'refH', refH)
 
-                if refBeta is None:
-                    if f"{wv}_{t}_FR" in opt_profiles[i]:
-                        if "aerBsc" in opt_profiles[i][f"{wv}_{t}_FR"]:
-                            refBeta = np.nanmean(opt_profiles[i][f"{wv}_{t}_FR"]["aerBsc"][refHInd[0]:refHInd[1]+1])
+                # Calculate SNR in the reference height
+                SNRRef = calc_snr(
+                    signal=np.sum(sig[refHInd[0]:refHInd[1] + 1], keepdims=True),
+                    bg=bg*(refHInd[1] - refHInd[0] + 1)
+                )
+
+                # Checking SNR treshold
+                if SNRRef < config_dict[f'{keyminSNR}{wv}']:
+                    print('Signal is too noisy at the reference height, skipping Klett retrival for this channel.', SNRRef, config_dict[f'{keyminSNR}{wv}'])
+                    continue
+
+                if refBeta is None and tel == 'NR':
+                    # Calculate NR refBeta based on mean FR aerBsc in reference height
+                    if f'{wv}_{t}_FR' in opt_profiles[i]:
+                        if 'aerBsc' in opt_profiles[i][f'{wv}_{t}_FR']:
+                            refBeta = np.nanmean(opt_profiles[i][f'{wv}_{t}_FR']['aerBsc'][refHInd[0]:refHInd[1] + 1])
                         else:
                             print('No valid refBeta found, skipping Klett retrieval for this channel')
-                            # No retrieval performed --> no need to store empty profile
-                            # prof = {}
-                            # prof['retrieval'] = 'klett'
-                            # prof['signal'] = signal
-                            # opt_profiles[i][f"{wv}_{t}_{tel}"] = prof
                             continue
                     else:
                         print('No valid refBeta found, skipping Klett retrieval for this channel')
-                        # No retrieval performed --> no need to store empty profile
-                        # prof = {}
-                        # prof['retrieval'] = 'klett'
-                        # prof['signal'] = signal
-                        # opt_profiles[i][f"{wv}_{t}_{tel}"] = prof
                         continue
 
                 print(
-                    'LR ', config_dict[f"{key_LR}{wv}"], 
+                    'LR ', config_dict[f'{key_LR}{wv}'], 
                     'refH', refH, 
                     'refBeta', refBeta,
                     'smoothWin_klett', config_dict[f'{key_smooth}{wv}']
@@ -89,19 +135,18 @@ def run_cldFreeGrps(data_cube, signal='TCor', nr=False, collect_debug=True):
                     height=height,
                     signal=sig,
                     bg=bg,
-                    LR_aer=config_dict[f"{key_LR}{wv}"],
+                    LR_aer=config_dict[f'{key_LR}{wv}'],
                     refH=refH,
                     refBeta=refBeta,
                     molBsc=molBsc,
                     window_size=config_dict[f'{key_smooth}{wv}'],
                     collect_debug=collect_debug
                 )
-                prof['aerExt'] = prof['aerBsc'] * config_dict[f"{key_LR}{wv}"]
-                prof['aerExtStd'] = prof['aerBscStd'] * config_dict[f"{key_LR}{wv}"]
+                prof['aerExt'] = prof['aerBsc'] * config_dict[f'{key_LR}{wv}']
+                prof['aerExtStd'] = prof['aerBscStd'] * config_dict[f'{key_LR}{wv}']
                 prof['retrieval'] = 'klett'
                 prof['signal'] = signal
-                print(prof.keys())
-                opt_profiles[i][f"{wv}_{t}_{tel}"] = prof
+                opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
 
     return opt_profiles
 
@@ -117,8 +162,7 @@ def fernald(
         window_size:int=40,
         collect_debug:bool=False
     ) -> dict[str, np.ndarray]:
-    """
-    Retrieve aerosol backscatter coefficient using the Fernald method.
+    """Retrieve aerosol backscatter coefficient using the Fernald method.
 
     Parameters
     ----------
@@ -129,22 +173,22 @@ def fernald(
     bg : array_like
         Background signal (Photon Count).
     LR_aer : float or array_like
-        Aerosol lidar ratio (sr).
+        Aerosol lidar ratio [sr].
     refH : float or array_like
-        Reference altitude or region (m).
+        Reference altitude or region [m].
     refBeta : float
-        Aerosol backscatter coefficient at the reference region (m^-1 sr^-1).
+        Aerosol backscatter coefficient at the reference region [m^-1 sr^-1].
     molBsc : array_like
-        Molecular backscatter coefficient (m^-1 sr^-1).
+        Molecular backscatter coefficient [m^-1 sr^-1].
     window_size : int, optional
         Bins of the smoothing window for the signal. Default is 40 bins.
 
     Returns
     -------
     aerBsc : ndarray
-        Aerosol backscatter coefficient (m^-1 sr^-1).
+        Aerosol backscatter coefficient [m^-1 sr^-1].
     aerBscStd : ndarray
-        Statistical uncertainty of aerosol backscatter (m^-1 sr^-1).
+        Statistical uncertainty of aerosol backscatter [m^-1 sr^-1].
     aerBR : ndarray
         Aerosol backscatter ratio.
     aerBRStd : ndarray
@@ -165,7 +209,6 @@ def fernald(
     - Define m
 
     """
-
     # Convert units
     height = height / 1e3  # Convert to km
     refH = np.array(refH) / 1e3  # Convert to km
@@ -177,26 +220,12 @@ def fernald(
     totSig[totSig < 0] = 0
     noise = np.sqrt(totSig)
 
-    dH = height[1] - height[0]
-
     # Atmospheric molecular radiative parameters
     LR_mol = np.full(height.shape[0], 8 * np.pi / 3)
 
-    # Reference altitude indices                                            # This part is more complicated in matlab:  # % index of the reference altitude
-    assert len(refH) == 2, 'refH has to be given as base and top'                                                       # if length(refAlt) == 1
-    indRefH = np.searchsorted(height, refH)                                                                             #     if refAlt > alt(end) || refAlt < alt(1)
-    print('indRefH ', indRefH)                                                                                          #         error('refAlt is out of range.');
-                                                                                                                        #     end
-                                                                                                                        #     indRefAlt = find(alt >= refAlt, 1, 'first');
-                                                                                                                        #     indRefAlt = ones(1, 2) * indRefAlt;
-                                                                                                                        # elseif length(refAlt) == 2
-                                                                                                                        #     if (refAlt(1) - alt(end)) * (refAlt(1) - alt(1)) <=0 && ...
-                                                                                                                        #         (refAlt(2) - alt(end)) * (refAlt(2) - alt(1)) <=0
-                                                                                                                        #         indRefAlt = [floor((refAlt(1) - alt(1)) / dAlt), floor((refAlt(2) - alt(1)) / dAlt)];
-                                                                                                                        #     else
-                                                                                                                        #         error('refAlt is out of range.');
-                                                                                                                        #     end
-                                                                                                                        # end
+    # Reference altitude indices
+    assert len(refH) == 2, 'refH has to be given as base and top'
+    indRefH = np.searchsorted(height, refH)
 
     # Aerosol lidar ratio setup
     if np.isscalar(LR_aer):
@@ -209,25 +238,19 @@ def fernald(
 
     # Range corrected signal (RCS)  # is this correct? should the signal be corrected with range in meters or kilometers?
     RCS = signal * height**2    
-    #RCS *= (1-0.001764883459848266)
+    # RCS *= (1-0.001764883459848266)
 
     # Smoothing signal
     # indRefMid = int(np.ceil(np.mean(indRefH)))
-    indRefMid = int(np.round(np.mean(indRefH)))                 # Changed to round to match matlab implementation more closely      | Matlab code: indRefMid = int32(mean(indRefAlt));
+    indRefMid = int(np.round(np.mean(indRefH)))
     RCS = uniform_filter(RCS, window_size)
     RCS[indRefMid] = np.nanmean(RCS[indRefH[0]:indRefH[1] + 1])
-    
-    print('indRefH', indRefH, indRefMid)
-    print('refH slice shape ', RCS[indRefH[0]:indRefH[1] + 1].shape)
-    print('RCS[indRefMid] ', RCS[indRefMid])
-    print('mean(mBsc)', np.mean(molBsc[indRefH[0]:indRefH[1] + 1]), refBeta)
 
     # Initialize parameters
     aerBsc = np.full(height.shape[0], np.nan)
     aerBsc[indRefMid] = refBeta
     aerBR = np.full(height.shape[0], np.nan)
     aerBR[indRefMid] = refBeta / molBsc[indRefMid]
-    print('aerBR[indRefMid] ', aerBR[indRefMid])
 
     # Backward retrieval
     for iAlt in range(indRefMid - 1, -1, -1):

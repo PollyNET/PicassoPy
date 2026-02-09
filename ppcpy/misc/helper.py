@@ -9,6 +9,7 @@ import xarray
 from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 import numpy as np
+from scipy.sparse import diags
 
 
 def detect_path_type(fullpath):
@@ -783,8 +784,6 @@ def mean_stable(x:np.ndarray, win:int, minBin:int=None, maxBin:int=None, minRelS
 
     return xStable, xIndx, xRelStd
 
-
-from scipy.sparse import diags
 
 def smooth2a(matrix_in:np.ndarray, Nr:int, Nc:int=None) -> np.ndarray:
     """Smooths 2D array data while ignoring NaNs.

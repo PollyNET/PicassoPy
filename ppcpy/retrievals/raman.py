@@ -1,9 +1,9 @@
 import logging
 import numpy as np
-from ppcpy.retrievals.ramanhelpers import *
 from scipy.stats import norm
-from ppcpy.misc.helper import idx2time
 
+from ppcpy.retrievals.ramanhelpers import *
+from ppcpy.misc.helper import idx2time
 from ppcpy.retrievals.collection import calc_snr
 
 sigma_angstroem:float = 0.2
@@ -22,7 +22,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
     heightFullOverlap : list, optional
         List with heights of full overlap per channel per cloud free region. Default is None.
     nr : bool, optional
-        If true, preform raman retrieval for FR and NR channels. Otherwise only FR channels. Default is False.
+        If true, preform Raman retrieval for FR and NR channels. Otherwise only FR channels. Default is False.
     collect_debug : bool, optional
         If true, collect debug information. Default is True.
 
@@ -56,7 +56,8 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
     ------
     - sigma_angstroem and MC_count are hardcoded. Can this be automated?
     - in raman_ext calulations we use a different hard coded MC_count than the global parameter.
-    - Should sigBGCor, sigTCor or RCS be used for the retrievals? RCS dampens the effect seen form the wrong first bin and makes the profile more straight (insted of the s-shape) in the lower bins.
+    - Should sigBGCor, sigTCor or RCS be used for the Raman retrievals? RCS dampens the effect form
+      the wrong first bin and makes the profile more straight (insted of the s-shape) in the lower bins.
 
     """
     height = data_cube.retrievals_highres['range']
@@ -93,30 +94,27 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
 
                 # Telescope type dependent configurations
                 if tel == 'NR':
-                    key_smooth = "smoothWin_raman_NR_"
-                    keyminSNR = f"minRamanRefSNR_NR_"
-                    angstrexp = config_dict[f'angstrexp_NR']
-                    refBeta = config_dict[f"refBeta_NR_{wv}"] if f"refBeta_NR_{wv}" in config_dict else None
+                    key_smooth = 'smoothWin_raman_NR_'
+                    keyminSNR = 'minRamanRefSNR_NR_'
+                    angstrexp = config_dict['angstrexp_NR']
+                    refBeta = config_dict[f'refBeta_NR_{wv}'] if f'refBeta_NR_{wv}' in config_dict else None
                     # TODO seperate klett and raman refBeta in config file?
-                    # refBeta = config_dict[f"refBeta_NR_raman_{wv}"] if f"refBeta_NR_raman_{wv}" in config_dict else None
+                    # refBeta = config_dict[f'refBeta_NR_raman_{wv}'] if f'refBeta_NR_raman_{wv}' in config_dict else None
                 else:
-                    key_smooth = "smoothWin_raman_"
-                    keyminSNR = f"minRamanRefSNR"
-                    angstrexp = config_dict[f'angstrexp']
+                    key_smooth = 'smoothWin_raman_'
+                    keyminSNR = 'minRamanRefSNR'
+                    angstrexp = config_dict['angstrexp']
                     refBeta = config_dict[f'refBeta{wv}']
 
                 if collect_debug:
-                    print(f"refBeta_{wv}_{t}_{tel}", refBeta)
-                    print(f"minRamanRefSNR{wv}_{t}_{tel}", config_dict[f'{keyminSNR}{wv}'], f"minRamanRefSNR{wv_r}_{t_r}_{tel_r}", config_dict[f'{keyminSNR}{wv_r}'])
-                    print(f"smoothWin_raman_{wv}_{t}_{tel}", config_dict[f"{key_smooth}{wv}"])
-                    print("angstrexp", angstrexp)
+                    print(f'refBeta_{wv}_{t}_{tel}', refBeta)
+                    print(f'minRamanRefSNR{wv}_{t}_{tel}', config_dict[f'{keyminSNR}{wv}'], f'minRamanRefSNR{wv_r}_{t_r}_{tel_r}', config_dict[f'{keyminSNR}{wv_r}'])
+                    print(f'smoothWin_raman_{wv}_{t}_{tel}', config_dict[f'{key_smooth}{wv}'])
+                    print('angstrexp', angstrexp)
 
                 # Elastic signals
-                sig = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv, t, tel)])     # Original  sigTCor
-                # sig *= height**2                                                                                   # Testing   RCS (PC)
-                # sig = np.squeeze(data_cube.retrievals_profile['RCS'][i, :, data_cube.gf(wv, t, tel)])              # Testing   RCS (PCR)
-                bg = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv, t, tel)])          # Original  sigTCor
-                # bg = np.squeeze(data_cube.retrievals_profile['BG'][i, data_cube.gf(wv, t, tel)])                   # Testing   sigBGCor
+                sig = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv, t, tel)])
+                bg = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv, t, tel)])
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
                 molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :]
 
@@ -133,7 +131,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
 
                 if wv == 1064 and wv_r == 607:
                     # calculate the extinction based on the 532nm, 607nm molecular profiles and a correction factor
-                    molExt_mod = data_cube.mol_profiles[f'mExt_532'][i, :]
+                    molExt_mod = data_cube.mol_profiles[f'mExt_532'][i, :]  # one per cloud free group (shape (22, 4096))
                     wv_mod = 532
                 else:
                     # calculate normally
@@ -155,104 +153,102 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                     MC_count=15,
                     bg=bg_r,
                 )
+                prof['retrieval'] = 'raman'
+                prof['signal'] = signal
                 
                 if wv == 1064 and wv_r == 607:
                     # Apply correction factor based on the angstroem exponent
                     prof['aerExt'] = prof['aerExt'] / (1064./532.)**angstrexp
                     prof['aerExtStd'] = prof['aerExtStd'] / (1064./532.)**angstrexp
 
-                refHInd = data_cube.refH[i][f"{wv}_{t}_{tel}"]['refHInd']
-                if ~np.any(np.isnan(refHInd)):
-                    refH = height[np.array(refHInd)]
-                    hFullOverlap = heightFullOverlap[i][data_cube.gf(wv, t, tel)][0]
-                    print(hFullOverlap, config_dict[f'{key_smooth}{wv}'] / 2 * hres)
-                    hBaseInd = np.argmax(height >= (hFullOverlap + config_dict[f'{key_smooth}{wv}'] / 2 * hres))
-                    print('refHInd', refHInd, 'refH', refH, 'hBaseInd', hBaseInd, 'hBase', height[hBaseInd])
+                refHInd = data_cube.refH[i][f'{wv}_{t}_{tel}']['refHInd']
+                if np.isnan(refHInd).any():
+                    print('No valid refHInd found, skipping Raman retrieval for this channel.')
+                    opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
+                    continue
 
-                    # Calculate SNR
-                    SNRRef = calc_snr(
-                        signal=np.sum(sig[refHInd[0]:refHInd[1] + 1], keepdims=True),
-                        bg=bg*(refHInd[1] - refHInd[0] + 1)
-                    )
-                    SNRRef_r = calc_snr(
-                        signal=np.sum(sig_r[refHInd[0]:refHInd[1] + 1], keepdims=True),
-                        bg=bg_r*(refHInd[1] - refHInd[0] + 1)
-                    )
-                    print("SNRRef", SNRRef, "SNRRef_r", SNRRef_r)
+                refH = height[np.array(refHInd)]
+                hFullOverlap = heightFullOverlap[i][data_cube.gf(wv, t, tel)][0]
+                hBaseInd = np.argmax(height >= (hFullOverlap + config_dict[f'{key_smooth}{wv}'] / 2 * hres))
+                print(hFullOverlap, config_dict[f'{key_smooth}{wv}'] / 2 * hres)
+                print('refHInd', refHInd, 'refH', refH, 'hBaseInd', hBaseInd, 'hBase', height[hBaseInd])
 
-                    if refBeta is None and tel == "NR":
-                        # Calculate NR refBeta based on mean FR aerBsc in reference height
-                        # TODO: find a better way of handeling NR cases where we have no FR values that follows the same logic as the rest of the code i.e. try to do it without continue statments...
-                        if f"{wv}_{t}_FR" in opt_profiles[i]:
-                            if "aerBsc" in opt_profiles[i][f"{wv}_{t}_FR"]:
-                                refBeta = np.nanmean(opt_profiles[i][f"{wv}_{t}_FR"]["aerBsc"][refHInd[0]:refHInd[1] + 1])
-                            else:
-                                print('No valid refBeta found, skipping Raman retrieval for this channel.')
-                                prof['retrieval'] = 'raman'
-                                prof['signal'] = signal
-                                opt_profiles[i][f"{wv}_{t}_{tel}"] = prof
-                                continue
+                # Calculate SNR in the reference height
+                SNRRef = calc_snr(
+                    signal=np.sum(sig[refHInd[0]:refHInd[1] + 1], keepdims=True),
+                    bg=bg*(refHInd[1] - refHInd[0] + 1)
+                )
+                SNRRef_r = calc_snr(
+                    signal=np.sum(sig_r[refHInd[0]:refHInd[1] + 1], keepdims=True),
+                    bg=bg_r*(refHInd[1] - refHInd[0] + 1)
+                )
+
+                # Checking SNR treshold
+                if SNRRef < config_dict[f'{keyminSNR}{wv}'] and SNRRef_r < config_dict[f'{keyminSNR}{wv_r}']:
+                    print('Signal is too noisy at the reference height, skipping Raman retrival for this channel.', SNRRef, config_dict[f'{keyminSNR}{wv}'], SNRRef_r, config_dict[f'{keyminSNR}{wv_r}'])
+                    opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
+                    continue
+
+                if refBeta is None and tel == 'NR':
+                    # Calculate NR refBeta based on mean FR aerBsc in reference height
+                    # TODO: find a better way of handeling NR cases where we have no FR values that follows the same logic as the rest of the code i.e. try to do it without continue statments...
+                    if f'{wv}_{t}_FR' in opt_profiles[i]:
+                        if 'aerBsc' in opt_profiles[i][f'{wv}_{t}_FR']:
+                            refBeta = np.nanmean(opt_profiles[i][f'{wv}_{t}_FR']['aerBsc'][refHInd[0]:refHInd[1] + 1])
                         else:
                             print('No valid refBeta found, skipping Raman retrieval for this channel.')
-                            prof['retrieval'] = 'raman'
-                            prof['signal'] = signal
-                            opt_profiles[i][f"{wv}_{t}_{tel}"] = prof
+                            opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
                             continue
-                    
-                    if SNRRef > config_dict[f'{keyminSNR}{wv}'] and SNRRef_r > config_dict[f'{keyminSNR}{wv_r}']:
-                        print('SNR is high enough to continue', SNRRef, config_dict[f'minRamanRefSNR{wv}'], SNRRef_r, config_dict[f'minRamanRefSNR{wv_r}'])
-
-                        aerExt_tmp = prof['aerExt'].copy()
-                        aerExt_tmp[:hBaseInd + 1] = aerExt_tmp[hBaseInd]
-                        print(f'filling aerExt below overlap with {aerExt_tmp[hBaseInd]} for calculating the backscatter')
-                        
-                        # Calculate Raman Backscatter
-                        prof.update(
-                            raman_bsc(
-                                height=height,
-                                sigElastic=sig,
-                                sigVRN2=sig_r,
-                                ext_aer=aerExt_tmp,
-                                angstroem=angstrexp, 
-                                ext_mol=molExt,
-                                beta_mol=molBsc,
-                                ext_mol_raman=molExt_r,
-                                beta_mol_inela=molBsc_r,
-                                HRef=refH,
-                                betaRef=refBeta,
-                                window_size=config_dict[f'{key_smooth}{wv}'],
-                                flagSmoothBefore=True,
-                                el_lambda=wv,
-                                inel_lambda=wv_r,
-                                bgElastic=bg,
-                                bgVRN2=bg_r,
-                                sigma_ext_aer=prof['aerExtStd'],
-                                sigma_angstroem=sigma_angstroem,                # <-- This should be the standard deviation of the angstroem exponent.
-                                MC_count=MC_count,                              # <-- Here we use the global (hard coded) variable and not 15 as in raman_Ext()
-                                method='monte-carlo',
-                                collect_debug=collect_debug
-                            )
-                        )
-                        # Calculate Lidar ratio      
-                        prof.update(
-                            lidarratio(
-                                aerExt=prof['aerExt'],
-                                aerBsc=prof['aerBsc'],
-                                hRes=hres, 
-                                aerExtStd=prof['aerExtStd'],
-                                aerBscStd=prof['aerBscStd'],
-                                smoothWinExt=config_dict[f'{key_smooth}{wv}'], 
-                                smoothWinBsc=config_dict[f'{key_smooth}{wv}']
-                            )
-                        )
                     else:
-                        print('SNR is too low, skipping Raman retrival for this channel.', SNRRef, config_dict[f'minRamanRefSNR{wv}'], SNRRef_r, config_dict[f'minRamanRefSNR{wv_r}'])
-                else:
-                    print('No valid refHInd found, skipping Raman retrieval for this channel')
+                        print('No valid refBeta found, skipping Raman retrieval for this channel.')
+                        opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
+                        continue
+                
+                aerExt_tmp = prof['aerExt'].copy()
+                aerExt_tmp[:hBaseInd + 1] = aerExt_tmp[hBaseInd]
+                print(f'filling aerExt below overlap with {aerExt_tmp[hBaseInd]} for calculating the backscatter')
+                
+                # Calculate Raman Backscatter
+                prof.update(
+                    raman_bsc(
+                        height=height,
+                        sigElastic=sig,
+                        sigVRN2=sig_r,
+                        ext_aer=aerExt_tmp,
+                        angstroem=angstrexp, 
+                        ext_mol=molExt,
+                        beta_mol=molBsc,
+                        ext_mol_raman=molExt_r,
+                        beta_mol_inela=molBsc_r,
+                        HRef=refH,
+                        betaRef=refBeta,
+                        window_size=config_dict[f'{key_smooth}{wv}'],
+                        flagSmoothBefore=True,
+                        el_lambda=wv,
+                        inel_lambda=wv_r,
+                        bgElastic=bg,
+                        bgVRN2=bg_r,
+                        sigma_ext_aer=prof['aerExtStd'],
+                        sigma_angstroem=sigma_angstroem,                # <-- This should be the standard deviation of the angstroem exponent.
+                        MC_count=MC_count,                              # <-- Here we use the global (hard coded) variable and not 15 as in raman_Ext()
+                        method='monte-carlo',
+                        collect_debug=collect_debug
+                    )
+                )
+                # Calculate Lidar ratio      
+                prof.update(
+                    lidarratio(
+                        aerExt=prof['aerExt'],
+                        aerBsc=prof['aerBsc'],
+                        hRes=hres, 
+                        aerExtStd=prof['aerExtStd'],
+                        aerBscStd=prof['aerBscStd'],
+                        smoothWinExt=config_dict[f'{key_smooth}{wv}'], 
+                        smoothWinBsc=config_dict[f'{key_smooth}{wv}']
+                    )
+                )
 
-                prof['retrieval'] = 'raman'
-                prof['signal'] = signal
-                opt_profiles[i][f"{wv}_{t}_{tel}"] = prof
+                opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
 
     return opt_profiles
 
@@ -284,9 +280,9 @@ def raman_ext(
     lambda_Raman : float
         Wavelength of Raman signal [nm].
     alpha_molecular_elastic : array_like
-        Molecular scattering coefficient at emitted wavelength in m^-1 sr^-1.
+        Molecular scattering coefficient at emitted wavelength [m^{-1} sr^{-1}].
     alpha_molecular_Raman : array_like
-        Molecular scattering coefficient at Raman wavelength in m^-1 sr^-1.
+        Molecular scattering coefficient at Raman wavelength [m^{-1} sr^{-1}].
     number_density : array_like
         Molecular number density.
     angstrom : float
