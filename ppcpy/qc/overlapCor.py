@@ -141,24 +141,17 @@ def fixLowest(overlap:np.ndarray, indexsearchmax:int, thres:float=0.05):
     in the lowest heights (below indexsearchmax, e.g. 800m)
     search for chunks, where the overlap function is smaller than 0.05
     in that chunk take the miniumum and fill heights below
-
-    TODO: This function is currently only applied for klett retrival. Should it also be applied for raman???
-    TODO: why are we making ovrlapcorrection for raman retrval when it is thoreticaly not effected by the overal effect??
-    TODO: Ask Holger / Martin about this 
-    TODO: This function dose not work when the olFunc goes negative or when the peek in the lower range is lower then 0.05
-            and it crashes in scenarios where the function is always over 0.05.
     
     """
     for i, grp in enumerate(overlap):
         for channel, vals in grp.items():
             var = vals['olFunc'][:indexsearchmax]
-            lt = np.where(var < thres)[0]
-            # lt = np.where(0.05 > var > 0)[0]
+            lt = np.where((var < thres) & (var > 0))[0]
             longestrun = sorted(
                 np.split(lt, np.where(np.diff(lt) != 1)[0] + 1), 
                 key=len, reverse=True)[0]
             if len(longestrun) == 0:
-                print(f"Warning: Fix not applied for channel {channel} in cloud free group {i}. All part of olFunc >= {thres} in lower heights.")
+                print(f"Warning: Fix not applied for channel {channel} in cloud free group {i}.")
                 continue
             idx = np.argmin(var[longestrun]) + longestrun[0]
             vals['olFunc'][:idx] = vals['olFunc'][idx]
