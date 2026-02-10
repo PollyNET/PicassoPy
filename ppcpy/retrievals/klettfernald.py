@@ -91,6 +91,10 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:b
                 sig = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv, t, tel)])
                 bg = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv, t, tel)])
                 molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
+                if np.isnan(sig).any():
+                    # Current temporary version of fernald() does not support NaN values in the signal.
+                    print(f'NaN-values detected in signal {signal}, skipping Klett retrieval for this channel.')
+                    continue
 
                 # Reference height
                 refHInd = data_cube.refH[i][f'{wv}_{t}_{tel}']['refHInd']
@@ -204,9 +208,19 @@ def fernald(
     - 2021-05-30: First edition by Zhenping.
     - 2025-01-03: AI Translation
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
+    - 2026-02-10: Reverted to using scipy.ndimage.uniform_filter1d due to occational issue with 
+                  propagating NaN-values in the backward and farward retrievals.
 
-    TODO:
-    - Define m
+    Notes
+    -----
+    - Temporarily using scipy.ndimage.uniform_filter1d for the smoothing of the RCS instead of
+      ppcpy.misc.helper.uniform_filter due to some rear but strange issue with propagating
+      NaN-values in the backwards and forwards retrieval methods. This issue has so far only
+      been observed at the 355 total NR channel at certain cloud free periods.
+      ppcpy.misc.helper.uniform_filter is generally preferred over scipy.ndimage.uniform_filter1d
+      when some few NaN-values at the edges do not cause issues, as should be the case here. 
+      Further investigation into this issue is needed to understand what is causing the NaN-values.
+    - TODO: Define m (Unsure if this m addition is needed).
 
     """
     # Convert units
@@ -242,8 +256,9 @@ def fernald(
 
     # Smoothing signal
     # indRefMid = int(np.ceil(np.mean(indRefH)))
-    indRefMid = int(np.round(np.mean(indRefH)))
-    RCS = uniform_filter(RCS, window_size)
+    indRefMid = int(np.round(np.mean(indRefH)))  # Changed to round to match matlab implementation more closely | Matlab code: indRefMid = int32(mean(indRefAlt));
+    # RCS = uniform_filter(RCS, window_size)
+    RCS = uniform_filter1d(RCS, window_size)
     RCS[indRefMid] = np.nanmean(RCS[indRefH[0]:indRefH[1] + 1])
 
     # Initialize parameters
