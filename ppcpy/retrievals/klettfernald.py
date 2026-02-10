@@ -1,6 +1,7 @@
 
 import logging
 import numpy as np
+from scipy.ndimage import uniform_filter1d
 
 from ppcpy.misc.helper import uniform_filter
 from ppcpy.retrievals.collection import calc_snr
