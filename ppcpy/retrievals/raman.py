@@ -49,7 +49,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
     
     History
     -------
-    - xxxx-xx-xx: ...
+    - xxxx-xx-xx: TODO: First edition by ...
     - 2026-02-04: Modified and cleaned by Buholdt
     
     TODO's
@@ -119,11 +119,8 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                 molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :]
 
                 # Inelastic signals
-                sig_r = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv_r, t, tel)]) # Original  sigTCor
-                # sig_r *= height**2                                                                                 # Testing   RCS (PC)
-                # sig_r = np.squeeze(data_cube.retrievals_profile['RCS'][i, :, data_cube.gf(wv_r, t, tel)])          # Testing   RCS (PCR)
-                bg_r = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv_r, t, tel)])      # Original  sigTCor
-                # bg_r = np.squeeze(data_cube.retrievals_profile['BG'][i, data_cube.gf(wv_r, t, tel)])               # Testing   sigBGCor
+                sig_r = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv_r, t, tel)])
+                bg_r = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv_r, t, tel)])
                 molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i, :]
                 molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i, :]
 
@@ -670,11 +667,9 @@ def smoothWin(signal:np.ndarray, win:int|np.ndarray, method:str="moving", filter
     signalSM : array
         Smoothed signal.
     
-    TODO's
-    ------
-    - The added NaN values at the edges causes the savgol filter in Lidar Ratio calculations to fail.
-      Make your own version of the savgol filter to fix this. A temporary quickfix is implemented 
-      where the savgol filter is only applied to the non-NaN part of the aerBsc (removed NaN edges).
+    Notes
+    -----
+    - TODO: Support for smoothing wiht variable window size is not yet implemented. 
     
     """
     if isinstance(win, int):
