@@ -5,20 +5,19 @@ elastic2raman = {355: 387, 532: 607}
 
 
 def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
-    """ Estimate the lidar constant from the optical profiles.
+    """Estimate the lidar constant from the optical profiles.
 
     Parameters
     ----------
     data_cube : object
         Main PicassoProc object.
     retrieval : str
-        Retrieval type. 'raman' or 'klett'.
+        Retrieval type. 'klett' or 'raman'.
     
     Returns
     -------
     LCs : list
         Lidar constant for retrieval type per channel per cloud free period.
-
 
     Notes
     -----
@@ -46,6 +45,8 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
 
         for channel in profiles:
             wv, t, tel = channel.split('_')
+
+            # Telescope type dependent configurations:
             if tel == 'NR':
                 key_smooth = f'smoothWin_{retrieval}_NR_'
             else:
@@ -55,14 +56,16 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
             hBaseInd = np.argmax(
                 height >= (hFullOverlap + config_dict[f'{key_smooth}{wv}'] / 2 * hres))
 
+            # Elastic signals:
             sig = profiles[channel]['signal']
             signal = np.nanmean(np.squeeze(
                 data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree), :, data_cube.gf(wv, t, tel)]), axis=0)
             molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
             molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :]
 
+            # Check for avaiabel retrievals:
             if not ('aerExt' in profiles[channel] and 'aerBsc' in profiles[channel]):
-                print(f'skipping {channel} {cldFree}')
+                print(f'No availabel retrievals, skipping {channel} {cldFree}')
                 continue
 
             aerExt = profiles[channel]['aerExt'].copy()
@@ -83,10 +86,17 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
                 maxBin=config_dict['LCMeanMaxIndx']
             )
             print(f"cldFreGrp {i}, Channel {wv} {t} {tel}, LC_stable {LC_stable}, LCStd {LCStd}")
+
+            if LC_stable is None:
+                print(f'Can not find a stable LC value, skipping {channel} {cldFree}')
+                continue
+
             LCs[i][channel] = {'LC': LC_stable, 'LCStd': LC_stable * LCStd}
 
             if retrieval == 'raman' and int(wv) in elastic2raman.keys():
                 wv_r = elastic2raman[int(wv)] 
+
+                # Inelastic signals:
                 signal_r = np.nanmean(np.squeeze(
                     data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree), :, data_cube.gf(wv_r, t, tel)]), axis=0)
                 #molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i, :]
@@ -106,6 +116,11 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
                     maxBin=config_dict['LCMeanMaxIndx']
                 )
                 print(f"cldFreGrp {i}, Channel {wv_r} {t} {tel}, LC_stable {LC_r_stable}, LCStd {LCStd_r}")
+
+                if LC_r_stable is None:
+                    print(f'Can not find a stable LC value, skipping {channel} {cldFree}')
+                    continue
+
                 LCs[i][f"{wv_r}_{t}_{tel}"] = {'LC': LC_r_stable, 'LCStd': LC_r_stable * LCStd_r}
 
     return LCs
@@ -125,7 +140,6 @@ def get_best_LC(LCs:list) -> dict:
         Lidar constants with lowest standard deviation per channel.
         
     """
-
     # list comprehension for nested list
     all_channels = set([k for e in LCs for k in e.keys()])
     
