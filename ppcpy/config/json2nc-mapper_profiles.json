@@ -107,7 +107,7 @@
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Fixed lidar ratio": "", "Reference value": "", "Reference search range": "", "Smoothing window":""},
         "comment": "The result is retrieved with Klett method. If you want to know more about the algorithm, please go to Klett, J. D. (1985). \"Lidar inversion with variable backscatter/extinction ratios.\" Applied optics 24(11): 1638-1643."
       }
     },
@@ -123,7 +123,7 @@
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Fixed lidar ratio": "", "Reference value": "", "Reference search range": "", "Smoothing window":""},
         "comment": "The result is retrieved with Klett method. If you want to know more about the algorithm, please go to Klett, J. D. (1985). \"Lidar inversion with variable backscatter/extinction ratios.\" Applied optics 24(11): 1638-1643."
       }
     },
@@ -140,7 +140,7 @@
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Fixed lidar ratio": "", "Reference value": "", "Reference search range": "", "Smoothing window":""},
         "comment": "The result is retrieved with Klett method. If you want to know more about the algorithm, please go to Klett, J. D. (1985). \"Lidar inversion with variable backscatter/extinction ratios.\" Applied optics 24(11): 1638-1643."
       }
     },
@@ -156,7 +156,7 @@
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Fixed lidar ratio": "", "Reference value": "", "Reference search range": "", "Smoothing window":""},
         "comment": "The result is retrieved with Klett method. If you want to know more about the algorithm, please go to Klett, J. D. (1985). \"Lidar inversion with variable backscatter/extinction ratios.\" Applied optics 24(11): 1638-1643."
       }
     },
@@ -173,7 +173,7 @@
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Fixed lidar ratio": "", "Reference value": "", "Reference search range": "", "Smoothing window":""},
         "comment": "The result is retrieved with Klett method. If you want to know more about the algorithm, please go to Klett, J. D. (1985). \"Lidar inversion with variable backscatter/extinction ratios.\" Applied optics 24(11): 1638-1643."
       }
     },
@@ -189,7 +189,7 @@
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Fixed lidar ratio": "", "Reference value": "", "Reference search range": "", "Smoothing window":""},
         "comment": "The result is retrieved with Klett method. If you want to know more about the algorithm, please go to Klett, J. D. (1985). \"Lidar inversion with variable backscatter/extinction ratios.\" Applied optics 24(11): 1638-1643."
       }
     },
@@ -206,7 +206,7 @@
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Reference value": "", "Reference search range": "", "Smoothing window":"", "Angstroem exponent": ""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -222,7 +222,7 @@
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Reference value": "", "Reference search range": "", "Smoothing window":"", "Angstroem exponent": ""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -239,7 +239,7 @@
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Reference value": "", "Reference search range": "", "Smoothing window":"", "Angstroem exponent": ""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -255,7 +255,7 @@
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Reference value": "", "Reference search range": "", "Smoothing window":"", "Angstroem exponent": ""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -272,7 +272,7 @@
         "plot_range": [-1e-06, 1e-05],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Reference value": "", "Reference search range": "", "Smoothing window":"", "Angstroem exponent": ""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -288,7 +288,7 @@
         "standard_name": "sigma (beta)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Reference value": "", "Reference search range": "", "Smoothing window":"", "Angstroem exponent": ""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -305,7 +305,7 @@
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
     },
@@ -321,7 +321,7 @@
         "standard_name": "sigma (vol, 355 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
     },
@@ -338,7 +338,7 @@
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
     },
@@ -354,7 +354,7 @@
         "standard_name": "sigma (vol, 532 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
     },
@@ -371,7 +371,7 @@
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
     },
@@ -387,7 +387,7 @@
         "standard_name": "sigma (vol, 1064 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
     },
@@ -404,7 +404,7 @@
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
     },
@@ -420,7 +420,7 @@
         "standard_name": "sigma (vol, 355 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
     },
@@ -437,7 +437,7 @@
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
     },
@@ -453,7 +453,7 @@
         "standard_name": "sigma (vol, 532 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
     },
@@ -470,7 +470,7 @@
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
     },
@@ -486,7 +486,7 @@
         "standard_name": "sigma (vol, 1064 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
     },
@@ -503,7 +503,7 @@
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
     },
@@ -519,7 +519,7 @@
         "standard_name": "sigma (par, 355 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
     },
@@ -536,7 +536,7 @@
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
     },
@@ -552,7 +552,7 @@
         "standard_name": "sigma (par, 532 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
     },
@@ -569,7 +569,7 @@
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
     },
@@ -585,7 +585,7 @@
         "standard_name": "sigma (par, 1064 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
     },
@@ -602,7 +602,7 @@
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
     },
@@ -618,7 +618,7 @@
         "standard_name": "sigma (par, 355 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
     },
@@ -635,7 +635,7 @@
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
     },
@@ -651,7 +651,7 @@
         "standard_name": "sigma (par, 532 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
     },
@@ -668,7 +668,7 @@
         "plot_range": [0.0, 0.4],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
     },
@@ -684,7 +684,7 @@
         "standard_name": "sigma (par, 1064 nm)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "eta": ""},
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
     },
@@ -701,7 +701,7 @@
         "plot_range": [-1.0e-06, 0.003],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "Angstroem exponent": ""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -718,7 +718,7 @@
         "plot_range": [-1.0e-06, 0.003],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "Angstroem exponent": ""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -735,7 +735,7 @@
         "plot_range": [-1.0e-06, 0.003],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "Angstroem exponent": ""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -752,7 +752,7 @@
         "plot_range": [-1.0e-06, 0.003],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "Angstroem exponent": ""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -769,7 +769,7 @@
         "plot_range": [-1.0e-06, 0.003],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "Angstroem exponent": ""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -786,7 +786,7 @@
         "plot_range": [-1.0e-06, 0.003],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":"", "Angstroem exponent": ""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -802,7 +802,7 @@
         "plot_range": [0.0, 120.0],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -817,7 +817,7 @@
         "standard_name": "sigma (S)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -833,7 +833,7 @@
         "plot_range": [0.0, 120.0],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -848,7 +848,7 @@
         "standard_name": "sigma (S)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -864,7 +864,7 @@
         "plot_range": [0.0, 120.0],
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
@@ -879,7 +879,7 @@
         "standard_name": "sigma (S)",
         "plot_scale": "linear",
         "source": "polly_device_name",
-        "retrieving_info": "",
+        "retrieving_info": {"Smoothing window":""},
         "comment": "The result is retrieved with Raman method. For information, please go to Ansmann, A., et al. (1992). \"Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar.\" Applied optics 31(33): 7113-7131."
       }
     },
