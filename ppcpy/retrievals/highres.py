@@ -12,10 +12,12 @@ def attbsc_2d(data_cube, nr:bool=True, collect_debug:bool=False):
 
     Parameters
     ----------
+    data_cube : object
+        Main PicassoProc object.
     nr : bool, optional
-        If Ture, calculate the attbsc for FR and NR channels. Default: True
+        If Ture, calculate the attbsc for FR and NR channels. Default is True.
     collect_debug : bool, optional
-        If True, collects debug information. Default: False
+        If True, collects debug information. Default is False.
     
     """
 
@@ -73,7 +75,13 @@ def attbsc_2d(data_cube, nr:bool=True, collect_debug:bool=False):
     
 
 def voldepol_2d(data_cube):
-    """calculate the voldepol
+    """Calculate the volume depolarisation ratio
+
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object
+    
     """
 
     config_dict = data_cube.polly_config_dict
