@@ -2,12 +2,29 @@
 import logging
 import numpy as np
 from ppcpy.misc.helper import uniform_filter
+from scipy.ndimage import uniform_filter1d
+from scipy.special import gammaincc
 
 #import fastrdp
 
-def rayleighfit(data_cube):
-    """ """
+def rayleighfit(data_cube) -> list:
+    """Rayleighfit ...
 
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
+    
+    Returns
+    -------
+    refH : list of dicts
+        Reference heights per channel per cloud free period.
+    
+    Notes
+    -----
+    - TODO: Write docstring.
+
+    """
     # TODO ist data.distance0 and height the same? https://github.com/PollyNET/Pollynet_Processing_Chain/blob/e413f9254094ff2c0a18fcdac4e9bebb5385d526/lib/preprocess/pollyPreprocess.m#L299
     height = data_cube.retrievals_highres['range']
     logging.warning(f'rayleighfit seems to use range in matlab, but the met data should be in height >> RECHECK!')
@@ -107,32 +124,46 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     
     """
     return uniform_filter(signal, window_len)
+    # return uniform_filter1d(signal, window_len, mode='nearest')
 
 
-def DouglasPeucker(signal, height, epsilon, heightBase, heightTop, maxHThick, window_size=1):
-    """
-    Simplify signal according to Douglas-Peucker algorithm.
+def DouglasPeucker(signal:np.ndarray, height:np.ndarray, epsilon:float, heightBase:float,
+                   heightTop:float, maxHThick:float, window_size:int=1) -> np.ndarray:
+    """Simplify signal according to Douglas-Peucker algorithm.
 
-    Parameters:
-        signal (array): Molecule corrected signal. [MHz]
-        height (array): Height. [m]
-        epsilon (float): Maximum distance.
-        heightBase (float): Minimum height for the algorithm. [m]
-        heightTop (float): Maximum height for the algorithm. [m]
-        maxHThick (float): Maximum spatial thickness of each segment. [m]
-        window_size (int): Size of the average smooth window.
+    Parameters
+    ----------
+    signal : ndarray
+        Molecule corrected signal. [MHz]
+    height : ndarray
+        Height. [m]
+    epsilon : float
+        Maximum distance.
+    heightBase : float
+        Minimum height for the algorithm. [m]
+    heightTop : float
+        Maximum height for the algorithm. [m]
+    maxHThick : float
+        Maximum spatial thickness of each segment. [m]
+    window_size : int
+        Size of the average smooth window.
 
-    Returns:
-        sigIndx (array): Index of the signal that stands for different segments of the signal.
+    Returns
+    -------
+    sigIndx : array
+        Index of the signal that stands for different segments of the signal.
 
-    References:
-        https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
+    References
+    ---------
+    https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
 
-    History:
-        - 2017-12-29: First edition by Zhenping.
-        - 2018-07-29: Add the height range for the searching instead of SNR restriction.
-        - 2018-07-31: Add the maxHThick argument to control the maximum thickness of each output segment.
-        - 2024-12-20: Direct translated from matlab with ai
+    History
+    -------
+    - 2017-12-29: First edition by Zhenping.
+    - 2018-07-29: Add the height range for the searching instead of SNR restriction.
+    - 2018-07-31: Add the maxHThick argument to control the maximum thickness of each output segment.
+    - 2024-12-20: Direct translated from matlab with ai
+    
     """
     #print('height', height[:30], 'epsilon', epsilon, 'height', heightBase, heightTop, 'maxHThick', maxHThick, 'window_size', window_size)
 
@@ -174,17 +205,23 @@ def DouglasPeucker(signal, height, epsilon, heightBase, heightTop, maxHThick, wi
     return posIndx[sigIndx] + hBaseIndx - 1
 
 
-def DP_algorithm(pointList, epsilon, maxHThick):
-    """
-    Recursive implementation of the Douglas-Peucker algorithm.
+def DP_algorithm(pointList:list, epsilon:float, maxHThick:float) -> list:
+    """Recursive implementation of the Douglas-Peucker algorithm.
 
-    Parameters:
-        pointList (list): List of points [[x1, y1], [x2, y2], ...].
-        epsilon (float): Maximum distance.
-        maxHThick (float): Maximum thickness for each segment.
+    Parameters
+    ----------
+    pointList : list
+        List of points [[x1, y1], [x2, y2], ...].
+    epsilon : float
+        Maximum distance.
+    maxHThick : float
+        Maximum thickness for each segment.
 
-    Returns:
-        sigIndx (list): Indices of simplified points.
+    Returns
+    -------
+    sigIndx : list
+        Indices of simplified points.
+    
     """
     if len(pointList) == 1:
         #print('pointList == 1')
@@ -222,59 +259,68 @@ def DP_algorithm(pointList, epsilon, maxHThick):
         return [0, len(pointList) - 1]
 
 
-def my_dist(pointM, pointS, pointE):
-    """
-    Calculate the perpendicular distance between pointM and the line
+def my_dist(pointM:list, pointS:list, pointE:list) -> float:
+    """Calculate the perpendicular distance between pointM and the line
     connecting pointS and pointE.
 
-    Parameters:
-        pointM (list): Middle point [x, y].
-        pointS (list): Start point [x, y].
-        pointE (list): End point [x, y].
+    Parameters
+    ----------
+    pointM : list
+        Middle point [x, y].
+    pointS : list
+        Start point [x, y].
+    pointE : list
+        End point [x, y].
 
-    Returns:
-        d (float): Distance.
+    Returns
+    -------
+    d : float
+        Distance.
+    
     """
     num = abs(pointM[1] - pointS[1] + (pointS[1] - pointE[1]) / (pointS[0] - pointE[0]) * (pointS[0] - pointM[0]))
     den = np.sqrt(1 + ((pointS[1] - pointE[1]) / (pointS[0] - pointE[0])) ** 2)
     return num / den
 
-from scipy.special import gammaincc
 
-def chi2fit(x, y, measure_error):
-    """
-    CHI2FIT Chi-2 fitting. All the code are translated from the exemplified code in Numerical 
+def chi2fit(x:np.ndarray, y:np.ndarray, measure_error:np.ndarray) -> tuple:
+    """CHI2FIT Chi-2 fitting. All the code are translated from the exemplified code in Numerical 
     Recipes in C (2nd Edition). Great help comes from Birgit Heese.
     
-    USAGE:
-        a, b, sigmaA, sigmaB, chi2, Q = chi2fit(x, y, measure_error)
+    Usage
+    -----
+    a, b, sigmaA, sigmaB, chi2, Q = chi2fit(x, y, measure_error)
     
-    INPUTS:
-        x: array 
-            The length of x should be larger than 1.
-        y: array
-            The measured signal.
-        measure_error: array
-            Measurement errors for the y values.
+    Parameters
+    ----------
+    x : ndarray 
+        The length of x should be larger than 1.
+    y : ndarray
+        The measured signal.
+    measure_error : ndarray
+        Measurement errors for the y values.
     
-    OUTPUTS:
-        a: float
-            Intercept of the linear regression.
-        b: float
-            Slope of the linear regression.
-        sigmaA: float
-            Uncertainty of the intercept.
-        sigmaB: float
-            Uncertainty of the slope.
-        chi2: float
-            Chi-square value.
-        Q: float
-            Goodness of fit.
+    Returns
+    -------
+    a : float
+        Intercept of the linear regression.
+    b : float
+        Slope of the linear regression.
+    sigmaA : float
+        Uncertainty of the intercept.
+    sigmaB : float
+        Uncertainty of the slope.
+    chi2 : float
+        Chi-square value.
+    Q : float
+        Goodness of fit.
     
-    HISTORY:
-        - 2018-08-03: First edition by Zhenping.
+    History
+    -------
+    - 2018-08-03: First edition by Zhenping.
     
     Authors: - zhenping@tropos.de
+
     """
     if len(x) != len(y):
         raise ValueError("Array lengths of x and y must agree.")
@@ -316,12 +362,12 @@ def chi2fit(x, y, measure_error):
     return a, b, sigmaA, sigmaB, chi2, Q
 
 
-def fit_profile(height, sig_aer, pc, bg, sig_mol, dpIndx, layerThickConstrain, 
-                slopeConstrain, SNRConstrain, flagShowDetail=False):
+def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndarray,sig_mol:np.ndarray,
+                dpIndx:np.ndarray, layerThickConstrain:float, slopeConstrain:float, SNRConstrain:float, 
+                flagShowDetail:bool=False) -> tuple:
 #def rayleighfit(height, sig_aer, snr, sig_mol, dpIndx, layerThickConstrain, 
 #                slopeConstrain, SNRConstrain, flagShowDetail=False):
-    """
-    Search the clean region with rayleigh fit algorithm.
+    """Search the clean region with rayleigh fit algorithm.
 
     Parameters
     ----------
@@ -351,6 +397,7 @@ def fit_profile(height, sig_aer, pc, bg, sig_mol, dpIndx, layerThickConstrain,
     tuple
         (hBIndx, hTIndx) - indices of bottom and top of searched region
         Returns (nan, nan) if region not found
+    
     """
     import numpy as np
     from scipy.stats import norm
