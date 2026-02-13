@@ -1,21 +1,35 @@
-
-
 import numpy as np
 from ppcpy.misc.helper import mean_stable
 
 elastic2raman = {355: 387, 532: 607}
 
 
-def lc_for_cldFreeGrps(data_cube, retrieval):
-    """ 
-    Estimate the lidar constant from the optical profiles.
+def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
+    """ Estimate the lidar constant from the optical profiles.
+
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
+    retrieval : str
+        Retrieval type. 'raman' or 'klett'.
+    
+    Returns
+    -------
+    LCs : list
+        Lidar constant for retrieval type per channel per cloud free period.
 
 
-    Updates:
-        For NR done directly form the optical profiles,
-        whereas in the matlab version, the LC*olAttri387.sigRatio is taken
+    Notes
+    -----
+    - For NR, done directly form the optical profiles, whereas in the matlab
+      version, the LC*olAttri387.sigRatio is taken.
+    - TODO: Change back to Picasso version to check if lidar calibration
+      constatns get more similar.
+    - TODO: Check if LC's are normalized with respect to the mean of 
+      the profiles.
+
     """
-
     print("retival", retrieval)
     height = data_cube.retrievals_highres['range']
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
@@ -55,8 +69,8 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
             aerExt[:hBaseInd] = aerExt[hBaseInd]
             aerBsc = profiles[channel]['aerBsc']
 
-            aerOD = np.cumsum(aerExt * np.concatenate(([height[0]], np.diff(height))))
-            molOD = np.cumsum(molExt * np.concatenate(([height[0]], np.diff(height))))
+            aerOD = np.nancumsum(aerExt * np.concatenate(([height[0]], np.diff(height))))
+            molOD = np.nancumsum(molExt * np.concatenate(([height[0]], np.diff(height))))
 
             trans = np.exp(-2 * (aerOD + molOD))
             bsc = molBsc + aerBsc
@@ -68,6 +82,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
                 minBin=config_dict['LCMeanMinIndx'],
                 maxBin=config_dict['LCMeanMaxIndx']
             )
+            print(f"cldFreGrp {i}, Channel {wv} {t} {tel}, LC_stable {LC_stable}, LCStd {LCStd}")
             LCs[i][channel] = {'LC': LC_stable, 'LCStd': LC_stable * LCStd}
 
             if retrieval == 'raman' and int(wv) in elastic2raman.keys():
@@ -85,16 +100,30 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
 
                 LC_r = signal_r * height**2 / bsc / trans_r
                 LC_r_stable, _, LCStd_r = mean_stable(
-                    LC_r, config_dict['LCMeanWindow'], 
-                    minBin=config_dict['LCMeanMinIndx'], maxBin=config_dict['LCMeanMaxIndx'])
+                    x=LC_r,
+                    win=config_dict['LCMeanWindow'], 
+                    minBin=config_dict['LCMeanMinIndx'],
+                    maxBin=config_dict['LCMeanMaxIndx']
+                )
+                print(f"cldFreGrp {i}, Channel {wv_r} {t} {tel}, LC_stable {LC_r_stable}, LCStd {LCStd_r}")
                 LCs[i][f"{wv_r}_{t}_{tel}"] = {'LC': LC_r_stable, 'LCStd': LC_r_stable * LCStd_r}
 
-                return LCs
+    return LCs
 
 
-def get_best_LC(LCs):
-    """ get lidar constant with the lowest standard deviation
-     
+def get_best_LC(LCs:list) -> dict:
+    """Get lidar constant with the lowest standard deviation.
+
+    Parameters
+    ----------
+    LCs : list
+        Lidar constant for each channel per cloud free period.
+    
+    Returns
+    -------
+    LCused : dict
+        Lidar constants with lowest standard deviation per channel.
+        
     """
 
     # list comprehension for nested list
