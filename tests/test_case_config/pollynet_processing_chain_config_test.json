@@ -1,0 +1,33 @@
+{
+    "fileinfo_new": "",
+    "doneListFile": "",
+    "polly_config_folder": "test_case_config",
+    "log_folder": "",
+    "gdas1_folder": "",
+    "MWRFolder": "",
+    "results_folder": "",
+    "pic_folder": "",
+    "pollynet_config_link_file": "test_case_config/pollynet_processing_chain_config_links.xlsx",
+
+    "figDPI": 80,
+    "fontname": "DejaVu Serif",
+
+    "minDataSize": 500000,
+
+    "institute": "Ground-based Remote Sensing Group (TROPOS)",
+    "homepage": "https://polly.tropos.de/",
+    "contact": " <>",
+
+    "visualizationMode": "python",
+    "pyBinDir": "~/picasso-env/bin/",
+
+    "flagDeleteData": false,
+    "flagDeletePreOutputs": true,
+    "flagEnableCaliResultsOutput": true,
+    "flagEnableResultsOutput": true,
+    "flagEnableDataVisualization": false,
+    "flagDebugOutput": false,
+    "flagReduceMATLABToolboxDependence": false,
+    "flagSendNotificationEmail": false,
+    "flagWatermarkOn": true
+}

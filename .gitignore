@@ -7,3 +7,5 @@ tests/pollynet_testing.m
 docs/build/*
 docs/source/_autosummary/*
 tests/*.png
+tests/plots/*.png
+tests/test_case_data/*.nc
