@@ -3,6 +3,7 @@
 import glob
 import re
 import datetime
+import os
 
 import xarray as xr
 #from scipy.interpolate import griddata
@@ -131,8 +132,9 @@ class MeteoNcCloudnet:
         self.filepattern = filepattern
 
     def find_path_for_time(self, time):
+        """find the files fo a given time """
 
-        candidates = glob.glob(self.basepath + "**/*")
+        candidates = glob.glob(self.basepath + "**", recursive=True)
         #print('candidates ', candidates)
 
         dt = datetime.datetime.fromtimestamp(time)
@@ -142,7 +144,7 @@ class MeteoNcCloudnet:
         filename = [s for s in candidates if regex.search(s) ]
         #print('filename ', filename)
 
-        assert len(filename) == 1
+        assert len(filename) == 1, f"{os.getcwd()}, {self.basepath} found {candidates} reduced to filenames {filename}"
 
         return filename[0]
 
