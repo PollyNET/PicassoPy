@@ -138,6 +138,15 @@ def get_best_LC(LCs:list) -> dict:
     -------
     LCused : dict
         Lidar constants with lowest standard deviation per channel.
+    
+    History
+    -------
+    - 2026-02-16: Added additional checks to hinder negative LCs to be chosen.
+
+    Notes
+    -----
+    - Since LC = LC_sable and LCStd = LC_stable * LC_Std so will any negative LC also have
+      a negative LCStd, and thus be chosen as the best LC.
         
     """
     # list comprehension for nested list
@@ -145,8 +154,8 @@ def get_best_LC(LCs:list) -> dict:
     
     LCused = {}
     for channel in all_channels:
-        lcs = np.array([e[channel]['LC'] for e in LCs if channel in e])
-        lcsstd = np.array([e[channel]['LCStd'] for e in LCs if channel in e])
+        lcs = np.array([e[channel]['LC'] for e in LCs if channel in e and e[channel]['LC'] >= 0])
+        lcsstd = np.array([e[channel]['LCStd'] for e in LCs if channel in e and e[channel]['LCStd'] >= 0])
 
         LCused[channel] = lcs[np.argmin(lcsstd)]
     return LCused
