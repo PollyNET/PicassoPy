@@ -253,8 +253,14 @@ def adding_refH_vars(data_cube, json_nc_mapping_dict:dict, cldFreeGrp, prod:str)
         json_nc_mapping_dict['variables'][f'reference_height_{wv}'] = {}
         json_nc_mapping_dict['variables'][f'reference_height_{wv}']['dtype'] = 'f4'
         json_nc_mapping_dict['variables'][f'reference_height_{wv}']['shape'] = ['reference_height']
-        json_nc_mapping_dict['variables'][f'reference_height_{wv}']['data'] = \
-            data_cube.retrievals_highres["height"][list(data_cube.refH[cldFreeGrp][f'{wv}_total_{tel}']['refHInd'])] if f'{wv}_total_{tel}' in data_cube.refH[cldFreeGrp] and ~np.any(np.isnan(data_cube.refH[cldFreeGrp][f'{wv}_total_{tel}']['refHInd'])) else None
+        if f'{wv}_total_{tel}' in data_cube.refH[cldFreeGrp]:
+            if np.isnan(data_cube.refH[cldFreeGrp][f'{wv}_total_{tel}']['refHInd']).any():
+                json_nc_mapping_dict['variables'][f'reference_height_{wv}']['data'] = [np.nan, np.nan]
+            else:
+                json_nc_mapping_dict['variables'][f'reference_height_{wv}']['data'] = data_cube.retrievals_highres["height"][list(data_cube.refH[cldFreeGrp][f'{wv}_total_{tel}']['refHInd'])]
+        else:
+            json_nc_mapping_dict['variables'][f'reference_height_{wv}']['data'] = None
+                
         json_nc_mapping_dict['variables'][f'reference_height_{wv}']['attributes'] = {
             'unit':'m',
             'long_name':f'Reference height for {"near" if tel == "NR" else "far"}-range {wv} nm',
