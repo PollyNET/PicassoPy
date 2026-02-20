@@ -222,7 +222,8 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[]):
                 else:
                     continue
             
-            ### Add reference hight variable:
+            ### Add molecular profiles and reference hight variable:
+            adding_mol_profiles(data_cube, json_nc_mapping_dict, n)
             adding_refH_vars(data_cube, json_nc_mapping_dict, n, prod)
 
             ### remove empty key-value-pairs
@@ -236,9 +237,8 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[]):
             json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict, compression_level=1)
 
 
-def adding_refH_vars(data_cube, json_nc_mapping_dict:dict, cldFreeGrp, prod:str) -> dict:
-    """
-    Temporarily quick fix for adding Reference heights as a variable to the NetCDF profile outputs.
+def adding_refH_vars(data_cube, json_nc_mapping_dict:dict, cldFreeGrp:int, prod:str) -> dict:
+    """Temporarily quick fix for adding Reference heights as a variable to the NetCDF profile outputs.
     In the future this should be included in the json2nc mapping scheme.
     """
     # Define which telescope the retrivals are from
@@ -269,3 +269,46 @@ def adding_refH_vars(data_cube, json_nc_mapping_dict:dict, cldFreeGrp, prod:str)
             'source':'pollyxt_tjk',
             'comment':'The reference height is searched by Rayleigh Fitting algorithm. It is through comparing the correlation of the slope between molecule backscatter and range-corrected signal and find the segement with best agreement.'
             }
+
+
+def adding_mol_profiles(data_cube, json_nc_mapping_dict:dict, cldFreeGrp:int) -> dict:
+    """Temporarily quick fix for adding molecular profiles as variables to the NetCDF profile outputs"""
+    # molExt and molBsc:
+    for wv in [355, 387, 407, 532, 607, 1058, 1064]:
+        for var_name in [f'mExt_{wv}', f'mBsc_{wv}']:
+            json_nc_mapping_dict['variables'][var_name] = {}
+            json_nc_mapping_dict['variables'][var_name]['dtype'] = 'f4'
+            json_nc_mapping_dict['variables'][var_name]['shape'] = ['height']
+
+            if var_name in data_cube.mol_profiles:
+                json_nc_mapping_dict['variables'][var_name]['data'] = data_cube.mol_profiles[var_name][cldFreeGrp]
+            else:
+                json_nc_mapping_dict['variables'][var_name]['data'] = None
+
+            json_nc_mapping_dict['variables'][var_name]['attributes'] = {
+                'unit':'sr^-1 m^-1',
+                'long_name':f'Molecular {"extinction" if "Ext" in var_name else "backscatter"} coefficient at emitted wavelength {wv}',
+                'standard_name':var_name,
+                'plot_scale':'linear',
+                'source':'pollyxt_tjk',
+                'comment':''
+            }
+        
+    # number_density:
+    json_nc_mapping_dict['variables']['number_density'] = {}
+    json_nc_mapping_dict['variables']['number_density']['dtype'] = 'f4'
+    json_nc_mapping_dict['variables']['number_density']['shape'] = ['height']
+
+    if 'number_density' in data_cube.mol_profiles:
+        json_nc_mapping_dict['variables']['number_density']['data'] = data_cube.mol_profiles['number_density'][cldFreeGrp]
+    else:
+        json_nc_mapping_dict['variables']['number_density']['data'] = None
+
+    json_nc_mapping_dict['variables']['number_density']['attributes'] = {
+        'unit':'',
+        'long_name':'Molecular number density',
+        'standard_name':'number_density',
+        'plot_scale':'linear',
+        'source':'pollyxt_tjk',
+        'comment':''
+    }
