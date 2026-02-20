@@ -127,8 +127,8 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                 number_density = data_cube.mol_profiles[f'number_density'][i, :]
 
                 if wv == 1064 and wv_r == 607:
-                    # calculate the extinction based on the 532nm, 607nm molecular profiles and a correction factor
-                    molExt_mod = data_cube.mol_profiles[f'mExt_532'][i, :]  # one per cloud free group (shape (22, 4096))
+                    # calculate the extinction based on the 532nm molecular profiles and a correction afterwards
+                    molExt_mod = data_cube.mol_profiles[f'mExt_532'][i, :]
                     wv_mod = 532
                 else:
                     # calculate normally
@@ -608,7 +608,7 @@ def calc_raman_bsc(
     -------
     - el_lambda & inel_lambda are not optional arguments as it currently stands. Either change the deafult value in the function init and doc-string or add a detection and replace by a config parameter in the code.
     - angstroem is an float in beta_aer calculations and an array of shape (1, ) in beta_aer_std claculations.
-    - Find a way of sending both HRef and HRefIndx through the functions to avoid recalculating the indices over and over again
+    - Find a way of sending both HRef and HRefIndx through the functions to avoid recalculating the indices over and over again.
 
     """
     ext_aer[~np.isfinite(ext_aer)] = 0
