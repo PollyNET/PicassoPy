@@ -148,7 +148,7 @@ def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
         json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict, compression_level=1)
 
 
-def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[]):
+def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], collect_debug:bool=False):
     """
     Saving profile data to NetCDF4 files
 
@@ -223,7 +223,8 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[]):
                     continue
             
             ### Add molecular profiles and reference hight variable:
-            adding_mol_profiles(data_cube, json_nc_mapping_dict, n)
+            if collect_debug:
+                adding_mol_profiles(data_cube, json_nc_mapping_dict, n)
             adding_refH_vars(data_cube, json_nc_mapping_dict, n, prod)
 
             ### remove empty key-value-pairs
