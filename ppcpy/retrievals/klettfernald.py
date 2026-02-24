@@ -7,7 +7,7 @@ from ppcpy.misc.helper import uniform_filter
 from ppcpy.retrievals.collection import calc_snr
 
 
-def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:bool=True) -> dict:
+def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:bool=False) -> dict:
     """Run klett retrieval for each cloud free region.
 
     Parameters
@@ -103,9 +103,6 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:b
                     print('No valid refHInd found, skipping Klett retrieval for this channel.')
                     continue
 
-                refH = height[np.array(refHInd)]
-                print('refHInd', refHInd, 'refH', refH)
-
                 # Calculate SNR in the reference height
                 SNRRef = calc_snr(
                     signal=np.sum(sig[refHInd[0]:refHInd[1] + 1], keepdims=True),
@@ -128,20 +125,22 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:b
                     else:
                         print('No valid refBeta found, skipping Klett retrieval for this channel')
                         continue
-
-                print(
-                    'LR ', config_dict[f'{key_LR}{wv}'], 
-                    'refH', refH, 
-                    'refBeta', refBeta,
-                    'smoothWin_klett', config_dict[f'{key_smooth}{wv}']
-                )
+                
+                # Print debug info
+                if collect_debug:
+                    print(
+                        'LR ', config_dict[f'{key_LR}{wv}'], 
+                        'refH', height[np.array(refHInd)], 
+                        'refBeta', refBeta,
+                        'smoothWin_klett', config_dict[f'{key_smooth}{wv}']
+                    )
                 
                 prof = fernald(
                     height=height,
                     signal=sig,
                     bg=bg,
                     LR_aer=config_dict[f'{key_LR}{wv}'],
-                    refH=refH,
+                    refHInd=refHInd,
                     refBeta=refBeta,
                     molBsc=molBsc,
                     window_size=config_dict[f'{key_smooth}{wv}'],
@@ -161,7 +160,7 @@ def fernald(
         signal:np.ndarray,
         bg:np.ndarray,
         LR_aer:float|np.ndarray,
-        refH:float|np.ndarray,
+        refHInd:list,
         refBeta:float,
         molBsc:np.ndarray,
         window_size:int=40,
@@ -179,8 +178,8 @@ def fernald(
         Background signal (Photon Count).
     LR_aer : float or array_like
         Aerosol lidar ratio [sr].
-    refH : float or array_like
-        Reference altitude or region [m].
+    refHInd : array_like
+        Reference height index [start, end].
     refBeta : float
         Aerosol backscatter coefficient at the reference region [m^-1 sr^-1].
     molBsc : array_like
@@ -226,7 +225,6 @@ def fernald(
     """
     # Convert units
     height = height / 1e3  # Convert to km
-    refH = np.array(refH) / 1e3  # Convert to km
     molBsc = np.array(molBsc) * 1e3  # Convert to km^-1 sr^-1
     refBeta = refBeta * 1e3  # Convert to km^-1 sr^-1
 
@@ -239,9 +237,8 @@ def fernald(
     LR_mol = np.full(height.shape[0], 8 * np.pi / 3)
 
     # Reference altitude indices
-    assert len(refH) == 2, 'refH has to be given as base and top'
-    indRefH = np.searchsorted(height, refH)
-
+    assert len(refHInd) == 2, 'refH has to be given as base and top'
+    
     # Aerosol lidar ratio setup
     if np.isscalar(LR_aer):
         LR_aer = np.full(height.shape[0], LR_aer)
@@ -256,11 +253,11 @@ def fernald(
     # RCS *= (1-0.001764883459848266)
 
     # Smoothing signal
-    # indRefMid = int(np.ceil(np.mean(indRefH)))
-    indRefMid = int(np.round(np.mean(indRefH)))  # Changed to round to match matlab implementation more closely | Matlab code: indRefMid = int32(mean(indRefAlt));
+    # indRefMid = int(np.ceil(np.mean(refHInd)))
+    indRefMid = int(np.round(np.mean(refHInd)))  # Changed to round to match matlab implementation more closely | Matlab code: indRefMid = int32(mean(indRefAlt));
     # RCS = uniform_filter(RCS, window_size)
     RCS = uniform_filter1d(RCS, window_size)
-    RCS[indRefMid] = np.nanmean(RCS[indRefH[0]:indRefH[1] + 1])
+    RCS[indRefMid] = np.nanmean(RCS[refHInd[0]:refHInd[1] + 1])
 
     # Initialize parameters
     aerBsc = np.full(height.shape[0], np.nan)

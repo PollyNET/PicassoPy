@@ -10,7 +10,7 @@ sigma_angstroem:float = 0.2
 MC_count:int = 3
 
 
-def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, nr:bool=False, collect_debug:bool=True) -> dict:
+def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, nr:bool=False, collect_debug:bool=False) -> dict:
     """Run raman retrieval for each cloud free region.
 
     Parameters
@@ -164,11 +164,10 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                     opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
                     continue
 
-                refH = height[np.array(refHInd)]
                 hFullOverlap = heightFullOverlap[i][data_cube.gf(wv, t, tel)][0]
                 hBaseInd = np.argmax(height >= (hFullOverlap + config_dict[f'{key_smooth}{wv}'] / 2 * hres))
                 print(hFullOverlap, config_dict[f'{key_smooth}{wv}'] / 2 * hres)
-                print('refHInd', refHInd, 'refH', refH, 'hBaseInd', hBaseInd, 'hBase', height[hBaseInd])
+                print('refHInd', refHInd, 'refH', height[np.array(refHInd)], 'hBaseInd', hBaseInd, 'hBase', height[hBaseInd])
 
                 # Calculate SNR in the reference height
                 SNRRef = calc_snr(
@@ -217,7 +216,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                         beta_mol=molBsc,
                         ext_mol_raman=molExt_r,
                         beta_mol_inela=molBsc_r,
-                        HRef=refH,
+                        HRefInd=refHInd,
                         betaRef=refBeta,
                         window_size=config_dict[f'{key_smooth}{wv}'],
                         flagSmoothBefore=True,
@@ -382,7 +381,7 @@ def raman_bsc(
         beta_mol:np.ndarray,
         ext_mol_raman:np.ndarray,
         beta_mol_inela:np.ndarray,
-        HRef:list|tuple,
+        HRefInd:list|tuple,
         betaRef:float,
         window_size:int=40,
         flagSmoothBefore:bool=True,
@@ -418,8 +417,8 @@ def raman_bsc(
         Molecular extinction coefficient for Raman wavelength.
     beta_mol_inela :ndarray
         Molecular backscatter coefficient for inelastic wavelength.
-    HRef : list or tuple
-        Reference region [m].
+    HRefInd : list or tuple
+        Reference region indices [start, end].
     betaRef : float
         Aerosol backscatter coefficient at the reference region.
     window_size : int
@@ -476,7 +475,7 @@ def raman_bsc(
         beta_mol=beta_mol,
         ext_mol_raman=ext_mol_raman,
         beta_mol_inela=beta_mol_inela,
-        HRef=HRef,
+        HRefInd=HRefInd,
         betaRef=betaRef,
         window_size=window_size,
         flagSmoothBefore=flagSmoothBefore,
@@ -486,7 +485,7 @@ def raman_bsc(
 
     # Calculate beta_aer_std:
     if method.lower() == 'monte-carlo':
-        hRefIdx = (height >= HRef[0]) & (height < HRef[1])
+        hRefIdx = (height >= height[HRefInd[0]]) & (height < height[HRefInd[1]])
         rel_std_betaRef = 0.1   # hard coded
         betaRefSample = sigGenWithNoise(betaRef, rel_std_betaRef * np.mean(beta_mol[hRefIdx]), MC_count[3], 'norm').T
         angstroemSample = sigGenWithNoise(angstroem, sigma_angstroem, MC_count[0], 'norm').T
@@ -510,7 +509,7 @@ def raman_bsc(
                                 beta_mol=beta_mol,
                                 ext_mol_raman=ext_mol_raman,
                                 beta_mol_inela=beta_mol_inela,
-                                HRef=HRef,
+                                HRefInd=HRefInd,
                                 betaRef=betaRefSample[iM],
                                 window_size=window_size,
                                 flagSmoothBefore=flagSmoothBefore,
@@ -543,7 +542,7 @@ def calc_raman_bsc(
         beta_mol:np.ndarray,
         ext_mol_raman:np.ndarray,
         beta_mol_inela:np.ndarray, 
-        HRef:list,
+        HRefInd:list,
         betaRef:float,
         window_size:int=40,
         flagSmoothBefore:bool=True,
@@ -572,8 +571,8 @@ def calc_raman_bsc(
         Molecular extinction coefficient for Raman wavelength [m^{-1}].
     beta_mol_inela : array
         Molecular inelastic backscatter coefficient [m^{-1}Sr^{-1}].
-    HRef : list
-        Reference region in meters [start, end].
+    HRefInd : list
+        Reference region in indices [start, end].
     betaRef : float
         Aerosol backscatter coefficient at the reference region [m^{-1}Sr^{-1}].
     window_size : int, optional
@@ -613,15 +612,16 @@ def calc_raman_bsc(
     """
     ext_aer[~np.isfinite(ext_aer)] = 0
 
-    if HRef[0] >= height[-1] or HRef[1] <= height[0]:
+    if height[HRefInd[0]] >= height[-1] or height[HRefInd[1]] <= height[0]:
+        # What is the purpouse of this check??? is it not better to check
+        # if height[0] > height[HRef[0]] or height[-1] < height[HRef[1]]
         raise ValueError("HRef is out of range.")
 
     ext_aer_factor = (el_lambda / inel_lambda) ** angstroem
     dH = height[1] - height[0]  # Height resolution in meters
 
-    # Indices for the reference region and midpoint
-    HRefIndx = [int((HRef[0] - height[0]) / dH), int((HRef[1] - height[0]) / dH)]
-    refIndx = int((np.mean(HRef) - height[0]) / dH)
+    # Reference region midpoint
+    refIndx = int(np.mean(HRefInd))
 
     # Calculate extinction coefficient at inelastic wavelength
     ext_aer_raman = ext_aer * ext_aer_factor
@@ -633,8 +633,8 @@ def calc_raman_bsc(
     aer_vr_OD = np.nansum(ext_aer_raman[:refIndx + 1]) * dH - np.nancumsum(ext_aer_raman) * dH      
 
     # Calculate signal ratios at reference height
-    elMean = sigElastic[HRefIndx[0]:HRefIndx[1] + 1] / (beta_mol[HRefIndx[0]:HRefIndx[1] + 1] + betaRef)     
-    vrMean = sigVRN2[HRefIndx[0]:HRefIndx[1] + 1] / beta_mol[HRefIndx[0]:HRefIndx[1] + 1]
+    elMean = sigElastic[HRefInd[0]:HRefInd[1] + 1] / (beta_mol[HRefInd[0]:HRefInd[1] + 1] + betaRef)     
+    vrMean = sigVRN2[HRefInd[0]:HRefInd[1] + 1] / beta_mol[HRefInd[0]:HRefInd[1] + 1]
 
     # Compute aerosol backscatter coefficient
     if not flagSmoothBefore:
