@@ -590,14 +590,25 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
 
     if numTest == 0:
         if flagShowDetail:
-            print('None clean region is found.')
+            print('None clean region found.')
         return np.nan, np.nan
 
     # search the best fit region
     X_val = (np.abs(mean_resid) * np.abs(std_resid) * np.abs(slope_resid) * 
              np.abs(msre_resid) * np.abs(Astat) / SNR_ref)
     X_val[X_val == 0] = np.nan
+
+    # QuicFix for all NaN arrays:
+    if np.isnan(X_val).all():
+        print("None valid clean region found.")
+        return np.nan, np.nan
     indxBest_Int = np.nanargmin(X_val)
+
+    # # Matlab equivalent code:
+    # try:
+    #     indxBest_Int = np.nanargmin(X_val)
+    # except ValueError:
+    #     indxBest_Int = 0
     
     # print('hIndB_Test', hIndxB_Test)
     # print('hIndT_Test', hIndxT_Test)
