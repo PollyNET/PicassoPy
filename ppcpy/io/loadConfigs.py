@@ -213,7 +213,8 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                     fix_indexing_keys = ['first_range_gate_indx']
                 elif 'LC' in polly_default_config_file_dict.keys():
                     fix_indexing_keys = ['LC']
-                return fix_indexing(polly_config_dict, keys=fix_indexing_keys + ['bgCorRangeIndx', 'bgCorRangeIndxLow', 'bgCorRangeIndxHigh', 'LCMeanMinIndx', 'LCMeanMaxIndx'])
+                return fix_indexing(polly_config_dict, keys=fix_indexing_keys + ['bgCorRangeIndx', 'LCMeanMinIndx', 'LCMeanMaxIndx'])
+                # return fix_indexing(polly_config_dict, keys=fix_indexing_keys + ['bgCorRangeIndx', 'bgCorRangeIndxLow', 'bgCorRangeIndxHigh', 'LCMeanMinIndx', 'LCMeanMaxIndx'])
                 
             except Exception:
                 logging.warning(f'polly_config_file: {polly_config_file} can not be processed.', exc_info=True)

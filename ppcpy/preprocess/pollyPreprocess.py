@@ -208,7 +208,8 @@ def pollyRemoveBG(rawSignal:np.ndarray, bgCorrectionIndexLow:list, bgCorrectionI
     # Calculate the mean across the channel specific column range for each row and page
     mean_matrix = np.empty((rawSignal.shape[0], 1, rawSignal.shape[2]), dtype=rawSignal.dtype)
     for iCh in range(rawSignal.shape[2]):
-        mean_matrix[:, :, iCh] = np.mean(rawSignal[:, bgCorrectionIndexLow[iCh]:bgCorrectionIndexHigh[iCh] + 1, iCh], axis=1, keepdims=True)
+        mean_matrix[:, :, iCh] = np.mean(rawSignal[:, bgCorrectionIndexLow[iCh]:bgCorrectionIndexHigh[iCh], iCh], axis=1, keepdims=True)
+        # mean_matrix[:, :, iCh] = np.mean(rawSignal[:, bgCorrectionIndexLow[iCh]:bgCorrectionIndexHigh[iCh] + 1, iCh], axis=1, keepdims=True)
 
     # Replicate the mean matrix along the second dimension
     bg = np.tile(mean_matrix, (1, maxHeightBin, 1))

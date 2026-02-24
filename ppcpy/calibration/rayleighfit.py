@@ -123,8 +123,8 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
     
     """
-    return uniform_filter(signal, window_len)
-    # return uniform_filter1d(signal, window_len, mode='nearest')
+    # return uniform_filter(signal, window_len)                     # ==> No crash
+    return uniform_filter1d(signal, window_len, mode='nearest')     # ==> Crash
 
 
 def DouglasPeucker(signal:np.ndarray, height:np.ndarray, epsilon:float, heightBase:float,
@@ -186,12 +186,24 @@ def DouglasPeucker(signal:np.ndarray, height:np.ndarray, epsilon:float, heightBa
         return []
 
     # Smooth the signal
-
+    print(f"scaRatio slice    ==>   # of NaNs: {np.sum(np.isnan(signal[hBaseIndx:hTopIndx+1]))}, # of zeros: {np.sum(signal[hBaseIndx:hTopIndx+1] == 0)}, # of negative values: {np.sum(signal[hBaseIndx:hTopIndx+1] < 0)}, shape: {signal[hBaseIndx:hTopIndx+1].shape}")
     signalTmp = smooth_signal(signal[hBaseIndx:hTopIndx+1], window_size)
+    """Test if it is the NaN values or just rounding differences between the filters that is causing the crash
+    by recreating the NaN values at the ends of the new smoothing filter. This is in theory the same as changing
+    hBaseIndx and hTopIndx. ==> Result: it is the added NaN values and not the rounding differences that effects the crash."""
+    # start = end = int((window_size - 1)/2)
+    # if window_size % 2 == 0:
+    #     start += 1
+    # signalTmp[:start] = np.nan
+    # signalTmp[-end:] = np.nan
+
+    print(f"signalTmp       ==>   # of NaNs: {np.sum(np.isnan(signalTmp))}, # of zeros: {np.sum(signalTmp == 0)}, # of negative values: {np.sum(signalTmp < 0)}, shape: {signalTmp.shape}")
     heightTmp = height[hBaseIndx:hTopIndx+1]
     posIndx = np.where(signalTmp > 0)[0]
     signalTmp = signalTmp[posIndx]
     heightTmp = heightTmp[posIndx]
+    print(f"slice: {[hBaseIndx, hTopIndx+1]}, posIndx: {posIndx.shape}, signalTmp: {signalTmp.shape}, heightTmp: {heightTmp.shape}")
+    # print(f"posIndx: {posIndx}, signalTmp: {signalTmp}, heightTmp: {heightTmp}")
 
     if len(signalTmp) < 2:
         return np.array([1, hTopIndx - hBaseIndx + 1])
@@ -430,17 +442,19 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
         test1 = test2 = test3 = test4 = test5 = True
         iDpBIndx = dpIndx[iIndx]
         iDpTIndx = dpIndx[iIndx + 1] + 1 # matlab slicing issue??
-        #print(iIndx, iDpBIndx, iDpTIndx)
+        print(iIndx, iDpBIndx, iDpTIndx)
 
         # check layer thickness
         if not ((height[iDpTIndx] - height[iDpBIndx]) > layerThickConstrain):
             if flagShowDetail:
                 print(f'Region {iIndx}: {height[iDpBIndx]} - {height[iDpTIndx]} '
                       f'is less than {layerThickConstrain:5.1f}m')
+            print("layer thicknes check faild")
             continue
 
         # normalize the recorded signal to the molecular signal
         if np.sum(sig_aer[iDpBIndx:iDpTIndx]) == 0:
+            print("sig_aer = 0 in search region, skipping this index pair")
             continue
 
         sig_factor = np.nanmean(sig_mol[iDpBIndx:iDpTIndx]) / \
@@ -464,6 +478,7 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
             meanSig_mol = np.nanmean(sig_mol[slice_range])
 
             if not ((meanSig_aer + deltaSig_aer/3) >= meanSig_mol):
+                print("test2 failed")
                 if flagShowDetail:
                     print(f'Region {iIndx}: {height[iDpBIndx]} - '
                           f'{height[iDpTIndx]} fails in near and far-Range '
@@ -487,6 +502,7 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
         x = height[iDpBIndx:iDpTIndx] / 1e3
 
         if len(residual) <= 10:
+            print("test3 failed: residual")
             if flagShowDetail:
                 print(f'Region {iIndx}: signal is too noisy.')
             test3 = False
@@ -503,6 +519,7 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
         d = np.sum(np.diff(et)**2) / np.sum(et**2)
 
         if not (1 <= d <= 3):
+            print("test3 faild: d")
             if flagShowDetail:
                 print(f'Region {iIndx}: {height[iDpBIndx]} - '
                       f'{height[iDpTIndx]} fails in white-noise criterion.')
@@ -517,6 +534,7 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
         #print('SNR', sigsum, '/', bgsum, '=', SNR)
         
         if SNR < SNRConstrain:
+            print("Test4 failed : SNRConstrain")
             if flagShowDetail:
                 print(f'Region {iIndx}: {height[iDpBIndx]} - '
                       f'{height[iDpTIndx]} fails in SNR criterion.')
@@ -540,6 +558,7 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
         y_mol = np.log(y_mol)
 
         if len(y_aer) <= 10:
+            print("test5 failed: y_aer")
             if flagShowDetail:
                 print(f'Region {iIndx}: signal is too noisy.')
             test5 = False
@@ -556,6 +575,7 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
                          slopeConstrain))
 
         if not slope_condition:
+            print("test5 failed: slope_condition")
             if flagShowDetail:
                 print(f'Slope_aer: {aerSlope}, delta_Slope_aer: {deltaAerSlope}, '
                       f'Slope_mol: {molSlope}')
@@ -567,7 +587,8 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
         if not (test1 and test2 and test3 and test4 and test5):
             print("one tests failed?")
             continue
-
+        
+        print("All tests passed!")
         # save statistics
         numTest += 1
         hIndxB_Test[numTest-1] = dpIndx[iIndx]
@@ -593,21 +614,29 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
             print('None clean region is found.')
         return np.nan, np.nan
 
+    # Print results
+    print('hIndB_Test', hIndxB_Test)
+    print('hIndT_Test', hIndxT_Test)
+    print('mean_resid', mean_resid)
+    print('std_resid', std_resid)
+    print('slope_resid', slope_resid)
+    print('msre_resid', msre_resid)
+    print('SNR_ref', SNR_ref)
+    print('Astat', Astat)
+
     # search the best fit region
     X_val = (np.abs(mean_resid) * np.abs(std_resid) * np.abs(slope_resid) * 
              np.abs(msre_resid) * np.abs(Astat) / SNR_ref)
     X_val[X_val == 0] = np.nan
     indxBest_Int = np.nanargmin(X_val)
-    
-    # print('hIndB_Test', hIndxB_Test)
-    # print('hIndT_Test', hIndxT_Test)
-    # print('mean_resid', mean_resid)
-    # print('std_resid', std_resid)
-    # print('slope_resid', slope_resid)
-    # print('msre_resid', msre_resid)
-    # print('SNR_ref', SNR_ref)
-    # print('Astat', Astat)
-    # print('X_val', X_val)
+
+    # # Matlab equivalent code
+    # if np.isnan(X_val).all():
+    #     indxBest_Int = 0
+    # else:
+    #     indxBest_Int = np.nanargmin(X_val)
+
+    print('X_val', X_val)
 
     if flagShowDetail:
         print(f'The best interval is {height[int(hIndxB_Test[indxBest_Int])]} - '
