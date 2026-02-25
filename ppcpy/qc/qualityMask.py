@@ -25,10 +25,10 @@ def qualityMask(data_cube):
 
     for ich, ch in enumerate(data_cube.retrievals_highres['channel']):
         print(ich, ch)
-        quality_mask[:, :, ich][data_cube.retrievals_highres['lowSNRMask'][:,:,ich]] = 1
-        quality_mask[data_cube.retrievals_highres['depCalMask'],:,ich] = 2
-        quality_mask[data_cube.retrievals_highres['shutterOnMask'],:,ich] = 3
-        quality_mask[data_cube.retrievals_highres['fogMask'],:,ich] = 4
-        quality_mask[:,:,ich][data_cube.flagSaturation[:,:,ich]] = 5
+        quality_mask[:, :, ich][data_cube.retrievals_highres['lowSNRMask'][:, :, ich]] = 1
+        quality_mask[data_cube.retrievals_highres['depCalMask'], :, ich] = 2
+        quality_mask[data_cube.retrievals_highres['shutterOnMask'], :, ich] = 3
+        quality_mask[data_cube.retrievals_highres['fogMask'], :, ich] = 4
+        quality_mask[:, :, ich][data_cube.flagSaturation[:, :, ich]] = 5
 
     return quality_mask

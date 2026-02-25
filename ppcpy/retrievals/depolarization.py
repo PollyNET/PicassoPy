@@ -1,13 +1,38 @@
-
 import logging
 import numpy as np
 
-from scipy.ndimage import uniform_filter1d
-def smooth_signal(signal, window_len):
-    return uniform_filter1d(signal, size=window_len, mode='nearest')
+from ppcpy.misc.helper import uniform_filter
+
+
+def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
+    """Uniformly smooth the input signal
+    
+    Parameters
+    ----------
+    singal : ndarray
+        Signal to be smooth
+    window_len : int
+        Width of the applied uniform filter
+
+    Returns
+    -------
+    ndarray
+        Smoothed signal
+    
+    History
+    -------
+    - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
+    
+    """
+    return uniform_filter(signal, window_len)
+
 
 def voldepol_cldFreeGrps(data_cube, ret_prof_name):
     """
+    TODO: Should the GHK-Transmission corrected (TCor) or the Background corrected (BGCor)
+    signal be used for calculating the volume depolarisation ratio?
+    >>> With the GHK formula the BGCor signal has to be used (in the current implementation, the voldepol is even 
+    >>> needed to perform the polarization-transmission-correction
     """
 
     config_dict = data_cube.polly_config_dict
@@ -133,10 +158,14 @@ def calc_profile_vdr(sigt, sigc, Gt, Gr, Ht, Hr, eta,
 
     print(f"G {Gt} {Gr} H {Ht} {Hr} Eta {eta} error {voldepol_error} Window {window} ")
     # Smooth signals before or after ratio calculation
-    if flag_smooth_before:
-        sig_ratio = smooth_signal(sigc, window) / smooth_signal(sigt, window)
-    else:
-        sig_ratio = smooth_signal(sigc / sigt, window)
+    sig_ratio = sigc / sigt
+    if window > 1: # smoothing with a window size of 1 equals no smoothing
+        if flag_smooth_before:
+            sig_ratio = smooth_signal(sigc, window) / smooth_signal(sigt, window)
+        else:
+            sig_ratio = smooth_signal(sigc / sigt, window)
+    elif window < 1:
+        raise ValueError("Unsupported smoothing window size")
 
     # Calculate volume depolarization ratio using GHK parameters
     vol_depol = (sig_ratio / eta * (Gt + Ht) - (Gr + Hr)) / ((Gr - Hr) - sig_ratio / eta * (Gt - Ht))

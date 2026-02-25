@@ -3,8 +3,8 @@ import logging
 from collections import defaultdict
 import pprint
 import numpy as np
-from scipy.ndimage import uniform_filter1d
 
+from ppcpy.misc.helper import uniform_filter
 from ppcpy.retrievals.collection import calc_snr
 
 
@@ -13,8 +13,27 @@ def onemx_onepx(x):
     """calculate the fraction of (1-x)/(1+x)"""
     return (1-x)/(1+x)
 
-def smooth_signal(signal, window_len):
-    return uniform_filter1d(signal, size=window_len, mode='nearest')
+def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
+    """Uniformly smooth the input signal
+    
+    Parameters
+    ----------
+    singal : ndarray
+        Signal to be smooth
+    window_len : int
+        Width of the applied uniform filter
+
+    Returns
+    -------
+    ndarray
+        Smoothed signal
+    
+    History
+    -------
+    - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
+    
+    """
+    return uniform_filter(signal, window_len)
 
 
 def loadGHK(data_cube):

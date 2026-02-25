@@ -1,21 +1,34 @@
-
-
 import numpy as np
 from ppcpy.misc.helper import mean_stable
 
 elastic2raman = {355: 387, 532: 607}
 
 
-def lc_for_cldFreeGrps(data_cube, retrieval):
-    """ 
-    Estimate the lidar constant from the optical profiles.
+def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
+    """Estimate the lidar constant from the optical profiles.
 
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
+    retrieval : str
+        Retrieval type. 'klett' or 'raman'.
+    
+    Returns
+    -------
+    LCs : list
+        Lidar constant for retrieval type per channel per cloud free period.
 
-    Updates:
-        For NR done directly form the optical profiles,
-        whereas in the matlab version, the LC*olAttri387.sigRatio is taken
+    Notes
+    -----
+    - For NR, done directly form the optical profiles, whereas in the matlab
+      version, the LC*olAttri387.sigRatio is taken.
+    - TODO: Change back to Picasso version to check if lidar calibration
+      constatns get more similar.
+    - TODO: Check if LC's are normalized with respect to the mean of 
+      the profiles.
+
     """
-
     print("retival", retrieval)
     height = data_cube.retrievals_highres['range']
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
@@ -32,6 +45,8 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
 
         for channel in profiles:
             wv, t, tel = channel.split('_')
+
+            # Telescope type dependent configurations:
             if tel == 'NR':
                 key_smooth = f'smoothWin_{retrieval}_NR_'
             else:
@@ -41,22 +56,24 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
             hBaseInd = np.argmax(
                 height >= (hFullOverlap + config_dict[f'{key_smooth}{wv}'] / 2 * hres))
 
+            # Elastic signals:
             sig = profiles[channel]['signal']
             signal = np.nanmean(np.squeeze(
                 data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree), :, data_cube.gf(wv, t, tel)]), axis=0)
             molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
             molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :]
 
+            # Check for avaiabel retrievals:
             if not ('aerExt' in profiles[channel] and 'aerBsc' in profiles[channel]):
-                print(f'skipping {channel} {cldFree}')
+                print(f'No availabel retrievals, skipping {channel} {cldFree}')
                 continue
 
             aerExt = profiles[channel]['aerExt'].copy()
             aerExt[:hBaseInd] = aerExt[hBaseInd]
             aerBsc = profiles[channel]['aerBsc']
 
-            aerOD = np.cumsum(aerExt * np.concatenate(([height[0]], np.diff(height))))
-            molOD = np.cumsum(molExt * np.concatenate(([height[0]], np.diff(height))))
+            aerOD = np.nancumsum(aerExt * np.concatenate(([height[0]], np.diff(height))))
+            molOD = np.nancumsum(molExt * np.concatenate(([height[0]], np.diff(height))))
 
             trans = np.exp(-2 * (aerOD + molOD))
             bsc = molBsc + aerBsc
@@ -68,10 +85,18 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
                 minBin=config_dict['LCMeanMinIndx'],
                 maxBin=config_dict['LCMeanMaxIndx']
             )
+            print(f"cldFreGrp {i}, Channel {wv} {t} {tel}, LC_stable {LC_stable}, LCStd {LCStd}")
+
+            if LC_stable is None:
+                print(f'Can not find a stable LC value, skipping {channel} {cldFree}')
+                continue
+
             LCs[i][channel] = {'LC': LC_stable, 'LCStd': LC_stable * LCStd}
 
             if retrieval == 'raman' and int(wv) in elastic2raman.keys():
                 wv_r = elastic2raman[int(wv)] 
+
+                # Inelastic signals:
                 signal_r = np.nanmean(np.squeeze(
                     data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree), :, data_cube.gf(wv_r, t, tel)]), axis=0)
                 #molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i, :]
@@ -85,25 +110,52 @@ def lc_for_cldFreeGrps(data_cube, retrieval):
 
                 LC_r = signal_r * height**2 / bsc / trans_r
                 LC_r_stable, _, LCStd_r = mean_stable(
-                    LC_r, config_dict['LCMeanWindow'], 
-                    minBin=config_dict['LCMeanMinIndx'], maxBin=config_dict['LCMeanMaxIndx'])
+                    x=LC_r,
+                    win=config_dict['LCMeanWindow'], 
+                    minBin=config_dict['LCMeanMinIndx'],
+                    maxBin=config_dict['LCMeanMaxIndx']
+                )
+                print(f"cldFreGrp {i}, Channel {wv_r} {t} {tel}, LC_stable {LC_r_stable}, LCStd {LCStd_r}")
+
+                if LC_r_stable is None:
+                    print(f'Can not find a stable LC value, skipping {channel} {cldFree}')
+                    continue
+
                 LCs[i][f"{wv_r}_{t}_{tel}"] = {'LC': LC_r_stable, 'LCStd': LC_r_stable * LCStd_r}
 
-                return LCs
+    return LCs
 
 
-def get_best_LC(LCs):
-    """ get lidar constant with the lowest standard deviation
-     
+def get_best_LC(LCs:list) -> dict:
+    """Get lidar constant with the lowest standard deviation.
+
+    Parameters
+    ----------
+    LCs : list
+        Lidar constant for each channel per cloud free period.
+    
+    Returns
+    -------
+    LCused : dict
+        Lidar constants with lowest standard deviation per channel.
+    
+    History
+    -------
+    - 2026-02-16: Added additional checks to hinder negative LCs to be chosen.
+
+    Notes
+    -----
+    - Since LC = LC_sable and LCStd = LC_stable * LC_Std so will any negative LC also have
+      a negative LCStd, and thus be chosen as the best LC.
+        
     """
-
     # list comprehension for nested list
     all_channels = set([k for e in LCs for k in e.keys()])
     
     LCused = {}
     for channel in all_channels:
-        lcs = np.array([e[channel]['LC'] for e in LCs if channel in e])
-        lcsstd = np.array([e[channel]['LCStd'] for e in LCs if channel in e])
+        lcs = np.array([e[channel]['LC'] for e in LCs if channel in e and e[channel]['LC'] >= 0])
+        lcsstd = np.array([e[channel]['LCStd'] for e in LCs if channel in e and e[channel]['LCStd'] >= 0])
 
         LCused[channel] = lcs[np.argmin(lcsstd)]
     return LCused

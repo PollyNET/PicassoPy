@@ -162,11 +162,9 @@ class PicassoProc:
             logging.info('date in nc-file will be replaced with date of filename.')
             np_array = np.array(self.rawdata_dict['measurement_time']['var_data']) ## converting to numpy-array for easier numpy-operations
             mdate = self.mdate_filename()
-            np_array[:,0] = mdate ## assign new date value to the whole first column of the 2d-numpy-array
+            np_array[:, 0] = mdate ## assign new date value to the whole first column of the 2d-numpy-array
             self.rawdata_dict['measurement_time']['var_data'] = np_array
             return self
-        else:
-            pass
 
     def setChannelTags(self):
         """set the channel tags
@@ -261,7 +259,23 @@ class PicassoProc:
 
         return self
 
-    def preprocessing(self, collect_debug=False):
+    def preprocessing(self, collect_debug:bool=False):
+        """
+        Preprocessing of Lidar data. Including in the followin processes in order:
+            Dead time correction
+            Background correction
+            Range correction
+            etc. 
+        
+        Returns:
+            - Background corrected signal including the background per channel.
+            - Range corrected signal.
+            - etc.
+
+        TODO:
+            - This is just a first draft for a docstring. Improve it. There is more
+              processes and outputs of the function.        
+        """
         preproc_dict = pollyPreprocess.pollyPreprocess(
             self.rawdata_dict,
             deltaT=self.polly_config_dict['deltaT'],
@@ -306,6 +320,9 @@ class PicassoProc:
         return self
 
     def SaturationDetect(self):
+        """
+        Saturation Detection ...
+        """
 
         self.flagSaturation = pollySaturationDetect.pollySaturationDetect(
             data_cube = self,
@@ -345,7 +362,9 @@ class PicassoProc:
 
     def aggregate_profiles(self, var=None):
         """
-        
+        Aggregate highres profiles over cloud free segments
+
+        TODO: Decide on a consistent way for doing the aggregation, do not mix mean and sum
         """
 
         if var == None:
@@ -355,14 +374,22 @@ class PicassoProc:
                 preprocprofiles.aggregate_clFreeGrps(self, 'sigBGCor')
             self.retrievals_profile['BG'] = \
                 preprocprofiles.aggregate_clFreeGrps(self, 'BG')
+            
+            # Remove empty dict keys (temporarly solution)
+            for v in ['RCS', 'sigBGCor', 'BG']:
+                if self.retrievals_profile[v] is None:
+                    del self.retrievals_profile[v]
 
         else:
             self.retrievals_profile[var] = \
                 preprocprofiles.aggregate_clFreeGrps(self, var)
-
+            
+            # Remove empty dict keys (temporarly solution)
+            if self.retrievals_profile[var] is None:
+                del self.retrievals_profile[var]
 
     def loadMeteo(self):
-
+        """ Load meteorological data """
         self.met = readMeteo.Meteo(
             self.polly_config_dict['meteorDataSource'], 
             self.polly_config_dict['meteo_folder'],
@@ -373,7 +400,10 @@ class PicassoProc:
 
 
     def loadAOD(self):
-        """"""
+        """ 
+        TODO: Not yet implemented!
+        """
+        # raise NotImplementedError
         pass
 
 
@@ -416,7 +446,16 @@ class PicassoProc:
 
     def transCor(self):
         """
-        
+        TODO:
+        flagTransCor = True:
+            Fix the GHK - Transmission correction
+        flagTransCor = False:
+            Check if it is correct to use the BG corrected signal and find a better solution.
+            It is a bit confusing to overwrite the signal as it is called sigTCor but actually is sigBGCor
+            Like storing a dedicated signal dict to be used throuhot the processing, the dictionary could
+            have elements like signal (sig), background (bg), and name. which we could overwrite each time 
+            a new correction is made. And by checking the name of the signal (TCor, BGCor) you can find out
+            which signal it is.
         """
 
         if self.polly_config_dict['flagTransCor']:
@@ -425,6 +464,8 @@ class PicassoProc:
                   transCor.transCorGHK_cube(self)
         else:
             logging.warning('NO transmission correction')
+            self.retrievals_highres['sigTCor'], self.retrievals_highres['BGTCor'] = \
+                self.retrievals_highres['sigBGCor'], self.retrievals_highres['BG']
 
 
     def retrievalKlett(self, oc=False, nr=False):
@@ -434,14 +475,16 @@ class PicassoProc:
         retrievalname = 'klett'
         kwargs = {}
         if oc:
+            # Check if overlap corrected signal exist
+            if "sigOLCor" not in self.retrievals_highres:   # This should be done more general not only for OLCor but for other signals as well.
+                return
             retrievalname +='_OC'
             kwargs['signal'] = 'OLCor'
         if nr:
             kwargs['nr'] = True
 
         print('retrievalname', retrievalname)
-        self.retrievals_profile[retrievalname] = \
-            klettfernald.run_cldFreeGrps(self, **kwargs)
+        self.retrievals_profile[retrievalname] = klettfernald.run_cldFreeGrps(self, **kwargs)
         if retrievalname not in self.retrievals_profile['avail_optical_profiles']:
             self.retrievals_profile['avail_optical_profiles'].append(retrievalname)
 
@@ -453,6 +496,9 @@ class PicassoProc:
         retrievalname = 'raman'
         kwargs = {}
         if oc:
+            # Check if overlap corrected signal exist
+            if "sigOLCor" not in self.retrievals_highres:   # This should be done more general not only for OLCor but for other signals as well.
+                return
             retrievalname +='_OC'
             kwargs['signal'] = 'OLCor'
 
@@ -465,31 +511,32 @@ class PicassoProc:
             kwargs['nr'] = True
         kwargs['collect_debug'] = collect_debug
 
-        self.retrievals_profile[retrievalname] = \
-            raman.run_cldFreeGrps(self, **kwargs)
+        self.retrievals_profile[retrievalname] = raman.run_cldFreeGrps(self, **kwargs)
         if retrievalname not in self.retrievals_profile['avail_optical_profiles']:
             self.retrievals_profile['avail_optical_profiles'].append(retrievalname)
 
 
-    def overlapCalc(self):
+    def overlapCalc(self, collect_debug=False):
         """estimate the overlap function
 
         different to the matlab version, where an average over all cloud
         free periods is taken, it is done here per cloud free segment
             
         """
-
+        if not self.polly_config_dict["flagOLCor"]:
+            return
         self.retrievals_profile['overlap'] = {}
-        self.retrievals_profile['overlap']['frnr'] = overlapEst.run_frnr_cldFreeGrps(self)
-        self.retrievals_profile['overlap']['raman'] = overlapEst.run_raman_cldFreeGrps(self)
+        self.retrievals_profile['overlap']['frnr'] = overlapEst.run_frnr_cldFreeGrps(self, collect_debug=collect_debug)
+        self.retrievals_profile['overlap']['raman'] = overlapEst.run_raman_cldFreeGrps(self, collect_debug=collect_debug)
     
     def overlapFixLowestBins(self):
         """the lowest bins are affected by stange near range effects"""
-
+        if not self.polly_config_dict["flagOLCor"]:
+            return
         height = self.retrievals_highres['range']
         for k in self.retrievals_profile['overlap']:
-            return overlapCor.fixLowest(
-                self.retrievals_profile['overlap'][k], np.where(height > 800)[0][0])
+            print(f"Fixing lower bins for {k} overlap functions")
+            overlapCor.fixLowest(self.retrievals_profile['overlap'][k], np.where(height > 800)[0][0])
 
 
     def overlapCor(self):
@@ -497,11 +544,10 @@ class PicassoProc:
 
         the overlap correction is implemented differently to the matlab version
         first a 2d (time, height) correction array is constructed then it is applied.
-        In future this will allow for time variing overlap functions
+        In future this will allow for time varing overlap functions
         
         """
-
-        if self.polly_config_dict['overlapCorMode'] == 0:
+        if self.polly_config_dict['overlapCorMode'] == 0 or not self.polly_config_dict["flagOLCor"]:
             logging.info('no overlap Correction')
             return self
         logging.info('overlap Correction')
@@ -520,7 +566,7 @@ class PicassoProc:
     def calcDepol(self):
         """
         """
-        
+
         for ret_prof_name in self.retrievals_profile['avail_optical_profiles']:
             print(ret_prof_name)
         
@@ -530,7 +576,8 @@ class PicassoProc:
                 self, ret_prof_name) 
 
     def estQualityMask(self):
-
+        """
+        """
         self.retrievals_highres['quality_mask'] = qualityMask.qualityMask(self)
 
 
@@ -545,6 +592,8 @@ class PicassoProc:
 
     def LidarCalibration(self):
         """
+        TODO: Add option to read constants from database.
+        TODO: Find out how we prioritise raman, klett, and database retrieved LC...
         """
         self.LC = {}
         self.LC['klett'] = lidarconstant.lc_for_cldFreeGrps(
@@ -553,7 +602,8 @@ class PicassoProc:
             self, 'raman')
         
         logging.warning('reading calibration constant from database not working yet')
-        self.LCused = lidarconstant.get_best_LC(self.LC['raman'])
+        # Prioritise Raman retrieved LCs but use Klett retrieved ones when no Raman retrieval exists.
+        self.LCused = lidarconstant.get_best_LC(self.LC['klett']) | lidarconstant.get_best_LC(self.LC['raman'])
 
 
     def attBsc_volDepol(self):
@@ -577,7 +627,7 @@ class PicassoProc:
 
 
     def quasiV1(self):
-        """
+        """quasiV1 retrivals and target categorisation.
         """
 
         quasiV1.quasi_bsc(self)
@@ -586,7 +636,7 @@ class PicassoProc:
         quasi.target_cat(self, version='V1')
 
     def quasiV2(self):
-        """
+        """quasiV2 retrivals and target categorisation.
         """
 
         quasiV2.quasi_bsc(self)

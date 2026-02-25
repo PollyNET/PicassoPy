@@ -3,17 +3,59 @@ import logging
 import numpy as np
 import itertools
 
-from scipy.ndimage import uniform_filter1d
-def smooth_signal(signal, window_len):
-    return uniform_filter1d(signal, size=window_len, mode='nearest')
+from ppcpy.misc.helper import uniform_filter
 
+def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
+    """Uniformly smooth the input signal.
+    
+    Parameters
+    ----------
+    singal : ndarray
+        Signal to be smooth.
+    window_len : int
+        Width of the applied uniform filter.
 
-def ae_cldFreeGrps(data_cube, ret_prof_name):
+    Returns
+    -------
+    ndarray
+        Smoothed signal.
+    
+    History
+    -------
+    - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter.
+    
     """
+    return uniform_filter(signal, window_len)
 
-    convention for now to store the AE in the channel of the lower of the two wavelengths
+
+def ae_cldFreeGrps(data_cube, ret_prof_name:str, collect_debug:bool=False) -> dict:
+    """Run Angstroem retrieval for each cloud free region.
+
+    Convention for now to store the AE in the channel of the lower of the two wavelengths
+
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
+    ret_prof_name : str
+        Name of optical retrieval profile.
+    collect_debug : bool, optional
+        If true, collects debug information. Default is False.
+    
+    Returns
+    -------
+    angexp : array
+        Ångström exponent based on param1 and param2.
+    angexpStd : array
+        Uncertainty of Ångström exponent.
+    
+    History
+    -------
+    - xxxx-xx-xx: TODO: First edition by ...
+    - 2026-02-20: Smoothing window changes. Now determines the smoothing window based on
+                  the higher of the two wavelengths, and discriminates between FR and NR.
+
     """
-
     config_dict = data_cube.polly_config_dict
     opt_profiles = data_cube.retrievals_profile[ret_prof_name]
 
@@ -22,65 +64,78 @@ def ae_cldFreeGrps(data_cube, ret_prof_name):
 
         combinations = [('Bsc', 355, 532), ('Bsc', 532, 1064), ('Ext', 355, 532)]
 
-        for c in itertools.product(combinations, ['FR', 'NR']):
-            ch0 = f"{c[0][1]}_total_{c[1]}"
-            ch1 = f"{c[0][2]}_total_{c[1]}"
-            which = c[0][0] # either Bsc or Ext
-            if (ch0 in opt_profiles[i]) and (ch1 in opt_profiles[i]):
-                flag = (f'aer{which}' in opt_profiles[i][ch0]) and (f'aer{which}' in opt_profiles[i][ch1])
+        for ((prod, wv1, wv2), tel) in itertools.product(combinations, ['FR', 'NR']):
+            ch1 = f'{wv1}_total_{tel}'
+            ch2 = f'{wv2}_total_{tel}'
+
+            if (ch1 in opt_profiles[i]) and (ch2 in opt_profiles[i]):
+                flag = (f'aer{prod}' in opt_profiles[i][ch1]) and (f'aer{prod}' in opt_profiles[i][ch2])
             else:
                 flag = False
-            #print(c, opt_profiles[i].keys(), ' -> ', flag)
+            #print(prod, wv1, wv2, tel, opt_profiles[i].keys(), ' -> ', flag)
+
             if flag:
-                print('channels available', ch0, ch1, which)
-                retrieval = opt_profiles[i][ch0]['retrieval']
+                print('channels available', ch1, ch2, prod)
+                retrieval = opt_profiles[i][ch1]['retrieval']
 
                 ae, aeStd = calc_ae(
-                    opt_profiles[i][ch0][f"aer{which}"], opt_profiles[i][ch0][f"aer{which}Std"],
-                    opt_profiles[i][ch1][f"aer{which}"], opt_profiles[i][ch1][f"aer{which}Std"],
-                    c[0][1], c[0][2], config_dict[f'smoothWin_{retrieval}_{c[0][1]}'])
+                    param1=opt_profiles[i][ch1][f'aer{prod}'],
+                    param1_std=opt_profiles[i][ch1][f'aer{prod}Std'],
+                    param2=opt_profiles[i][ch2][f'aer{prod}'],
+                    param2_std=opt_profiles[i][ch2][f'aer{prod}Std'],
+                    wavelength1=wv1, wavelength2=wv2,
+                    smooth_window=config_dict[f"smoothWin_{retrieval}{'_'+tel if tel=='NR' else ''}_{wv2}"]
+                )
 
-                opt_profiles[i][ch0][f'AE_{which}_{c[0][1]}_{c[0][2]}'] = ae
-                opt_profiles[i][ch0][f'AEStd_{which}_{c[0][1]}_{c[0][2]}'] = aeStd
+                opt_profiles[i][ch1][f'AE_{prod}_{wv1}_{wv2}'] = ae
+                opt_profiles[i][ch1][f'AEStd_{prod}_{wv1}_{wv2}'] = aeStd
     
     return opt_profiles
 
 
+def calc_ae(param1:np.ndarray, param1_std:np.ndarray, param2:np.ndarray, param2_std:np.ndarray,
+            wavelength1:float, wavelength2:float, smooth_window:int=17) -> tuple:
+    """Calculates the Ångström exponent and its uncertainty.
 
+    Usage
+    -----
+    angexp, angexpStd = pollyAE(param1, param1_std, param2, param2_std, wavelength1, wavelength2)
 
-def calc_ae(param1, param1_std, param2, param2_std, wavelength1, wavelength2, smooth_window=17):
-    """calculates the Ångström exponent and its uncertainty.
+    Parameters
+    ----------
+    param1 : array
+        Extinction or backscatter coefficient at wavelength1.
+    param1_std : array
+        Uncertainty of param1.
+    param2 : array
+        Extinction or backscatter coefficient at wavelength2.
+    param2_std : array
+        Uncertainty of param2.
+    wavelength1 : float
+        The wavelength for the input parameter 1 [nm].
+    wavelength2 : float
+        The wavelength for the input parameter 2 [nm].
+    smooth_window : int, optional
+        The width of the smoothing window. Default is 17.
 
-    USAGE:
-        angexp, angexpStd = pollyAE(param1, param1_std, param2, param2_std, wavelength1, wavelength2)
+    Returns
+    -------
+    angexp : array
+        Ångström exponent based on param1 and param2.
+    angexpStd : array
+        Uncertainty of Ångström exponent.
 
-    INPUTS:
-        param1: array
-            Extinction or backscatter coefficient at wavelength1.
-        param1_std: array
-            Uncertainty of param1.
-        param2: array
-            Extinction or backscatter coefficient at wavelength2.
-        param2_std: array
-            Uncertainty of param2.
-        wavelength1: float
-            The wavelength for the input parameter 1. [nm]
-        wavelength2: float
-            The wavelength for the input parameter 2. [nm]
-        smooth_window: int, optional
-            The width of the smoothing window (default: 17).
+    History
+    -------
+    - 2021-05-31: first edition by Zhenping
 
-    OUTPUTS:
-        angexp: array
-            Ångström exponent based on param1 and param2.
-        angexpStd: array
-            Uncertainty of Ångström exponent.
-
-    HISTORY:
-        - 2021-05-31: first edition by Zhenping
+    Notes
+    -----
+    - Should the ratio be smoothed or not?? If we do not smooth the ratio then why are we
+      considering the smoothing window in the error calculations??
+    
     """
-
-    # Replace non-positive values with NaN
+    # Replace non-positive and 0 values with NaN
     param1 = np.where(param1 > 0, param1, np.nan)
     param2 = np.where(param2 > 0, param2, np.nan)
 

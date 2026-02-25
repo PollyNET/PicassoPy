@@ -1,9 +1,9 @@
 
 import numpy as np
-from scipy.ndimage import uniform_filter1d
 from scipy.stats import norm, poisson
+from scipy.signal import savgol_coeffs
 
-def movingslope_variedWin(signal, winWidth):
+def movingslope_variedWin(signal:np.ndarray, winWidth:int|np.ndarray) -> np.ndarray:
     """
     MOVINGSLOPE_VARIEDWIN calculates the slope of the signal with a moving slope.
     This is a wrapper for the `movingslope` function to make it compatible with
@@ -51,7 +51,15 @@ def movingslope_variedWin(signal, winWidth):
 
     return slope
 
-def movingslope(vec, supportlength=3, modelorder=1, dt=1):
+def moving_smooth_varied_win(signal, winWidth):
+    """ """
+    raise NotImplementedError
+
+def moving_linfit_varied_win(height, signal, winWidth):
+    """ """
+    raise NotImplementedError
+
+def movingslope(vec:np.ndarray, supportlength:int=3, modelorder:int=1, dt:float=1) -> np.ndarray:
     """
     MOVINGSLOPE estimates the local slope of a sequence of points using a sliding window.
 
@@ -123,9 +131,8 @@ def movingslope(vec, supportlength=3, modelorder=1, dt=1):
     # Scale by spacing
     return Dvec / dt
 
-def _getcoef(t, supportlength, modelorder):
-    """
-    Helper function to compute the filter coefficients.
+def _getcoef(t:np.ndarray, supportlength:int, modelorder:int) -> np.ndarray:
+    """Helper function to compute the filter coefficients.
 
     Parameters
     ----------
@@ -146,10 +153,8 @@ def _getcoef(t, supportlength, modelorder):
     return pinvA[1]  # Only the linear term
 
 
-def sigGenWithNoise(signal, noise=None, nProfile=1, method='norm'):
-    """
-    SIGGENWITHNOISE generate noise-containing signal with a certain noise-adding 
-    algorithm.
+def sigGenWithNoise(signal:np.ndarray, noise:np.ndarray=None, nProfile:int=1, method:str='norm') -> np.ndarray:
+    """SIGGENWITHNOISE generate noise-containing signal with a certain noise-adding algorithm.
 
     Parameters
     ----------
@@ -172,6 +177,7 @@ def sigGenWithNoise(signal, noise=None, nProfile=1, method='norm'):
     History
     -------
     - 2021-06-13: First edition by Zhenping.
+    - 2026-02-04: Modifications to reduce computational time, Buholdt
     """
     if noise is None:
         noise = np.sqrt(signal)
@@ -180,15 +186,73 @@ def sigGenWithNoise(signal, noise=None, nProfile=1, method='norm'):
     noise = np.array(noise).reshape(1, -1)
     noise[np.isnan(noise)] = 0
 
-    signalGen = np.full((len(signal.flatten()), nProfile), np.nan)
+    signalGen = np.full((np.prod(signal.shape), nProfile), np.nan)
 
     if method == 'norm':
-        for iBin in range(len(signal.flatten())):
+        for iBin in range(np.prod(signal.shape)):
             signalGen[iBin, :] = signal[0, iBin] + norm.rvs(scale=noise[0, iBin], size=nProfile)
     elif method == 'poisson':
-        for iBin in range(len(signal.flatten())):
+        for iBin in range(np.prod(signal.shape)):
             signalGen[iBin, :] = poisson.rvs(signal[0, iBin], size=nProfile)
     else:
         raise ValueError('A valid method should be provided.')
 
     return signalGen
+
+
+def savgol_filter(x:np.ndarray, window_length:int, polyorder:int=2, deriv:int=0, delta:float=1.0, fill_val:float=np.nan) -> np.ndarray:
+    """Savitzky-Golay filter
+
+    A Savitzky-Golay filter that works with NaN values.
+
+    Parameters
+    ----------
+    x : ndarray
+        Signal to be smoothed
+    window_length : int
+        Width of savgol filter
+    polyorder : int, optional
+        The order of the polynomial used to make the filter. 
+        must be less than 'window_length'. Default is 2.
+    deriv : int, optional
+        The order of the derivative to compute for the filter. Default is 0.
+    delta : float, optional
+        The spacing of which the filter will be applied. This is only used 
+        if 'deriv' > 0. Defualt is 1.0.
+    fill_val : float, optional
+        Value to be used for filling edges in order to recreate the input 
+        dimension. Default is np.nan. 
+    
+    Returns
+    -------
+    out : ndarray
+        Smoothed signal
+    
+    Notes
+    -----
+    This function is inspiered by scipy.signal's Savitzky-Golay filter [1].
+
+    References
+    ----------
+    [1] Virtanen, et al., Scipy 1.0: Fundamental Algorithms for Scientific
+    Computing in Python, Nature Methods, 2020, 17, 261-272, https://rdcu.be/b08Wh,
+    10.1038/s41592-019-0686-2
+    [2] A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of Data by
+    Simplified Least Squares Procedures. Analytical Chemistry, 1964, 36 (8),
+    pp 1627-1639.
+    [3] Jianwen Luo, Kui Ying, and Jing Bai. 2005. Savitzky-Golay smoothing and
+    differentiation filter for even number data. Signal Process.
+    85, 7 (July 2005), 1429-1434.
+
+    """
+    f = savgol_coeffs(window_length, polyorder, deriv=deriv, delta=delta)
+    x_smooth = np.convolve(x, f, mode='valid')
+    fill = np.full(int((window_length - 1)/2), fill_val)
+
+    # if window_length is even fill one more element at the start.
+    if window_length % 2 == 0:
+        out = np.hstack((np.append(fill, fill_val), x_smooth, fill))
+    else:
+        out = np.hstack((fill, x_smooth, fill))
+    
+    return out
