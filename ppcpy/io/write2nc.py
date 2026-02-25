@@ -265,7 +265,6 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], col
             ### Add molecular profiles and reference hight variable:
             if collect_debug:
                 adding_mol_profiles(data_cube, json_nc_mapping_dict, n)
-            adding_refH_vars(data_cube, json_nc_mapping_dict, n, prod)
 
             ### remove empty key-value-pairs
             for var in list(json_nc_mapping_dict['variables'].keys()): ## use list here to suppress RuntimeError: dictionary changed size during iteration
@@ -276,40 +275,6 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], col
             """ Create the NetCDF file """
             output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{start}_{stop}_{prod}.nc")
             json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1,prod=prod)
-
-
-def adding_refH_vars(data_cube, json_nc_mapping_dict:dict, cldFreeGrp:int, prod:str) -> dict:
-    """Temporarily quick fix for adding Reference heights as a variable to the NetCDF profile outputs.
-    In the future this should be included in the json2nc mapping scheme.
-    """
-    # Define which telescope the retrivals are from
-    tel = "NR" if "NR" in prod else "FR"
-
-    # This is sub-optimal as the dimension will get rewriten for each cldFreeGrp.
-    json_nc_mapping_dict['dimensions']['reference_height'] = 2
-
-    # Add refH variable for each channel (1064NR will be deleted by the remove empty key-value-pairs process later on).
-    for wv in [355, 532, 1064]:
-        # print(f"cldFreeGroup {cldFreeGrp}, channel {wv}_total_{tel}")
-        json_nc_mapping_dict['variables'][f'reference_height_{wv}'] = {}
-        json_nc_mapping_dict['variables'][f'reference_height_{wv}']['dtype'] = 'f4'
-        json_nc_mapping_dict['variables'][f'reference_height_{wv}']['shape'] = ['reference_height']
-        if f'{wv}_total_{tel}' in data_cube.refH[cldFreeGrp]:
-            if np.isnan(data_cube.refH[cldFreeGrp][f'{wv}_total_{tel}']['refHInd']).any():
-                json_nc_mapping_dict['variables'][f'reference_height_{wv}']['data'] = [np.nan, np.nan]
-            else:
-                json_nc_mapping_dict['variables'][f'reference_height_{wv}']['data'] = data_cube.retrievals_highres["height"][list(data_cube.refH[cldFreeGrp][f'{wv}_total_{tel}']['refHInd'])]
-        else:
-            json_nc_mapping_dict['variables'][f'reference_height_{wv}']['data'] = None
-                
-        json_nc_mapping_dict['variables'][f'reference_height_{wv}']['attributes'] = {
-            'unit':'m',
-            'long_name':f'Reference height for {"near" if tel == "NR" else "far"}-range {wv} nm',
-            'standard_name':f'ref_h_{wv}',
-            'plot_scale':'linear',
-            'source':'pollyxt_tjk',
-            'comment':'The reference height is searched by Rayleigh Fitting algorithm. It is through comparing the correlation of the slope between molecule backscatter and range-corrected signal and find the segement with best agreement.'
-            }
 
 
 def adding_mol_profiles(data_cube, json_nc_mapping_dict:dict, cldFreeGrp:int) -> dict:
