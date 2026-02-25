@@ -296,16 +296,6 @@
                                                  "parameter":"aerBscStd",
                                                  "channel":"532_total_NR"
                             },
-                            "aerBsc_klett_1064": {
-                                                 "method":"klett",
-                                                 "parameter":"aerBsc",
-                                                 "channel":"1064_total_NR"
-                            },
-                            "uncertainty_aerBsc_klett_1064": {
-                                                 "method":"klett",
-                                                 "parameter":"aerBscStd",
-                                                 "channel":"1064_total_NR"
-                            },
                             "aerBsc_raman_355": {
                                                  "method":"raman",
                                                  "parameter":"aerBsc",
@@ -325,16 +315,6 @@
                                                  "method":"raman",
                                                  "parameter":"aerBscStd",
                                                  "channel":"532_total_NR"
-                            },
-                            "aerBsc_raman_1064": {
-                                                 "method":"raman",
-                                                 "parameter":"aerBsc",
-                                                 "channel":"1064_total_NR"
-                            },
-                            "uncertainty_aerBsc_raman_1064": {
-                                                 "method":"raman",
-                                                 "parameter":"aerBscStd",
-                                                 "channel":"1064_total_NR"
                             },
                             "aerExt_raman_355": {
                                                  "method":"raman",
@@ -356,16 +336,6 @@
                                                  "parameter":"aerExtStd",
                                                  "channel":"532_total_NR"
                             },
-                            "aerExt_raman_1064": {
-                                                 "method":"raman",
-                                                 "parameter":"aerExt",
-                                                 "channel":"1064_total_NR"
-                            },
-                            "uncertainty_aerExt_raman_1064": {
-                                                 "method":"raman",
-                                                 "parameter":"aerExtStd",
-                                                 "channel":"1064_total_NR"
-                            },
                             "aerLR_raman_355": {
                                                  "method":"raman",
                                                  "parameter":"LR",
@@ -385,16 +355,6 @@
                                                  "method":"raman",
                                                  "parameter":"LRStd",
                                                  "channel":"532_total_NR"
-                            },
-                            "aerLR_raman_1064": {
-                                                 "method":"raman",
-                                                 "parameter":"LR",
-                                                 "channel":"1064_total_NR"
-                            },
-                            "uncertainty_aerLR_raman_1064": {
-                                                 "method":"raman",
-                                                 "parameter":"LRStd",
-                                                 "channel":"1064_total_NR"
                             },
                             "AE_Bsc_raman_355_532": {
                                                  "method":"raman",

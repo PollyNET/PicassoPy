@@ -1,6 +1,8 @@
 import logging
 import json
 import copy
+import re
+from pathlib import Path
 from netCDF4 import Dataset
 
 def read_json_to_dict(file_path):
@@ -12,13 +14,16 @@ def read_json_to_dict(file_path):
     return data
 
 
-def create_netcdf_from_dict(nc_file_path, data_dict, compression_level=1):
+def create_netcdf_from_dict(nc_file_path, data_cube, data_dict, compression_level,prod):
     """
     Creates a NetCDF file from a structured dictionary.
 
     Args:
         nc_file_path (str): Path to the NetCDF file to create.
+        data_cube (obj): the data-object of class PicassoProc
         data_dict (dict): Dictionary with keys 'global_attributes', 'dimensions', and 'variables'.
+        compression_level (int): a nc-compressionlevel of 1 is a good reference
+        prod (str): e.g. profile, OC_profile, NR_profile, ...
 
     Example of `data_dict` structure:
     {
@@ -53,6 +58,12 @@ def create_netcdf_from_dict(nc_file_path, data_dict, compression_level=1):
         }
     }
     """
+    def extract_bracket_values(string):
+        """Extract all values inside square brackets"""
+        pattern = r'\[([^\]]+)\]'
+        matches = re.findall(pattern, string)
+        return matches
+
     logging.info(f"writing to file: {nc_file_path}")
     # Create a new NetCDF file
     with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file:
@@ -80,7 +91,47 @@ def create_netcdf_from_dict(nc_file_path, data_dict, compression_level=1):
 
                 # Add variable attributes
                 for attr_name, attr_value in attributes.items():
-                    setattr(var, attr_name, attr_value)
+                    #print(attr_name,attr_value)
+                    if isinstance(attr_value, (dict)):
+                        #print(var_name)
+                        #print(attr_value)
+                        for key in attr_value.keys():
+                           #print(key)
+                           #print(attr_value[key])
+                            if attr_value[key]['value'].startswith("__"):
+                                before, separator, after = attr_value[key]['value'].partition("__")
+                                #print(after)
+                                if '[' and ']' in after:
+                                    dict_name = after.split('[')[0]
+                                    #print(dict_name)
+                                    nested_keys = extract_bracket_values(after)
+                                    #print(nested_keys)
+                                    #print(nested_keys[0])
+                                    if len(nested_keys) == 1:
+                                        key_value = getattr(data_cube,dict_name)
+                                        if nested_keys[0] in key_value.keys():
+                                            if "smoothwin" in nested_keys[0].lower():
+                                                attr_value[key]['value'] = key_value[nested_keys[0]]*7.5 # x hight-resolution=7.5m
+                                            elif "refbeta" in nested_keys[0].lower():
+                                                result = key_value[nested_keys[0]]*1e6 # [m^{-1}*Sr^{-1} --> [Mm^{-1}*Sr^{-1}
+                                                attr_value[key]['value'] = f"{result:.0e}"
+                                            else:
+                                                attr_value[key]['value'] = key_value[nested_keys[0]]
+                                    if len(nested_keys) == 2:
+                                        key_value = getattr(data_cube,dict_name)
+                                        if nested_keys[0] in key_value.keys():
+                                            if nested_keys[1] in key_value[nested_keys[0]]:
+                                                attr_value[key]['value'] = key_value[nested_keys[0]][nested_keys[1]]
+
+                        setattr(var, attr_name, json.dumps(attr_value))
+                    elif isinstance(attr_value, (str)):
+                        if attr_value.startswith("__"):
+                            before, separator, after = attr_value.partition("__")
+                            attr_value = getattr(data_cube,after)
+                        setattr(var, attr_name, attr_value)
+                    elif isinstance(attr_value, (list)):
+                        setattr(var, attr_name, attr_value)
+
 
                 # Add variable data (if provided)
                 if data is not None:

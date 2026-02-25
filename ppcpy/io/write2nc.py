@@ -87,7 +87,7 @@ def write_channelwise_2_nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
 
         """ Create the NetCDF file """
         output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{prod}.nc")
-        json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict, compression_level=1)
+        json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1,prod=prod)
 
 def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
     ## writes data from products, listed in prod_ls, to nc-file
@@ -145,7 +145,7 @@ def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
 
         """ Create the NetCDF file """
         output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{prod}.nc")
-        json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict, compression_level=1)
+        json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1,prod=prod)
 
 
 def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], collect_debug:bool=False):
@@ -161,10 +161,7 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], col
     prod_ls : list
         List of product names
 
-    TODO: attribute['source'] = ""polly_device_name" and not the name. 
     TODO: Missing comment in variable attributes.
-    TODO: Missing retrieval info, ie. reference value, Lidar ratio, smoothing win etc. for both klett and raman retrievals
-    TODO: Add reference height variable for each channel and cldFreeGroup in the saved profiles (netCDF).
     TODO: Not all retrievals / information needed for the profiles are in data_cube.retrivals_highres...
     TODO: write docstring
     """
@@ -180,7 +177,12 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], col
 
         """ set dimension sizes """
         for d in json_nc_mapping_dict['dimensions']:
-            json_nc_mapping_dict['dimensions'][d] = len(data_cube.retrievals_highres[d])    # TODO: set to config value "max_height_bin" instead
+            #json_nc_mapping_dict['dimensions'][d] = len(data_cube.retrievals_highres[d])    # TODO: set to config value "max_height_bin" instead
+            if d == "reference_height":
+                json_nc_mapping_dict['dimensions'][d] = 2
+            else:
+                json_nc_mapping_dict['dimensions'][d] = len(data_cube.retrievals_highres[d])
+
 
         """ fill variables """
         #for n, profil in enumerate(data_cube.retrievals_profile[method]):
@@ -198,6 +200,44 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], col
             json_nc_mapping_dict['variables']['start_time']['data'] = starttime.astype('datetime64[ns]').astype('int64') / 1_000_000_000
             json_nc_mapping_dict['variables']['end_time']['data'] = stoptime.astype('datetime64[ns]').astype('int64') / 1_000_000_000
             json_nc_mapping_dict['variables']['height']['data'] = data_cube.retrievals_highres['height']
+
+            ## adding reference heights
+            ## 355
+            refHindex0_355 = data_cube.refH[n]['355_total_FR']['refHInd'][0]
+            refHindex1_355 = data_cube.refH[n]['355_total_FR']['refHInd'][1]
+            if np.isnan(refHindex0_355):
+                refH0_355 = np.nan
+            else:
+                refH0_355 = data_cube.retrievals_highres['height'][refHindex0_355]
+            if np.isnan(refHindex1_355):
+                refH1_355 = np.nan
+            else:
+                refH1_355 = data_cube.retrievals_highres['height'][refHindex1_355]
+            json_nc_mapping_dict['variables']['reference_height_355']['data'] = [refH0_355,refH1_355]
+            ## 532
+            refHindex0_532 = data_cube.refH[n]['532_total_FR']['refHInd'][0]
+            refHindex1_532 = data_cube.refH[n]['532_total_FR']['refHInd'][1]
+            if np.isnan(refHindex0_532):
+                refH0_532 = np.nan
+            else:
+                refH0_532 = data_cube.retrievals_highres['height'][refHindex0_532]
+            if np.isnan(refHindex1_532):
+                refH1_532 = np.nan
+            else:
+                refH1_532 = data_cube.retrievals_highres['height'][refHindex1_532]
+            json_nc_mapping_dict['variables']['reference_height_532']['data'] = [refH0_532,refH1_532]
+            ## 1064
+            refHindex0_1064 = data_cube.refH[n]['1064_total_FR']['refHInd'][0]
+            refHindex1_1064 = data_cube.refH[n]['1064_total_FR']['refHInd'][1]
+            if np.isnan(refHindex0_1064):
+                refH0_1064 = np.nan
+            else:
+                refH0_1064 = data_cube.retrievals_highres['height'][refHindex0_1064]
+            if np.isnan(refHindex1_1064):
+                refH1_1064 = np.nan
+            else:
+                refH1_1064 = data_cube.retrievals_highres['height'][refHindex1_1064]
+            json_nc_mapping_dict['variables']['reference_height_1064']['data'] = [refH0_1064,refH1_1064]
 
             ## adding global attributes
             adding_global_attr(data_cube, json_nc_mapping_dict)
@@ -235,7 +275,7 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], col
 
             """ Create the NetCDF file """
             output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{start}_{stop}_{prod}.nc")
-            json2nc_mapping.create_netcdf_from_dict(output_filename, json_nc_mapping_dict, compression_level=1)
+            json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1,prod=prod)
 
 
 def adding_refH_vars(data_cube, json_nc_mapping_dict:dict, cldFreeGrp:int, prod:str) -> dict:
