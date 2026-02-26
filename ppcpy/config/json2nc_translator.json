@@ -271,6 +271,21 @@
                                                  "method":"raman",
                                                  "parameter":"AEStd_Ext_355_532",
                                                  "channel":"355_total_FR"
+                            },
+                            "reference_height_355": {
+                                                 "method":"klett",
+                                                 "parameter":"refH",
+                                                 "channel":"355_total_FR"
+                            },
+                            "reference_height_532": {
+                                                 "method":"klett",
+                                                 "parameter":"refH",
+                                                 "channel":"532_total_FR"
+                            },
+                            "reference_height_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"refH",
+                                                 "channel":"1064_total_FR"
                             }
               }
   },
@@ -375,6 +390,16 @@
                                                  "method":"raman",
                                                  "parameter":"AEStd_Ext_355_532",
                                                  "channel":"355_total_NR"
+                            },
+                            "reference_height_355": {
+                                                 "method":"klett",
+                                                 "parameter":"refH",
+                                                 "channel":"355_total_NR"
+                            },
+                            "reference_height_532": {
+                                                 "method":"klett",
+                                                 "parameter":"refH",
+                                                 "channel":"532_total_NR"
                             }
               }
   },
@@ -649,6 +674,21 @@
                                                  "method":"raman_OC",
                                                  "parameter":"AEStd_Ext_355_532",
                                                  "channel":"355_total_FR"
+                            },
+                            "reference_height_355": {
+                                                 "method":"klett",
+                                                 "parameter":"refH",
+                                                 "channel":"355_total_FR"
+                            },
+                            "reference_height_532": {
+                                                 "method":"klett",
+                                                 "parameter":"refH",
+                                                 "channel":"532_total_FR"
+                            },
+                            "reference_height_1064": {
+                                                 "method":"klett",
+                                                 "parameter":"refH",
+                                                 "channel":"1064_total_FR"
                             }
               }
   },

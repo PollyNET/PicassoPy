@@ -488,6 +488,38 @@ class PicassoProc:
         if retrievalname not in self.retrievals_profile['avail_optical_profiles']:
             self.retrievals_profile['avail_optical_profiles'].append(retrievalname)
 
+        ## adding ref.heights to the retrievals_profile dict
+        def ref_heights_implementation(self,cldFreeGrp,wv,telescope):
+            refHindex0 = self.refH[cldFreeGrp][f'{wv}_total_{telescope}']['refHInd'][0]
+            refHindex1 = self.refH[cldFreeGrp][f'{wv}_total_{telescope}']['refHInd'][1]
+            if np.isnan(refHindex0):
+                refH0 = np.nan
+            else:
+                refH0 = self.retrievals_highres['height'][refHindex0]
+            if np.isnan(refHindex1):
+                refH1 = np.nan
+            else:
+                refH1 = self.retrievals_highres['height'][refHindex1]
+            return [float(refH0),float(refH1)]
+
+
+        for n in range(0, len(self.clFreeGrps)):
+            refH_355_NR = ref_heights_implementation(self,cldFreeGrp=n,wv='355',telescope='NR')
+            refH_532_NR = ref_heights_implementation(self,cldFreeGrp=n,wv='532',telescope='NR')
+            if '355_total_NR' in self.retrievals_profile[retrievalname][n].keys():
+                self.retrievals_profile[retrievalname][n]['355_total_NR']['refH'] = refH_355_NR
+            if '532_total_NR' in self.retrievals_profile[retrievalname][n].keys():
+                self.retrievals_profile[retrievalname][n]['532_total_NR']['refH'] = refH_532_NR
+            refH_355_FR = ref_heights_implementation(self,cldFreeGrp=n,wv='355',telescope='FR')
+            refH_532_FR = ref_heights_implementation(self,cldFreeGrp=n,wv='532',telescope='FR')
+            refH_1064_FR = ref_heights_implementation(self,cldFreeGrp=n,wv='1064',telescope='FR')
+            if '355_total_FR' in self.retrievals_profile[retrievalname][n].keys():
+                self.retrievals_profile[retrievalname][n]['355_total_FR']['refH'] = refH_355_FR
+            if '532_total_FR' in self.retrievals_profile[retrievalname][n].keys():
+                self.retrievals_profile[retrievalname][n]['532_total_FR']['refH'] = refH_532_FR
+            if '1064_total_FR' in self.retrievals_profile[retrievalname][n].keys():
+                self.retrievals_profile[retrievalname][n]['1064_total_FR']['refH'] = refH_1064_FR
+
 
     def retrievalRaman(self, oc=False, nr=False, collect_debug=False):
         """
