@@ -665,10 +665,10 @@ def calc_raman_bsc(
 
     # Optical depths
     mol_el_OD = np.nansum(ext_mol[:refIndx + 1]) * dH - np.nancumsum(ext_mol) * dH
-    mol_el_mod_OD = np.nansum(ext_mol_el_raman[:refIndx + 1]) * dH - np.nancumsum(ext_mol_el_raman) * dH
+    mol_el_vr_OD = np.nansum(ext_mol_el_raman[:refIndx + 1]) * dH - np.nancumsum(ext_mol_el_raman) * dH
     mol_vr_OD = np.nansum(ext_mol_raman[:refIndx + 1]) * dH - np.nancumsum(ext_mol_raman) * dH
     aer_el_OD = np.nansum(ext_aer[:refIndx + 1]) * dH - np.nancumsum(ext_aer) * dH
-    aer_el_mod_OD = np.nansum(ext_aer_el_raman[:refIndx + 1]) * dH - np.nancumsum(ext_aer_el_raman) * dH
+    aer_el_vr_OD = np.nansum(ext_aer_el_raman[:refIndx + 1]) * dH - np.nancumsum(ext_aer_el_raman) * dH
     aer_vr_OD = np.nansum(ext_aer_raman[:refIndx + 1]) * dH - np.nancumsum(ext_aer_raman) * dH
 
     # Calculate signal ratios at reference height
@@ -676,7 +676,7 @@ def calc_raman_bsc(
     vrMean = sigVRN2[HRefInd[0]:HRefInd[1] + 1] / beta_mol_raman[HRefInd[0]:HRefInd[1] + 1]
     
     # Calculate the exponetial term
-    exponential_term = np.exp(-2*(mol_el_OD + aer_el_OD) + mol_el_mod_OD + aer_el_mod_OD + mol_vr_OD + aer_vr_OD)
+    exponential_term = np.exp(-2*(mol_el_OD + aer_el_OD) + mol_el_vr_OD + aer_el_vr_OD + mol_vr_OD + aer_vr_OD)
 
     # Compute aerosol backscatter coefficient
     if not flagSmoothBefore:
@@ -689,7 +689,7 @@ def calc_raman_bsc(
         beta_aer = signalratio * (np.nanmean(vrMean) / np.nanmean(elMean)) * exponential_term * beta_mol_raman - beta_mol
 
     LR = ext_aer / beta_aer
-    return beta_aer, LR, [mol_el_OD, mol_el_mod_OD, mol_vr_OD, aer_el_OD, aer_el_mod_OD, aer_vr_OD], signalratio
+    return beta_aer, LR, [mol_el_OD, mol_el_vr_OD, mol_vr_OD, aer_el_OD, aer_el_vr_OD, aer_vr_OD], signalratio
 
 
 def lidarratio(
