@@ -71,6 +71,19 @@ def loadGHK(data_cube):
         H[data_cube.flag_532_cross_FR] = onemx_onepx(TR[data_cube.flag_532_cross_FR])
         H[data_cube.flag_1064_total_FR] = onemx_onepx(TR[data_cube.flag_1064_total_FR])
         H[data_cube.flag_1064_cross_FR] = onemx_onepx(TR[data_cube.flag_1064_cross_FR])
+
+        if np.any(data_cube.flag_532_total_NR):
+            print("GHK for 532NR")
+            K[data_cube.flag_532_total_NR] = 1.0
+            G[data_cube.flag_532_total_NR] = 1.0    
+            H[data_cube.flag_532_total_NR] = onemx_onepx(TR[data_cube.flag_532_total_NR])
+            print("H", H[data_cube.flag_532_total_NR])
+        if np.any(data_cube.flag_532_cross_DFOV):
+            print("GHK for 532DFOV")
+            K[data_cube.flag_532_cross_DFOV] = 1.0
+            G[data_cube.flag_532_cross_DFOV] = 1.0    
+            H[data_cube.flag_532_cross_DFOV] = onemx_onepx(TR[data_cube.flag_532_cross_DFOV])
+            print("H", H[data_cube.flag_532_cross_DFOV])
         print('TR', TR)
     else:
         print("Using GHK from config file")
