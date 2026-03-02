@@ -662,7 +662,7 @@ def channel_2_variable_mapping(data_retrievals, var, channeltags_dict):
 
 
 def uniform_filter(x:np.ndarray, win:int, fill_val:float=np.nan) -> np.ndarray:
-    """Simple smoothing filter
+    """Uniform smoothing filter.
 
     The smoothing is applied without padding and the original dimension of the
     input is recreated by filling the reduced edges with a fill value.
@@ -685,18 +685,32 @@ def uniform_filter(x:np.ndarray, win:int, fill_val:float=np.nan) -> np.ndarray:
     History
     -------
     - 2026-02-02: First edition by Buholdt
+
+    Notes
+    -----
+    - Currently only support smoothing of 1D-arrays with a constant window size.
+
     """
-    f = np.ones(win)/win
-    x_smoothed = np.convolve(x, f, mode='valid')
-    fill = np.full(int((win - 1)/2), fill_val)
+    if isinstance(win, int):
+        if len(x.shape) > 1:
+            raise NotImplementedError('Support for smoothing of mulitdimensional arrays is not yet implemented')
+        
+        f = np.ones(win)/win
+        x_smoothed = np.convolve(x, f, mode='valid')
+        fill = np.full(int((win - 1)/2), fill_val)
 
-    # if window size is even fill one more element at the start.
-    if win % 2 == 0:
-        out = np.hstack((np.append(fill, fill_val), x_smoothed, fill))
-    else:
-        out = np.hstack((fill, x_smoothed, fill))
+        # if window size is even fill one more element at the start.
+        if win % 2 == 0:
+            out = np.hstack((np.append(fill, fill_val), x_smoothed, fill))
+        else:
+            out = np.hstack((fill, x_smoothed, fill))
 
-    return out
+        return out
+
+    if isinstance(win, (np.ndarray, list, tuple)):
+        raise NotImplementedError("Support for smoothing with variable window size is not yet implemented.")
+    
+    raise ValueError("Invalid window configuration.")
 
 
 def mean_stable(x:np.ndarray, win:int, minBin:int=None, maxBin:int=None, minRelStd:float=None) -> tuple:
