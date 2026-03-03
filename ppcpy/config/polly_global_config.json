@@ -17,6 +17,7 @@
     "flagTransCor": true,
     "flagOLCor": true,
 	"flagUseTheoreticalMDR": false,
+    "flagPicassoComparison": false,
 
     "depolCaliConst532": 0,
     "depolCaliConstStd532": 0,

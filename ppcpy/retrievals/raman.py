@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import norm
 
 from ppcpy.retrievals.ramanhelpers import *
-from ppcpy.misc.helper import idx2time
+from ppcpy.misc.helper import uniform_filter
 from ppcpy.retrievals.collection import calc_snr
 
 sigma_angstroem:float = 0.2
@@ -51,6 +51,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
     -------
     - xxxx-xx-xx: TODO: First edition by ...
     - 2026-02-04: Modified and cleaned by Buholdt
+    - 2026-02-27: Added ext_aer_mod and ext_mol_mod to backscatter calculations.
     
     TODO's
     ------
@@ -153,6 +154,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                 prof['retrieval'] = 'raman'
                 prof['signal'] = signal
                 
+                aerExt_mod = prof['aerExt'].copy()
                 if wv == 1064 and wv_r == 607:
                     # Apply correction factor based on the angstroem exponent
                     prof['aerExt'] = prof['aerExt'] / (1064./532.)**angstrexp
@@ -187,7 +189,6 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
 
                 if refBeta is None and tel == 'NR':
                     # Calculate NR refBeta based on mean FR aerBsc in reference height
-                    # TODO: find a better way of handeling NR cases where we have no FR values that follows the same logic as the rest of the code i.e. try to do it without continue statments...
                     if f'{wv}_{t}_FR' in opt_profiles[i]:
                         if 'aerBsc' in opt_profiles[i][f'{wv}_{t}_FR']:
                             refBeta = np.nanmean(opt_profiles[i][f'{wv}_{t}_FR']['aerBsc'][refHInd[0]:refHInd[1] + 1])
@@ -202,8 +203,17 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                 
                 aerExt_tmp = prof['aerExt'].copy()
                 aerExt_tmp[:hBaseInd + 1] = aerExt_tmp[hBaseInd]
+                aerExt_mod[:hBaseInd + 1] = aerExt_mod[hBaseInd]    # should the hBaseInd for 1064 or 532 be used here for the 1064nm channel??
                 print(f'filling aerExt below overlap with {aerExt_tmp[hBaseInd]} for calculating the backscatter')
-                
+
+                # Change equation back for comparison with Picasso. This is only a temporary addition that will be removed
+                # once picasso is updated or the comparison to picasso is completed.
+                if config_dict['flagPicassoComparison']:
+                    molBsc_r = molBsc.copy()
+                    molExt_mod = molExt.copy()
+                    aerExt_mod = aerExt_tmp.copy()
+
+
                 # Calculate Raman Backscatter
                 prof.update(
                     raman_bsc(
@@ -215,13 +225,15 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                         ext_mol=molExt,
                         beta_mol=molBsc,
                         ext_mol_raman=molExt_r,
-                        beta_mol_inela=molBsc_r,
+                        beta_mol_raman=molBsc_r,
                         HRefInd=refHInd,
                         betaRef=refBeta,
-                        window_size=config_dict[f'{key_smooth}{wv}'],
-                        flagSmoothBefore=True,
                         el_lambda=wv,
                         inel_lambda=wv_r,
+                        ext_mol_el_raman=molExt_mod,
+                        ext_aer_el_raman=aerExt_mod,
+                        window_size=config_dict[f'{key_smooth}{wv}'],
+                        flagSmoothBefore=True,
                         bgElastic=bg,
                         bgVRN2=bg_r,
                         sigma_ext_aer=prof['aerExtStd'],
@@ -270,7 +282,7 @@ def raman_ext(
     height : array_like
         Height [m].
     sig : array_like
-        Measured Raman signal. Unit: Photon Count.
+        Measured Raman signal [Photon Count].
     lambda_emit : float
         Wavelength of the emitted laser beam [nm].
     lambda_Raman : float
@@ -290,7 +302,7 @@ def raman_ext(
     MC_count : int, optional
         Number of Monte Carlo iterations. Default is 1.
     bg : float, optional
-        Background signal (Photon Count). Default is 0.
+        Background signal [Photon Count]. Default is 0.
 
     Returns
     -------
@@ -315,8 +327,9 @@ def raman_ext(
     ------
     - moving_smooth_varied_win function is not yet implemented.
     - moving_linfit_varied_win function is not yet implemented.
-    """
+    - Investigate what smothing function is used, Savitzky-Golay or something else?
 
+    """
     # Prepare variables
     temp = number_density / (sig * height**2)
     temp[temp <= 0] = np.nan
@@ -380,13 +393,15 @@ def raman_bsc(
         ext_mol:np.ndarray,
         beta_mol:np.ndarray,
         ext_mol_raman:np.ndarray,
-        beta_mol_inela:np.ndarray,
+        beta_mol_raman:np.ndarray,
         HRefInd:list|tuple,
         betaRef:float,
+        el_lambda:float,
+        inel_lambda:float,
+        ext_aer_el_raman:np.ndarray=None,
+        ext_mol_el_raman:np.ndarray=None,
         window_size:int=40,
         flagSmoothBefore:bool=True,
-        el_lambda:int=None,
-        inel_lambda:int=None,
         bgElastic:np.ndarray=None,
         bgVRN2:np.ndarray=None,
         sigma_ext_aer:np.ndarray=None,
@@ -395,52 +410,58 @@ def raman_bsc(
         method:str='monte-carlo',
         collect_debug:bool=False
     ) -> dict[str, np.ndarray]:
-    """Calculate uncertainty of aerosol backscatter coefficient with Monte-Carlo simulation.
+    """Calculate aerosol backscatter coefficient and its uncertainty.
 
     Parameters
     ----------
     height : ndarray
-        Heights in meters.
+        Height [m].
     sigElastic : ndarray
-        Elastic photon count signal.
+        Elastic signal [photon count].
     sigVRN2 : ndarray
-        N2 vibration rotational Raman photon count signal.
+        N2 vibration rotational Raman signal [photon count].
     ext_aer : ndarray
-        Aerosol extinction coefficient [m^{-1}].
+        Aerosol extinction coefficient for elastic wavelength [m^{-1}].
     angstroem : ndarray
         Aerosol Angstrom exponent.
     ext_mol : ndarray
-        Molecular extinction coefficient [m^{-1}].
+        Molecular extinction coefficient for elastic wavelength [m^{-1}].
     beta_mol : ndarray
-        Molecular backscatter coefficient [m^{-1}Sr^{-1}].
+        Molecular backscatter coefficient for elastic wavelength [m^{-1}Sr^{-1}].
     ext_mol_raman : ndarray
-        Molecular extinction coefficient for Raman wavelength.
-    beta_mol_inela :ndarray
-        Molecular backscatter coefficient for inelastic wavelength.
+        Molecular extinction coefficient for inelastic Raman wavelength [m^{-1}].
+    beta_mol_raman :ndarray
+        Molecular backscatter coefficient for inelastic Raman wavelength [m^{-1}Sr^{-1}].
     HRefInd : list or tuple
-        Reference region indices [start, end].
+        Reference region indices of height array [start, end].
     betaRef : float
-        Aerosol backscatter coefficient at the reference region.
-    window_size : int
-        Number of bins for the sliding window for signal smoothing. Default is 40.
-    flagSmoothBefore : bool
-        Flag to control the smoothing order. Default is True.
-    el_lambda : int
+        Aerosol backscatter coefficient for elastic wavelength at the reference region [m^{-1}Sr^{-1}].
+    el_lambda : float
         Elastic wavelength [nm].
-    inel_lambda : int
+    inel_lambda : float
         Inelastic wavelength [nm].
-    bgElastic : ndarray
-        Background of elastic signal.
-    bgVRN2 : ndarray
-        Background of N2 vibration rotational signal.
-    sigma_ext_aer : ndarray
-        Uncertainty of aerosol extinction coefficient [m^{-1}].
-    sigma_angstroem : ndarray
+    ext_aer_el_raman : ndarray, optional
+        Aerosol extinction coefficient for elastic wavelength that initializes the Raman retrieval [m^{-1}]. Default is None.
+    ext_mol_el_raman : ndarray, optional
+        Molecular extinction coefficient for elastic wavelength that initializes the Raman retrieval [m^{-1}]. Default is None.
+    window_size : int, optional
+        Number of smoothing bins to be used. Default is 40.
+    flagSmoothBefore : bool, optional
+        Flag to control the smoothing order. Default is True.
+    bgElastic : ndarray, optional
+        Background of elastic signal [photon count].
+    bgVRN2 : ndarray, optional
+        Background of N2 vibration rotational signal [photon count].
+    sigma_ext_aer : ndarray, optional
+        Uncertainty of aerosol extinction coefficient for elastic wavelength [m^{-1}].
+    sigma_angstroem : ndarray, optional
         Uncertainty of Angstrom exponent.
-    MC_count : int or list
+    MC_count : int or list, optional
         Samples for each error source. Default is 3.
-    method : str
+    method : str, optional
         Computational method ('monte-carlo' or 'analytical'). Default is 'monte-carlo'.
+    collect_debug : bool, optional
+        If True, collectes debug information. Default is False.
 
     Returns
     -------
@@ -453,9 +474,10 @@ def raman_bsc(
     
     History
     -------
-    - xxxx-xx-xx ...
-    - 2026-02-04: Cleaned by Buholdt
-    
+    - xxxx-xx-xx: First edition by ...
+    - 2026-02-04: Cleaned by Buholdt.
+    - 2026-02-27: Added ext_aer_mod and ext_mol_mod for better consistancy with the 1064nm channel.
+
     """
     if isinstance(MC_count, int):
         MC_count = np.ones(4, dtype=int) * MC_count
@@ -474,13 +496,15 @@ def raman_bsc(
         ext_mol=ext_mol,
         beta_mol=beta_mol,
         ext_mol_raman=ext_mol_raman,
-        beta_mol_inela=beta_mol_inela,
+        beta_mol_raman=beta_mol_raman,
         HRefInd=HRefInd,
         betaRef=betaRef,
-        window_size=window_size,
-        flagSmoothBefore=flagSmoothBefore,
         el_lambda=el_lambda,
-        inel_lambda=inel_lambda
+        inel_lambda=inel_lambda,
+        ext_aer_el_raman=ext_aer_el_raman,
+        ext_mol_el_raman=ext_mol_el_raman,
+        window_size=window_size,
+        flagSmoothBefore=flagSmoothBefore
     )
 
     # Calculate beta_aer_std:
@@ -508,13 +532,15 @@ def raman_bsc(
                                 ext_mol=ext_mol,
                                 beta_mol=beta_mol,
                                 ext_mol_raman=ext_mol_raman,
-                                beta_mol_inela=beta_mol_inela,
+                                beta_mol_raman=beta_mol_raman,
                                 HRefInd=HRefInd,
                                 betaRef=betaRefSample[iM],
-                                window_size=window_size,
-                                flagSmoothBefore=flagSmoothBefore,
                                 el_lambda=el_lambda,
-                                inel_lambda=inel_lambda
+                                inel_lambda=inel_lambda,
+                                ext_aer_el_raman=ext_aer_el_raman,
+                                ext_mol_el_raman=ext_mol_el_raman,
+                                window_size=window_size,
+                                flagSmoothBefore=flagSmoothBefore
                             )[0]
         aerBscStd = np.nanstd(aerBscSample, axis=0)
 
@@ -541,48 +567,54 @@ def calc_raman_bsc(
         ext_mol:np.ndarray,
         beta_mol:np.ndarray,
         ext_mol_raman:np.ndarray,
-        beta_mol_inela:np.ndarray, 
+        beta_mol_raman:np.ndarray, 
         HRefInd:list,
         betaRef:float,
+        el_lambda:float,
+        inel_lambda:float,
+        ext_mol_el_raman:np.ndarray=None,
+        ext_aer_el_raman:np.ndarray=None,
         window_size:int=40,
-        flagSmoothBefore:bool=True,
-        el_lambda:int=None,                 # Not optional (can not multiply float array with NoneType...)
-        inel_lambda:int=None                # Not optional (can not multiply float array with NoneType...)
+        flagSmoothBefore:bool=True
     ) -> tuple[np.ndarray, np.ndarray, list, np.ndarray]:
     """Calculate the aerosol backscatter coefficient with the Raman method.
 
     Parameters
     ----------
     height : array
-        Height in meters.
+        Height [m].
     sigElastic : array
-        Elastic photon count signal.
+        Elastic signal [photon count].
     sigVRN2 : array
-        N2 vibration rotational Raman photon count signal.
+        N2 vibration rotational Raman signal [photon count].
     ext_aer : array
-        Aerosol extinction coefficient [m^{-1}].
+        Aerosol extinction coefficient for elastic wavelength [m^{-1}].
     angstroem : array
         Aerosol Angstrom exponent.
     ext_mol : array
-        Molecular extinction coefficient [m^{-1}].
+        Molecular extinction coefficient for elastic wavelength [m^{-1}].
     beta_mol : array
-        Molecular backscatter coefficient [m^{-1}Sr^{-1}].
+        Molecular backscatter coefficient for elastic wavelength [m^{-1}Sr^{-1}].
     ext_mol_raman : array
-        Molecular extinction coefficient for Raman wavelength [m^{-1}].
-    beta_mol_inela : array
-        Molecular inelastic backscatter coefficient [m^{-1}Sr^{-1}].
+        Molecular extinction coefficient for inelastic Raman wavelength [m^{-1}].
+    beta_mol_raman : array
+        Molecular backscatter coefficient for inelastic Raman wavelength [m^{-1}Sr^{-1}].
     HRefInd : list
-        Reference region in indices [start, end].
+        Reference region indices of height array [start, end].
     betaRef : float
-        Aerosol backscatter coefficient at the reference region [m^{-1}Sr^{-1}].
+        Aerosol backscatter coefficient for elastic wavelength at the reference region [m^{-1}Sr^{-1}].
+    el_lambda : float
+        Elastic wavelength [nm].
+    inel_lambda : float
+        Inelastic Raman wavelength [nm].
+    ext_aer_el_raman : array, optional
+        Aerosol extinction coefficient for elastic wavelength that initializes the Raman retrieval [m^{-1}]. Default is None.
+    ext_mol_el_raman : array, optional
+        Molecular extinction coefficient for elastic wavelength that initializes the Raman retrieval [m^{-1}]. Default is None.
     window_size : int, optional
-        Number of bins for the sliding window for signal smoothing. Default is 40.
+        Number of smoothing bins to be used. Default is 40.
     flagSmoothBefore : bool, optional
         Whether to smooth the signal before or after calculating the signal ratio. Default is True.
-    el_lambda : int, optional
-        Elastic wavelength [nm].
-    inel_lambda : int, optional
-        Inelastic wavelength [nm].
 
     Returns
     -------
@@ -602,12 +634,11 @@ def calc_raman_bsc(
     - 2018-09-04: Changed smoothing order for signal ridge stability.
     - 2024-11-12: Modified by HB for consistency in 2024.
     - 2026-02-04: Cleaned by Buholdt
+    - 2026-02-27: Added ext_aer_el_raman and ext_mol_el_raman for better consistancy with the 1064nm channel.
 
-    TODO:
-    -------
-    - el_lambda & inel_lambda are not optional arguments as it currently stands. Either change the deafult value in the function init and doc-string or add a detection and replace by a config parameter in the code.
-    - angstroem is an float in beta_aer calculations and an array of shape (1, ) in beta_aer_std claculations.
-    - Find a way of sending both HRef and HRefIndx through the functions to avoid recalculating the indices over and over again.
+    Notes
+    -----
+    - TODO: Angstroem is an float in beta_aer calculations and an array of shape (1, ) in beta_aer_std claculations.
 
     """
     ext_aer[~np.isfinite(ext_aer)] = 0
@@ -617,85 +648,48 @@ def calc_raman_bsc(
         # if height[0] > height[HRef[0]] or height[-1] < height[HRef[1]]
         raise ValueError("HRef is out of range.")
 
-    ext_aer_factor = (el_lambda / inel_lambda) ** angstroem
-    dH = height[1] - height[0]  # Height resolution in meters
+    # If elastic Raman extinctions are not given set them to the standard elastic extinctions
+    if ext_aer_el_raman is None:
+        ext_aer_el_raman = ext_aer
+    if ext_mol_el_raman is None:
+        ext_mol_el_raman = ext_mol
+
+    # Height resolution in meters
+    dH = height[1] - height[0]
 
     # Reference region midpoint
     refIndx = int(np.mean(HRefInd))
 
     # Calculate extinction coefficient at inelastic wavelength
-    ext_aer_raman = ext_aer * ext_aer_factor
+    ext_aer_raman = ext_aer * (el_lambda / inel_lambda) ** angstroem
 
     # Optical depths
-    mol_el_OD = np.nansum(ext_mol[:refIndx + 1]) * dH - np.nancumsum(ext_mol) * dH                  
-    mol_vr_OD = np.nansum(ext_mol_raman[:refIndx + 1]) * dH - np.nancumsum(ext_mol_raman) * dH      
-    aer_el_OD = np.nansum(ext_aer[:refIndx + 1]) * dH - np.nancumsum(ext_aer) * dH                   
-    aer_vr_OD = np.nansum(ext_aer_raman[:refIndx + 1]) * dH - np.nancumsum(ext_aer_raman) * dH      
+    mol_el_OD = np.nansum(ext_mol[:refIndx + 1]) * dH - np.nancumsum(ext_mol) * dH
+    mol_el_vr_OD = np.nansum(ext_mol_el_raman[:refIndx + 1]) * dH - np.nancumsum(ext_mol_el_raman) * dH
+    mol_vr_OD = np.nansum(ext_mol_raman[:refIndx + 1]) * dH - np.nancumsum(ext_mol_raman) * dH
+    aer_el_OD = np.nansum(ext_aer[:refIndx + 1]) * dH - np.nancumsum(ext_aer) * dH
+    aer_el_vr_OD = np.nansum(ext_aer_el_raman[:refIndx + 1]) * dH - np.nancumsum(ext_aer_el_raman) * dH
+    aer_vr_OD = np.nansum(ext_aer_raman[:refIndx + 1]) * dH - np.nancumsum(ext_aer_raman) * dH
 
     # Calculate signal ratios at reference height
     elMean = sigElastic[HRefInd[0]:HRefInd[1] + 1] / (beta_mol[HRefInd[0]:HRefInd[1] + 1] + betaRef)     
-    vrMean = sigVRN2[HRefInd[0]:HRefInd[1] + 1] / beta_mol[HRefInd[0]:HRefInd[1] + 1]
+    vrMean = sigVRN2[HRefInd[0]:HRefInd[1] + 1] / beta_mol_raman[HRefInd[0]:HRefInd[1] + 1]
+    
+    # Calculate the exponetial term
+    exponential_term = np.exp(-2*(mol_el_OD + aer_el_OD) + mol_el_vr_OD + aer_el_vr_OD + mol_vr_OD + aer_vr_OD)
 
     # Compute aerosol backscatter coefficient
     if not flagSmoothBefore:
         signalratio = (sigElastic / sigVRN2)
-        beta_aer = (signalratio * (np.nanmean(vrMean) / np.nanmean(elMean)) * np.exp(mol_vr_OD - mol_el_OD + aer_vr_OD - aer_el_OD) - 1) * beta_mol
+        beta_aer = signalratio * (np.nanmean(vrMean) / np.nanmean(elMean)) * exponential_term * beta_mol_raman - beta_mol
         beta_aer[(np.isnan(beta_aer)) | (~np.isfinite(beta_aer))] = 0
-        beta_aer = smoothWin(beta_aer, window_size, method='moving')
+        beta_aer = uniform_filter(beta_aer, window_size)
     else:
-        signalratio = (smoothWin(sigElastic, window_size, method="moving") / smoothWin(sigVRN2, window_size, method="moving"))
-        beta_aer = (signalratio * (np.nanmean(vrMean) / np.nanmean(elMean)) * np.exp(mol_vr_OD - mol_el_OD + aer_vr_OD - aer_el_OD) - 1) * beta_mol
+        signalratio = (uniform_filter(sigElastic, window_size) / uniform_filter(sigVRN2, window_size))
+        beta_aer = signalratio * (np.nanmean(vrMean) / np.nanmean(elMean)) * exponential_term * beta_mol_raman - beta_mol
 
     LR = ext_aer / beta_aer
-    return beta_aer, LR, [mol_el_OD, mol_vr_OD, aer_el_OD, aer_vr_OD], signalratio
-
-
-def smoothWin(signal:np.ndarray, win:int|np.ndarray, method:str="moving", filter:str="uniform") -> np.ndarray:
-    """Smooth signal with a height-dependent window.
-
-    Parameters
-    ----------
-    signal : array
-        Input signal array.
-    win : int or array
-        Window size. Can be a fixed scalar or a variable-length array.
-    method : str, optional
-        Smoothing method. Default is 'moving'.
-
-    Returns
-    -------
-    signalSM : array
-        Smoothed signal.
-    
-    Notes
-    -----
-    - TODO: Support for smoothing wiht variable window size is not yet implemented. 
-    
-    """
-    if isinstance(win, int):
-        if filter == "uniform":
-            f = np.ones(win)/win
-        elif filter == "gaussian":
-            f = np.exp(-0.5 * ((np.arange(win) - (win - 1)/2) / (0.3 * (win - 1)/2))**2 )
-            f /= np.sum(f)
-        elif filter == "noSmoothing":
-            return signal
-        else:
-            raise ValueError("Invalid filter type.")
-        smooth_signal = np.convolve(signal, f, mode='valid')
-        fill = np.full(int((win - 1)/2), np.nan)
-        # if window size is even fill one more element at the start.
-        if win % 2 == 0:
-            out = np.hstack((np.append(fill, np.nan), smooth_signal, fill))
-        else:
-            out = np.hstack((fill, smooth_signal, fill))
-            
-        return out
-    
-    if isinstance(win, np.ndarray):
-        raise NotImplementedError("Support for variable window size smoothing is not implemented yet.")
-
-    raise ValueError("Invalid window configuration.")
+    return beta_aer, LR, [mol_el_OD, mol_el_vr_OD, mol_vr_OD, aer_el_OD, aer_el_vr_OD, aer_vr_OD], signalratio
 
 
 def lidarratio(
@@ -744,6 +738,7 @@ def lidarratio(
     History
     -------
     2021-07-20: First edition by Zhenping (translated to Python)
+    2026-02-04: Changed from scipy.signal.savgol_filter to ppcpy.retrievals.ramanhelpers.savgol_filter
 
     Notes
     -----
