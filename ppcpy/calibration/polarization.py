@@ -437,7 +437,7 @@ def calibrateMol(data_cube):
                 sigBGCor_cross = np.squeeze(data_cube.retrievals_highres['sigBGCor'][slice(*cldFree), :, data_cube.gf(wv, 'cross', 'FR')])
                 bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][slice(*cldFree), data_cube.gf(wv, 'cross', 'FR')])
 
-                refHInd = data_cube.refH[i][f'{wv}_{t}_{tel}']['refHInd']
+                refHInd = data_cube.retrievals_profile['refH'][i][f'{wv}_{t}_{tel}']['refInd']
                 print(f'referenceH {wv} {t} {tel}', refHInd)
 
                 if np.any(np.isnan(refHInd)):

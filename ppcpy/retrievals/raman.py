@@ -158,7 +158,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                     prof['aerExt'] = prof['aerExt'] / (1064./532.)**angstrexp
                     prof['aerExtStd'] = prof['aerExtStd'] / (1064./532.)**angstrexp
 
-                refHInd = data_cube.refH[i][f'{wv}_{t}_{tel}']['refHInd']
+                refHInd = data_cube.retrievals_profile['refH'][i][f'{wv}_{t}_{tel}']['refInd']
                 if np.isnan(refHInd).any():
                     print('No valid refHInd found, skipping Raman retrieval for this channel.')
                     opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
@@ -243,7 +243,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                         smoothWinBsc=config_dict[f'{key_smooth}{wv}']
                     )
                 )
-
+                prof['refBeta'] = refBeta
                 opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
 
     return opt_profiles

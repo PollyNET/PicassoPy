@@ -14,17 +14,24 @@ def read_json_to_dict(file_path):
     return data
 
 
-def create_netcdf_from_dict(nc_file_path, data_cube, data_dict, compression_level,prod):
-    """
-    Creates a NetCDF file from a structured dictionary.
+def create_netcdf_from_dict(nc_file_path:str, data_cube, data_dict:dict, compression_level:int, prod:str):
+    """Creates a NetCDF file from a structured dictionary.
 
-    Args:
-        nc_file_path (str): Path to the NetCDF file to create.
-        data_cube (obj): the data-object of class PicassoProc
-        data_dict (dict): Dictionary with keys 'global_attributes', 'dimensions', and 'variables'.
-        compression_level (int): a nc-compressionlevel of 1 is a good reference
-        prod (str): e.g. profile, OC_profile, NR_profile, ...
+    Parameters
+    ----------
+    nc_file_path : str
+        Path to the NetCDF file to create.
+    data_cube : object
+        the data-object of class PicassoProc.
+    data_dict : dict
+        Dictionary with keys 'global_attributes', 'dimensions', and 'variables'.
+    compression_level : int
+        a nc-compressionlevel of 1 is a good reference.
+    prod : str
+        e.g. profile, OC_profile, NR_profile, ...
 
+    Examples
+    --------
     Example of `data_dict` structure:
     {
         "global_attributes": {
@@ -87,7 +94,7 @@ def create_netcdf_from_dict(nc_file_path, data_cube, data_dict, compression_leve
                 data = var_info.get('data')
 
                 # Create variable
-                var = nc_file.createVariable(var_name, dtype, dimensions,zlib=True,complevel=compression_level)
+                var = nc_file.createVariable(var_name, dtype, dimensions, zlib=True, complevel=compression_level)
 
                 # Add variable attributes
                 for attr_name, attr_value in attributes.items():

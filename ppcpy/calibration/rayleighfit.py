@@ -7,6 +7,31 @@ from scipy.special import gammaincc
 
 #import fastrdp
 
+def getVal(array:np.ndarray, indices:list) -> list:
+    """Get values of array for a set of indices, including robustness
+    to NaN indices.
+
+    Parameters
+    ----------
+    height : ndarray
+        Array to be searched.
+    indices : arry_like
+        Indeces of the array, may include NaN values.
+
+    Returns
+    -------
+    out : list
+        Values of the array at given indices.
+        If indx is NaN value is also NaN.
+    
+    """
+    indices = np.asarray(indices, dtype=float)
+    out = np.full(indices.shape, np.nan)
+    mask = ~np.isnan(indices)
+    out[mask] = array[indices[mask].astype(int)]
+    return out.tolist()
+
+
 def rayleighfit(data_cube) -> list:
     """Rayleighfit ...
 
@@ -66,11 +91,14 @@ def rayleighfit(data_cube) -> list:
                     #print('DPInd', DPInd)
 
                     #p.Results.minRefThickness, p.Results.minRefDeltaExt, p.Results.minRefSNR, flagShowDetail
-                    refHInd = fit_profile(
+                    refInd = fit_profile(
                         height, rcs, sig, bg, mSig, DPInd,
                         config_dict[f'minRefThickness{wv}'], config_dict[f'minRefDeltaExt{wv}'],
                         config_dict[f'minRefSNR{wv}'], flagShowDetail=False)
-                    print('refHInd', refHInd)
+                    print('refInd', refInd)
+
+                    refHeight = getVal(data_cube.retrievals_highres['height'], refInd)
+                    refRange = getVal(data_cube.retrievals_highres['range'], refInd)
 
                     # for debugging reasons
                     #return rcs, mSig, scaRatio
@@ -79,7 +107,7 @@ def rayleighfit(data_cube) -> list:
                     # with matlab. Above 15km, the relative difference increased to ~ 3%
                     # continue at https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L788
                     refH_cldFree[f"{wv}_{t}_{tel}"] = {
-                        'DPInd': DPInd, 'refHInd': refHInd
+                        'DPInd': DPInd, 'refInd': refInd, 'refHeight': refHeight, 'refRange':refRange
                     }
                 else:
                     logging.warning(f"No channel for rayleigh fit {wv}_{t}_{tel}")
@@ -87,19 +115,41 @@ def rayleighfit(data_cube) -> list:
             refH[i] = refH_cldFree
     
     else: # manual RefH
-        logging.info(f"manual reference height")
+        logging.info("manual reference height")
         for i, cldFree in enumerate(data_cube.clFreeGrps):
             print(i, cldFree)
             refH_cldFree = {}
             for wv, t, tel in [(532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]:
                 refBInd = int(np.searchsorted(height, config_dict[f'refH_{tel}_{wv}'][0]))
                 refTInd = int(np.searchsorted(height, config_dict[f'refH_{tel}_{wv}'][1]))
-                print(wv, t, tel, refBInd, refTInd)
+                refInd = [refBInd, refTInd]
+                print('refInd', refInd)
+
+                refHeight = getVal(data_cube.retrievals_highres['height'], refInd)
+                refRange = getVal(data_cube.retrievals_highres['range'], refInd)
+
                 refH_cldFree[f"{wv}_{t}_{tel}"] = {
-                    'DPInd': [], 'refHInd': [refBInd, refTInd]
+                    'DPInd': [], 'refInd': refInd, 'refHeight': refHeight, 'refRange': refRange
                 }
             refH[i] = refH_cldFree
 
+    # Current methodology is to take NR refH values form the config file.
+    logging.info("Using Config values for NR refH.")
+    for wv, t, tel in [(532, 'total', 'NR'), (355, 'total', 'NR')]:
+        refInd = (
+            np.searchsorted(
+                data_cube.retrievals_highres['height'],
+                data_cube.polly_config_dict[f'refH_{tel}_{wv}']
+            ) - [0, 1] # - [0, 1] --> make sure all values lay inside the designeted range
+        ).tolist()
+        refHeight = getVal(data_cube.retrievals_highres['height'], refInd)
+        refRange = getVal(data_cube.retrievals_highres['range'], refInd)
+
+        for i in range(len(data_cube.clFreeGrps)):
+            refH[i][f'{wv}_{t}_{tel}'] = {
+                'DPInd': [], 'refInd': refInd, 'refHeight': refHeight, 'refRange': refRange
+            }
+    
     return refH
 
 

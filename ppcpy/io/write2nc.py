@@ -236,7 +236,7 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], col
 
             """ Create the NetCDF file """
             output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{start}_{stop}_{prod}.nc")
-            json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1,prod=prod)
+            json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1, prod=prod)
 
 
 def adding_mol_profiles(data_cube, json_nc_mapping_dict:dict, cldFreeGrp:int) -> dict:

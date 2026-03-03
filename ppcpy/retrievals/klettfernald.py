@@ -98,7 +98,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:b
                     continue
 
                 # Reference height
-                refHInd = data_cube.refH[i][f'{wv}_{t}_{tel}']['refHInd']
+                refHInd = data_cube.retrievals_profile['refH'][i][f'{wv}_{t}_{tel}']['refInd']
                 if np.isnan(refHInd).any():
                     print('No valid refHInd found, skipping Klett retrieval for this channel.')
                     continue
@@ -150,6 +150,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:b
                 prof['aerExtStd'] = prof['aerBscStd'] * config_dict[f'{key_LR}{wv}']
                 prof['retrieval'] = 'klett'
                 prof['signal'] = signal
+                prof['refBeta'] = refBeta
                 opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
 
     return opt_profiles

@@ -273,18 +273,18 @@
                                                  "channel":"355_total_FR"
                             },
                             "reference_height_355": {
-                                                 "method":"klett",
-                                                 "parameter":"refH",
+                                                 "method":"refH",
+                                                 "parameter":"refHeight",
                                                  "channel":"355_total_FR"
                             },
                             "reference_height_532": {
-                                                 "method":"klett",
-                                                 "parameter":"refH",
+                                                 "method":"refH",
+                                                 "parameter":"refHeight",
                                                  "channel":"532_total_FR"
                             },
                             "reference_height_1064": {
-                                                 "method":"klett",
-                                                 "parameter":"refH",
+                                                 "method":"refH",
+                                                 "parameter":"refHeight",
                                                  "channel":"1064_total_FR"
                             }
               }
@@ -392,13 +392,13 @@
                                                  "channel":"355_total_NR"
                             },
                             "reference_height_355": {
-                                                 "method":"klett",
-                                                 "parameter":"refH",
+                                                 "method":"refH",
+                                                 "parameter":"refHeight",
                                                  "channel":"355_total_NR"
                             },
                             "reference_height_532": {
-                                                 "method":"klett",
-                                                 "parameter":"refH",
+                                                 "method":"refH",
+                                                 "parameter":"refHeight",
                                                  "channel":"532_total_NR"
                             }
               }
@@ -676,18 +676,18 @@
                                                  "channel":"355_total_FR"
                             },
                             "reference_height_355": {
-                                                 "method":"klett",
-                                                 "parameter":"refH",
+                                                 "method":"refH",
+                                                 "parameter":"refHeight",
                                                  "channel":"355_total_FR"
                             },
                             "reference_height_532": {
-                                                 "method":"klett",
-                                                 "parameter":"refH",
+                                                 "method":"refH",
+                                                 "parameter":"refHeight",
                                                  "channel":"532_total_FR"
                             },
                             "reference_height_1064": {
-                                                 "method":"klett",
-                                                 "parameter":"refH",
+                                                 "method":"refH",
+                                                 "parameter":"refHeight",
                                                  "channel":"1064_total_FR"
                             }
               }
