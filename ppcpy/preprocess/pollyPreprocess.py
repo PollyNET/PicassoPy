@@ -226,6 +226,8 @@ def slicerange(array:np.ndarray, maxHeightBin:int, firstBinIndex:list) -> np.nda
     Output:
     - out (np.ndarray): sliced array
     """
+
+    assert len(firstBinIndex) == array.shape[2], f"first bin index and array do not match {len(firstBinIndex)}, {array.shape}"
     firstBinIndex = np.asarray(firstBinIndex)
     heightBins = np.arange(maxHeightBin)[:, None] + firstBinIndex[None, :]
     out = array[:, heightBins, np.arange(array.shape[2])]
