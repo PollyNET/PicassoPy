@@ -70,10 +70,10 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
                 opt_profiles[i][channel]['vdr'] = vdr
                 opt_profiles[i][channel]['vdrStd'] = vdrStd
 
-                if np.isnan(data_cube.refH[i][f"{wv}_{t}_{tel}"]['refHInd']).any():
+                if np.isnan(data_cube.retrievals_profile['refH'][i][f"{wv}_{t}_{tel}"]['refInd']).any():
                     continue
                 mdr, mdrStd, flgaDeftMdr = get_MDR(
-                    vdr, vdrStd, data_cube.refH[i][f"{wv}_{t}_{tel}"]['refHInd'],
+                    vdr, vdrStd, data_cube.retrievals_profile['refH'][i][f"{wv}_{t}_{tel}"]['refInd'],
                 )
                 if config_dict["flagUseTheoreticalMDR"]:
                     logging.info("use the theoretical MDR value")
@@ -90,7 +90,7 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
                     window=1
                     )
                 mdr, mdrStd, flgaDeftMdr = get_MDR(
-                    vdr, vdrStd, data_cube.refH[i][f"{wv}_{t}_{tel}"]['refHInd'],
+                    vdr, vdrStd, data_cube.retrievals_profile['refH'][i][f"{wv}_{t}_{tel}"]['refInd'],
                 )
                 print(f"est. mdr {channel}  {mdr} {mdrStd}  (smooth1)")
 

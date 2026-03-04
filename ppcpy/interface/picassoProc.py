@@ -430,9 +430,12 @@ class PicassoProc:
         print('Start Rayleigh Fit')
         logging.warning(f'Potential for differences to matlab code du to numerical issues (subtraction of two small values)')
 
-        self.refH =  rayleighfit.rayleighfit(self)
-        return self.refH
+        # self.refH =  rayleighfit.rayleighfit(self)
+        self.retrievals_profile['refH'] = rayleighfit.rayleighfit(self)
+        # return self.refH
 
+        # example
+        # self.retrievals_profile['klett'][cldFreeGrp]['355_total_NR']['refH']
 
     def polarizationCaliMol(self):
         """
@@ -675,6 +678,23 @@ class PicassoProc:
         sql_db.write_rows_to_sql_db(db_path, table_name, column_names, rows_to_insert)
 
 
+    def adding_retrieving_infos_2_polly_config_dict(self):
+            """ some infos from the polly_config_dict should have there own keys, e.g. reference_search_range
+            parameters:
+            - self
+            output:
+            - self (with added polly_config dict_keys)
+            """
+            lower_overlap = np.array(self.polly_config_dict['heightFullOverlap'])
+            reference_search_range_355_total_FR = [int(lower_overlap[self.flag_355_total_FR][0]),self.polly_config_dict['maxDecomHeight355']]
+            reference_search_range_532_total_FR = [int(lower_overlap[self.flag_532_total_FR][0]),self.polly_config_dict['maxDecomHeight532']]
+            reference_search_range_1064_total_FR = [int(lower_overlap[self.flag_1064_total_FR][0]),self.polly_config_dict['maxDecomHeight1064']]
+    
+            self.polly_config_dict['reference_search_range_355_total_FR'] = reference_search_range_355_total_FR
+            self.polly_config_dict['reference_search_range_532_total_FR'] = reference_search_range_532_total_FR
+            self.polly_config_dict['reference_search_range_1064_total_FR'] = reference_search_range_1064_total_FR
+    
+            return self
 
 #    def __str__(self):
 #        return f"{self.rawdata_dict}"
