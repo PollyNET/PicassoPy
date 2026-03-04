@@ -87,7 +87,7 @@ def write_channelwise_2_nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
 
         """ Create the NetCDF file """
         output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{prod}.nc")
-        json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1,prod=prod)
+        json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1, prod=prod)
 
 def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
     ## writes data from products, listed in prod_ls, to nc-file
@@ -140,12 +140,12 @@ def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
         for var in list(json_nc_mapping_dict['variables'].keys()):  ## use list here to suppress RuntimeError: dictionary changed size during iteration
             if json_nc_mapping_dict['variables'][var]['data'] is None:
                 print(f'removing variable: {var}')
-                json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict,key_to_remove=var)
+                json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict, key_to_remove=var)
 
 
         """ Create the NetCDF file """
         output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{prod}.nc")
-        json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1,prod=prod)
+        json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1, prod=prod)
 
 
 def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], collect_debug:bool=False):
@@ -236,7 +236,7 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], col
 
             """ Create the NetCDF file """
             output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{start}_{stop}_{prod}.nc")
-            json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1, prod=prod)
+            json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1, prod=prod, cldFreeIndx=n)
 
 
 def adding_mol_profiles(data_cube, json_nc_mapping_dict:dict, cldFreeGrp:int) -> dict:

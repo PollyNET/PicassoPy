@@ -109,7 +109,7 @@
         "source": "__device",
         "retrieving_info": {
             "Fixed lidar ratio": {"value": "__polly_config_dict[LR_NR_355]", "unit": "[Sr]"},
-            "Reference value": {"value": "__polly_config_dict[refBeta355]", "unit":"[Mm^{-1}*Sr^{-1}]"},
+            "Reference value": {"value": "__retrievals_profile[klett][*][355_total_NR][refBeta]", "unit":"[Mm^{-1}*Sr^{-1}]"},
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_klett_NR_355]", "unit": "[m]"}
             },
         "comment": "The result is retrieved with Klett method. If you want to know more about the algorithm, please go to Klett, J. D. (1985). \"Lidar inversion with variable backscatter/extinction ratios.\" Applied optics 24(11): 1638-1643."
@@ -145,7 +145,7 @@
         "source": "__device",
         "retrieving_info": {
             "Fixed lidar ratio": {"value": "__polly_config_dict[LR_NR_532]", "unit": "[Sr]"},
-            "Reference value": {"value": "__polly_config_dict[refBeta532]", "unit":"[Mm^{-1}*Sr^{-1}]"},
+            "Reference value": {"value": "__retrievals_profile[klett][*][532_total_NR][refBeta]", "unit":"[Mm^{-1}*Sr^{-1}]"},
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_klett_NR_532]", "unit": "[m]"}
             },
         "comment": "The result is retrieved with Klett method. If you want to know more about the algorithm, please go to Klett, J. D. (1985). \"Lidar inversion with variable backscatter/extinction ratios.\" Applied optics 24(11): 1638-1643."
@@ -180,7 +180,7 @@
         "plot_scale": "linear",
         "source": "__device",
         "retrieving_info": {
-            "Reference value": {"value": "__polly_config_dict[refBeta355]", "unit":"[Mm^{-1}*Sr^{-1}]"},
+            "Reference value": {"value": "__retrievals_profile[raman][*][355_total_NR][refBeta]", "unit":"[Mm^{-1}*Sr^{-1}]"},
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_raman_NR_355]", "unit": "[m]"},
             "Angstroem exponent":{"value": "__polly_config_dict[angstrexp_NR]", "unit": ""}
             },
@@ -216,7 +216,7 @@
         "plot_scale": "linear",
         "source": "__device",
         "retrieving_info": {
-            "Reference value": {"value": "__polly_config_dict[refBeta532]", "unit":"[Mm^{-1}*Sr^{-1}]"},
+            "Reference value": {"value": "__retrievals_profile[raman][*][532_total_NR][refBeta]", "unit":"[Mm^{-1}*Sr^{-1}]"},
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_raman_NR_532]", "unit": "[m]"},
             "Angstroem exponent":{"value": "__polly_config_dict[angstrexp_NR]", "unit": ""}
             },

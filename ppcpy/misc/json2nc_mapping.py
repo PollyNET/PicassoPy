@@ -2,6 +2,7 @@ import logging
 import json
 import copy
 import re
+import numpy as np
 from pathlib import Path
 from netCDF4 import Dataset
 
@@ -14,7 +15,8 @@ def read_json_to_dict(file_path):
     return data
 
 
-def create_netcdf_from_dict(nc_file_path:str, data_cube, data_dict:dict, compression_level:int, prod:str):
+def create_netcdf_from_dict(nc_file_path:str, data_cube, data_dict:dict,
+                            compression_level:int, prod:str, cldFreeIndx:int=None):
     """Creates a NetCDF file from a structured dictionary.
 
     Parameters
@@ -29,6 +31,9 @@ def create_netcdf_from_dict(nc_file_path:str, data_cube, data_dict:dict, compres
         a nc-compressionlevel of 1 is a good reference.
     prod : str
         e.g. profile, OC_profile, NR_profile, ...
+    cldFreeIndx : int, optional
+        If the product to be saved are optical profiles; index of the cloud free
+        region for the saved profiles. Else; None. Default is None.
 
     Examples
     --------
@@ -112,23 +117,23 @@ def create_netcdf_from_dict(nc_file_path:str, data_cube, data_dict:dict, compres
                                     dict_name = after.split('[')[0]
                                     #print(dict_name)
                                     nested_keys = extract_bracket_values(after)
-                                    #print(nested_keys)
-                                    #print(nested_keys[0])
-                                    if len(nested_keys) == 1:
-                                        key_value = getattr(data_cube,dict_name)
-                                        if nested_keys[0] in key_value.keys():
-                                            if "smoothwin" in nested_keys[0].lower():
-                                                attr_value[key]['value'] = key_value[nested_keys[0]]*7.5 # x hight-resolution=7.5m
-                                            elif "refbeta" in nested_keys[0].lower():
-                                                result = key_value[nested_keys[0]]*1e6 # [m^{-1}*Sr^{-1} --> [Mm^{-1}*Sr^{-1}
-                                                attr_value[key]['value'] = f"{result:.0e}"
-                                            else:
-                                                attr_value[key]['value'] = key_value[nested_keys[0]]
-                                    if len(nested_keys) == 2:
-                                        key_value = getattr(data_cube,dict_name)
-                                        if nested_keys[0] in key_value.keys():
-                                            if nested_keys[1] in key_value[nested_keys[0]]:
-                                                attr_value[key]['value'] = key_value[nested_keys[0]][nested_keys[1]]
+                                    extraction = getattr(data_cube, dict_name)
+                                    for nested_key in nested_keys:
+                                        if nested_key in extraction:
+                                            extraction = extraction[nested_key]
+                                        elif nested_key == '*' and isinstance(cldFreeIndx, (int, float)) and len(extraction) > cldFreeIndx:
+                                            extraction = extraction[int(cldFreeIndx)]
+                                        else:
+                                            extraction = attr_value[key]['value']
+                                            break
+                            
+                                    if 'smoothwin' in nested_key.lower() and isinstance(extraction, (float, int, np.ndarray)):
+                                        attr_value[key]['value'] = extraction*7.5 # x hight-resolution=7.5m
+                                    elif "refbeta" in nested_key.lower() and isinstance(extraction, (float, int)):
+                                        result = extraction*1e6 # [m^{-1}*Sr^{-1} --> [Mm^{-1}*Sr^{-1}
+                                        attr_value[key]['value'] = f"{result:.2e}"
+                                    else:
+                                        attr_value[key]['value'] = extraction
 
                         setattr(var, attr_name, json.dumps(attr_value))
                     elif isinstance(attr_value, (str)):
