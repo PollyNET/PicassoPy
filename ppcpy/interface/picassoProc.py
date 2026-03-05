@@ -272,9 +272,7 @@ class PicassoProc:
             - Range corrected signal.
             - etc.
 
-        TODO:
-            - This is just a first draft for a docstring. Improve it. There is more
-              processes and outputs of the function.        
+        .. TODO:: This is just a first draft for a docstring. Improve it. There is more processes and outputs of the function.        
         """
         preproc_dict = pollyPreprocess.pollyPreprocess(
             self.rawdata_dict,
@@ -364,7 +362,7 @@ class PicassoProc:
         """
         Aggregate highres profiles over cloud free segments
 
-        TODO: Decide on a consistent way for doing the aggregation, do not mix mean and sum
+        .. TODO:: Decide on a consistent way for doing the aggregation, do not mix mean and sum
         """
 
         if var == None:
@@ -401,7 +399,7 @@ class PicassoProc:
 
     def loadAOD(self):
         """ 
-        TODO: Not yet implemented!
+        .. TODO:: Not yet implemented!
         """
         # raise NotImplementedError
         pass
@@ -449,16 +447,18 @@ class PicassoProc:
 
     def transCor(self):
         """
-        TODO:
-        flagTransCor = True:
-            Fix the GHK - Transmission correction
-        flagTransCor = False:
-            Check if it is correct to use the BG corrected signal and find a better solution.
-            It is a bit confusing to overwrite the signal as it is called sigTCor but actually is sigBGCor
-            Like storing a dedicated signal dict to be used throuhot the processing, the dictionary could
-            have elements like signal (sig), background (bg), and name. which we could overwrite each time 
-            a new correction is made. And by checking the name of the signal (TCor, BGCor) you can find out
-            which signal it is.
+
+        .. TODO::
+
+            flagTransCor = True:
+                Fix the GHK - Transmission correction
+            flagTransCor = False:
+                Check if it is correct to use the BG corrected signal and find a better solution.
+                It is a bit confusing to overwrite the signal as it is called sigTCor but actually is sigBGCor
+                Like storing a dedicated signal dict to be used throuhot the processing, the dictionary could
+                have elements like signal (sig), background (bg), and name. which we could overwrite each time 
+                a new correction is made. And by checking the name of the signal (TCor, BGCor) you can find out
+                which signal it is.
         """
 
         if self.polly_config_dict['flagTransCor']:
@@ -595,8 +595,8 @@ class PicassoProc:
 
     def LidarCalibration(self):
         """
-        TODO: Add option to read constants from database.
-        TODO: Find out how we prioritise raman, klett, and database retrieved LC...
+        .. TODO:: Add option to read constants from database.
+        .. TODO:: Find out how we prioritise raman, klett, and database retrieved LC...
         """
         self.LC = {}
         self.LC['klett'] = lidarconstant.lc_for_cldFreeGrps(
@@ -649,10 +649,11 @@ class PicassoProc:
 
     def write_2_sql_db(self, db_path:str, parameter:str, method:str|None=None):
         """ write LC or eta to sqlite db table
-        parameters:
-        - parameter (str): can be LC (Lidar-calibration-constant) or DC (Depol-calibration-constant)
-        - method (str): 'raman' or 'klett'
-        - db_path (str): location of the sqlite db-file
+
+        Paramters
+        parameter (str): can be LC (Lidar-calibration-constant) or DC (Depol-calibration-constant)
+        method (str): 'raman' or 'klett'
+        db_path (str): location of the sqlite db-file
 
         """
         if parameter == 'LC':
@@ -679,22 +680,26 @@ class PicassoProc:
 
 
     def adding_retrieving_infos_2_polly_config_dict(self):
-            """ some infos from the polly_config_dict should have there own keys, e.g. reference_search_range
-            parameters:
-            - self
-            output:
-            - self (with added polly_config dict_keys)
-            """
-            lower_overlap = np.array(self.polly_config_dict['heightFullOverlap'])
-            reference_search_range_355_total_FR = [int(lower_overlap[self.flag_355_total_FR][0]),self.polly_config_dict['maxDecomHeight355']]
-            reference_search_range_532_total_FR = [int(lower_overlap[self.flag_532_total_FR][0]),self.polly_config_dict['maxDecomHeight532']]
-            reference_search_range_1064_total_FR = [int(lower_overlap[self.flag_1064_total_FR][0]),self.polly_config_dict['maxDecomHeight1064']]
+        """ some infos from the polly_config_dict should have there own keys, e.g. reference_search_range
+
+        Parameters
+        ----------
+        self
+        
+        Returns
+        -------
+        self (with added polly_config dict_keys)
+        """
+        lower_overlap = np.array(self.polly_config_dict['heightFullOverlap'])
+        reference_search_range_355_total_FR = [int(lower_overlap[self.flag_355_total_FR][0]),self.polly_config_dict['maxDecomHeight355']]
+        reference_search_range_532_total_FR = [int(lower_overlap[self.flag_532_total_FR][0]),self.polly_config_dict['maxDecomHeight532']]
+        reference_search_range_1064_total_FR = [int(lower_overlap[self.flag_1064_total_FR][0]),self.polly_config_dict['maxDecomHeight1064']]
     
-            self.polly_config_dict['reference_search_range_355_total_FR'] = reference_search_range_355_total_FR
-            self.polly_config_dict['reference_search_range_532_total_FR'] = reference_search_range_532_total_FR
-            self.polly_config_dict['reference_search_range_1064_total_FR'] = reference_search_range_1064_total_FR
+        self.polly_config_dict['reference_search_range_355_total_FR'] = reference_search_range_355_total_FR
+        self.polly_config_dict['reference_search_range_532_total_FR'] = reference_search_range_532_total_FR
+        self.polly_config_dict['reference_search_range_1064_total_FR'] = reference_search_range_1064_total_FR
     
-            return self
+        return self
 
 #    def __str__(self):
 #        return f"{self.rawdata_dict}"

@@ -19,8 +19,11 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     ndarray
         Smoothed signal
     
-    History
-    -------
+    Notes
+    -----
+
+    **History**
+    
     - 2026-02-04 Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
 
     """
@@ -28,7 +31,9 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
 
 
 def cloudscreen(data_cube):
-    """ """
+    """perform cloud screening
+    
+    """
 
     config_dict = data_cube.polly_config_dict
     print('Starting cloud screen')
@@ -67,29 +72,33 @@ def cloudscreen(data_cube):
 
 
 def cloudScreen_MSG(height, RCS, slope_thres, search_region):
-    """
-    CLOUDSCREEN_MSG cloud screen with maximum signal gradient.
+    """CLOUDSCREEN_MSG cloud screen with maximum signal gradient.
 
+    Parameters
+    ----------
+    height: array
+        Height in meters.
+    signal: array (time, height) !! this is transposed compared to the original implementation 
+        Photon count rate in MHz.
+    slope_thres: float
+        Threshold of the slope to determine whether there is strong backscatter signal. [MHz*m]
+    search_region: list or array (2 elements)
+        [baseHeight, topHeight] in meters.
 
-    INPUTS:
-        height: array
-            Height in meters.
-        signal: array (time, height) !! this is transposed compared to the original implementation 
-            Photon count rate in MHz.
-        slope_thres: float
-            Threshold of the slope to determine whether there is strong backscatter signal. [MHz*m]
-        search_region: list or array (2 elements)
-            [baseHeight, topHeight] in meters.
+    Returns
+    -------
+    flagCloudFree: boolean array
+        Indicates whether the profile is cloud free.
+    layerStatus: matrix (height x time)
+        Layer status for each bin (0: unknown, 1: cloud, 2: aerosol).
 
-    OUTPUTS:
-        flagCloudFree: boolean array
-            Indicates whether the profile is cloud free.
-        layerStatus: matrix (height x time)
-            Layer status for each bin (0: unknown, 1: cloud, 2: aerosol).
+    Notes
+    -----
 
-    HISTORY:
-        - 2021-05-18: First edition by Zhenping
-        - 2025-03-20: Translated into python
+    **History**
+
+    - 2021-05-18: First edition by Zhenping
+    - 2025-03-20: Translated into python
     """
 
     if len(search_region) != 2 or search_region[1] <= height[0]:
@@ -118,5 +127,8 @@ def cloudScreen_MSG(height, RCS, slope_thres, search_region):
 
 
 def cloudScreen_Zhao(height, RCS, slope_thres, search_region):
-    """ """
+    """cloud screen Zhao
+    
+    .. TODO:: not yet implemented from matlab version
+    """
     raise ValueError('not yet implemented')

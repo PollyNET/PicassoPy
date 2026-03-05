@@ -8,6 +8,9 @@ ASSUME_AIR_IDEAL = True
 
 def air_refractive_index(wavelength, pressure, temperature, C, relative_humidity):
     """Calculate the refractive index of air.
+
+    Parameters
+    ----------
     wavelength: Wavelength [nm]
     pressure: Atmospheric pressure [hPa]
     temperature: Atmospheric temperature [K]
@@ -30,6 +33,9 @@ def air_refractive_index(wavelength, pressure, temperature, C, relative_humidity
 
 def moist_air_density(pressure, temperature, C, Xw):
     """Calculate the density of moist air.
+
+    Parameters
+    ----------
     pressure: Total pressure [hPa]
     temperature: Temperature [K]
     C: CO2 concentration [ppmv]
@@ -53,8 +59,15 @@ def moist_air_density(pressure, temperature, C, Xw):
 
 def molar_mass_dry_air(C):
     """Molar mass of dry air as a function of CO2 concentration.
+
+    Parameters
+    ----------
     C: CO2 concentration [ppmv]
-    Returns: Molar mass of dry air [kg/mol]
+
+    Returns
+    -------
+    Molar mass of dry air [kg/mol]
+
     """
     C1 = 400.
     Ma = 10 ** -3 * (28.9635 + 12.011e-6 * (C - C1))
@@ -62,6 +75,9 @@ def molar_mass_dry_air(C):
 
 def compressibility_of_moist_air(pressure, temperature, molar_fraction):
     """Compressibility of moist air.
+
+    Parameters
+    ----------
     pressure: Total pressure [hPa]
     temperature: Temperature [K]
     molar_fraction: Molar fraction of water vapor
@@ -89,10 +105,12 @@ def compressibility_of_moist_air(pressure, temperature, molar_fraction):
 def n_standard_air(wavelength):
     """Calculate the refractive index of standard air at a given wavelength.
 
-    Parameters:
+    Parameters
+    ----------
         wavelength (float): Wavelength [nm].
 
-    Returns:
+    Returns
+    -------
         float: Refractive index of standard air.
     """
     wl_micrometers = wavelength / 1000.0
@@ -107,11 +125,13 @@ def n_standard_air(wavelength):
 def n_standard_air_with_CO2(wavelength, C):
     """Calculate the refractive index of air at a specific wavelength with CO2 concentration.
 
-    Parameters:
+    Parameters
+    ----------
         wavelength (float): Wavelength [nm].
         C (float): CO2 concentration [ppmv].
 
-    Returns:
+    Returns
+    -------
         float: Refractive index of air for the given CO2 concentration.
     """
     C2 = 450.
@@ -122,11 +142,13 @@ def n_standard_air_with_CO2(wavelength, C):
 def n_water_vapor(wavelength):
     """Calculate the refractive index of water vapor.
 
-    Parameters:
-        wavelength (float): Wavelength [nm].
+    Parameters
+    ----------
+    wavelength (float): Wavelength [nm].
 
-    Returns:
-        float: Refractive index of water vapor.
+    Returns
+    -------
+    float: Refractive index of water vapor.
     """
     wl_micrometers = wavelength / 1000.0
     s = 1 / wl_micrometers
@@ -140,20 +162,24 @@ def n_water_vapor(wavelength):
 
 def alpha_rayleigh(wavelength, pressure, temperature, C, rh):
     """Cacluate the extinction coefficient for Rayleigh scattering. 
- 	Inputs:
-        wavelength : float or array of floats
-            Wavelegnth [nm]
-        pressure : float or array of floats
-            Atmospheric pressure [hPa]
-        temperature : float
-            Atmospheric temperature [K]
-        C : float
-            CO2 concentration [ppmv].
-        rh : float
-            Relative humidity from 0 to 100 [%] 
- 	Returns:
-        alpha: float
-            The molecular scattering coefficient [m-1]
+
+    Parameters
+    ----------
+    wavelength : float or array of floats
+        Wavelegnth [nm]
+    pressure : float or array of floats
+        Atmospheric pressure [hPa]
+    temperature : float
+        Atmospheric temperature [K]
+    C : float
+        CO2 concentration [ppmv].
+    rh : float
+        Relative humidity from 0 to 100 [%] 
+
+    Returns
+    -------
+    alpha: float
+        The molecular scattering coefficient [m-1]
     """
     ASSUME_AIR_IDEAL = True
     sigma = sigma_rayleigh(wavelength, pressure, temperature, C, rh)
@@ -163,20 +189,24 @@ def alpha_rayleigh(wavelength, pressure, temperature, C, rh):
 
 def beta_pi_rayleigh(wavelength, pressure, temperature, C, rh):
     """Calculates the total Rayleigh backscatter coefficient.
- 	Inputs:
-        wavelength: float
-            Wavelength [nm]
-        pressure: float
-            The atmospheric pressure [hPa]
-        temperature: float
-            The atmospheric temperature [K]   
-        C: float
-            CO2 concentration [ppmv].
-        rh: float
-            Relative humidity from 0 to 100 [%] 
- 	Returns
-        beta_pi: array
-            molecule backscatter coefficient. [m^{-1}Sr^{-1}]
+
+    Parameters
+    ----------
+    wavelength: float
+        Wavelength [nm]
+    pressure: float
+        The atmospheric pressure [hPa]
+    temperature: float
+        The atmospheric temperature [K]   
+    C: float
+        CO2 concentration [ppmv].
+    rh: float
+        Relative humidity from 0 to 100 [%] 
+
+	Returns
+    -------
+    beta_pi: array
+        molecule backscatter coefficient. [m^{-1}Sr^{-1}]
     """
     ASSUME_AIR_IDEAL = True
     dsigma_pi = dsigma_phi_rayleigh(np.pi, wavelength, pressure, temperature, C, rh)
@@ -186,22 +216,26 @@ def beta_pi_rayleigh(wavelength, pressure, temperature, C, rh):
 
 def dsigma_phi_rayleigh(theta, wavelength, pressure, temperature, C, rh):
     """Calculates the angular rayleigh scattering cross section per molecule.
- 	Inputs:
-        theta: float
-            Scattering angle [rads]
-        wavelength: float
-            Wavelength [nm]
-        pressure: float
-            The atmospheric pressure [hPa]
-        temperature: float
-            The atmospheric temperature [K]   
-        C: float
-            CO2 concentration [ppmv].
-        rh: float
-            Relative humidity from 0 to 100 [%] 
- 	Returns:
-        dsigma: float
-            rayleigh-scattering cross section [m2sr-1]
+
+    Parameters
+    ----------
+    theta: float
+        Scattering angle [rads]
+    wavelength: float
+        Wavelength [nm]
+    pressure: float
+        The atmospheric pressure [hPa]
+    temperature: float
+        The atmospheric temperature [K]   
+    C: float
+        CO2 concentration [ppmv].
+    rh: float
+        Relative humidity from 0 to 100 [%] 
+
+    Returns
+    -------
+    dsigma: float
+        rayleigh-scattering cross section [m2sr-1]
     """
     phase = phase_function(theta, wavelength, pressure, temperature, C, rh)
     phase = phase / (4 * np.pi)
@@ -211,11 +245,13 @@ def dsigma_phi_rayleigh(theta, wavelength, pressure, temperature, C, rh):
 
 def enhancement_factor_f(pressure, temperature):
     """Enhancement factor.
- 	Inputs:
-        pressure: float
-            Atmospheric pressure [hPa]
-        temperature: float
-            Atmospehric temperature [K]
+
+    Parameters
+    ----------
+    pressure: float
+        Atmospheric pressure [hPa]
+    temperature: float
+        Atmospehric temperature [K]
     """
     T = temperature
     p = pressure * 100.
@@ -224,22 +260,30 @@ def enhancement_factor_f(pressure, temperature):
 
 def kings_factor_atmosphere(wavelength, C, p_e, p_t):
     """calculate the king factor.
-    Usage:
-        k = king_factor_atmosphere(wavelength, C, p_e, p_t)
-    Inputs:
-        wavelength: float
-            Unit: nm
-        C: float
-            CO2 concentration in ppmv
-        p_e: float
-            water vapor pressure in hPa
-        p_t: float
-            total air pressure in hPa
-    Returns:
-        k: float
-            total atmospheric King's factor
-    References:
-        https://bitbucket.org/iannis_b/lidar_molecular
+
+    Parameters
+    ----------
+    wavelength: float
+        Unit: nm
+    C: float
+        CO2 concentration in ppmv
+    p_e: float
+        water vapor pressure in hPa
+    p_t: float
+        total air pressure in hPa
+
+    Returns
+    -------
+    k: float
+        total atmospheric King's factor
+
+    References
+    ----------
+    https://bitbucket.org/iannis_b/lidar_molecular
+
+    Examples
+    --------
+    k = king_factor_atmosphere(wavelength, C, p_e, p_t)
     """
     if not (200 < wavelength < 4000):
         raise ValueError('King\'s factor formula is only valid from 0.2 to 4um.')
@@ -266,25 +310,34 @@ def kings_factor_atmosphere(wavelength, C, p_e, p_t):
 
 def kings_factor_N2(wavenumber):
     """approximates the King's correction factor for a specific wavenumber.
- 	According to Bates, the agreement with experimental values is "rather better than 1 per cent."
+	According to Bates, the agreement with experimental values is "rather better than 1 per cent."
 
- 	Inputs:
-        wavenumber : float
-        Wavenumber (defined as 1/lamda) in cm-1
- 	Returns:
-        Fk : float
-        Kings factor for N2
- 	Notes:
-        The King's factor is estimated as:
-        .. math::
-        F_{N_2} = 1.034 + 3.17 \cdot 10^{-4} \cdot \lambda^{-2}
-        where :math:`\lambda` is the wavelength in micrometers.
- 	References:
-        Tomasi, C., Vitale, V., Petkov, B., Lupi, A. & Cacciari, A. Improved
-        algorithm for calculations of Rayleigh-scattering optical depth in standard
-        atmospheres. Applied Optics 44, 3320 (2005).
-        Bates, D. R.: Rayleigh scattering by air, Planetary and Space Science, 32(6),
-        785-790, doi:10.1016/0032-0633(84)90102-8, 1984.
+    Parameters
+    ----------
+    wavenumber : float
+    Wavenumber (defined as 1/lamda) in cm-1
+
+    Returns
+    -------
+    Fk : float
+    Kings factor for N2
+
+    Notes
+    -----
+    The King's factor is estimated as
+
+    .. math:: F_{N_2} = 1.034 + 3.17 \\cdot 10^{-4} \\cdot \\lambda^{-2}
+
+    where :math:`\\lambda` is the wavelength in micrometers.
+    
+
+	References
+    ----------
+    Tomasi, C., Vitale, V., Petkov, B., Lupi, A. & Cacciari, A. Improved
+    algorithm for calculations of Rayleigh-scattering optical depth in standard
+    atmospheres. Applied Optics 44, 3320 (2005).
+    Bates, D. R.: Rayleigh scattering by air, Planetary and Space Science, 32(6),
+    785-790, doi:10.1016/0032-0633(84)90102-8, 1984.
     """
     lamda_cm = 1 / wavenumber
     lamda_um = lamda_cm * 10 ** 4
@@ -308,13 +361,15 @@ def kings_factor_H2O():
 
 def molar_fraction_water_vapour(pressure, temperature, relative_humidity):
     """Molar fraction of water vapor. 
- 	Inputs:
-        pressure: float
-            Total pressure [hPa]
-        temperature: float
-            Atmospehric temperature [K] 
-        relative_humidity:
-            Relative humidity from 0 to 100 [%]
+
+    Parameters
+    ----------
+    pressure: float
+        Total pressure [hPa]
+    temperature: float
+        Atmospehric temperature [K] 
+    relative_humidity:
+        Relative humidity from 0 to 100 [%]
     """
     p = pressure
     h = relative_humidity / 100.
@@ -326,19 +381,23 @@ def molar_fraction_water_vapour(pressure, temperature, relative_humidity):
 
 def number_density_at_pt(pressure, temperature, relative_humidity, ideal):
     """Calculate the number density for a given temperature and pressure, taking into account the compressibility of air.
- 	Inputs:
-        pressure: float or array
-            Pressure in hPa
-        temperature: float or array
-            Temperature in K
-        relative_humidity: float or array (?)
-            ? The relative humidity of air (Check)
-        ideal: boolean
-            If False, the compressibility of air is considered. If True, the 
-            compressibility is set to 1.
- 	Returns:
-        n: array or array
-            Number density of the atmosphere [m^{-3}] 
+
+    Parameters
+    ----------
+    pressure: float or array
+        Pressure in hPa
+    temperature: float or array
+        Temperature in K
+    relative_humidity: float or array (?)
+        ? The relative humidity of air (Check)
+    ideal: boolean
+        If False, the compressibility of air is considered. If True, the 
+        compressibility is set to 1.
+
+    Returns
+    -------
+    n: array or array
+        Number density of the atmosphere [m^{-3}] 
     """
     Xw = molar_fraction_water_vapour(pressure, temperature, relative_humidity)
     if ideal:
@@ -352,35 +411,40 @@ def number_density_at_pt(pressure, temperature, relative_humidity, ideal):
 
 def phase_function(theta, wavelength, pressure, temperature, C, rh):
     """Calculates the phase function at an angle theta for a specific wavelegth.
- 	Inputs:
-        theta: float
-            Scattering angle [rads]
-        wavelength: float
-            Wavelength [nm]
-        pressure: float
-            The atmospheric pressure [hPa]
-        temperature: float
-            The atmospheric temperature [K]   
-        C: float
-            CO2 concentration [ppmv].
-        rh: float
-            Relative humidity from 0 to 100 [%]    
- 	Returns:
-        p: float
-            Scattering phase function
-         
- 	Notes:
-        The formula is derived from Bucholtz (1995). A different formula is given in 
-        Miles (2001). 
-  
-        The use of this formula insetad of the wavelenght independent 3/4(1+cos(th)**2)
-        improves the results for back and forward scatterring by ~1.5%
-  
-        Anthony Bucholtz, "Rayleigh-scattering calculations for the terrestrial atmosphere", 
-        Applied Optics 34, no. 15 (May 20, 1995): 2765-2773.  
-  
-        R. B Miles, W. R Lempert, and J. N Forkey, "Laser Rayleigh scattering", 
-        Measurement Science and Technology 12 (2001): R33-R51
+
+    Parameters
+    ----------
+    theta: float
+        Scattering angle [rads]
+    wavelength: float
+        Wavelength [nm]
+    pressure: float
+        The atmospheric pressure [hPa]
+    temperature: float
+        The atmospheric temperature [K]   
+    C: float
+        CO2 concentration [ppmv].
+    rh: float
+        Relative humidity from 0 to 100 [%]    
+        
+	Returns
+    -------
+    p: float
+        Scattering phase function
+        
+    Notes
+    -----
+    The formula is derived from Bucholtz (1995). A different formula is given in 
+    Miles (2001). 
+
+    The use of this formula insetad of the wavelenght independent 3/4(1+cos(th)**2)
+    improves the results for back and forward scatterring by ~1.5%
+
+    Anthony Bucholtz, "Rayleigh-scattering calculations for the terrestrial atmosphere", 
+    Applied Optics 34, no. 15 (May 20, 1995): 2765-2773.  
+
+    R. B Miles, W. R Lempert, and J. N Forkey, "Laser Rayleigh scattering", 
+    Measurement Science and Technology 12 (2001): R33-R51
     """
     p_e = rh_to_pressure(rh, temperature)
     r = rho_atmosphere(wavelength, C, p_e, pressure)
@@ -401,11 +465,13 @@ def physical_constants():
 def pressure_to_rh(partial_pressure, temperature):
     """Convert water vapour partial pressure to relative humidity.
     
-    Args:
+    Parameters
+    ----------
         partial_pressure (float): Water vapour partial pressure [hPa]
         temperature (float): Temperature [K]
     
-    Returns:
+    Returns
+    -------
         float: Relative humidity from 0 to 100 [%]
     """
     svp = saturation_vapor_pressure(temperature)
@@ -415,11 +481,13 @@ def pressure_to_rh(partial_pressure, temperature):
 def rh_to_pressure(rh, temperature):
     """Convert relative humidity to water vapour partial pressure.
     
-    Args:
+    Parameters
+    ----------
         rh (float): Relative humidity from 0 to 100 [%]
         temperature (float): Temperature [K]
     
-    Returns:
+    Returns
+    -------
         float: Water vapour pressure [hPa]
     """
     svp = saturation_vapor_pressure(temperature)
@@ -430,14 +498,16 @@ def rh_to_pressure(rh, temperature):
 def rho_atmosphere(wavelength, C, p_e, p_t):
     """Calculate the depolarization factor of the atmosphere.
     
-    Args:
-        wavelength (float or array): Wavelength in nm
-        C (float): CO2 concentration in ppmv
-        p_e (float): water-vapor pressure [hPa]
-        p_t (float): total air pressure [hPa]
+    Parameters
+    ----------
+    wavelength (float or array): Wavelength in nm
+    C (float): CO2 concentration in ppmv
+    p_e (float): water-vapor pressure [hPa]
+    p_t (float): total air pressure [hPa]
     
-    Returns:
-        float or array: Depolarization factor
+    Returns
+    -------
+    float or array: Depolarization factor
     """
     F_k = kings_factor_atmosphere(wavelength, C, p_e, p_t)
     rho = (6 * F_k - 6) / (7 * F_k + 3)
@@ -446,10 +516,12 @@ def rho_atmosphere(wavelength, C, p_e, p_t):
 def saturation_vapor_pressure(temperature):
     """Saturation vapor pressure of water of moist air.
     
-    Args:
-        temperature (float): Atmospheric temperature [K]
+    Parameters
+    ----------
+    temperature (float): Atmospheric temperature [K]
     
-    Returns:
+    Returns
+    -------
         float: Saturation vapor pressure [hPa]
     """
     T = temperature
@@ -459,15 +531,17 @@ def saturation_vapor_pressure(temperature):
 def sigma_rayleigh(wavelength, pressure, temperature, C, rh):
     """Calculates the Rayleigh-scattering cross section per molecule.
     
-    Args:
-        wavelength (float): Wavelength [nm]
-        pressure (float): The atmospheric pressure [hPa]
-        temperature (float): The atmospheric temperature [K]
-        C (float): CO2 concentration [ppmv]
-        rh (float): Relative humidity from 0 to 100 [%]
+    Parameters
+    ----------
+    wavelength (float): Wavelength [nm]
+    pressure (float): The atmospheric pressure [hPa]
+    temperature (float): The atmospheric temperature [K]
+    C (float): CO2 concentration [ppmv]
+    rh (float): Relative humidity from 0 to 100 [%]
     
-    Returns:
-        float: Rayleigh-scattering cross section [m2]
+    Returns
+    -------
+    float: Rayleigh-scattering cross section [m2]
     """
     p_e = rh_to_pressure(rh, temperature)
 
@@ -493,7 +567,7 @@ def sigma_rayleigh(wavelength, pressure, temperature, C, rh):
 def rayleigh_scattering(wavelength, pressure, temperature, C, rh):
     """Calculate the molecular volume backscatter coefficient and extinction coefficient.
 
-    Parameters:
+    Parameters
     ----------
     wavelength : float
         Wavelength in nanometers [nm].
@@ -506,26 +580,27 @@ def rayleigh_scattering(wavelength, pressure, temperature, C, rh):
     rh : float
         Relative humidity as a percentage (0 to 100).
 
-    Returns:
+    Returns
     -------
     beta_mol : float
         Molecular backscatter coefficient [m^{-1}*sr^{-1}].
     alpha_mol : float
         Molecular extinction coefficient [m^{-1}].
 
-    References:
+    References
     ----------
     Bucholtz, A.: Rayleigh-scattering calculations for the terrestrial atmosphere, 
     Appl. Opt. 34, 2765-2773 (1995).
     A. Behrendt and T. Nakamura, "Calculation of the calibration constant of polarization lidar and 
     its dependency on atmospheric temperature," Opt. Express, vol. 10, no. 16, pp. 805-817, 2002.
 
-    History:
-    -------
-    First edition by Zhenping, 2017-12-16. 
-    Based on the Python source code of Ioannis Binietoglou's 
-    [repo](https://bitbucket.org/iannis_b/lidar_molecular).
-    AI-Translated, 2024-12-03
+    Notes
+    -----
+    **History**
+
+    - First edition by Zhenping, 2017-12-16. 
+    - Based on the Python source code of Ioannis Binietoglou's [repo](https://bitbucket.org/iannis_b/lidar_molecular).
+    - AI-Translated, 2024-12-03
     """
     beta_mol = beta_pi_rayleigh(wavelength, pressure, temperature, C, rh)
     alpha_mol = alpha_rayleigh(wavelength, pressure, temperature, C, rh)

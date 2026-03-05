@@ -60,7 +60,7 @@ extensions = [
   "sphinx.ext.mathjax",
   "sphinx.ext.viewcode",
   "sphinx.ext.todo",
-  "sphinx.ext.napoleon",
+  "numpydoc",
   "myst_parser"
   #"sphinx.ext.autosectionlabel",
   #"recommonmark",
@@ -69,7 +69,7 @@ sphinx_rtd_size_width = "90%"
 source_suffix = {'.rst' = 'restructuredtext', '.md' = 'markdown'}
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
-#auto_doc_default_options = {'autosummary' = true}
+auto_doc_default_options = {'autosummary' = true}
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 html_theme = "pydata_sphinx_theme"

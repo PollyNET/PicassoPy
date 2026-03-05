@@ -60,28 +60,35 @@ def quasi_bsc(data_cube):
 def quasi_retrieval2(height, att_beta_el, att_beta_ra, wv, wv_r, molExtEl, molBscEl, molExtRa, AE, LR, nIters=1):
     """Retrieve aerosol optical properties using quasi retrieval method (V2), improved by utilizing Raman signals.
     
-    Parameters:
-        height (ndarray): Height array [m].
-        att_beta_el (ndarray): Attenuated backscatter at elastic wavelength [m^{-1}sr^{-1}].
-        att_beta_ra (ndarray): Attenuated backscatter at Raman wavelength [m^{-1}sr^{-1}].
-        wavelength (int): Elastic backscatter wavelength [nm].
-        molExtEl (ndarray): Molecular extinction coefficient at elastic wavelength [m^{-1}].
-        molBscEl (ndarray): Molecular backscatter coefficient at elastic wavelength [m^{-1}sr^{-1}].
-        molExtRa (ndarray): Molecular extinction coefficient at Raman wavelength [m^{-1}].
-        AE (float): Extinction-related Ångström exponent.
-        LR (float): Aerosol lidar ratio [sr].
-        nIters (int, optional): Number of iterations. Default is 1.
+    Parameters
+    ----------
+    height (ndarray): Height array [m].
+    att_beta_el (ndarray): Attenuated backscatter at elastic wavelength [m^{-1}sr^{-1}].
+    att_beta_ra (ndarray): Attenuated backscatter at Raman wavelength [m^{-1}sr^{-1}].
+    wavelength (int): Elastic backscatter wavelength [nm].
+    molExtEl (ndarray): Molecular extinction coefficient at elastic wavelength [m^{-1}].
+    molBscEl (ndarray): Molecular backscatter coefficient at elastic wavelength [m^{-1}sr^{-1}].
+    molExtRa (ndarray): Molecular extinction coefficient at Raman wavelength [m^{-1}].
+    AE (float): Extinction-related Ångström exponent.
+    LR (float): Aerosol lidar ratio [sr].
+    nIters (int, optional): Number of iterations. Default is 1.
     
-    Returns:
-        quasi_par_bsc (ndarray): Quasi particle backscatter coefficient [m^{-1}sr^{-1}].
-        quasi_par_ext (ndarray): Quasi particle extinction coefficient [m^{-1}].
+    Returns
+    -------
+    quasi_par_bsc (ndarray): Quasi particle backscatter coefficient [m^{-1}sr^{-1}].
+    quasi_par_ext (ndarray): Quasi particle extinction coefficient [m^{-1}].
     
-    Reference:
-        Baars et al., 2017 (DOI:10.5194/amt-10-3175-2017)
+    References
+    ----------
+    Baars et al., 2017 doi:10.5194/amt-10-3175-2017
     
-    History:
-        - 2021-06-07: first edition by Zhenping
-        - 2025-03-30: AI translation to python
+    Notes
+    -----
+    
+    **History**
+
+    - 2021-06-07: first edition by Zhenping
+    - 2025-03-30: AI translation to python
     """
     diff_height = np.vstack((np.diff(height, prepend=height[0]))).T
     quasi_par_ext = np.zeros_like(molBscEl)

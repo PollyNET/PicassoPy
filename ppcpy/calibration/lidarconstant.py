@@ -26,12 +26,10 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
 
     Notes
     -----
-    - For NR, done directly form the optical profiles, whereas in the matlab
-      version, the LC*olAttri387.sigRatio is taken.
-    - TODO: Change back to Picasso version to check if lidar calibration
-      constatns get more similar.
-    - TODO: Check if LC's are normalized with respect to the mean of 
-      the profiles.
+    - For NR, done directly form the optical profiles, whereas in the matlab version, the ``LC*olAttri387.sigRatio`` is taken.
+
+    .. TODO:: Change back to Picasso version to check if lidar calibration constants get more similar.
+    .. TODO:: Check if LC's are normalized with respect to the mean of the profiles.
 
     """
     print("retival", retrieval)
@@ -143,15 +141,15 @@ def get_best_LC(LCs:list) -> dict:
     -------
     LCused : dict
         Lidar constants with lowest standard deviation per channel.
-    
-    History
-    -------
-    - 2026-02-16: Added additional checks to hinder negative LCs to be chosen.
 
     Notes
     -----
-    - Since LC = LC_sable and LCStd = LC_stable * LC_Std so will any negative LC also have
+    - Since ``LC = LC_stable`` and ``LCStd = LC_stable * LC_Std`` so will any negative LC also have
       a negative LCStd, and thus be chosen as the best LC.
+
+    **History**
+
+    - 2026-02-16: Added additional checks to hinder negative LCs to be chosen.
         
     """
     # list comprehension for nested list

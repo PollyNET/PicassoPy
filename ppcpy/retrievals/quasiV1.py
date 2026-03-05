@@ -6,7 +6,8 @@ import logging
 from scipy.interpolate import interp1d
 
 def quasi_bsc(data_cube):
-    """
+    """calculate the quasi backscatter for a datacube
+
     """
 
     rgs = data_cube.retrievals_highres['range']
@@ -60,37 +61,40 @@ def quasi_bsc(data_cube):
 def quasi_retrieval(height, att_beta, molExt, molBsc, LRaer, nIters=2):
     """Retrieve aerosol optical properties using the quasi-retrieving method.
 
-    Parameters:
-        height (array): 
-            Height in meters [m].
-        att_beta (ndarray): 
-            Attenuated backscatter [m^{-1}Sr^{-1}].
-        molExt (ndarray): 
-            Molecular extinction coefficient [m^{-1}].
-        molBsc (ndarray): 
-            Molecular backscatter coefficient [m^{-1}Sr^{-1}].
-        LRaer (float): 
-            Aerosol lidar ratio [Sr].
-        nIters (int, optional): 
-            Number of iterations (default is 2).
+    Parameters
+    ----------
+    height (array): 
+        Height in meters [m].
+    att_beta (ndarray): 
+        Attenuated backscatter [m^{-1}Sr^{-1}].
+    molExt (ndarray): 
+        Molecular extinction coefficient [m^{-1}].
+    molBsc (ndarray): 
+        Molecular backscatter coefficient [m^{-1}Sr^{-1}].
+    LRaer (float): 
+        Aerosol lidar ratio [Sr].
+    nIters (int, optional): 
+        Number of iterations (default is 2).
 
-    Returns:
-        quasi_par_bsc (ndarray): 
-            Quasi particle backscatter coefficient [m^{-1}Sr^{-1}].
-        quasi_par_ext (ndarray): 
-            Quasi particle extinction coefficient [m^{-1}].
+    Returns
+    -------
+    quasi_par_bsc (ndarray): 
+        Quasi particle backscatter coefficient [m^{-1}Sr^{-1}].
+    quasi_par_ext (ndarray): 
+        Quasi particle extinction coefficient [m^{-1}].
 
-    References:
-        Baars, H., Seifert, P., Engelmann, R., & Wandinger, U. 
-        "Target categorization of aerosol and clouds by continuous 
-        multiwavelength-polarization lidar measurements."
-        Atmospheric Measurement Techniques 10, 3175-3201, 
-        doi:10.5194/amt-10-3175-2017 (2017).
+    References
+    ----------
+    Baars, H. et al. 2017 doi:10.5194/amt-10-3175-2017
 
-    History:
-        - 2018-12-25: First edition by Zhenping
-        - 2019-03-31: Added the keyword 'nIters' to control iteration times.
-        - 2025-03-21: AI based translation to python and debugging
+    Notes
+    -----
+
+    **History**
+    
+    - 2018-12-25: First edition by Zhenping
+    - 2019-03-31: Added the keyword 'nIters' to control iteration times.
+    - 2025-03-21: AI based translation to python and debugging
     """
 
     # Compute differential heights

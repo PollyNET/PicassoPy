@@ -97,8 +97,11 @@ def overlapCalc(height:np.ndarray, sigFR:np.ndarray, bgFR:np.ndarray, sigNR:np.n
     normRange : list
         Height index of the signal normalization range.
 
-    History
-    -------
+    Notes
+    -----
+
+    **History**
+    
     - 2021-05-18: First edition by Zhenping
 
     """
@@ -273,23 +276,25 @@ def overlapCalcRaman(
     olFunc0 : ndarray
         Overlap function with no smoothing.
 
-    History
-    -------
-    - 2023-06-06: First edition by Cristofer
-
     Notes
     -----
-    - TODO: What is returned by the function and what is described in the docstring does not corresponed.
-    - TODO: This function uses a mix of ppcpy.misc.helper.unifrom_filter and scipy.ndimage.uniform_filter1d
+    .. TODO:: What is returned by the function and what is described in the docstring does not corresponed.
+
+    .. TODO:: This function uses a mix of ppcpy.misc.helper.unifrom_filter and scipy.ndimage.uniform_filter1d
             for smoothing. This is done to avoid NaN-value related errors. A better more cohesive solution
             should be precude in the future.
-    - TODO: Be cearfull with NaN values! scipy.ndimage.uniform_filter1d used for smoothing in this module
+
+    .. TODO:: Be cearfull with NaN values! scipy.ndimage.uniform_filter1d used for smoothing in this module
             will propagate any NaN values present in the signal throughot the rest of the smoothed signal.
             Additionaly, here we are using mode 'reflect' for padding (see scipy.ndimage.uniform_filter1d
             documentation). This might not be the most optimal mode, the other availabel mode should also
             be considered. Optimally, should we designe our own filter for this purpuse that do not have
             the issue with propagating NaN values, Like what is used in the rest of the modules. However,
             without reducing dimension or filling in NaN values.
+
+    ** History **
+    
+    - 2023-06-06: First edition by Cristofer
 
     """
     if len(aerBsc) > 0:

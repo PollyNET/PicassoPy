@@ -70,29 +70,30 @@ def faster_polyval(a, x):
 
 #@profile
 def pollyDTCor(rawSignal:np.ndarray, mShots:np.ndarray, hRes:float, **varargin:dict) -> np.ndarray:
-    """
-    Dead Time Correction
+    """    Dead Time Correction
 
-    Parameters:
-        rawSignal (ndarray): Raw signal [Photon counts].
-        mShots (ndarray): Measurment shots per ... [].
-        hRes (ndarray): Height resolution [m].
+    Parameters
+    ----------
+    rawSignal (ndarray): Raw signal [Photon counts].
+    mShots (ndarray): Measurment shots per ... [].
+    hRes (ndarray): Height resolution [m].
     
     keyword arguments:
-        device (str or bool): Name of PollyXT device, default: False
-        flagDeadTimeCorrection (bool): ....., default: Flase
-        DeadTimeCorrectionMode (int): deadtime correction mode:
-            1: use the parameters saved in the netcdf files,
-            2: nonparalyzable correction with user define deadtime (default),
-            3: paralyzable correction with user defined parameters,
-            4: no deadtime correction,
-        deadtimeParams (list): ...., default: []
-        deadtime (list): ...., default: []
+    device (str or bool): Name of PollyXT device, default: False
+    flagDeadTimeCorrection (bool): ....., default: Flase
+    DeadTimeCorrectionMode (int): deadtime correction mode:
+        1: use the parameters saved in the netcdf files,
+        2: nonparalyzable correction with user define deadtime (default),
+        3: paralyzable correction with user defined parameters,
+        4: no deadtime correction,
+    deadtimeParams (list): ...., default: []
+    deadtime (list): ...., default: []
     
-    Returns:
+    Returns
+    -------
         signalDTCor (ndarray): Dead time corrected signal [Photon counts].
 
-    TODO:
+    .. TODO::
         - Finish docstring and remove all unnecessary comments
         - Could think of moving the scale convertion to after the loops ie. form PCR to PC
     """
@@ -186,16 +187,18 @@ def pollyDTCor(rawSignal:np.ndarray, mShots:np.ndarray, hRes:float, **varargin:d
     return signalDTCor
 
 def pollyRemoveBG(rawSignal:np.ndarray, bgCorrectionIndexLow:list, bgCorrectionIndexHigh:list, maxHeightBin:int=3000, firstBinIndex:list|None=None) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Background correction. Remove mean background noise from signal.
+    """Background correction. Remove mean background noise from signal.
 
-    Parameters:
-    - rawSignal (np.ndarray): Lidar Signal to be processed
-    - bgCorrectionIndexLow (list of int): lower index of background noise per channel
-    - bgCorrectionIndexHigh (list of int): upper index of background noise per channel
-    - maxHeightBin (int): maximum height bin index (default: 3000)
-    - firstBinIndex (list of int): first height bin index per channel (default: 0 per chanel)
-    Output:
+    Parameters
+    ----------
+    rawSignal (np.ndarray): Lidar Signal to be processed
+    bgCorrectionIndexLow (list of int): lower index of background noise per channel
+    bgCorrectionIndexHigh (list of int): upper index of background noise per channel
+    maxHeightBin (int): maximum height bin index (default: 3000)
+    firstBinIndex (list of int): first height bin index per channel (default: 0 per chanel)
+
+    Returns
+    -------
     - signal_out (np.ndarray): Background corrected signal
     - bg (np.ndarray): Removed background noise
     """
@@ -216,15 +219,17 @@ def pollyRemoveBG(rawSignal:np.ndarray, bgCorrectionIndexLow:list, bgCorrectionI
     return signal_out, bg
 
 def slicerange(array:np.ndarray, maxHeightBin:int, firstBinIndex:list) -> np.ndarray:
-    """
-    Slice a given array across the height/range dimension from firstBinIndex to maxHeightBin + firstBinIndex.
+    """Slice a given array across the height/range dimension from firstBinIndex to maxHeightBin + firstBinIndex.
 
-    Parameters:
-    - array (np.ndarray): array to be sliced
-    - maxHeightBin (int): length of slice
-    - firstBinIndex (list of int): start hight/range index of slice per channel
-    Output:
-    - out (np.ndarray): sliced array
+    Parameters
+    ----------
+    array (np.ndarray): array to be sliced
+    maxHeightBin (int): length of slice
+    firstBinIndex (list of int): start hight/range index of slice per channel
+
+    Returns
+    -------
+    out (np.ndarray): sliced array
     """
 
     assert len(firstBinIndex) == array.shape[2], f"first bin index and array do not match {len(firstBinIndex)}, {array.shape}"
@@ -315,13 +320,15 @@ def calculate_rcs(datasignal, ranges) -> np.ndarray:
     """
     Function for calculating RCS.
 
-    Args:
+    Parameters
+    ----------
         datasignal: 
             signal to range correct
         ranges: 
             ranges that are squared
 
-    Returns:
+    Returns
+    -------
         np.ndarray: Computed RCS array.
     """
 
@@ -342,163 +349,159 @@ def calculate_rcs(datasignal, ranges) -> np.ndarray:
 
 
 def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict):
-    """
-    POLLYPREPROCESS Deadtime correction, background correction, first-bin shift, mask for low-SNR and mask for depolarization-calibration process.
+    """Deadtime correction, background correction, first-bin shift, mask for low-SNR and mask for depolarization-calibration process.
     
+    Parameters
+    ----------
+    data: struct
+        rawSignal: array
+            signal. [Photon Count]
+        mShots: array
+            number of the laser shots for each profile.
+        mTime: array
+            datetime array for the measurement time of each profile.
+        depCalAng: array
+            angle of the polarizer in the receiving channel. (>0 means 
+            calibration process starts)
+        zenithAng: array
+            zenith angle of the laer beam.
+        repRate: float
+            laser pulse repetition rate. [s^-1]
+        hRes: float
+            spatial resolution [m]
+        mSite: string
+            measurement site.
     
-     USAGE:
-        [data] = pollyPreprocess(data)
+    deltaT: numeric
+        integration time (in seconds) for single profile. (default: 30)
+    flagForceMeasTime: logical
+        flag to control whether to align measurement time with file creation
+        time, instead of taking the measurement time in the data file.
+        (default: false)
+    maxHeightBin: numeric
+        number of range bins to read out from data file. (default: 3000)
+    firstBinIndex: numeric
+        index of first bin to read out. (default: 1)
+    pollyType: char
+        polly version. (default: 'arielle')
+    flagDeadTimeCorrection: logical
+        flag to control whether to apply deadtime correction. (default: false)
+    deadtimeCorrectionMode: numeric
+        deadtime correction mode. (default: 2)
+        1: polynomial correction with parameters saved in data file.
+        2: non-paralyzable correction
+        3: polynomail correction with user defined parameters
+        4: disable deadtime correction
+    deadtimeParams: numeric
+        deadtime parameters. (default: [])
+    flagSigTempCor: logical
+        flag to implement signal temperature correction.
+    tempCorFunc: cell
+        symbolic function for signal temperature correction.
+        "1": no correction
+        "exp(-0.001*T)": exponential correction function. (Unit: Kelvin)
+    meteorDataSource: str
+        meteorological data type.
+        e.g., 'gdas1'(default), 'standard_atmosphere', 'websonde', 'radiosonde'
+    gdas1Site: str
+        the GDAS1 site for the current campaign.
+    meteo_folder: str
+        the main folder of the GDAS1 profiles.
+    radiosondeSitenum: integer
+        site number, which can be found in 
+        doc/radiosonde-station-list.txt.
+    radiosondeFolder: str
+        the folder of the sonding files.
+    radiosondeType: integer
+        file type of the radiosonde file.
+        - 1: radiosonde file for MOSAiC (default)
+        - 2: radiosonde file for MUA
+    bgCorrectionIndexLow: 1-dim. array
+        base indecis of bins for background estimation.
+        (defults: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10])
+    bgCorrectionIndexHigh: 1-dim. array
+        top index of bins for background estimation.
+        (defults: [240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240])
+    asl: numeric
+        above sea level in meters. (default: 0)
+    initialPolAngle: numeric
+        initial polarization angle of the polarizer for polarization
+        calibration. (default: 0)
+    maskPolCalAngle: cell
+        mask for positive and negative calibration angle of the polarizer, in
+        which 'p' stands for positive angle, while 'n' for negative angle.
+        (default: {})
+    minSNRThresh: numeric
+        lower bound of signal-noise ratio.
+    minPC_fog: numeric
+        minimun number of photon count after strong attenuation by fog.
+    flagFarRangeChannel: logical
+        flags of far-range channel.
+    flag532nmChannel: logical
+        flags of channels with central wavelength (CW) at 532 nm.
+    flagTotalChannel: logical
+        flags of channels receiving total elastic signal.
+    flag355nmChannel: logical
+        flags of channels with CW at 355 nm.
+    flag607nmChannel: logical
+        flags of channels with CW at 607 nm.
+    flag387nmChannel: logical
+        flags of channels with CW at 387 nm.
+    flag407nmChannel: logical
+        flags of channels with CW at 407 nm.
+    flag532nmRotRaman: logical
+        flags of rotational Raman channels with CW at 532 nm.
+    flag1064nmRotRaman: logical
+        flags of rotational Raman channels with CW at 1064 nm.
     
-     INPUTS:
-        data: struct
-            rawSignal: array
-                signal. [Photon Count]
-            mShots: array
-                number of the laser shots for each profile.
-            mTime: array
-                datetime array for the measurement time of each profile.
-            depCalAng: array
-                angle of the polarizer in the receiving channel. (>0 means 
-                calibration process starts)
-            zenithAng: array
-                zenith angle of the laer beam.
-            repRate: float
-                laser pulse repetition rate. [s^-1]
-            hRes: float
-                spatial resolution [m]
-            mSite: string
-                measurement site.
-    
-     KEYWORDS:
-        deltaT: numeric
-            integration time (in seconds) for single profile. (default: 30)
-        flagForceMeasTime: logical
-            flag to control whether to align measurement time with file creation
-            time, instead of taking the measurement time in the data file.
-            (default: false)
-        maxHeightBin: numeric
-            number of range bins to read out from data file. (default: 3000)
-        firstBinIndex: numeric
-            index of first bin to read out. (default: 1)
-        pollyType: char
-            polly version. (default: 'arielle')
-        flagDeadTimeCorrection: logical
-            flag to control whether to apply deadtime correction. (default: false)
-        deadtimeCorrectionMode: numeric
-            deadtime correction mode. (default: 2)
-            1: polynomial correction with parameters saved in data file.
-            2: non-paralyzable correction
-            3: polynomail correction with user defined parameters
-            4: disable deadtime correction
-        deadtimeParams: numeric
-            deadtime parameters. (default: [])
-        flagSigTempCor: logical
-            flag to implement signal temperature correction.
-        tempCorFunc: cell
-            symbolic function for signal temperature correction.
-            "1": no correction
-            "exp(-0.001*T)": exponential correction function. (Unit: Kelvin)
-        meteorDataSource: str
-            meteorological data type.
-            e.g., 'gdas1'(default), 'standard_atmosphere', 'websonde', 'radiosonde'
-        gdas1Site: str
-            the GDAS1 site for the current campaign.
-        meteo_folder: str
-            the main folder of the GDAS1 profiles.
-        radiosondeSitenum: integer
-            site number, which can be found in 
-            doc/radiosonde-station-list.txt.
-        radiosondeFolder: str
-            the folder of the sonding files.
-        radiosondeType: integer
-            file type of the radiosonde file.
-            - 1: radiosonde file for MOSAiC (default)
-            - 2: radiosonde file for MUA
-        bgCorrectionIndexLow: 1-dim. array
-            base indecis of bins for background estimation.
-            (defults: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10])
-        bgCorrectionIndexHigh: 1-dim. array
-            top index of bins for background estimation.
-            (defults: [240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240])
-        asl: numeric
-            above sea level in meters. (default: 0)
-        initialPolAngle: numeric
-            initial polarization angle of the polarizer for polarization
-            calibration. (default: 0)
-        maskPolCalAngle: cell
-            mask for positive and negative calibration angle of the polarizer, in
-            which 'p' stands for positive angle, while 'n' for negative angle.
-            (default: {})
-        minSNRThresh: numeric
-            lower bound of signal-noise ratio.
-        minPC_fog: numeric
-            minimun number of photon count after strong attenuation by fog.
-        flagFarRangeChannel: logical
-            flags of far-range channel.
-        flag532nmChannel: logical
-            flags of channels with central wavelength (CW) at 532 nm.
-        flagTotalChannel: logical
-            flags of channels receiving total elastic signal.
-        flag355nmChannel: logical
-            flags of channels with CW at 355 nm.
-        flag607nmChannel: logical
-            flags of channels with CW at 607 nm.
-        flag387nmChannel: logical
-            flags of channels with CW at 387 nm.
-        flag407nmChannel: logical
-            flags of channels with CW at 407 nm.
-        flag532nmRotRaman: logical
-            flags of rotational Raman channels with CW at 532 nm.
-        flag1064nmRotRaman: logical
-            flags of rotational Raman channels with CW at 1064 nm.
-    
-     OUTPUTS:
-        data: struct
-            rawSignal: array
-                signal. [Photon Count]
-            mShots: array
-                number of the laser shots for each profile.
-            mTime: array
-                datetime array for the measurement time of each profile.
-            depCalAng: array
-                angle of the polarizer in the receiving channel. (>0 means 
-                calibration process starts)
-            zenithAng: array
-                zenith angle of the laer beam.
-            repRate: float
-                laser pulse repetition rate. [s^-1]
-            hRes: float
-                spatial resolution [m]
-            mSite: string
-                measurement site.
-            deadtime: matrix (channel x polynomial_orders)
-                deadtime correction parameters.
-            signal: array
-                Background removed signal
-            bg: array
-                background
-            height: array
-                height. [m]
-            lowSNRMask: logical
-                If SNR less SNRmin, mask is set true. Otherwise, false
-            depCalMask: logical
-                If polly was doing polarization calibration, depCalMask is set
-                true. Otherwise, false.
-            fogMask: logical
-                If it is foggy which means the signal will be very weak, 
-                fogMask will be set true. Otherwise, false
-            mask607Off: logical
-                mask of PMT on/off status at 607 nm channel.
-            mask387Off: logical
-                mask of PMT on/off status at 387 nm channel.
-            mask407Off: logical
-                mask of PMT on/off status at 407 nm channel.
-            mask355RROff: logical
-                mask of PMT on/off status at 355 nm rotational Raman channel.
-            mask532RROff: logical
-                mask of PMT on/off status at 532 nm rotational Raman channel.
-            mask1064RROff: logical
-                mask of PMT on/off status at 1064 nm rotational Raman channel.
+    Returns
+    -------
+    data: struct
+        rawSignal: array
+            signal. [Photon Count]
+        mShots: array
+            number of the laser shots for each profile.
+        mTime: array
+            datetime array for the measurement time of each profile.
+        depCalAng: array
+            angle of the polarizer in the receiving channel. (>0 means 
+            calibration process starts)
+        zenithAng: array
+            zenith angle of the laer beam.
+        repRate: float
+            laser pulse repetition rate. [s^-1]
+        hRes: float
+            spatial resolution [m]
+        mSite: string
+            measurement site.
+        deadtime: matrix (channel x polynomial_orders)
+            deadtime correction parameters.
+        signal: array
+            Background removed signal
+        bg: array
+            background
+        height: array
+            height. [m]
+        lowSNRMask: logical
+            If SNR less SNRmin, mask is set true. Otherwise, false
+        depCalMask: logical
+            If polly was doing polarization calibration, depCalMask is set
+            true. Otherwise, false.
+        fogMask: logical
+            If it is foggy which means the signal will be very weak, 
+            fogMask will be set true. Otherwise, false
+        mask607Off: logical
+            mask of PMT on/off status at 607 nm channel.
+        mask387Off: logical
+            mask of PMT on/off status at 387 nm channel.
+        mask407Off: logical
+            mask of PMT on/off status at 407 nm channel.
+        mask355RROff: logical
+            mask of PMT on/off status at 355 nm rotational Raman channel.
+        mask532RROff: logical
+            mask of PMT on/off status at 532 nm rotational Raman channel.
+        mask1064RROff: logical
+            mask of PMT on/off status at 1064 nm rotational Raman channel.
     
     """    
     logging.info('starting data preprocessing...')
@@ -750,17 +753,23 @@ def any_signal(sig: np.ndarray) -> np.ndarray:
     """check if there is any signal
     POLLYISLASERSHUTTERON determine whether the laser shutter is on due to the flying object.
 
-    INPUTS:
-        sig: np.ndarray
-            BGCor signal with shape [height, time].
+    Parameters
+    ----------
+    sig: np.ndarray
+        BGCor signal with shape [height, time].
 
-    OUTPUTS:
-        flag: np.ndarray
-            Boolean array of shape [time,] where True indicates the laser shutter is turned on.
+    Returns
+    -------
+    flag: np.ndarray
+        Boolean array of shape [time,] where True indicates the laser shutter is turned on.
 
-    HISTORY:
-        - 2021-04-21: first edition by Zhenping
-        - 2025-05-14: translated and generalized pollyIsLaserShutterOn, 
+    Notes
+    -----
+
+    **History**
+
+    - 2021-04-21: first edition by Zhenping
+    - 2025-05-14: translated and generalized pollyIsLaserShutterOn, 
 
     """
     # Mean and standard deviation over the height dimension (axis 0)

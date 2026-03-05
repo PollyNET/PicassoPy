@@ -4,8 +4,7 @@ from scipy.stats import norm, poisson
 from scipy.signal import savgol_coeffs
 
 def movingslope_variedWin(signal:np.ndarray, winWidth:int|np.ndarray) -> np.ndarray:
-    """
-    MOVINGSLOPE_VARIEDWIN calculates the slope of the signal with a moving slope.
+    """calculates the slope of the signal with a moving slope.
     This is a wrapper for the `movingslope` function to make it compatible with
     height-independent smoothing windows.
 
@@ -26,8 +25,11 @@ def movingslope_variedWin(signal:np.ndarray, winWidth:int|np.ndarray) -> np.ndar
     slope : ndarray
         Slope at each bin.
 
-    History
-    -------
+    Notes
+    -----
+
+    **History**
+    
     - 2018-08-03: First edition by Zhenping.
 
     """
@@ -60,8 +62,7 @@ def moving_linfit_varied_win(height, signal, winWidth):
     raise NotImplementedError
 
 def movingslope(vec:np.ndarray, supportlength:int=3, modelorder:int=1, dt:float=1) -> np.ndarray:
-    """
-    MOVINGSLOPE estimates the local slope of a sequence of points using a sliding window.
+    """estimates the local slope of a sequence of points using a sliding window.
 
     Parameters
     ----------
@@ -80,13 +81,12 @@ def movingslope(vec:np.ndarray, supportlength:int=3, modelorder:int=1, dt:float=
     Dvec : ndarray
         Derivative estimates, same size and shape as `vec`.
 
-    History
-    -------
-    - Original MATLAB implementation by John D'Errico.
+    Notes
+    -----
 
-    Authors
-    -------
-    - woodchips@rochester.rr.com
+    **History**
+    
+    - Original MATLAB implementation by John D'Errico (woodchips@rochester.rr.com)
     """
     vec = np.asarray(vec)
     n = len(vec)
@@ -174,8 +174,11 @@ def sigGenWithNoise(signal:np.ndarray, noise:np.ndarray=None, nProfile:int=1, me
     signalGen : array
         Noise-containing signal. Shape is (len(signal), nProfile).
 
-    History
-    -------
+    Notes
+    -----
+
+    **History**
+    
     - 2021-06-13: First edition by Zhenping.
     - 2026-02-04: Modifications to reduce computational time, Buholdt
     """

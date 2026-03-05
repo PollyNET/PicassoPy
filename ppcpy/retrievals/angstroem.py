@@ -20,8 +20,10 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     ndarray
         Smoothed signal.
     
-    History
-    -------
+    Notes
+    -----
+    **History**
+    
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter.
     
     """
@@ -49,8 +51,11 @@ def ae_cldFreeGrps(data_cube, ret_prof_name:str, collect_debug:bool=False) -> di
     angexpStd : array
         Uncertainty of Ångström exponent.
     
-    History
-    -------
+    Notes
+    -----
+
+    **History**
+
     - xxxx-xx-xx: TODO: First edition by ...
     - 2026-02-20: Smoothing window changes. Now determines the smoothing window based on
                   the higher of the two wavelengths, and discriminates between FR and NR.
@@ -97,9 +102,6 @@ def calc_ae(param1:np.ndarray, param1_std:np.ndarray, param2:np.ndarray, param2_
             wavelength1:float, wavelength2:float, smooth_window:int=17) -> tuple:
     """Calculates the Ångström exponent and its uncertainty.
 
-    Usage
-    -----
-    angexp, angexpStd = pollyAE(param1, param1_std, param2, param2_std, wavelength1, wavelength2)
 
     Parameters
     ----------
@@ -125,14 +127,19 @@ def calc_ae(param1:np.ndarray, param1_std:np.ndarray, param2:np.ndarray, param2_
     angexpStd : array
         Uncertainty of Ångström exponent.
 
-    History
-    -------
-    - 2021-05-31: first edition by Zhenping
 
     Notes
     -----
-    - Should the ratio be smoothed or not?? If we do not smooth the ratio then why are we
-      considering the smoothing window in the error calculations??
+    Should the ratio be smoothed or not?? If we do not smooth the ratio then why are we
+    considering the smoothing window in the error calculations??
+    
+    **History**
+
+    - 2021-05-31: first edition by Zhenping
+
+    Examples
+    --------
+    angexp, angexpStd = pollyAE(param1, param1_std, param2, param2_std, wavelength1, wavelength2)
     
     """
     # Replace non-positive and 0 values with NaN
