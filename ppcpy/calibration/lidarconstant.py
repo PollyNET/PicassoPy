@@ -1,8 +1,13 @@
+"""
+Testtext for documentation
+
+
+contains :py:func:`get_best_LC`
+"""
 import numpy as np
 from ppcpy.misc.helper import mean_stable
 
 elastic2raman = {355: 387, 532: 607}
-
 
 def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
     """Estimate the lidar constant from the optical profiles.

@@ -270,10 +270,13 @@ def pollyPolCaliTime(depCalAng, mTime, init_depAng, maskDepCalAng):
     ## search the calibration periods
     valuesFlagDepCal = flagDepCal.astype(int)
 
+    print('flagNDepCal', flagNDepCal)
+    print('flagPDepCal', flagPDepCal)
+
     ## label connected components in the matrix; 0 will stay 0
     ## connected 1s will be numbered consecutively
     depCalPeriods, nDepCalPeriods = label(valuesFlagDepCal)
-    #print(depCalPeriods)
+    print('depCalPeriods', depCalPeriods)
     
     if nDepCalPeriods >= 1:
         pass
@@ -285,7 +288,8 @@ def pollyPolCaliTime(depCalAng, mTime, init_depAng, maskDepCalAng):
         #flagIDepCal = (depCalPeriods == iDepCalPeriod) # flag for the ith calibration period.
         flagIDepCal = depCalPeriods[depCalPeriods == iDepCalPeriod] # flag for the ith calibration period.
         indices = np.where(depCalPeriods == flagIDepCal[0])[0]
-        #print(flagIDepCal)
+        print('flagIDepCal', flagIDepCal)
+        print(len(flagIDepCal), len(maskDepCalAng))
 
         if len(flagIDepCal) != len(maskDepCalAng):
             logging.warning(f"Depolarization Calibration from Timestamp "
