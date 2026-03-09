@@ -871,5 +871,31 @@
                                                  "parameter":"quasiAEV2_532_1064"
                             }
 		}
+  },
+  "target_classification": {
+              "variables": {
+		            "time": {
+				    "parameter":"time"
+			    },
+		            "height": {
+				    "parameter":"height"
+			    },
+                            "target_classification": {
+                                                 "parameter":"tcMaskV1"
+                            }
+		}
+  },
+  "target_classification_V2": {
+              "variables": {
+		            "time": {
+				    "parameter":"time"
+			    },
+		            "height": {
+				    "parameter":"height"
+			    },
+                            "target_classification": {
+                                                 "parameter":"tcMaskV2"
+                            }
+		}
   }
 }

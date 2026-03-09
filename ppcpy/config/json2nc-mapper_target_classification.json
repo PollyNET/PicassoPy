@@ -1,0 +1,127 @@
+{
+  "global_attributes": {
+    "Conventions": "CF-1.0",
+    "Licence": "Creative Commons Attribution Share Alike 4.0 International (CC BY-SA 4.0)",
+    "Data_Policy": "Each PollyNET site has Principal Investigator(s) (PI), responsible for deployment, maintenance and data collection. Information on which PI is responsible can be gathered via polly@tropos.de. The PI has priority use of the data collected at the site. The PI is entitled to be informed of any use of that data. Mandatory guidelines for data use and publication: Using PollyNET data or plots (also for presentations/workshops): Please consult with the PI or the PollyNET team (see contact_mail contact) before using data or plots! This will help to avoid misinterpretations of the lidar data and avoid the use of data from periods of malfunction of the instrument. Using PollyNET images/data on external websites: PIs and PollyNET must be asked for agreement and a link directed to polly.tropos.de must be included. Publishing PollyNET data and/or plots data: Offer authorship for the PI(s)! Acknowledge projects which have made the measurements possible according to PI(s) recommendation. PollyNET requests a notification of any published papers or reports or a brief description of other uses (e.g., posters, oral presentations, etc.) of data/plots used from PollyNET. This will help us determine the use of PollyNET data, which is helpful in optimizing product development and acquire new funding for future measurements. It also helps us to keep our product-related references up-to-date.",
+    "location": "",
+    "institute": "Ground-based Remote Sensing Group (TROPOS)",
+    "source": "polly_device_name",
+    "version": "picasso_version",
+    "reference": "https://polly.tropos.de/",
+    "contact": "baars@tropos.de",
+    "PicassoConfig_Info": "",
+    "PollyConfig_Info": "",
+    "CampaignConfig_Info": "",
+    "PollyData_Info": "",
+    "history": ""
+  },
+  "dimensions": {
+    "height": 0,
+    "time": 0
+  },
+  "variables": {
+    "altitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "m",
+        "long_name": "Height of lidar above mean sea level",
+        "standard_name": "altitude"
+      }
+    },
+    "longitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees_east",
+        "long_name": "Longitude of the site",
+        "standard_name": "longitude",
+        "axis": "Y"
+      }
+    },
+    "latitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees_north",
+        "long_name": "Latitude of the site",
+        "standard_name": "latitude",
+        "axis": "Y"
+      }
+    },
+    "height": {
+      "dtype": "f4",
+      "shape": [
+        "height"
+      ],
+      "data": null,
+      "attributes": {
+        "unit": "m",
+        "long_name": "Height above the ground",
+        "standard_name": "height",
+        "axis": "Z"
+      }
+    },
+    "tilt_angle": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees",
+        "long_name": "Tilt angle of lidar device",
+        "standard_name": "tilt_angle"
+      }
+    },
+    "time": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "attributes": {
+        "unit": "seconds since 1970-01-01 00:00:00 UTC",
+        "long_name": "Time UTC",
+        "standard_name": "time",
+        "axis": "T",
+        "calendar": "julian"
+      }
+    },
+    "target_classification": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "target_classification",
+        "standard_name": "tc_mask",
+        "comment": "This variable provides 11 atmospheric target classifications that can be distinguished by multiwavelength raman lidar.",
+        "definition": {
+            "0": "No signal",
+            "1": "Clean atmosphere",
+            "2": "Non-typed particles/low conc.",
+            "3": "Aerosol: small",
+            "4": "Aerosol: large, spherical",
+            "5": "Aerosol: mixture, partly non-spherical",
+            "6": "Aerosol: large, non-spherical",
+            "7": "Cloud: non-typed",
+            "8": "Cloud: water droplets",
+            "9": "Cloud: likely water droplets",
+            "10": "Cloud: ice crystals",
+            "11": "Cloud: likely ice crystals"
+            },
+        "target_classification_legend_keys": {
+            "legend_key_red": [1.0, 0.9, 0.6, 0.8667, 0.9059, 0.5333, 0.0, 0.4706, 0.2275, 0.7059, 0.0667, 0.5255],
+            "legend_key_green": [1.0, 0.9, 0.6, 0.8, 0.43, 0.13, 0.0, 0.11, 0.54, 0.87, 0.47, 0.73],
+            "legend_key_blue": [1.0, 0.9, 0.6, 0.47, 0.18, 0.0, 0.0, 0.51, 0.79, 0.97, 0.2, 0.42]
+            }
+      }
+    }
+  }
+}
