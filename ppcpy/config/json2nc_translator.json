@@ -806,6 +806,9 @@
 		            "height": {
 				    "parameter":"height"
 			    },
+                            "quasi_bsc_355": {
+                                                 "parameter":"quasiBscV1_355_total_FR"
+                            },
                             "quasi_bsc_532": {
                                                  "parameter":"quasiBscV1_532_total_FR"
                             },
@@ -815,8 +818,57 @@
                             "quasi_pardepol_532": {
                                                  "parameter":"quasiPdrV1_532_total_FR"
                             },
+                            "quasi_voldepol_532": {
+                                                 "parameter":"quasiVdrV1_532_total_FR"
+                            },
+                            "quasi_ext_355": {
+                                                 "parameter":"quasiExtV1_355_total_FR"
+                            },
+                            "quasi_ext_532": {
+                                                 "parameter":"quasiExtV1_532_total_FR"
+                            },
+                            "quasi_ext_1064": {
+                                                 "parameter":"quasiExtV1_1064_total_FR"
+                            },
                             "quasi_ang_532_1064": {
-                                                 "parameter":"quasiPdrV1_532_total_FR"
+                                                 "parameter":"quasiAEV1_532_1064"
+                            }
+		}
+  },
+  "quasi_results_V2": {
+              "variables": {
+		            "time": {
+				    "parameter":"time"
+			    },
+		            "height": {
+				    "parameter":"height"
+			    },
+                            "quasi_bsc_355": {
+                                                 "parameter":"quasiBscV2_355_total_FR"
+                            },
+                            "quasi_bsc_532": {
+                                                 "parameter":"quasiBscV2_532_total_FR"
+                            },
+                            "quasi_bsc_1064": {
+                                                 "parameter":"quasiBscV2_1064_total_FR"
+                            },
+                            "quasi_pardepol_532": {
+                                                 "parameter":"quasiPdrV2_532_total_FR"
+                            },
+                            "quasi_voldepol_532": {
+                                                 "parameter":"quasiVdrV2_532_total_FR"
+                            },
+                            "quasi_ext_355": {
+                                                 "parameter":"quasiExtV2_355_total_FR"
+                            },
+                            "quasi_ext_532": {
+                                                 "parameter":"quasiExtV2_532_total_FR"
+                            },
+                            "quasi_ext_1064": {
+                                                 "parameter":"quasiExtV2_1064_total_FR"
+                            },
+                            "quasi_ang_532_1064": {
+                                                 "parameter":"quasiAEV2_532_1064"
                             }
 		}
   }
