@@ -89,7 +89,7 @@
         "calendar": "julian"
       }
     },
-    "attenuated_backscatter_355nm": {
+    "quasi_bsc_532": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -99,39 +99,16 @@
       "_FillValue": -999999999,
       "attributes": {
         "unit": "sr^-1 m^-1",
-        "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "attenuated backscatter at 355 nm",
-        "standard_name": "att_beta_355nm",
-        "plot_range": "0.0, 2.0e-05",
-        "plot_scale": "linear",
+        "long_name": "quasi aerosol backscatter coefficients at 532 nm",
+        "standard_name": "quasi_bsc_532",
         "retrieving_info": {
-            "Lidar_calibration_constant_used": {"value": "__LCused[355_total_FR]", "unit": ""}
-            },
-        "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
-      }
-    },
-    "attenuated_backscatter_532nm": {
-      "dtype": "f8",
-      "shape": [
-        "time",
-        "height"
-      ],
-      "data": null,
-      "_FillValue": -999999999,
-      "attributes": {
-        "unit": "sr^-1 m^-1",
-        "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "attenuated backscatter at 532 nm",
-        "standard_name": "att_beta_532nm",
-        "plot_range": "0.0, 2.0e-05",
-        "plot_scale": "linear",
-        "retrieving_info": {
+            "Fixed lidar ratio": {"value": "__polly_config_dict[LR532]", "unit": "[Sr]"},
             "Lidar_calibration_constant_used": {"value": "__LCused[532_total_FR]", "unit": ""}
             },
-        "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
+        "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin. If the AOD is greater than 0.2, the relative uncertainty can be as large as 20%. Be careful about that!"
       }
     },
-    "attenuated_backscatter_1064nm": {
+    "quasi_bsc_1064": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -141,18 +118,17 @@
       "_FillValue": -999999999,
       "attributes": {
         "unit": "sr^-1 m^-1",
-        "unit_html": "sr<sup>-1</sup> m<sup>-1</sup>",
-        "long_name": "attenuated backscatter at 1064 nm",
-        "standard_name": "att_beta_1064nm",
-        "plot_range": "0.0, 1.5e-05",
-        "plot_scale": "linear",
+        "long_name": "quasi aerosol backscatter coefficients at 1064 nm",
+        "standard_name": "quasi_bsc_1064",
+        "Lidar_calibration_constant_used": "",
         "retrieving_info": {
+            "Fixed lidar ratio": {"value": "__polly_config_dict[LR1064]", "unit": "[Sr]"},
             "Lidar_calibration_constant_used": {"value": "__LCused[1064_total_FR]", "unit": ""}
             },
-        "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
+        "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin. If the AOD is greater than 0.2, the relative uncertainty can be as large as 20%. Be careful about that!"
       }
     },
-    "quality_mask_355nm": {
+    "quasi_pardepol_532": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -162,9 +138,32 @@
       "_FillValue": -999999999,
       "attributes": {
         "unit": "",
-        "long_name": "quality mask for attenuated backscatter at 355 nm",
-        "standard_name": "quality_mask_355",
-        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 355 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog)"
+        "long_name": "quasi particle depolarization ratio at 532 nm",
+        "standard_name": "quasi_pardepol_532",
+        "retrieving_info": {
+            "Fixed lidar ratio": {"value": "__polly_config_dict[LR532]", "unit": "[Sr]"},
+            "eta": {"value": "__pol_cali[532_FR][eta_best]", "unit": ""}
+            },
+        "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin."
+      }
+    },
+    "quasi_ang_532_1064": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "quasi backscatter-related angstroem exponent at 532-1064",
+        "standard_name": "quasi_ang_532_1064",
+        "retrieving_info": {
+            "Fixed lidar ratio 532 nm": {"value": "__polly_config_dict[LR532]", "unit": "[Sr]"},
+            "Fixed lidar ratio 1064 nm": {"value": "__polly_config_dict[LR1064]", "unit": "[Sr]"}
+            },
+        "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin. Be careful about that!"
       }
     },
     "quality_mask_532nm": {

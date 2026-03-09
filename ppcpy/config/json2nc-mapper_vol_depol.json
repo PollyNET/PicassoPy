@@ -104,7 +104,9 @@
         "standard_name": "voldepol_532",
         "plot_range": "0.0, 0.3",
         "plot_scale": "linear",
-	"eta": "",
+        "retrieving_info": {
+            "eta": {"value": "__pol_cali[355_FR][eta_best]", "unit": ""}
+            },
         "comment": "The depolarization ratio was calibrated with \\Delta 90\\circ method."
       }
     },
@@ -123,7 +125,9 @@
         "standard_name": "voldepol_532",
         "plot_range": "0.0, 0.3",
         "plot_scale": "linear",
-	"eta": "",
+        "retrieving_info": {
+            "eta": {"value": "__pol_cali[532_FR][eta_best]", "unit": ""}
+            },
         "comment": "The depolarization ratio was calibrated with \\Delta 90\\circ method."
       }
     },
@@ -142,7 +146,9 @@
         "standard_name": "voldepol_1064",
         "plot_range": "0.0, 0.3",
         "plot_scale": "linear",
-	"eta": "",
+        "retrieving_info": {
+            "eta": {"value": "__pol_cali[1064_FR][eta_best]", "unit": ""}
+            },
         "comment": "The depolarization ratio was calibrated with \\Delta 90\\circ method."
       }
     },
@@ -161,7 +167,9 @@
         "standard_name": "voldepol_532",
         "plot_range": "0.0, 0.3",
         "plot_scale": "linear",
-	"eta": "",
+        "retrieving_info": {
+            "eta": {"value": "", "unit": ""}
+            },
         "comment": "The depolarization ratio was calibrated in reference to the FR channel."
       }
     }

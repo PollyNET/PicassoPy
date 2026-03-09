@@ -797,5 +797,27 @@
                                                  "parameter":"voldepol_532_total_DFOV"
                             }
 	      }
+  },
+  "quasi_results": {
+              "variables": {
+		            "time": {
+				    "parameter":"time"
+			    },
+		            "height": {
+				    "parameter":"height"
+			    },
+                            "quasi_bsc_532": {
+                                                 "parameter":"quasiBscV1_532_total_FR"
+                            },
+                            "quasi_bsc_1064": {
+                                                 "parameter":"quasiBscV1_1064_total_FR"
+                            },
+                            "quasi_pardepol_532": {
+                                                 "parameter":"quasiPdrV1_532_total_FR"
+                            },
+                            "quasi_ang_532_1064": {
+                                                 "parameter":"quasiPdrV1_532_total_FR"
+                            }
+		}
   }
 }

@@ -108,6 +108,7 @@ def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
         ## adding dynamical variables
         json_nc_translator = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config', f'json2nc_translator.json'))
         for var in json_nc_translator[prod]['variables'].keys():
+            #print(f'var: {var}')
             if var in json_nc_mapping_dict['variables'].keys():
                 pass
             else:
@@ -121,20 +122,11 @@ def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
             else:
                 pass
 
+            #print(f'para: {parameter}')
+
             if parameter in data_cube.retrievals_highres.keys():
+                #print(f'para in retrievals_highres: {parameter}')
                 json_nc_mapping_dict['variables'][var]['data'] = data_cube.retrievals_highres[parameter]
-                ## update variable attribute
-                if "eta" in json_nc_mapping_dict['variables'][var]['attributes'].keys():
-                    wv, t, tel = re.findall(r"(\d{3,4})_(\w+)_(\w+)", parameter)[0]
-                    json_nc_mapping_dict['variables'][var]['attributes']['eta'] = data_cube.pol_cali[f'{wv}_{tel}']['eta_best']
-                    json_nc_mapping_dict['variables'][var]['attributes']['comment'] += f" (eta: {data_cube.pol_cali[f'{wv}_{tel}']['eta_best']})"
-                if "Lidar_calibration_constant_used" in json_nc_mapping_dict['variables'][var]['attributes'].keys():
-                    if "OC" in parameter:
-                        parameter = parameter.replace("OC", "FR")
-                    else:
-                        pass
-                    LC_used_key = parameter.split("attBsc_")[-1]
-                    json_nc_mapping_dict['variables'][var]['attributes']['Lidar_calibration_constant_used'] = data_cube.LCused[LC_used_key]
             
         ### remove empty key-value-pairs
         for var in list(json_nc_mapping_dict['variables'].keys()):  ## use list here to suppress RuntimeError: dictionary changed size during iteration
