@@ -69,6 +69,7 @@ class PicassoProc:
 
 
     def mdate_filename(self):
+        """get the date from filename in YYYYMMDD"""
         filename = self.rawdata_dict['filename']
         mdate = re.split(r'_',filename)[0:3]
         YYYY = mdate[0]
@@ -122,10 +123,12 @@ class PicassoProc:
 #        return mdate
 
     def mdate_infile(self):
+        """first date in file as string"""
         mdate_infilename = self.rawdata_dict['measurement_time']['var_data'][0][0]
         return f"{mdate_infilename}"
 
     def check_for_correct_mshots(self):
+        """check if mshots are more than 1.1 * laser_prf * deltatime or smaller 0"""
         laser_rep_rate = self.rawdata_dict['laser_rep_rate']['var_data']
         mShotsPerPrf = laser_rep_rate * self.polly_config_dict['deltaT']
         mShots = self.rawdata_dict['measurement_shots']['var_data']
@@ -136,6 +139,12 @@ class PicassoProc:
         return condition_check_matrix
 
     def filter_or_correct_false_mshots(self):
+        """ filter or correct the mshots (currently only logging)
+        
+        .. TODO::
+            that might be covered via the mcps conversion
+        
+        """
         logging.info(f"flagFilterFalseMShots: {self.polly_config_dict['flagFilterFalseMShots']}")
         logging.info(f"flagCorrectFalseMShots: {self.polly_config_dict['flagCorrectFalseMShots']}")
 
@@ -149,6 +158,7 @@ class PicassoProc:
         return self
 
     def mdate_consistency(self) -> bool:
+        """check mdate consistency"""
         if self.mdate_filename() == self.mdate_infile():
             logging.info('... date in nc-file equals date of filename')
             return True
@@ -157,6 +167,7 @@ class PicassoProc:
             return False
 
     def reset_date_infile(self):
+        """correct the date in the file """
         logging.info('date consistency-check... ')
         if self.mdate_consistency() == False:
             logging.info('date in nc-file will be replaced with date of filename.')
@@ -318,8 +329,9 @@ class PicassoProc:
         return self
 
     def SaturationDetect(self):
-        """
-        Saturation Detection ...
+        """Saturation Detection
+        
+        
         """
 
         self.flagSaturation = pollySaturationDetect.pollySaturationDetect(
@@ -330,7 +342,7 @@ class PicassoProc:
 
 
     def polarizationCaliD90(self):
-        """
+        """calibration with the Delta-90 method
         
         The stuff that starts here in the matlab version
         https://github.com/PollyNET/Pollynet_Processing_Chain/blob/5efd7d35596c67ef8672f5948e47d1f9d46ab867/lib/interface/picassoProcV3.m#L442
@@ -341,12 +353,17 @@ class PicassoProc:
 
 
     def cloudScreen(self):
-        """https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L663"""
+        """basic cloud screenting
+        
+        https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L663
+        """
         self.flagCloudFree = cloudscreen.cloudscreen(self)
 
 
     def cloudFreeSeg(self):
-        """https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L707
+        """cloud free profile segmentation
+        
+        https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L707
         
         .. code-block:: python
         
@@ -359,8 +376,7 @@ class PicassoProc:
         self.clFreeGrps = profilesegment.segment(self)
 
     def aggregate_profiles(self, var=None):
-        """
-        Aggregate highres profiles over cloud free segments
+        """Aggregate highres profiles over cloud free segments
 
         .. TODO:: Decide on a consistent way for doing the aggregation, do not mix mean and sum
         """
@@ -398,7 +414,8 @@ class PicassoProc:
 
 
     def loadAOD(self):
-        """ 
+        """load the AOD from a co-located fotometer
+        
         .. TODO:: Not yet implemented!
         """
         # raise NotImplementedError
@@ -436,7 +453,7 @@ class PicassoProc:
         # self.retrievals_profile['klett'][cldFreeGrp]['355_total_NR']['refH']
 
     def polarizationCaliMol(self):
-        """
+        """calibration with molecular signal in reference height
         
         """
 
@@ -446,7 +463,7 @@ class PicassoProc:
 
 
     def transCor(self):
-        """
+        """transmission correction
 
         .. TODO::
 
@@ -472,7 +489,7 @@ class PicassoProc:
 
 
     def retrievalKlett(self, oc=False, nr=False):
-        """
+        """apply the klett retrieval
         """
 
         retrievalname = 'klett'
@@ -493,7 +510,7 @@ class PicassoProc:
 
 
     def retrievalRaman(self, oc=False, nr=False, collect_debug=False):
-        """
+        """apply the raman retrieval (nighttime only)
         """
 
         retrievalname = 'raman'
@@ -543,7 +560,7 @@ class PicassoProc:
 
 
     def overlapCor(self):
-        """
+        """overlap correction
 
         the overlap correction is implemented differently to the matlab version
         first a 2d (time, height) correction array is constructed then it is applied.
@@ -567,7 +584,7 @@ class PicassoProc:
 
 
     def calcDepol(self):
-        """
+        """calculate the volume depol and the particle depol
         """
 
         for ret_prof_name in self.retrievals_profile['avail_optical_profiles']:
@@ -579,13 +596,14 @@ class PicassoProc:
                 self, ret_prof_name) 
 
     def estQualityMask(self):
-        """
+        """estimate the quality mask
+
         """
         self.retrievals_highres['quality_mask'] = qualityMask.qualityMask(self)
 
 
     def Angstroem(self):
-        """
+        """calculate the angstrom exponent
         """
         for ret_prof_name in self.retrievals_profile['avail_optical_profiles']:
             print(ret_prof_name)
@@ -594,7 +612,8 @@ class PicassoProc:
                 self, ret_prof_name) 
 
     def LidarCalibration(self):
-        """
+        """calculate the lidar constant
+
         .. TODO:: Add option to read constants from database.
         .. TODO:: Find out how we prioritise raman, klett, and database retrieved LC...
         """
@@ -622,7 +641,7 @@ class PicassoProc:
 
 
     def molecularHighres(self):
-        """
+        """calculate the molecular signal for the 2d high resolution
         """
 
         self.mol_2d = molecular.calc_2d(

@@ -32,9 +32,11 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
 def voldepol_cldFreeGrps(data_cube, ret_prof_name):
     """
     .. TODO:: Should the GHK-Transmission corrected (TCor) or the Background corrected (BGCor)
-    signal be used for calculating the volume depolarisation ratio?
-    >>> With the GHK formula the BGCor signal has to be used (in the current implementation, the voldepol is even 
-    >>> needed to perform the polarization-transmission-correction
+        signal be used for calculating the volume depolarisation ratio?
+
+
+    With the GHK formula the BGCor signal has to be used (in the current implementation, the voldepol is even 
+    needed to perform the polarization-transmission-correction
     """
 
     config_dict = data_cube.polly_config_dict
@@ -264,8 +266,7 @@ def calc_pdr(vol_depol, vol_depol_std, aer_bsc, aer_bsc_std, mol_bsc, mol_depol,
 
     References
     ----------
-    - Freudenthaler, V., et al., Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006,
-    Tellus B, 61, 165-179, 2009.
+    - Freudenthaler, V., et al., Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006,  Tellus B, 61, 165-179, 2009.
 
     Notes
     -----

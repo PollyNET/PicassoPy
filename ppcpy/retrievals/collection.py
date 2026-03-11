@@ -5,8 +5,9 @@ import numpy as np
 def calc_snr(signal, bg):
     """Calculate signal-to-noise ratio (SNR).
 
-    .. TODO:: could have also been in helpers, but that seems more on organizing stuff...
-    while this is an calculation, in the matlab version this function is used more than 20 times
+    .. TODO:: 
+        could have also been in helpers, but that seems more on organizing stuff...
+        while this is an calculation, in the matlab version this function is used more than 20 times
 
     Parameters
     ----------

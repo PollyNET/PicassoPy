@@ -162,11 +162,10 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], col
     data_cube : object
         Main PicassoProc object
     root_dir : str
-        ....
     prod_ls : list
         List of product names
 
-    ..TODO:: 
+    .. TODO:: 
         Missing comment in variable attributes.
         Not all retrievals / information needed for the profiles are in data_cube.retrivals_highres...
         write docstring
