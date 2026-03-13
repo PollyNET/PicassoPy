@@ -110,7 +110,7 @@ def create_netcdf_from_dict(nc_file_path:str, data_cube, data_dict:dict,
                         for key in attr_value.keys():
                            #print(key)
                            #print(attr_value[key])
-                            if attr_value[key]['value'].startswith("__"):
+                            if isinstance(attr_value[key], (dict)) and 'value' in attr_value[key].keys() and attr_value[key]['value'].startswith("__"):
                                 before, separator, after = attr_value[key]['value'].partition("__")
                                 #print(after)
                                 if '[' and ']' in after:
