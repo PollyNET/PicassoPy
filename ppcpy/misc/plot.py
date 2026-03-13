@@ -13,8 +13,8 @@ def plot_optical_analysis(profiles, height, times, plot_settings={}, smooth=None
 
     # backscatter
     height = height.copy()/1000.
-    h_top = 20
-    ihtop = np.where(height > h_top)[0][0]
+    h_top = height[-1]
+    ihtop = np.where(height >= h_top)[0][0]
     ax[0].axvline(0, lw=0.8, c='k')
     if '355_total_NR' in profiles and 'aerBsc' in profiles['355_total_NR']:
         ax[0].plot(profiles['355_total_NR']['aerBsc'][:ihtop]*1e6, height[:ihtop], 

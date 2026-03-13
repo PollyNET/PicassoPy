@@ -69,6 +69,7 @@ class PicassoProc:
 
 
     def mdate_filename(self):
+        """get the date from filename in YYYYMMDD"""
         filename = self.rawdata_dict['filename']
         mdate = re.split(r'_',filename)[0:3]
         YYYY = mdate[0]
@@ -122,10 +123,12 @@ class PicassoProc:
 #        return mdate
 
     def mdate_infile(self):
+        """first date in file as string"""
         mdate_infilename = self.rawdata_dict['measurement_time']['var_data'][0][0]
         return f"{mdate_infilename}"
 
     def check_for_correct_mshots(self):
+        """check if mshots are more than 1.1 * laser_prf * deltatime or smaller 0"""
         laser_rep_rate = self.rawdata_dict['laser_rep_rate']['var_data']
         mShotsPerPrf = laser_rep_rate * self.polly_config_dict['deltaT']
         mShots = self.rawdata_dict['measurement_shots']['var_data']
@@ -136,6 +139,12 @@ class PicassoProc:
         return condition_check_matrix
 
     def filter_or_correct_false_mshots(self):
+        """ filter or correct the mshots (currently only logging)
+        
+        .. TODO::
+            that might be covered via the mcps conversion
+        
+        """
         logging.info(f"flagFilterFalseMShots: {self.polly_config_dict['flagFilterFalseMShots']}")
         logging.info(f"flagCorrectFalseMShots: {self.polly_config_dict['flagCorrectFalseMShots']}")
 
@@ -149,6 +158,7 @@ class PicassoProc:
         return self
 
     def mdate_consistency(self) -> bool:
+        """check mdate consistency"""
         if self.mdate_filename() == self.mdate_infile():
             logging.info('... date in nc-file equals date of filename')
             return True
@@ -157,6 +167,7 @@ class PicassoProc:
             return False
 
     def reset_date_infile(self):
+        """correct the date in the file """
         logging.info('date consistency-check... ')
         if self.mdate_consistency() == False:
             logging.info('date in nc-file will be replaced with date of filename.')
@@ -272,9 +283,7 @@ class PicassoProc:
             - Range corrected signal.
             - etc.
 
-        TODO:
-            - This is just a first draft for a docstring. Improve it. There is more
-              processes and outputs of the function.        
+        .. TODO:: This is just a first draft for a docstring. Improve it. There is more processes and outputs of the function.        
         """
         preproc_dict = pollyPreprocess.pollyPreprocess(
             self.rawdata_dict,
@@ -320,8 +329,9 @@ class PicassoProc:
         return self
 
     def SaturationDetect(self):
-        """
-        Saturation Detection ...
+        """Saturation Detection
+        
+        
         """
 
         self.flagSaturation = pollySaturationDetect.pollySaturationDetect(
@@ -332,7 +342,7 @@ class PicassoProc:
 
 
     def polarizationCaliD90(self):
-        """
+        """calibration with the Delta-90 method
         
         The stuff that starts here in the matlab version
         https://github.com/PollyNET/Pollynet_Processing_Chain/blob/5efd7d35596c67ef8672f5948e47d1f9d46ab867/lib/interface/picassoProcV3.m#L442
@@ -343,12 +353,17 @@ class PicassoProc:
 
 
     def cloudScreen(self):
-        """https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L663"""
+        """basic cloud screenting
+        
+        https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L663
+        """
         self.flagCloudFree = cloudscreen.cloudscreen(self)
 
 
     def cloudFreeSeg(self):
-        """https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L707
+        """cloud free profile segmentation
+        
+        https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L707
         
         .. code-block:: python
         
@@ -361,10 +376,9 @@ class PicassoProc:
         self.clFreeGrps = profilesegment.segment(self)
 
     def aggregate_profiles(self, var=None):
-        """
-        Aggregate highres profiles over cloud free segments
+        """Aggregate highres profiles over cloud free segments
 
-        TODO: Decide on a consistent way for doing the aggregation, do not mix mean and sum
+        .. TODO:: Decide on a consistent way for doing the aggregation, do not mix mean and sum
         """
 
         if var == None:
@@ -400,8 +414,9 @@ class PicassoProc:
 
 
     def loadAOD(self):
-        """ 
-        TODO: Not yet implemented!
+        """load the AOD from a co-located fotometer
+        
+        .. TODO:: Not yet implemented!
         """
         # raise NotImplementedError
         pass
@@ -438,7 +453,7 @@ class PicassoProc:
         # self.retrievals_profile['klett'][cldFreeGrp]['355_total_NR']['refH']
 
     def polarizationCaliMol(self):
-        """
+        """calibration with molecular signal in reference height
         
         """
 
@@ -448,17 +463,19 @@ class PicassoProc:
 
 
     def transCor(self):
-        """
-        TODO:
-        flagTransCor = True:
-            Fix the GHK - Transmission correction
-        flagTransCor = False:
-            Check if it is correct to use the BG corrected signal and find a better solution.
-            It is a bit confusing to overwrite the signal as it is called sigTCor but actually is sigBGCor
-            Like storing a dedicated signal dict to be used throuhot the processing, the dictionary could
-            have elements like signal (sig), background (bg), and name. which we could overwrite each time 
-            a new correction is made. And by checking the name of the signal (TCor, BGCor) you can find out
-            which signal it is.
+        """transmission correction
+
+        .. TODO::
+
+            flagTransCor = True:
+                Fix the GHK - Transmission correction
+            flagTransCor = False:
+                Check if it is correct to use the BG corrected signal and find a better solution.
+                It is a bit confusing to overwrite the signal as it is called sigTCor but actually is sigBGCor
+                Like storing a dedicated signal dict to be used throuhot the processing, the dictionary could
+                have elements like signal (sig), background (bg), and name. which we could overwrite each time 
+                a new correction is made. And by checking the name of the signal (TCor, BGCor) you can find out
+                which signal it is.
         """
 
         if self.polly_config_dict['flagTransCor']:
@@ -472,7 +489,7 @@ class PicassoProc:
 
 
     def retrievalKlett(self, oc=False, nr=False):
-        """
+        """apply the klett retrieval
         """
 
         retrievalname = 'klett'
@@ -493,7 +510,7 @@ class PicassoProc:
 
 
     def retrievalRaman(self, oc=False, nr=False, collect_debug=False):
-        """
+        """apply the raman retrieval (nighttime only)
         """
 
         retrievalname = 'raman'
@@ -543,7 +560,7 @@ class PicassoProc:
 
 
     def overlapCor(self):
-        """
+        """overlap correction
 
         the overlap correction is implemented differently to the matlab version
         first a 2d (time, height) correction array is constructed then it is applied.
@@ -567,7 +584,7 @@ class PicassoProc:
 
 
     def calcDepol(self):
-        """
+        """calculate the volume depol and the particle depol
         """
 
         for ret_prof_name in self.retrievals_profile['avail_optical_profiles']:
@@ -579,13 +596,14 @@ class PicassoProc:
                 self, ret_prof_name) 
 
     def estQualityMask(self):
-        """
+        """estimate the quality mask
+
         """
         self.retrievals_highres['quality_mask'] = qualityMask.qualityMask(self)
 
 
     def Angstroem(self):
-        """
+        """calculate the angstrom exponent
         """
         for ret_prof_name in self.retrievals_profile['avail_optical_profiles']:
             print(ret_prof_name)
@@ -594,9 +612,10 @@ class PicassoProc:
                 self, ret_prof_name) 
 
     def LidarCalibration(self):
-        """
-        TODO: Add option to read constants from database.
-        TODO: Find out how we prioritise raman, klett, and database retrieved LC...
+        """calculate the lidar constant
+
+        .. TODO:: Add option to read constants from database.
+        .. TODO:: Find out how we prioritise raman, klett, and database retrieved LC...
         """
         self.LC = {}
         self.LC['klett'] = lidarconstant.lc_for_cldFreeGrps(
@@ -622,7 +641,7 @@ class PicassoProc:
 
 
     def molecularHighres(self):
-        """
+        """calculate the molecular signal for the 2d high resolution
         """
 
         self.mol_2d = molecular.calc_2d(
@@ -649,10 +668,11 @@ class PicassoProc:
 
     def write_2_sql_db(self, db_path:str, parameter:str, method:str|None=None):
         """ write LC or eta to sqlite db table
-        parameters:
-        - parameter (str): can be LC (Lidar-calibration-constant) or DC (Depol-calibration-constant)
-        - method (str): 'raman' or 'klett'
-        - db_path (str): location of the sqlite db-file
+
+        Paramters
+        parameter (str): can be LC (Lidar-calibration-constant) or DC (Depol-calibration-constant)
+        method (str): 'raman' or 'klett'
+        db_path (str): location of the sqlite db-file
 
         """
         if parameter == 'LC':
@@ -679,22 +699,26 @@ class PicassoProc:
 
 
     def adding_retrieving_infos_2_polly_config_dict(self):
-            """ some infos from the polly_config_dict should have there own keys, e.g. reference_search_range
-            parameters:
-            - self
-            output:
-            - self (with added polly_config dict_keys)
-            """
-            lower_overlap = np.array(self.polly_config_dict['heightFullOverlap'])
-            reference_search_range_355_total_FR = [int(lower_overlap[self.flag_355_total_FR][0]),self.polly_config_dict['maxDecomHeight355']]
-            reference_search_range_532_total_FR = [int(lower_overlap[self.flag_532_total_FR][0]),self.polly_config_dict['maxDecomHeight532']]
-            reference_search_range_1064_total_FR = [int(lower_overlap[self.flag_1064_total_FR][0]),self.polly_config_dict['maxDecomHeight1064']]
+        """ some infos from the polly_config_dict should have there own keys, e.g. reference_search_range
+
+        Parameters
+        ----------
+        self
+        
+        Returns
+        -------
+        self (with added polly_config dict_keys)
+        """
+        lower_overlap = np.array(self.polly_config_dict['heightFullOverlap'])
+        reference_search_range_355_total_FR = [int(lower_overlap[self.flag_355_total_FR][0]),self.polly_config_dict['maxDecomHeight355']]
+        reference_search_range_532_total_FR = [int(lower_overlap[self.flag_532_total_FR][0]),self.polly_config_dict['maxDecomHeight532']]
+        reference_search_range_1064_total_FR = [int(lower_overlap[self.flag_1064_total_FR][0]),self.polly_config_dict['maxDecomHeight1064']]
     
-            self.polly_config_dict['reference_search_range_355_total_FR'] = reference_search_range_355_total_FR
-            self.polly_config_dict['reference_search_range_532_total_FR'] = reference_search_range_532_total_FR
-            self.polly_config_dict['reference_search_range_1064_total_FR'] = reference_search_range_1064_total_FR
+        self.polly_config_dict['reference_search_range_355_total_FR'] = reference_search_range_355_total_FR
+        self.polly_config_dict['reference_search_range_532_total_FR'] = reference_search_range_532_total_FR
+        self.polly_config_dict['reference_search_range_1064_total_FR'] = reference_search_range_1064_total_FR
     
-            return self
+        return self
 
 #    def __str__(self):
 #        return f"{self.rawdata_dict}"

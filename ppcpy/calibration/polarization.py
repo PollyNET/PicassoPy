@@ -28,8 +28,11 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     ndarray
         Smoothed signal
     
-    History
-    -------
+    Notes
+    -----
+
+    **History**
+
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
     
     """
@@ -117,7 +120,7 @@ def loadGHK(data_cube):
 
 
 def calibrateGHK(data_cube):
-    """estimate the polarization calibration from the delta 90 Method 
+    """estimate the polarization calibration from the delta 90 Method [1]_
 
     Parameters
     ----------
@@ -130,15 +133,17 @@ def calibrateGHK(data_cube):
         polarization factors from delta 90 for each wavelength containing 
         sub-dicts with 'eta', 'eta_std', 'time_start', 'time_end', 'status'
 
-    History
-    -------
+    Notes
+    -----
+    
+    **History**
 
     Function is called here https://github.com/PollyNET/Pollynet_Processing_Chain/blob/5f5e4d0fd3dcebe7f87220cf802fcd6f414fe235/lib/interface/picassoProcV3.m#L548
     The two most relevant functions here are https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/pollyPolCaliGHK.m
     which also calls https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/depolCaliGHK.m
 
     References
-    -----------
+    ----------
     
     .. [1] Freudenthaler 2016
 
@@ -187,8 +192,8 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
                    collect_debug=False):
     """Polarization calibration for PollyXT lidar system.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     signal_t : ndarray
         Background-removed photon count signal at the total channel.
         Shape: (n_bins, n_profiles)
@@ -222,8 +227,8 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
     collect_debug : bool, default=False
         store and return the intermediate results
 
-    Returns:
-    --------
+    Returns
+    -------
     pol_cali_eta : list
         Eta values from polarization calibration.
     pol_cali_eta_std : list
@@ -374,6 +379,7 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
 
 
 def analyze_segments(dplus, dminus, segment_len, rel_std_dplus, rel_std_dminus): 
+    """ """
     results = []
     for i in range(len(dplus) - segment_len):
         #print(i, i+segment_len)
@@ -417,6 +423,7 @@ def analyze_segments(dplus, dminus, segment_len, rel_std_dplus, rel_std_dminus):
 """
 
 def default_to_regular(d):
+    """ """
     if isinstance(d, defaultdict):
         d = {k: default_to_regular(v) for k, v in d.items()}
     return d
@@ -485,49 +492,55 @@ def calibrateMol(data_cube):
 def depol_cali_mol(signal_t, background_t, signal_c, background_c, TR_t, TR_t_std, TR_c, TR_c_std, minSNR, mdr, mdrStd):
     """ Molecular polarization calibration.
     
-    INPUTS:
-        signal_t: numeric
-            Total signal (photon count).
-        background_t: numeric
-            Background at total channel (photon count).
-        signal_c: numeric
-            Cross signal (photon count).
-        background_c: numeric
-            Background at cross channel (photon count).
-        TR_t: scalar
-            Transmission ratio at total channel.
-        TR_t_std: scalar
-            Uncertainty of the transmission ratio at total channel.
-        TR_c: scalar
-            Transmission ratio at cross channel.
-        TR_c_std: scalar
-            Uncertainty of the transmission ratio at cross channel.
-        minSNR: float
-            The SNR constraint for the signal strength at reference height.
-        mdr: float
-            Default molecular depolarization ratio.
-        mdrStd: float
-            Default standard deviation of molecular depolarization ratio.
+    Parameters
+    ----------
+    signal_t: numeric
+        Total signal (photon count).
+    background_t: numeric
+        Background at total channel (photon count).
+    signal_c: numeric
+        Cross signal (photon count).
+    background_c: numeric
+        Background at cross channel (photon count).
+    TR_t: scalar
+        Transmission ratio at total channel.
+    TR_t_std: scalar
+        Uncertainty of the transmission ratio at total channel.
+    TR_c: scalar
+        Transmission ratio at cross channel.
+    TR_c_std: scalar
+        Uncertainty of the transmission ratio at cross channel.
+    minSNR: float
+        The SNR constraint for the signal strength at reference height.
+    mdr: float
+        Default molecular depolarization ratio.
+    mdrStd: float
+        Default standard deviation of molecular depolarization ratio.
     
-    OUTPUTS:
-        polCaliEta: array
-            Polarization calibration eta.
-        polCaliEtaStd: array
-            Uncertainty of polarization calibration eta.
-        polCaliFac: array
-            Polarization calibration factor.
-        polCaliFacStd: array
-            Uncertainty of polarization calibration factor.
+    Returns
+    -------
+    polCaliEta: array
+        Polarization calibration eta.
+    polCaliEtaStd: array
+        Uncertainty of polarization calibration eta.
+    polCaliFac: array
+        Polarization calibration factor.
+    polCaliFacStd: array
+        Uncertainty of polarization calibration factor.
     
-    REFERENCES:
-        Baars, H., et al., Aerosol profiling with lidar in the Amazon Basin during the wet and dry season,
-        J Geophys Res-Atmos, 117, 10.1029/2012jd018338, 2012.
+    References
+    ----------
+    Baars, H., et al., Aerosol profiling with lidar in the Amazon Basin during the wet and dry season,
+    J Geophys Res-Atmos, 117, 10.1029/2012jd018338, 2012.
     
-    HISTORY:
-        - 2021-07-06: First edition by Zhenping
-        - 2024-12-23: 
+    Notes
+    -----
+
+    **History**
+
+    - 2021-07-06: First edition by Zhenping
+    - 2024-12-23: converted to python
     
-    Authors: - zhenping@tropos.de
     """
     polCaliEta = []
     polCaliEtaStd = []

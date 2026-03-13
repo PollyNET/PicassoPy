@@ -128,56 +128,59 @@ def target_cat(data_cube, version='V1'):
 def target_classify(height, attBeta532, quasiBsc1064, quasiBsc532, quasiPDR532, VDR532, quasiAE, **kwargs):
     """aerosol/cloud target classification.
     
-    Parameters:
-        height (ndarray): Height array (m).
-        attBeta532 (ndarray): Attenuated backscatter at 532 nm.
-        quasiBsc1064 (ndarray): Quasi particle backscatter at 1064 nm. (m^{-1}sr^{-1})
-        quasiBsc532 (ndarray): Quasi particle backscatter at 532 nm. (m^{-1}sr^{-1})
-        quasiPDR532 (ndarray): Quasi particle depolarization ratio at 532 nm.
-        VDR532 (ndarray): Volume depolarization ratio at 532 nm.
-        quasiAE (ndarray): Quasi Ångström exponents.
-        **kwargs: Optional parameters to control thresholds.
+    Parameters
+    ----------
+    height (ndarray): Height array (m).
+    attBeta532 (ndarray): Attenuated backscatter at 532 nm.
+    quasiBsc1064 (ndarray): Quasi particle backscatter at 1064 nm. (m^{-1}sr^{-1})
+    quasiBsc532 (ndarray): Quasi particle backscatter at 532 nm. (m^{-1}sr^{-1})
+    quasiPDR532 (ndarray): Quasi particle depolarization ratio at 532 nm.
+    VDR532 (ndarray): Volume depolarization ratio at 532 nm.
+    quasiAE (ndarray): Quasi Ångström exponents.
 
-    Keyword Arguments:
-        clearThresBsc1064 (float): Default 1e-8.
-        turbidThresBsc1064 (float): Default 2e-7.
-        turbidThresBsc532 (float): Default 2e-7.
-        dropletThresPDR (float): Default 0.05.
-        spheriodThresPDR (float): Default 0.07.
-        unspheroidThresPDR (float): Default 0.2.
-        iceThresVDR (float): Default 0.3.
-        iceThresPDR (float): Default 0.35.
-        largeThresAE (float): Default 0.75.
-        smallThresAE (float): Default 0.5.
-        cloudThresBsc1064 (float): Default 2e-5.
-        minAttnRatioBsc1064 (float): Default 10.
-        searchCloudAbove (float): Default 300.
-        searchCloudBelow (float): Default 100.
-        hFullOL (float): Default 600.
+    clearThresBsc1064 (float): Default 1e-8.
+    turbidThresBsc1064 (float): Default 2e-7.
+    turbidThresBsc532 (float): Default 2e-7.
+    dropletThresPDR (float): Default 0.05.
+    spheriodThresPDR (float): Default 0.07.
+    unspheroidThresPDR (float): Default 0.2.
+    iceThresVDR (float): Default 0.3.
+    iceThresPDR (float): Default 0.35.
+    largeThresAE (float): Default 0.75.
+    smallThresAE (float): Default 0.5.
+    cloudThresBsc1064 (float): Default 2e-5.
+    minAttnRatioBsc1064 (float): Default 10.
+    searchCloudAbove (float): Default 300.
+    searchCloudBelow (float): Default 100.
+    hFullOL (float): Default 600.
 
-    Returns:
-        ndarray: Classification mask.
-            0: No signal
-            1: Clean atmosphere
-            2: Non-typed particles/low conc.
-            3: Aerosol: small
-            4: Aerosol: large, spherical
-            5: Aerosol: mixture, partly non-spherical
-            6: Aerosol: large, non-spherical
-            7: Cloud: non-typed
-            8: Cloud: water droplets
-            9: Cloud: likely water droplets
-            10: Cloud: ice crystals
-            11: Cloud: likely ice crystal
+    Returns
+    -------
+    ndarray: Classification mask.
+        0: No signal
+        1: Clean atmosphere
+        2: Non-typed particles/low conc.
+        3: Aerosol: small
+        4: Aerosol: large, spherical
+        5: Aerosol: mixture, partly non-spherical
+        6: Aerosol: large, non-spherical
+        7: Cloud: non-typed
+        8: Cloud: water droplets
+        9: Cloud: likely water droplets
+        10: Cloud: ice crystals
+        11: Cloud: likely ice crystal
 
-    References:
-        Baars, H., Seifert, P., Engelmann, R. & Wandinger, U. 
-        Target categorization of aerosol and clouds by continuous multiwavelength-polarization lidar measurements.
-        Atmospheric Measurement Techniques 10, 3175-3201, doi:10.5194/amt-10-3175-2017 (2017).
+    References
+    ----------
+    Baars, H. et al. 2017 doi:10.5194/amt-10-3175-2017
 
-    History:
-        - 2021-06-05: First edition by Zhenping
-        - 2025-03-25: AI based translation to python
+    Notes
+    -----
+
+    **History**
+
+    - 2021-06-05: First edition by Zhenping
+    - 2025-03-25: AI based translation to python
     """
 
     # Default parameter values
@@ -260,20 +263,26 @@ def detect_liquid_bits(height, bsc1064, cloudThresBsc1064=2e-5, minAttnRatioBsc1
                         searchCloudAbove=300, searchCloudBelow=100, **kwargs):
     """ detect liquid cloud bits.
     
-    Parameters:
-        height (ndarray): Height array (m).
-        bsc1064 (ndarray): Particle backscatter at 1064 nm (height x time).
-        cloudThresBsc1064 (float, optional): Threshold of cloud backscatter at 1064 nm. Default is 2e-5.
-        minAttnRatioBsc1064 (float, optional): Minimum attenuation required to detect liquid cloud. Default is 10.
-        searchCloudAbove (float, optional): Cloud search window above current bit (m). Default is 300.
-        searchCloudBelow (float, optional): Cloud search window below current bit (m). Default is 100.
+    Parameters
+    ----------
+    height (ndarray): Height array (m).
+    bsc1064 (ndarray): Particle backscatter at 1064 nm (height x time).
+    cloudThresBsc1064 (float, optional): Threshold of cloud backscatter at 1064 nm. Default is 2e-5.
+    minAttnRatioBsc1064 (float, optional): Minimum attenuation required to detect liquid cloud. Default is 10.
+    searchCloudAbove (float, optional): Cloud search window above current bit (m). Default is 300.
+    searchCloudBelow (float, optional): Cloud search window below current bit (m). Default is 100.
     
-    Returns:
-        ndarray: Logical mask (height x time) for detected liquid cloud regions.
+    Returns
+    -------
+    ndarray: Logical mask (height x time) for detected liquid cloud regions.
     
-    History:
-        - 2021-06-05: First edition by Zhenping
-        - 2025-03-25: AI based translation to python
+    Notes
+    -----
+    
+    **History**
+    
+    - 2021-06-05: First edition by Zhenping
+    - 2025-03-25: AI based translation to python
     """
     bsc1064 = np.nan_to_num(bsc1064)  # Replace NaN and Inf with 0
     flagLiquid = np.zeros_like(bsc1064, dtype=bool)

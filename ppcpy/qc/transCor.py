@@ -75,14 +75,12 @@ def transCor_E16_channel(sigT, bgT, voldepol, HT):
     -----
     Following [1]_ in the notation of [2]_
         
-    .. math:: P_{i, \text{corr}} = P_i \frac{1 + R_i\delta^V}{1+\delta^V}    
+    .. math:: P_{i, \\text{corr}} = P_i \\frac{1 + R_i \delta^V}{1+\delta^V}    
     
-    with the signal :math:`P_i`, the transmission ratio :math:`R_i` and the volume depolarization ratio :math:`delta^V`
+    with the signal :math:`P_i`, the transmission ratio :math:`R_i` and the volume depolarization ratio :math:`\\delta^V`
     
 
-    ToDo
-    ----
-    Clarify the background treatment. The bgTCor should not change (i.e. assuming the vdr is 0?
+    .. TODO:: Clarify the background treatment. The bgTCor should not change (i.e. assuming the vdr is 0?)
 
     
     References

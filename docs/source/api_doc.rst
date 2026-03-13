@@ -3,18 +3,16 @@
 API Reference
 #################
 
+.. toctree::
+   :maxdepth: 2
 
-.. autosummary::
-   :toctree: _autosummary
-   :recursive:
+   api_doc/interface
+   api_doc/calibration
+   api_doc/preprocess.rst
+   api_doc/cloudmask.rst
+   api_doc/io.rst
+   api_doc/misc.rst
+   api_doc/qc.rst
+   api_doc/retrievals.rst
 
-   ppcpy.interface
-   ppcpy.calibration
-   ppcpy.cloudmask
-   ppcpy.config
-   ppcpy.io
-   ppcpy.misc
-   ppcpy.preprocess
-   ppcpy.qc
-   ppcpy.retrievals
 

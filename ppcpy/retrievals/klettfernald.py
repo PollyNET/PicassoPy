@@ -40,14 +40,15 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:b
     signal : str
         Name of the signal used for the retrievals, eg. 'TCor'.
     
-    History
-    -------
+    Notes
+    -----
+
+    **History**
+
     - xxxx-xx-xx: TODO: First edition by ...
     - 2026-02-09: Modified and cleaned by Buholdt
     
-    TODO's
-    ------
-    - Should sigBGCor, sigTCor or RCS be used for the Klett retrievals?
+    .. TODO:: Should sigBGCor, sigTCor or RCS be used for the Klett retrievals?
 
     """
 
@@ -204,13 +205,6 @@ def fernald(
     Fernald, F. G.: Analysis of atmospheric lidar observations: some comments,
     Appl. Opt., 23, 652-653, 10.1364/AO.23.000652, 1984.
 
-    History
-    -------
-    - 2021-05-30: First edition by Zhenping.
-    - 2025-01-03: AI Translation
-    - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
-    - 2026-02-10: Reverted to using scipy.ndimage.uniform_filter1d due to occational issue with 
-                  propagating NaN-values in the backward and farward retrievals.
 
     Notes
     -----
@@ -221,7 +215,16 @@ def fernald(
       ppcpy.misc.helper.uniform_filter is generally preferred over scipy.ndimage.uniform_filter1d
       when some few NaN-values at the edges do not cause issues, as should be the case here. 
       Further investigation into this issue is needed to understand what is causing the NaN-values.
-    - TODO: Define m (Unsure if this m addition is needed).
+
+    .. TODO:: Define m (Unsure if this m addition is needed).
+
+    **History**
+
+    - 2021-05-30: First edition by Zhenping.
+    - 2025-01-03: AI Translation
+    - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
+    - 2026-02-10: Reverted to using scipy.ndimage.uniform_filter1d due to occational issue with 
+                  propagating NaN-values in the backward and farward retrievals.
 
     """
     # Convert units
