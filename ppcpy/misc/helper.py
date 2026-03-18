@@ -682,14 +682,14 @@ def uniform_filter(x:np.ndarray, win:int, fill_val:float=np.nan) -> np.ndarray:
     -------
     out : ndarray
         Smoothed signal.
-    
-    History
-    -------
-    - 2026-02-02: First edition by Buholdt
 
     Notes
     -----
     - Currently only support smoothing of 1D-arrays with a constant window size.
+
+    **History**
+    
+    - 2026-02-02: First edition by Buholdt
 
     """
     if isinstance(win, int):

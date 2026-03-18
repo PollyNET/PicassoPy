@@ -14,6 +14,11 @@ def segment(data_cube) -> np.ndarray:
     -------
     clFreeGrps : ndarray
         Time index of the detected cloud free regions [start, end].
+
+    **History**
+
+    - xxxx-xx-xx: First edition by ...
+    - 2026-03-18: Updated flagValPrf to include 'shutterOnMask' and 'fogMask'.
     """
     
     config_dict = data_cube.polly_config_dict

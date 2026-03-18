@@ -18,8 +18,8 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     ndarray
         Smoothed signal
     
-    History
-    -------
+    **History**
+    
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
     - 2026-03-17: Changed back to scipy.ndimage.uniform_filter1d due to NaN-related issues in
       Zhao's cloud screening algorithm.
@@ -48,6 +48,11 @@ def cloudscreen(data_cube, wv=532) -> np.ndarray:
     -----
     - The cloud screening is done for both the far range and near range total channels of
       wavelength wv if the channels exist.
+    
+    **History**
+    
+    - xxxx-xx-xx: First edition by ...
+    - 2026-03-18: Updated to include necessary configurations for cloudScreen_Zhao.
     """
 
     config_dict = data_cube.polly_config_dict
@@ -127,16 +132,15 @@ def cloudScreen_MSG(height:np.ndarray, signal:np.ndarray, slope_thres:float, sea
         A boolean array indicates whether the profile is cloud free.
     layerStatus: ndarray (time x height)
         Layer status for each bin (0: unknown, 1: cloud, 2: aerosol).
-        
-
-    History
-    -------
-    - 2021-05-18: First edition by Zhenping.
-    - 2025-03-20: Translated into python.
 
     Notes
     -----
     - This function does not yield any layerStatus information.
+
+    **History**
+    
+    - 2021-05-18: First edition by Zhenping.
+    - 2025-03-20: Translated into python.
     """
 
     if len(search_region) != 2 or search_region[1] <= height[0]:
@@ -201,8 +205,8 @@ def cloudScreen_Zhao(height:np.ndarray, signal:np.ndarray, bg:np.ndarray, search
     layer detection method based on micropulse lidar measurements, Journal of Geophysical
     Research: Atmospheres, 119(11), 6788-6802.
 
-    History
-    -------
+    **History**
+    
     - 2021-05-18: First edition by Zhengping.
     - 2026-03-11: Translated into python.
     """
@@ -294,11 +298,6 @@ def VDE_cld(signal:np.ndarray, height:np.ndarray, BG:float, minLayerDepth:float=
     Zhao, C., Y. Wang, Q. Wang, Z. Li, Z. Wang, and D. Liu (2014), A new cloud and aerosol
     layer detection method based on micropulse lidar measurements, Journal of Geophysical
     Research: Atmospheres, 119(11), 6788-6802.
-    
-    History
-    -------
-    - 2021-06-13: First edition by Zhenping
-    - 2026-03-11: Translated into pyhton
 
     Notes
     -----
@@ -306,8 +305,13 @@ def VDE_cld(signal:np.ndarray, height:np.ndarray, BG:float, minLayerDepth:float=
     - Also could consider using numba and its @njit decorator. That would also enhance the performance
       but the code needs to be rewritten to fit numba's requirements.
     - This function does not work with NaN values in the signal.
-    """
+
+    **History**
     
+    - 2021-06-13: First edition by Zhenping
+    - 2026-03-11: Translated into pyhton
+    """
+
     if np.floor(minLayerDepth / (height[1] - height[0])) < 3:
         raise ValueError('minLayerDepth must be assured there are at least 3 bins in each layer')
     
