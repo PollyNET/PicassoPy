@@ -1,11 +1,8 @@
-
-
 import numpy as np
-from scipy.ndimage import label
-from ppcpy.misc.helper import uniform_filter
-from ppcpy.retrievals.ramanhelpers import savgol_filter
+from scipy.ndimage import label, uniform_filter1d
+from ppcpy.misc.helper import uniform_filter, savgol_filter
 
-# Helper functions
+
 def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     """Uniformly smooth the input signal
     
@@ -23,82 +20,114 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     
     History
     -------
-    - 2026-02-04 Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
-
+    - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
+    - 2026-03-17: Changed back to scipy.ndimage.uniform_filter1d due to NaN-related issues in
+      Zhao's cloud screening algorithm.
     """
-    return uniform_filter(signal, window_len)
+
+    # return uniform_filter(signal, window_len)
+    return uniform_filter1d(signal, window_len, mode='nearest')
 
 
-def cloudscreen(data_cube) -> np.ndarray:
+def cloudscreen(data_cube, wv=532) -> np.ndarray:
     """Preform cloud screening.
 
     Parameters
     ----------
     data_cube : object
         Main PicassoProc object.
+    wv : int, optional
+        Wavelength of the channel to perfom cloud screening [nm]. Default is 532.
     
     Returns
     -------
     falgCloudFree : ndarray
         1 dimensional temporal boolean array. 0 = cloudy, 1 = cloud free. 
     
+    Notes
+    -----
+    - The cloud screening is done for both the far range and near range total channels of
+      wavelength wv if the channels exist.
     """
+
     config_dict = data_cube.polly_config_dict
     print('Starting cloud screen')
     print('cloud screen mode', config_dict['cloudScreenMode'])
-    print('slope_thres', config_dict['maxSigSlope4FilterCloud'])
-    height = data_cube.retrievals_highres['range']
 
-    wv = 532
-    RCS = np.squeeze(data_cube.retrievals_highres['RCS'][:, :, data_cube.gf(wv, 'total', 'FR')])
+    height = data_cube.retrievals_highres['range']
     bg = np.squeeze(data_cube.retrievals_highres['BG'][:, data_cube.gf(wv, 'total', 'FR')])
     hFullOL = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, 'total', 'FR')][0]
 
+    # Cloud screen mode dependent configuration
     if config_dict['cloudScreenMode'] == 1:
         screenfunc = cloudScreen_MSG
+        sig = 'RCS'
+        kwargs = {
+            'slope_thres': config_dict['maxSigSlope4FilterCloud'],
+        }
     elif config_dict['cloudScreenMode'] == 2:
         screenfunc = cloudScreen_Zhao
+        sig = 'PCR_slice'
+        kwargs = {
+            'bg': bg,
+            'minSNR': 2, 
+            'heightFullOverlap': hFullOL
+        }
     else:
-        raise ValueError(f'cloudScreenMode not properly defined')
+        raise ValueError(f'cloudScreenMode {config_dict['cloudScreenMode']} not properly defined.')
+
+    signal = np.squeeze(data_cube.retrievals_highres[sig][:, :, data_cube.gf(wv, 'total', 'FR')])
 
     flagCloudFree, layerStatus = screenfunc(
-        height, RCS, config_dict['maxSigSlope4FilterCloud'], [hFullOL, 7000])
+        height=height, signal=signal,
+        search_region=[hFullOL, 7000],
+        **kwargs
+    )
 
     # and for near range if it exists
     if np.any(data_cube.gf(wv, 'total', 'NR')):
-        RCS = np.squeeze(data_cube.retrievals_highres['RCS'][:, :, data_cube.gf(wv, 'total', 'NR')])
+        signal = np.squeeze(data_cube.retrievals_highres[sig][:, :, data_cube.gf(wv, 'total', 'NR')])
         bg = np.squeeze(data_cube.retrievals_highres['BG'][:, data_cube.gf(wv, 'total', 'NR')])
         hFullOL = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, 'total', 'NR')][0]
-        if config_dict['cloudScreenMode'] == 1:
-            flagCloudFree_NR, layerStatus_NR = screenfunc(
-                height, RCS, config_dict['maxSigSlope4FilterCloud'], [hFullOL, 2000])
+
+        if 'hFullOl' in kwargs and 'bg' in kwargs:
+            kwargs['heightFullOverlap'] = hFullOL
+            kwargs['bg'] = bg
+
+        flagCloudFree_NR, layerStatus_NR = screenfunc(
+            height=height, signal=signal,
+            search_region=[hFullOL, 2000],
+            **kwargs
+        )
 
         flagCloudFree = flagCloudFree & flagCloudFree_NR
 
     return flagCloudFree
 
 
-
-def cloudScreen_MSG(height:np.ndarray, signal:np.ndarray, slope_thres:float, search_region:list) -> float:
+def cloudScreen_MSG(height:np.ndarray, signal:np.ndarray, slope_thres:float, search_region:list, smooth_win:int=9) -> float:
     """Cloud screen with maximum signal gradient.
 
     Parameters
     ----------
-    height : array
+    height : ndarray
         Height in meters.
-    signal : array (time, height) !! this is transposed compared to the original implementation 
-        Photon count rate in MHz.
+    signal : ndarray (time, height)
+        Range corrected photon count rate signal [MHz].
     slope_thres : float
         Threshold of the slope to determine whether there is strong backscatter signal. [MHz*m]
     search_region : list or array (2 elements)
         [baseHeight, topHeight] in meters.
+    smooth_win : int, optional
+        Width of the applied smoothing filter [bins]. Default is 9.
 
     Returns
     -------
-    flagCloudFree : boolean array
-        Indicates whether the profile is cloud free.
-    layerStatus: matrix (height x time)
+    flagCloudFree : ndarray
+        A boolean array indicates whether the profile is cloud free.
+    layerStatus: ndarray (time x height)
         Layer status for each bin (0: unknown, 1: cloud, 2: aerosol).
+        
 
     History
     -------
@@ -107,9 +136,9 @@ def cloudScreen_MSG(height:np.ndarray, signal:np.ndarray, slope_thres:float, sea
 
     Notes
     -----
-    - layerStatus is currently not calculated in this module.
-
+    - This function does not yield any layerStatus information.
     """
+
     if len(search_region) != 2 or search_region[1] <= height[0]:
         raise ValueError("Not a valid search_region.")
 
@@ -118,53 +147,52 @@ def cloudScreen_MSG(height:np.ndarray, signal:np.ndarray, slope_thres:float, sea
         search_region[0] = height[0]
 
     flagCloudFree = np.zeros(signal.shape[0], dtype=bool)
-    layerStatus = np.zeros_like(signal, dtype=int)
+    layerStatus = None
 
     # Find indices corresponding to search_region
-    search_indx = np.array(((np.array(search_region) - height[0]) / (height[1] - height[0])) + 1, dtype=int)
+    search_index = np.searchsorted(height, np.array(search_region))
 
     for indx in range(signal.shape[0]):
         if np.isnan(signal[indx, 0]):
+            print(f"Skipping timestamp {indx}.")
             continue
 
-        slope = np.concatenate(([0], np.diff(smooth_signal(signal[indx, :], 10)))) / (height[1] - height[0])
+        slope = np.concatenate(([0], np.diff(smooth_signal(signal[indx, :], smooth_win)))) / (height[1] - height[0])
 
-        if not np.any(slope[search_indx[0]:search_indx[1]] >= slope_thres):
+        if not np.any(slope[search_index[0]:search_index[1] + 1] >= slope_thres):
             flagCloudFree[indx] = True
 
     return flagCloudFree, layerStatus
 
 
-def cloudScreen_Zhao(time:np.ndarray, height:np.ndarray, signal:np.ndarray, bg:np.ndarray, search_region:list=[0, 10000],
-                     minDepth:float=100, heightFullOverlap:float=600, smoothWin:int=8, minSNR:float=1) -> tuple:
+def cloudScreen_Zhao(height:np.ndarray, signal:np.ndarray, bg:np.ndarray, search_region:list=[0, 10000],
+                     minDepth:float=100, heightFullOverlap:float=600, smoothWin:int=7, minSNR:float=1) -> tuple:
     """Cloud layer detection based on Zhao's algorithm.
 
     Parameters
     ----------
-    time : ndarray
-        measurement time for each profile [datenum].
     height : ndarray
-        height above ground [m].
-    signal : ndarray
-        Photon count rate signal [MHz].
+        Height above ground [m].
+    signal : ndarray (time, height)
+        Background corrected photon count rate signal [MHz].
     bg : ndarray
-        Background of the Photon count rate signal [MHz].
+        Background of the photon count rate signal [MHz].
     search_region : list
-        bottom and top height for cloud detection [m].
-    minDepth : flaot
-        minimum layer depth [m]. Default is 100.
+        Bottom and top height for cloud detection [m].
+    minDepth : float
+        Minimum layer depth [m]. Default is 100.
     heightFullOverlap : float
-        minimum heght with full overlap [m]. Default is 600.
+        Minimum height with full overlap [m]. Default is 600.
     smoothWin : int
-        smoothing window width [bins]. Default is 8.
-    minSNR : flaot
-        minimum layer mean signal-noise-ratio. Default is 1.
+        Smoothing window width [bins]. Default is 7.
+    minSNR : float
+        Minimum layer mean signal-noise-ratio. Default is 1.
 
     Returns
     -------
-    flagCloudFree : boolean array
-        Indicates whether the profile is cloud free.
-    layerStatus: matrix (height x time)
+    flagCloudFree : ndarray
+        A boolean array indicates whether the profile is cloud free.
+    layerStatus: ndarray (time x height)
         Layer status for each bin (0: unknown, 1: cloud, 2: aerosol).
     
     References
@@ -177,75 +205,73 @@ def cloudScreen_Zhao(time:np.ndarray, height:np.ndarray, signal:np.ndarray, bg:n
     -------
     - 2021-05-18: First edition by Zhengping.
     - 2026-03-11: Translated into python.
-
-    Notes
-    -----
-    - Not yet tested or croschecked with the Matlab version!
-
     """
-    if (signal.shape[0] != height.shape[0] or
-        signal.shape[1] != time.shape[0] or
-        signal.shape[1] != bg.shape[0]):
-        raise ValueError('Dimensions are not matched!')
 
-    flagCloudFree = np.ones((1, len(time)), dtype=bool)
+    if (signal.shape[1] != height.shape[0] or
+        signal.shape[0] != signal.shape[0] or
+        signal.shape[0] != bg.shape[0]):
+        raise ValueError('Dimensions do not match!')
+
+    flagCloudFree = np.ones(signal.shape[0], dtype=bool)
     layerStatus = np.zeros(signal.shape, dtype=int)
 
-    flagDetectBins = (height >= search_region[0] & height <= search_region[2])
+    flagDetectBins = (height >= search_region[0]) & (height <= search_region[1])
 
-    for iTime in range(len(time)):
+    for iTime in range(signal.shape[0]):
         ## layer detection
-        layerInfo = VDE_cld(
-            signal=signal[flagDetectBins, iTime],
+        layerInfo, _, _ = VDE_cld(
+            signal=signal[iTime, flagDetectBins],
             height=height[flagDetectBins] / 1e3,
-            BG=bg(iTime),
+            BG=bg[iTime],
             minLayerDepth=minDepth / 1e3,
             minHeight=heightFullOverlap / 1e3,
             smoothWin=smoothWin,
             minSNR=minSNR
         )
 
-        for iLayer in layerInfo:
+        for iLayer in range(len(layerInfo)):
             ## gridding the layers
-            layerIndex = (height >= layerInfo[iLayer]['baseHeight'] * 1e3 and
-                          height <= layerInfo[iLayer]['topHeight'] * 1e3)
+            layerIndex = (height >= layerInfo[iLayer]['baseHeight'] * 1e3) & \
+                          (height <= layerInfo[iLayer]['topHeight'] * 1e3)
             
             if layerInfo[iLayer]['flagCloud']:
                 ## cloud layer
                 flagCloudFree[iTime] = False
-                layerStatus[layerIndex, iTime] = 1
+                layerStatus[iTime, layerIndex] = 1
 
             else:
                 ## aerosol layer
-                layerStatus[layerIndex, iTime] = 2
+                layerStatus[iTime, layerIndex] = 2
 
     return flagCloudFree, layerStatus
 
 
 def VDE_cld(signal:np.ndarray, height:np.ndarray, BG:float, minLayerDepth:float=0.2,
-            minHeight:float=0.4, smoothWin:int=3, minSNR:int=5) -> tuple:
-    """VDE_CLD cloud layer detection with VDE method. This method only required elstic signal.
+            minHeight:float=0.4, smoothWin:int=3, savgolSmoothWin:int=9, minSNR:int=5) -> tuple:
+    """Cloud layer detection with VDE method. This method only required elstic signal.
     
     Parameters
     ----------
-    signal : ndarray
+    signal : ndarray (height) 
         raw signal without background [photon count].
     height : ndarray
         height above the ground [km].
     BG : float
         background signal [photon count].
     minLayerDepth : float
-        minimun layer geometrical depth [km]. Default is 0.2.
+        minimum layer geometrical depth [km]. Default is 0.2.
     minHeight : float
         minimum height to start the searching with [km]. Default is 0.4.
     smoothWin : int
-        smoothindow in bins. Default is 3.
+        smoothing window bins. Default is 3.
+    savgolSmoothWin : int
+        smoothing window bins of the Savitzky-Golay filter. Default is 9.
     minSNR : int
         minimum layer SNR to filter the fake features. Default is 5.
     
     Returns
     -------
-    layerInfo : dict
+    layerInfo : list of dicts
         id : int
             identity of the layer.
         baseHeight : float
@@ -276,43 +302,46 @@ def VDE_cld(signal:np.ndarray, height:np.ndarray, BG:float, minLayerDepth:float=
 
     Notes
     -----
-    - Not yet tested or croschecked with the Matlab version!
-    - Breaking errors in the signal shape are suspected, ei. transposed vs not compared to the matlab version. 
-
+    - Some of the for-loops could be vectorised for enhanced performance. However, not in a pretty way.
+    - Also could consider using numba and its @njit decorator. That would also enhance the performance
+      but the code needs to be rewritten to fit numba's requirements.
+    - This function does not work with NaN values in the signal.
     """
+    
     if np.floor(minLayerDepth / (height[1] - height[0])) < 3:
         raise ValueError('minLayerDepth must be assured there are at least 3 bins in each layer')
     
     layerInfo = []
 
     minIndex = np.where(height >= minHeight)[0][0]
-    
+
     P = signal[minIndex:]
     height = height[minIndex:]
 
     # ----------------------------------------------------
     # 1. Semi-Discretization Process (SDP)
     # ----------------------------------------------------
-    noise_level = np.sqrt(BG + P)
+    noise_tresh = np.maximum(np.sqrt(BG + P)*3, np.sqrt(3)*3)
     Ps = smooth_signal(P, smoothWin)
 
     ## bottom to top semi-discretization
     PD1 = Ps.copy()
     for i in range(1, len(PD1)):
-        if np.abs(PD1[i] - PD1[i - 1]) <= np.nanmax([noise_level[i]*3, np.sqrt(3)*3]):
+        if np.abs(PD1[i] - PD1[i - 1]) <= noise_tresh[i]:
             PD1[i] = PD1[i - 1]
 
     ### top to bottom semi-discretizion
     PD2 = Ps.copy()
     for i in range(len(PD2) - 2, -1, -1):
-        if np.abs(PD2[i] - PD2[i + 1]) <= np.nanmax([noise_level(i)*3, np.sqrt(3)*3]):
+        if np.abs(PD2[i] - PD2[i + 1]) <= noise_tresh[i]:
             PD2[i] = PD2[i + 1]
-    
+
     PD = np.nanmean(np.vstack([PD1, PD2]), axis=0)
 
     # ----------------------------------------------------
     # 2. Value Distribution Equalization (VDE) Process
     # ----------------------------------------------------
+    PD = PD[~np.isnan(PD)]
     IS = np.argsort(PD)
     RS = PD[IS]
 
@@ -328,7 +357,7 @@ def VDE_cld(signal:np.ndarray, height:np.ndarray, BG:float, minLayerDepth:float=
     
     yi = PE * (MA - MI) + MI
     
-    RIS = np.argsort(IS) ## ?????
+    RIS = np.argsort(IS)
     PN = yi[RIS]
 
     # ----------------------------------------------------
@@ -361,8 +390,8 @@ def VDE_cld(signal:np.ndarray, height:np.ndarray, BG:float, minLayerDepth:float=
     # ----------------------------------------------------
     # 4. Layer classification
     # ----------------------------------------------------
+    Ps_1 = savgol_filter(P, savgolSmoothWin, 2)
     for iLayer in range(len(layerInfo)):
-        Ps_1 = savgol_filter(P, 10, 2)
         mask = (height >= layerInfo[iLayer]['baseHeight']) & (height <= layerInfo[iLayer]['topHeight'])
         sig = Ps_1[mask] * height[mask]**2
         sig[sig <= 0] = np.nan
