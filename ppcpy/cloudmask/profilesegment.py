@@ -32,25 +32,31 @@ def segment(data_cube) -> np.ndarray:
 
 
 
-def clFreeSeg(prfFlag:np.ndarray, nIntPrf:int, minNIntPrf:int) -> np.ndarray:
-    """CLFREESEG splits continuous cloud-free profiles into small sections.
+def clFreeSeg(prfFlag, nIntPrf, minNIntPrf):
+    """splits continuous cloud-free profiles into small sections.
 
-    INPUTS:
-        prfFlag: array-like (boolean)
-            Cloud-free flags for each profile.
-        nIntPrf: int
-            Number of integral profiles.
-        minNIntPrf: int
-            Minimum number of integral profiles.
+    Parameters
+    ----------
+    prfFlag: array-like (boolean)
+        Cloud-free flags for each profile.
+    nIntPrf: int
+        Number of integral profiles.
+    minNIntPrf: int
+        Minimum number of integral profiles.
 
-    OUTPUTS:
-        clFreSegs: 2D numpy array
-            Start and stop indexes for each cloud-free section.
-            [[start1, stop1], [start2, stop2], ...]
+    Returns
+    -------
+    clFreSegs: 2D numpy array
+        Start and stop indexes for each cloud-free section.
+        [[start1, stop1], [start2, stop2], ...]
 
-    HISTORY:
-        - 2021-05-22: First edition by Zhenping
-        - 2025-03-20: Translated to python 
+    Notes
+    -----
+    
+    **History**
+    
+    - 2021-05-22: First edition by Zhenping
+    - 2025-03-20: Translated to python 
     """
 
     # Label contiguous cloud-free segments

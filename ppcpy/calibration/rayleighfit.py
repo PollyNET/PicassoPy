@@ -47,7 +47,8 @@ def rayleighfit(data_cube) -> list:
     
     Notes
     -----
-    - TODO: Write docstring.
+    .. TODO:: Write docstring.
+
 
     """
     # TODO ist data.distance0 and height the same? https://github.com/PollyNET/Pollynet_Processing_Chain/blob/e413f9254094ff2c0a18fcdac4e9bebb5385d526/lib/preprocess/pollyPreprocess.m#L299
@@ -168,8 +169,11 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     ndarray
         Smoothed signal
     
-    History
-    -------
+    Notes
+    -----
+
+    **History**
+    
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
     
     """
@@ -204,11 +208,14 @@ def DouglasPeucker(signal:np.ndarray, height:np.ndarray, epsilon:float, heightBa
         Index of the signal that stands for different segments of the signal.
 
     References
-    ---------
+    ----------
     https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
 
-    History
-    -------
+    Notes
+    -----
+
+    **History**
+
     - 2017-12-29: First edition by Zhenping.
     - 2018-07-29: Add the height range for the searching instead of SNR restriction.
     - 2018-07-31: Add the maxHThick argument to control the maximum thickness of each output segment.
@@ -337,9 +344,6 @@ def chi2fit(x:np.ndarray, y:np.ndarray, measure_error:np.ndarray) -> tuple:
     """CHI2FIT Chi-2 fitting. All the code are translated from the exemplified code in Numerical 
     Recipes in C (2nd Edition). Great help comes from Birgit Heese.
     
-    Usage
-    -----
-    a, b, sigmaA, sigmaB, chi2, Q = chi2fit(x, y, measure_error)
     
     Parameters
     ----------
@@ -365,12 +369,16 @@ def chi2fit(x:np.ndarray, y:np.ndarray, measure_error:np.ndarray) -> tuple:
     Q : float
         Goodness of fit.
     
-    History
-    -------
+    Notes
+    -----
+
+    **History**
+    
     - 2018-08-03: First edition by Zhenping.
     
-    Authors: - zhenping@tropos.de
-
+    Examples
+    --------
+    ``a, b, sigmaA, sigmaB, chi2, Q = chi2fit(x, y, measure_error)``
     """
     if len(x) != len(y):
         raise ValueError("Array lengths of x and y must agree.")

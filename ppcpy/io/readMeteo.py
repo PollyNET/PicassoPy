@@ -88,6 +88,7 @@ class Meteo:
     """
 
     def __init__(self, meteorDataSource, meteo_folder, meteo_file):
+        """ """
     
         assert meteorDataSource == 'nc_cloudnet', "Other meteo sources are not implemented yet"
 
@@ -150,7 +151,7 @@ class MeteoNcCloudnet:
 
 
     def load(self, time, height_grid):
-        """
+        """load the data
         
         not quite sure on the interface yet
         ```

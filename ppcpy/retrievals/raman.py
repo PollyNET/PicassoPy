@@ -47,18 +47,21 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
     signal : str
         Name of the signal used for the retrievals, eg. 'TCor'.
     
-    History
-    -------
+    Notes
+    -----
+
+    **History**
+    
     - xxxx-xx-xx: TODO: First edition by ...
     - 2026-02-04: Modified and cleaned by Buholdt
     - 2026-02-27: Added ext_aer_mod and ext_mol_mod to backscatter calculations.
     
-    TODO's
-    ------
-    - sigma_angstroem and MC_count are hardcoded. Can this be automated?
-    - in raman_ext calulations we use a different hard coded MC_count than the global parameter.
-    - Should sigBGCor, sigTCor or RCS be used for the Raman retrievals? RCS dampens the effect form
-      the wrong first bin and makes the profile more straight (insted of the s-shape) in the lower bins.
+
+    .. TODO::
+        - sigma_angstroem and MC_count are hardcoded. Can this be automated?
+        - in raman_ext calulations we use a different hard coded MC_count than the global parameter.
+        - Should sigBGCor, sigTCor or RCS be used for the Raman retrievals? RCS dampens the effect form
+          the wrong first bin and makes the profile more straight (insted of the s-shape) in the lower bins.
 
     """
     height = data_cube.retrievals_highres['range']
@@ -317,17 +320,19 @@ def raman_ext(
     in cirrus clouds by using a combined Raman elastic-backscatter lidar.
     Applied Optics Vol. 31, Issue 33, pp. 7113-7131 (1992).
 
-    History
-    -------
+    Notes
+    -----
+
+    **History**
+    
     - 2021-05-31: First edition by Zhenping
     - 2025-01-05: AI supported translation
     - 2026-02-04: Cleaned by Buholdt
 
-    TODO's
-    ------
-    - moving_smooth_varied_win function is not yet implemented.
-    - moving_linfit_varied_win function is not yet implemented.
-    - Investigate what smothing function is used, Savitzky-Golay or something else?
+    .. TODO::
+        - moving_smooth_varied_win function is not yet implemented.
+        - moving_linfit_varied_win function is not yet implemented.
+        - Investigate what smothing function is used, Savitzky-Golay or something else?
 
     """
     # Prepare variables
@@ -472,8 +477,11 @@ def raman_bsc(
     LR : ndarray
         Aerosol Lidar ratio [sr].
     
-    History
-    -------
+    Notes
+    -----
+
+    **History**
+    
     - xxxx-xx-xx: First edition by ...
     - 2026-02-04: Cleaned by Buholdt.
     - 2026-02-27: Added ext_aer_mod and ext_mol_mod for better consistancy with the 1064nm channel.
@@ -627,18 +635,19 @@ def calc_raman_bsc(
     ----------
     Ansmann, A., et al. (1992). "Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar." Applied optics 31(33): 7113-7131.
 
-    History
-    -------
+
+    Notes
+    -----
+    .. TODO:: Angstroem is an float in beta_aer calculations and an array of shape (1, ) in beta_aer_std claculations.
+
+    **History**
+
     - 2018-01-02: First edition by Zhenping.
     - 2018-07-24: Added ext_mol_factor and ext_aer_factor for wavelength of 1064nm.
     - 2018-09-04: Changed smoothing order for signal ridge stability.
     - 2024-11-12: Modified by HB for consistency in 2024.
     - 2026-02-04: Cleaned by Buholdt
     - 2026-02-27: Added ext_aer_el_raman and ext_mol_el_raman for better consistancy with the 1064nm channel.
-
-    Notes
-    -----
-    - TODO: Angstroem is an float in beta_aer calculations and an array of shape (1, ) in beta_aer_std claculations.
 
     """
     ext_aer[~np.isfinite(ext_aer)] = 0
@@ -735,10 +744,6 @@ def lidarratio(
     EARLINET Single Calculus Chain–technical–Part 2: Calculation of optical products, 
     Atmospheric Measurement Techniques, 9, 3009-3029, 2016.
 
-    History
-    -------
-    2021-07-20: First edition by Zhenping (translated to Python)
-    2026-02-04: Changed from scipy.signal.savgol_filter to ppcpy.retrievals.ramanhelpers.savgol_filter
 
     Notes
     -----
@@ -746,6 +751,10 @@ def lidarratio(
     smoothing it does preform an interpolation to add in the edges removed by
     the smoothing/convolution operation.
 
+    **History**
+
+    2021-07-20: First edition by Zhenping (translated to Python)
+    2026-02-04: Changed from scipy.signal.savgol_filter to ppcpy.retrievals.ramanhelpers.savgol_filter
     """
     # Adjust smoothing window for backscatter to match extinction resolution
     if smoothWinExt >= smoothWinBsc:

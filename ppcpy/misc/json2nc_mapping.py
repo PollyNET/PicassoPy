@@ -38,37 +38,40 @@ def create_netcdf_from_dict(nc_file_path:str, data_cube, data_dict:dict,
     Examples
     --------
     Example of `data_dict` structure:
-    {
-        "global_attributes": {
-            "title": "Example NetCDF File",
-            "institution": "My Organization"
-        },
-        "dimensions": {
-            "time": None,  # Unlimited dimension
-            "lat": 10,
-            "lon": 20
-        },
-        "variables": {
-            "temperature": {
-                "dimensions": ("time", "lat", "lon"),
-                "dtype": "float32",
-                "attributes": {
-                    "units": "K",
-                    "long_name": "Surface temperature"
-                },
-                "data": np.random.rand(5, 10, 20)  # Example data
+
+    .. code-block:: javascript
+
+        {
+            "global_attributes": {
+                "title": "Example NetCDF File",
+                "institution": "My Organization"
             },
-            "pressure": {
-                "dimensions": ("time", "lat", "lon"),
-                "dtype": "float32",
-                "attributes": {
-                    "units": "Pa",
-                    "long_name": "Surface pressure"
+            "dimensions": {
+                "time": None,  // Unlimited dimension
+                "lat": 10,
+                "lon": 20
+            },
+            "variables": {
+                "temperature": {
+                    "dimensions": ("time", "lat", "lon"),
+                    "dtype": "float32",
+                    "attributes": {
+                        "units": "K",
+                        "long_name": "Surface temperature"
+                    },
+                    "data": np.random.rand(5, 10, 20)  // Example data
                 },
-                "data": np.random.rand(5, 10, 20)  # Example data
+                "pressure": {
+                    "dimensions": ("time", "lat", "lon"),
+                    "dtype": "float32",
+                    "attributes": {
+                        "units": "Pa",
+                        "long_name": "Surface pressure"
+                    },
+                    "data": np.random.rand(5, 10, 20)  // Example data
+                }
             }
         }
-    }
     """
     def extract_bracket_values(string):
         """Extract all values inside square brackets"""
@@ -110,7 +113,7 @@ def create_netcdf_from_dict(nc_file_path:str, data_cube, data_dict:dict,
                         for key in attr_value.keys():
                            #print(key)
                            #print(attr_value[key])
-                            if attr_value[key]['value'].startswith("__"):
+                            if isinstance(attr_value[key], (dict)) and 'value' in attr_value[key].keys() and attr_value[key]['value'].startswith("__"):
                                 before, separator, after = attr_value[key]['value'].partition("__")
                                 #print(after)
                                 if '[' and ']' in after:

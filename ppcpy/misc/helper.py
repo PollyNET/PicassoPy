@@ -55,10 +55,10 @@ def get_input_path(timestamp, device, raw_folder):
 
 def get_pollyxt_files(timestamp, device, raw_folder, output_path):
     """
-        This function locates multiple pollyxt level0 nc-zip files from one day measurements,
-        unzipps the files to output_path
-        and returns a list of files to be merged
-        and the title of the new merged nc-file
+    This function locates multiple pollyxt level0 nc-zip files from one day measurements,
+    unzipps the files to output_path
+    and returns a list of files to be merged
+    and the title of the new merged nc-file
     """
     input_path = get_input_path(timestamp, device, raw_folder)
     path_exist = Path(input_path)
@@ -157,9 +157,9 @@ def get_pollyxt_files(timestamp, device, raw_folder, output_path):
 
 def get_pollyxt_logbook_files(timestamp, device, raw_folder, output_path):
     """
-        This function locates multiple pollyxt logbook-zip files from one day measurements,
-        unzipps the files to output_path
-        and  merge them to one file
+    This function locates multiple pollyxt logbook-zip files from one day measurements,
+    unzipps the files to output_path
+    and  merge them to one file
     """
     input_path = get_input_path(timestamp, device, raw_folder)
     path_exist = Path(input_path)
@@ -347,7 +347,7 @@ def checking_attr(timestamp, device, raw_folder, output_path):
     -------
     ...
     
-    TODO: Variables 'force' and 'polly_files_list' are not defined anywhere
+    .. TODO:: Variables 'force' and 'polly_files_list' are not defined anywhere
     """
     ## select only those nc-files where the global attributes and the var-attributes haven't changed
     selected_var_nc_ls = checking_vars(timestamp, device, raw_folder, output_path)
@@ -629,12 +629,14 @@ def find_matching_dimension(array, reference_list):
     """
     Finds the dimension of a 3D array that matches the length of the reference list.
 
-    Args:
-        array (np.ndarray): The 3D NumPy array to check.
-        reference_list (list): The list to compare the dimension lengths with. This can also be a dict.
+    Parameters
+    ----------
+    array (np.ndarray): The 3D NumPy array to check.
+    reference_list (list): The list to compare the dimension lengths with. This can also be a dict.
 
-    Returns:
-        int: The index of the matching dimension, or -1 if no match is found.
+    Returns
+    -------
+    int: The index of the matching dimension, or -1 if no match is found.
     """
     list_length = len(reference_list)
     for dim_index, dim_size in enumerate(array.shape):
@@ -690,8 +692,8 @@ def uniform_filter(x:np.ndarray, win:int, fill_val:float=np.nan) -> np.ndarray:
     **History**
     
     - 2026-02-02: First edition by Buholdt
-
     """
+    
     if isinstance(win, int):
         if len(x.shape) > 1:
             raise NotImplementedError('Support for smoothing of mulitdimensional arrays is not yet implemented')
@@ -799,12 +801,13 @@ def mean_stable(x:np.ndarray, win:int, minBin:int=None, maxBin:int=None, minRelS
     xRelStd : float
         Relative uncertainty of the sequences used to calculate the mean values.
 
-    History
-    -------
+    Notes
+    -----
+    **History**
+
     - 2021-05-30: First edition by Zhenping
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to uniform_filter
 
-    .. Authors: - zhenping@tropos.de
     """
     # Default values for minBin and maxBin
     if minBin is None:
@@ -862,8 +865,8 @@ def mean_stable(x:np.ndarray, win:int, minBin:int=None, maxBin:int=None, minRelS
 def smooth2a(matrix_in:np.ndarray, Nr:int, Nc:int=None) -> np.ndarray:
     """Smooths 2D array data while ignoring NaNs.
 
-    This function smooths the data in `matrix_in` using a mean filter over a
-    rectangle of size (2*Nr+1)-by-(2*Nc+1). Each element is replaced by the mean
+    This function smooths the data in ``matrix_in`` using a mean filter over a
+    rectangle of size ``(2*Nr+1)-by-(2*Nc+1)``. Each element is replaced by the mean
     of the surrounding rectangle, ignoring NaN elements. If an element is NaN,
     it remains NaN in the output. At the edges, as much of the rectangle as fits
     is used.
@@ -885,9 +888,9 @@ def smooth2a(matrix_in:np.ndarray, Nr:int, Nc:int=None) -> np.ndarray:
 
     References
     ----------
-        - Written by Greg Reeves, March 2009, Division of Biology, Caltech.
-        - Inspired by "smooth2" by Kelly Hilands, October 2004, Applied Research Laboratory, Penn State University.
-        - Developed from code by Olof Liungman, 1997, Dept. of Oceanography, Earth Sciences Centre, Göteborg University.
+    - Written by Greg Reeves, March 2009, Division of Biology, Caltech.
+    - Inspired by "smooth2" by Kelly Hilands, October 2004, Applied Research Laboratory, Penn State University.
+    - Developed from code by Olof Liungman, 1997, Dept. of Oceanography, Earth Sciences Centre, Göteborg University.
     """
 
     if Nc is None:

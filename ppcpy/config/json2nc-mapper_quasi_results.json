@@ -1,0 +1,321 @@
+{
+  "global_attributes": {
+    "Conventions": "CF-1.0",
+    "Licence": "Creative Commons Attribution Share Alike 4.0 International (CC BY-SA 4.0)",
+    "Data_Policy": "Each PollyNET site has Principal Investigator(s) (PI), responsible for deployment, maintenance and data collection. Information on which PI is responsible can be gathered via polly@tropos.de. The PI has priority use of the data collected at the site. The PI is entitled to be informed of any use of that data. Mandatory guidelines for data use and publication: Using PollyNET data or plots (also for presentations/workshops): Please consult with the PI or the PollyNET team (see contact_mail contact) before using data or plots! This will help to avoid misinterpretations of the lidar data and avoid the use of data from periods of malfunction of the instrument. Using PollyNET images/data on external websites: PIs and PollyNET must be asked for agreement and a link directed to polly.tropos.de must be included. Publishing PollyNET data and/or plots data: Offer authorship for the PI(s)! Acknowledge projects which have made the measurements possible according to PI(s) recommendation. PollyNET requests a notification of any published papers or reports or a brief description of other uses (e.g., posters, oral presentations, etc.) of data/plots used from PollyNET. This will help us determine the use of PollyNET data, which is helpful in optimizing product development and acquire new funding for future measurements. It also helps us to keep our product-related references up-to-date.",
+    "location": "",
+    "institute": "Ground-based Remote Sensing Group (TROPOS)",
+    "source": "polly_device_name",
+    "version": "picasso_version",
+    "reference": "https://polly.tropos.de/",
+    "contact": "baars@tropos.de",
+    "PicassoConfig_Info": "",
+    "PollyConfig_Info": "",
+    "CampaignConfig_Info": "",
+    "PollyData_Info": "",
+    "history": ""
+  },
+  "dimensions": {
+    "height": 0,
+    "time": 0
+  },
+  "variables": {
+    "altitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "m",
+        "long_name": "Height of lidar above mean sea level",
+        "standard_name": "altitude"
+      }
+    },
+    "longitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees_east",
+        "long_name": "Longitude of the site",
+        "standard_name": "longitude",
+        "axis": "Y"
+      }
+    },
+    "latitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees_north",
+        "long_name": "Latitude of the site",
+        "standard_name": "latitude",
+        "axis": "Y"
+      }
+    },
+    "height": {
+      "dtype": "f4",
+      "shape": [
+        "height"
+      ],
+      "data": null,
+      "attributes": {
+        "unit": "m",
+        "long_name": "Height above the ground",
+        "standard_name": "height",
+        "axis": "Z"
+      }
+    },
+    "tilt_angle": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees",
+        "long_name": "Tilt angle of lidar device",
+        "standard_name": "tilt_angle"
+      }
+    },
+    "time": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "attributes": {
+        "unit": "seconds since 1970-01-01 00:00:00 UTC",
+        "long_name": "Time UTC",
+        "standard_name": "time",
+        "axis": "T",
+        "calendar": "julian"
+      }
+    },
+    "quasi_bsc_355": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "sr^-1 m^-1",
+        "long_name": "quasi aerosol backscatter coefficients at 355 nm",
+        "standard_name": "quasi_bsc_355",
+        "retrieving_info": {
+            "Fixed lidar ratio": {"value": "__polly_config_dict[LR355]", "unit": "[Sr]"},
+            "Lidar_calibration_constant_used": {"value": "__LCused[355_total_FR]", "unit": ""}
+            },
+        "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin. If the AOD is greater than 0.2, the relative uncertainty can be as large as 20%. Be careful about that!"
+      }
+    },
+    "quasi_bsc_532": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "sr^-1 m^-1",
+        "long_name": "quasi aerosol backscatter coefficients at 532 nm",
+        "standard_name": "quasi_bsc_532",
+        "retrieving_info": {
+            "Fixed lidar ratio": {"value": "__polly_config_dict[LR532]", "unit": "[Sr]"},
+            "Lidar_calibration_constant_used": {"value": "__LCused[532_total_FR]", "unit": ""}
+            },
+        "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin. If the AOD is greater than 0.2, the relative uncertainty can be as large as 20%. Be careful about that!"
+      }
+    },
+    "quasi_bsc_1064": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "sr^-1 m^-1",
+        "long_name": "quasi aerosol backscatter coefficients at 1064 nm",
+        "standard_name": "quasi_bsc_1064",
+        "retrieving_info": {
+            "Fixed lidar ratio": {"value": "__polly_config_dict[LR1064]", "unit": "[Sr]"},
+            "Lidar_calibration_constant_used": {"value": "__LCused[1064_total_FR]", "unit": ""}
+            },
+        "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin. If the AOD is greater than 0.2, the relative uncertainty can be as large as 20%. Be careful about that!"
+      }
+    },
+    "quasi_ext_355": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "sr^-1 m^-1",
+        "long_name": "quasi extinction at 355 nm",
+        "standard_name": "quasi_ext_355",
+        "retrieving_info": {
+            "Angstroem exponent":{"value": "__polly_config_dict[angstrexp]", "unit": ""}
+            },
+        "comment": ""
+      }
+    },
+    "quasi_ext_532": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "sr^-1 m^-1",
+        "long_name": "quasi extinction at 532 nm",
+        "standard_name": "quasi_ext_532",
+        "retrieving_info": {
+            "Angstroem exponent":{"value": "__polly_config_dict[angstrexp]", "unit": ""}
+            },
+        "comment": ""
+      }
+    },
+    "quasi_ext_1064": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "sr^-1 m^-1",
+        "long_name": "quasi extinction at 1064 nm",
+        "standard_name": "quasi_ext_1064",
+        "retrieving_info": {
+            "Angstroem exponent":{"value": "__polly_config_dict[angstrexp]", "unit": ""}
+            },
+        "comment": ""
+      }
+    },
+    "quasi_voldepol_532": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "quasi volume depolarization ratio at 532 nm",
+        "standard_name": "quasi_voldepol_532",
+        "retrieving_info": {
+            "Fixed lidar ratio": {"value": "__polly_config_dict[LR532]", "unit": "[Sr]"},
+            "eta": {"value": "__pol_cali[532_FR][eta_best]", "unit": ""}
+            },
+        "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin."
+      }
+    },
+    "quasi_pardepol_532": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "quasi particle depolarization ratio at 532 nm",
+        "standard_name": "quasi_pardepol_532",
+        "retrieving_info": {
+            "Fixed lidar ratio": {"value": "__polly_config_dict[LR532]", "unit": "[Sr]"},
+            "eta": {"value": "__pol_cali[532_FR][eta_best]", "unit": ""}
+            },
+        "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin."
+      }
+    },
+    "quasi_ang_532_1064": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "quasi backscatter-related angstroem exponent at 532-1064",
+        "standard_name": "quasi_ang_532_1064",
+        "retrieving_info": {
+            "Fixed lidar ratio 532 nm": {"value": "__polly_config_dict[LR532]", "unit": "[Sr]"},
+            "Fixed lidar ratio 1064 nm": {"value": "__polly_config_dict[LR1064]", "unit": "[Sr]"}
+            },
+        "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin. Be careful about that!"
+      }
+    },
+    "quality_mask_355nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "quality mask for attenuated backscatter at 355 nm",
+        "standard_name": "quality_mask_355",
+        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 355 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog)"
+      }
+    },
+    "quality_mask_532nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "quality mask for attenuated backscatter at 532 nm",
+        "standard_name": "quality_mask_532",
+        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 532 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog)"
+      }
+    },
+    "quality_mask_1064nm": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "quality mask for attenuated backscatter at 1064 nm",
+        "standard_name": "quality_mask_1064",
+        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 1064 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog)"
+      }
+    },
+    "quality_mask_voldepol_532": {
+      "dtype": "f8",
+      "shape": [
+        "time",
+        "height"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "",
+        "long_name": "quality mask for the depolarization",
+        "standard_name": "quality_mask_532",
+        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 1064 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog)"
+      }
+    }
+  }
+}

@@ -18,6 +18,9 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     ndarray
         Smoothed signal
     
+    Notes
+    -----
+    
     **History**
     
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter

@@ -19,8 +19,10 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     ndarray
         Smoothed signal
     
-    History
-    -------
+    Notes
+    -----
+    **History**
+    
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
     
     """
@@ -29,10 +31,12 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
 
 def voldepol_cldFreeGrps(data_cube, ret_prof_name):
     """
-    TODO: Should the GHK-Transmission corrected (TCor) or the Background corrected (BGCor)
-    signal be used for calculating the volume depolarisation ratio?
-    >>> With the GHK formula the BGCor signal has to be used (in the current implementation, the voldepol is even 
-    >>> needed to perform the polarization-transmission-correction
+    .. TODO:: Should the GHK-Transmission corrected (TCor) or the Background corrected (BGCor)
+        signal be used for calculating the volume depolarisation ratio?
+
+
+    With the GHK formula the BGCor signal has to be used (in the current implementation, the voldepol is even 
+    needed to perform the polarization-transmission-correction
     """
 
     config_dict = data_cube.polly_config_dict
@@ -106,7 +110,7 @@ def calc_profile_vdr(sigt, sigc, Gt, Gr, Ht, Hr, eta,
 #                  smooth_window=1, flag_smooth_before=True):
     """Calculate volume depolarization ratio using GHK parameters.
 
-    Parameters:
+    Parameters
     ----------
     sigt : ndarray
         Signal strength of the total channel [photon count].
@@ -131,14 +135,14 @@ def calc_profile_vdr(sigt, sigc, Gt, Gr, Ht, Hr, eta,
     flag_smooth_before : bool, optional
         Flag to control whether smoothing is applied before or after the signal ratio. Default is True.
 
-    Returns:
+    Returns
     -------
     vol_depol : ndarray
         Volume depolarization ratio.
     vol_depol_std : ndarray
         Uncertainty of the volume depolarization ratio.
 
-    References:
+    References
     ----------
     - Engelmann, R. et al. The automated multiwavelength Raman polarization and water-vapor lidar Polly XT: 
       the neXT generation. Atmospheric Measurement Techniques 9, 1767-1784 (2016).
@@ -147,8 +151,11 @@ def calc_profile_vdr(sigt, sigc, Gt, Gr, Ht, Hr, eta,
     - Freudenthaler, V. About the effects of polarising optics on lidar signals and the Delta90 calibration. 
       Atmos. Meas. Tech., 9, 4181–4255 (2016).
 
-    History:
-    -------
+    Notes
+    -----
+
+    **History**
+
     - 2018-09-02: First edition by Zhenping
     - 2018-09-04: Change the smoothing order. Smoothing the signal ratio instead of smoothing the signal.
     - 2019-05-24: Add 'flag_smooth_before' to control the smoothing order.
@@ -233,7 +240,7 @@ def pardepol_cldFreeGrps(data_cube, ret_prof_name):
 def calc_pdr(vol_depol, vol_depol_std, aer_bsc, aer_bsc_std, mol_bsc, mol_depol, mol_depol_std):
     """Calculate the particle depolarization ratio and estimate its standard deviation.
 
-    Parameters:
+    Parameters
     ----------
     vol_depol : ndarray
         Volume depolarization ratio.
@@ -250,21 +257,24 @@ def calc_pdr(vol_depol, vol_depol_std, aer_bsc, aer_bsc_std, mol_bsc, mol_depol,
     mol_depol_std : float
         Standard deviation of molecule depolarization ratio.
 
-    Returns:
+    Returns
     -------
     par_depol : ndarray
         Particle depolarization ratio.
     par_depol_std : ndarray
         Standard deviation of particle depolarization ratio.
 
-    References:
+    References
     ----------
-    - Freudenthaler, V., et al., Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006,
-      Tellus B, 61, 165-179, 2009.
+    - Freudenthaler, V., et al., Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006,  Tellus B, 61, 165-179, 2009.
 
-    History:
-    -------
+    Notes
+    -----
+
+    **History**
+
     - 2021-05-31: First edition by Zhenping
+    - 2025-02-27: Translation to python
 
     """
 

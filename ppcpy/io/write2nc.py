@@ -15,6 +15,7 @@ root_dir0 = Path(__file__).resolve().parent.parent.parent
 root_dir = helper.detect_path_type(root_dir0)
 
 def get_git_info(path="."):
+    """ """
     try:
         repo = Repo(Path(path).resolve(), search_parent_directories=True)
         branch = repo.active_branch.name
@@ -24,28 +25,31 @@ def get_git_info(path="."):
         return None, None
 
 def adding_fixed_vars(data_cube, json_nc_mapping_dict):
-        ## adding fixed variables
-        json_nc_mapping_dict['variables']['altitude']['data'] = data_cube.polly_config_dict['asl']
-        json_nc_mapping_dict['variables']['latitude']['data'] = data_cube.polly_config_dict['lat']
-        json_nc_mapping_dict['variables']['longitude']['data'] = data_cube.polly_config_dict['lon']
-        json_nc_mapping_dict['variables']['tilt_angle']['data'] = data_cube.rawdata_dict['zenithangle']['var_data']
+    """ """
+    ## adding fixed variables
+    json_nc_mapping_dict['variables']['altitude']['data'] = data_cube.polly_config_dict['asl']
+    json_nc_mapping_dict['variables']['latitude']['data'] = data_cube.polly_config_dict['lat']
+    json_nc_mapping_dict['variables']['longitude']['data'] = data_cube.polly_config_dict['lon']
+    json_nc_mapping_dict['variables']['tilt_angle']['data'] = data_cube.rawdata_dict['zenithangle']['var_data']
 
 def adding_global_attr(data_cube, json_nc_mapping_dict):
-        ## adding global attributes
-        json_nc_mapping_dict['global_attributes']['location'] = data_cube.polly_config_dict['site']
-        json_nc_mapping_dict['global_attributes']['source'] = data_cube.polly_config_dict['name']
-        json_nc_mapping_dict['global_attributes']['version'] = __version__
-        #json_nc_mapping_dict['global_attributes']['CampaignConfig_Info'] = "name:pollyxt_cpv,location:Mindelo,startTime:739458,endTime:739507,lon:-24.9954,lat:16.8778,asl:10,caption:, Mindelo, Cabo Verde,"
-        json_nc_mapping_dict['global_attributes']['PicassoConfig_Info'] = '; '.join(f'{k}={v}' for k, v in data_cube.picasso_config_dict.items())
-        json_nc_mapping_dict['global_attributes']['PollyConfig_Info'] = '; '.join(f'{k}={v}' for k, v in data_cube.polly_config_dict.items())
-        json_nc_mapping_dict['global_attributes']['PollyData_Info'] = f"pollyType:{data_cube.polly_config_dict['name']},pollyDataFile:{data_cube.rawdata_dict['filename']}"
-        #/pollyhome/Bildermacher2/todo_filelist/pollyxt_cpv/data_zip/202408/2024_08_21_Wed_CPV_00_00_01.nc,zipFile:2024_08_21_Wed_CPV_00_00_01.nc.zip,dataSize:125647907,dataTime:739485,pollyLaserlogbook:/pollyhome/Bildermacher2/todo_filelist/pollyxt_cpv/data_zip/202408/2024_08_21_Wed_CPV_00_00_01.nc.laserlogbook.txt,"
-        now_utc = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-        gitbranch, gitcommit = get_git_info(root_dir)
-        json_nc_mapping_dict['global_attributes']['history'] = f'Last processing time at {now_utc} UTC, git branch: {gitbranch}, git commit: {gitcommit}'
+    """ """
+    ## adding global attributes
+    json_nc_mapping_dict['global_attributes']['location'] = data_cube.polly_config_dict['site']
+    json_nc_mapping_dict['global_attributes']['source'] = data_cube.polly_config_dict['name']
+    json_nc_mapping_dict['global_attributes']['version'] = __version__
+    #json_nc_mapping_dict['global_attributes']['CampaignConfig_Info'] = "name:pollyxt_cpv,location:Mindelo,startTime:739458,endTime:739507,lon:-24.9954,lat:16.8778,asl:10,caption:, Mindelo, Cabo Verde,"
+    json_nc_mapping_dict['global_attributes']['PicassoConfig_Info'] = '; '.join(f'{k}={v}' for k, v in data_cube.picasso_config_dict.items())
+    json_nc_mapping_dict['global_attributes']['PollyConfig_Info'] = '; '.join(f'{k}={v}' for k, v in data_cube.polly_config_dict.items())
+    json_nc_mapping_dict['global_attributes']['PollyData_Info'] = f"pollyType:{data_cube.polly_config_dict['name']},pollyDataFile:{data_cube.rawdata_dict['filename']}"
+    #/pollyhome/Bildermacher2/todo_filelist/pollyxt_cpv/data_zip/202408/2024_08_21_Wed_CPV_00_00_01.nc,zipFile:2024_08_21_Wed_CPV_00_00_01.nc.zip,dataSize:125647907,dataTime:739485,pollyLaserlogbook:/pollyhome/Bildermacher2/todo_filelist/pollyxt_cpv/data_zip/202408/2024_08_21_Wed_CPV_00_00_01.nc.laserlogbook.txt,"
+    now_utc = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    gitbranch, gitcommit = get_git_info(root_dir)
+    json_nc_mapping_dict['global_attributes']['history'] = f'Last processing time at {now_utc} UTC, git branch: {gitbranch}, git commit: {gitcommit}'
 
 
 def write_channelwise_2_nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
+    """ """
     ## writes data from products, listed in prod_ls, to nc-file
     #  available products:  prod_ls = ["SNR", "BG", "RCS", "att_bsc", "vol_depol"]
     for prod in prod_ls:
@@ -90,6 +94,7 @@ def write_channelwise_2_nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
         json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1, prod=prod)
 
 def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
+    """ """
     ## writes data from products, listed in prod_ls, to nc-file
     for prod in prod_ls:
         logging.info(f"saving product: {prod}")
@@ -108,6 +113,7 @@ def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
         ## adding dynamical variables
         json_nc_translator = json2nc_mapping.read_json_to_dict(Path(root_dir,'ppcpy','config', f'json2nc_translator.json'))
         for var in json_nc_translator[prod]['variables'].keys():
+            #print(f'var: {var}')
             if var in json_nc_mapping_dict['variables'].keys():
                 pass
             else:
@@ -121,20 +127,11 @@ def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
             else:
                 pass
 
+            #print(f'para: {parameter}')
+
             if parameter in data_cube.retrievals_highres.keys():
+                #print(f'para in retrievals_highres: {parameter}')
                 json_nc_mapping_dict['variables'][var]['data'] = data_cube.retrievals_highres[parameter]
-                ## update variable attribute
-                if "eta" in json_nc_mapping_dict['variables'][var]['attributes'].keys():
-                    wv, t, tel = re.findall(r"(\d{3,4})_(\w+)_(\w+)", parameter)[0]
-                    json_nc_mapping_dict['variables'][var]['attributes']['eta'] = data_cube.pol_cali[f'{wv}_{tel}']['eta_best']
-                    json_nc_mapping_dict['variables'][var]['attributes']['comment'] += f" (eta: {data_cube.pol_cali[f'{wv}_{tel}']['eta_best']})"
-                if "Lidar_calibration_constant_used" in json_nc_mapping_dict['variables'][var]['attributes'].keys():
-                    if "OC" in parameter:
-                        parameter = parameter.replace("OC", "FR")
-                    else:
-                        pass
-                    LC_used_key = parameter.split("attBsc_")[-1]
-                    json_nc_mapping_dict['variables'][var]['attributes']['Lidar_calibration_constant_used'] = data_cube.LCused[LC_used_key]
             
         ### remove empty key-value-pairs
         for var in list(json_nc_mapping_dict['variables'].keys()):  ## use list here to suppress RuntimeError: dictionary changed size during iteration
@@ -157,13 +154,13 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], col
     data_cube : object
         Main PicassoProc object
     root_dir : str
-        ....
     prod_ls : list
         List of product names
 
-    TODO: Missing comment in variable attributes.
-    TODO: Not all retrievals / information needed for the profiles are in data_cube.retrivals_highres...
-    TODO: write docstring
+    .. TODO:: 
+        Missing comment in variable attributes.
+        Not all retrievals / information needed for the profiles are in data_cube.retrivals_highres...
+        write docstring
     """
     ## writes data from products, listed in prod_ls, to nc-file
     ##  available products:  prod_ls = ["profiles", "NR_profeils", "OC_profiles"]
