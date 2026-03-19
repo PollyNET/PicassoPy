@@ -611,7 +611,7 @@ class PicassoProc:
             self.retrievals_profile[ret_prof_name] = angstroem.ae_cldFreeGrps(
                 self, ret_prof_name) 
 
-    def LidarCalibration(self):
+    def LidarCalibration(self, collect_debug:bool=False):
         """calculate the lidar constant
 
         .. TODO:: Add option to read constants from database.
@@ -619,9 +619,15 @@ class PicassoProc:
         """
         self.LC = {}
         self.LC['klett'] = lidarconstant.lc_for_cldFreeGrps(
-            self, 'klett')
+            self, 
+            retrieval='klett', 
+            collect_debug=collect_debug
+        )
         self.LC['raman'] = lidarconstant.lc_for_cldFreeGrps(
-            self, 'raman')
+            self, 
+            retrieval='raman', 
+            collect_debug=collect_debug
+        )
         
         logging.warning('reading calibration constant from database not working yet')
         # Prioritise Raman retrieved LCs but use Klett retrieved ones when no Raman retrieval exists.
