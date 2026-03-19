@@ -143,7 +143,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
 
                 ## Round-trip transmission
                 trans_r = np.exp(- (aerOD + molOD + aerOD_r + molOD_r))
-                bsc_r = molBsc_r
+                bsc_r = molBsc_r if ~config_dict['flagPicassoComparison'] else molBsc
                 
                 ## Lidar clibration constant
                 LC_r = (signal_r * height**2) / (bsc_r * trans_r)
