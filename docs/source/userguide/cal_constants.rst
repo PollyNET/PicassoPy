@@ -103,3 +103,15 @@ The calibration constants can also be read back into picassopy: :py:meth:`~ppcpy
     data_cube.read_calibration_db()
 
 The values are then stored into ``data_cube.LC['raman_db']``, ``data_cube.LC['klett_db']`` and ``data_cube.pol_cali['D90_db']``, respectively.
+
+A basic visualization of the calibration constants is also available by :py:func:`~ppcpy.calibration.select.plot_cals`
+
+.. code-block:: python
+
+    from ppcpy.calibration.select import plot_cals
+    plot_cals(data_cube.pol_cali, 'eta', used=data_cube.etaused)
+    plot_cals(data_cube.LC, 'LC', used=data_cube.LCused)
+
+
+.. image:: img/plot_cals_example.png
+    :width: 55%

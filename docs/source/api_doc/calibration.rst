@@ -24,3 +24,10 @@ ppcpy.calibration.rayleighfit
 
 .. automodule:: ppcpy.calibration.rayleighfit
    :members:
+
+*************************
+ppcpy.calibration.select
+*************************
+
+.. automodule:: ppcpy.calibration.select
+   :members:
