@@ -4,8 +4,10 @@ Testtext for documentation
 
 contains :py:func:`get_best_LC`
 """
+from collections import defaultdict
 import numpy as np
 from ppcpy.misc.helper import mean_stable
+from ppcpy.misc.helper import default_to_regular
 
 elastic2raman = {355: 387, 532: 607}
 
@@ -40,9 +42,10 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
     print('LCMeanWindow', config_dict['LCMeanWindow'], 
           'LCMeanMinIndx', config_dict['LCMeanMinIndx'],
           'LCMeanMaxIndx', config_dict['LCMeanMaxIndx'])
-    LCs = [{} for i in range(len(data_cube.clFreeGrps))]
+    LCs = defaultdict(list)
 
     for i, cldFree in enumerate(data_cube.clFreeGrps):
+        cldFreeTime = np.array(data_cube.retrievals_highres['time'])[cldFree]
         cldFree = cldFree[0], cldFree[1] + 1
         profiles = data_cube.retrievals_profile[retrieval][i]
 
@@ -94,7 +97,10 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
                 print(f'Can not find a stable LC value, skipping {channel} {cldFree}')
                 continue
 
-            LCs[i][channel] = {'LC': LC_stable, 'LCStd': LC_stable * LCStd}
+            LCs[channel].append({
+                'LC': LC_stable, 'LCStd': LC_stable * LCStd,
+                'time_start': int(cldFreeTime[0]), 'time_end': int(cldFreeTime[1])
+            })
 
             if retrieval == 'raman' and int(wv) in elastic2raman.keys():
                 wv_r = elastic2raman[int(wv)] 
@@ -124,43 +130,10 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str) -> list:
                     print(f'Can not find a stable LC value, skipping {channel} {cldFree}')
                     continue
 
-                LCs[i][f"{wv_r}_{t}_{tel}"] = {'LC': LC_r_stable, 'LCStd': LC_r_stable * LCStd_r}
+                LCs[f"{wv_r}_{t}_{tel}"].append({
+                    'LC': LC_stable, 'LCStd': LC_stable * LCStd,
+                    'time_start': int(cldFreeTime[0]), 'time_end': int(cldFreeTime[1])
+                })
 
-    return LCs
-
-
-def get_best_LC(LCs:list) -> dict:
-    """Get lidar constant with the lowest standard deviation.
-
-    Parameters
-    ----------
-    LCs : list
-        Lidar constant for each channel per cloud free period.
-    
-    Returns
-    -------
-    LCused : dict
-        Lidar constants with lowest standard deviation per channel.
-
-    Notes
-    -----
-    - Since ``LC = LC_stable`` and ``LCStd = LC_stable * LC_Std`` so will any negative LC also have
-      a negative LCStd, and thus be chosen as the best LC.
-
-    **History**
-
-    - 2026-02-16: Added additional checks to hinder negative LCs to be chosen.
-        
-    """
-    # list comprehension for nested list
-    all_channels = set([k for e in LCs for k in e.keys()])
-    
-    LCused = {}
-    for channel in all_channels:
-        lcs = np.array([e[channel]['LC'] for e in LCs if channel in e and e[channel]['LC'] >= 0])
-        lcsstd = np.array([e[channel]['LCStd'] for e in LCs if channel in e and e[channel]['LCStd'] >= 0])
-
-        LCused[channel] = lcs[np.argmin(lcsstd)]
-    return LCused
-
+    return default_to_regular(LCs)
 

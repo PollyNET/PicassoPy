@@ -12,6 +12,7 @@ import ppcpy.qc.overlapCor as overlapCor
 import ppcpy.qc.qualityMask as qualityMask
 
 
+import ppcpy.calibration.select as select
 import ppcpy.calibration.polarization as polarization
 import ppcpy.cloudmask.cloudscreen as cloudscreen
 import ppcpy.cloudmask.profilesegment as profilesegment
@@ -66,6 +67,9 @@ class PicassoProc:
         self.retrievals_highres = {}
         self.retrievals_profile = {}
         self.retrievals_profile['avail_optical_profiles'] = []
+
+        self.pol_cali = {}
+        self.LC = {}
 
 
     def mdate_filename(self):
@@ -349,7 +353,8 @@ class PicassoProc:
         """
 
         polarization.loadGHK(self)
-        self.pol_cali = polarization.calibrateGHK(self)
+        self.pol_cali['D90'] = polarization.calibrateGHK(self)
+        self.etaused = select.single_best(self.pol_cali['D90'], 'eta', 'eta_std') 
 
 
     def cloudScreen(self):
@@ -459,7 +464,9 @@ class PicassoProc:
 
         logging.warning(f'not checked against the matlab code')
         if self.polly_config_dict['flagMolDepolCali']:
-            self.pol_cali_mol = polarization.calibrateMol(self)
+            self.pol_cali['mol'] = polarization.calibrateMol(self)
+        else:
+            logging.warning("'flagMolDepolCali' set to False")
 
 
     def transCor(self):
@@ -481,7 +488,7 @@ class PicassoProc:
         if self.polly_config_dict['flagTransCor']:
             logging.warning('transmission correction')
             self.retrievals_highres['sigTCor'], self.retrievals_highres['BGTCor'] = \
-                  transCor.transCorGHK_cube(self)
+                transCor.transCorGHK_cube(self)
         else:
             logging.warning('NO transmission correction')
             self.retrievals_highres['sigTCor'], self.retrievals_highres['BGTCor'] = \
@@ -614,10 +621,8 @@ class PicassoProc:
     def LidarCalibration(self):
         """calculate the lidar constant
 
-        .. TODO:: Add option to read constants from database.
         .. TODO:: Find out how we prioritise raman, klett, and database retrieved LC...
         """
-        self.LC = {}
         self.LC['klett'] = lidarconstant.lc_for_cldFreeGrps(
             self, 'klett')
         self.LC['raman'] = lidarconstant.lc_for_cldFreeGrps(
@@ -625,7 +630,7 @@ class PicassoProc:
         
         logging.warning('reading calibration constant from database not working yet')
         # Prioritise Raman retrieved LCs but use Klett retrieved ones when no Raman retrieval exists.
-        self.LCused = lidarconstant.get_best_LC(self.LC['klett']) | lidarconstant.get_best_LC(self.LC['raman'])
+        self.LCused = select.single_best(self.LC['klett'], 'LC', 'LCStd') | select.single_best(self.LC['raman'], 'LC', 'LCStd')
 
 
     def attBsc_volDepol(self):
@@ -666,36 +671,70 @@ class PicassoProc:
         quasi.quasi_angstrom(self, version='V2')
         quasi.target_cat(self, version='V2')
 
-    def write_2_sql_db(self, db_path:str, parameter:str, method:str|None=None):
+    def write_2_sql_db(self, parameter:str, db_path:str|None=None, method:str|None=None):
         """ write LC or eta to sqlite db table
 
         Paramters
-        parameter (str): can be LC (Lidar-calibration-constant) or DC (Depol-calibration-constant)
-        method (str): 'raman' or 'klett'
-        db_path (str): location of the sqlite db-file
+        ---------
+        parameter : str
+            can be LC (Lidar-calibration-constant) or DC (Depol-calibration-constant)
+        method : str
+            'raman' or 'klett'
+        db_path : str
+            location of the sqlite db-file
+
+            
+        Notes
+        -----
+        The unique columns are needed that new entries overwrite old ones, 
+        otherwise they are just added to the table with same timestamps.
 
         """
+        if db_path == None:
+            db_path = self.polly_config_dict['calibrationDB']
+            logging.info(f"read db_path from polly_config_dict {db_path}")
+        
         if parameter == 'LC':
             table_name = 'lidar_calibration_constant'
             column_names = [
                 'cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'used_for_processing', 
                 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
             data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text', 'text']
+            unique=', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope, cali_method)'
         elif parameter == 'DC':
             table_name = 'depol_calibration_constant'
             column_names = [
                 'cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'used_for_processing', 
                 'wavelength', 'telescope', 'nc_zip_file', 'polly_type']
             data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text']
+            unique=', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope)'
         assert len(column_names) == len(data_types), 'column names do not match data types'
 
         logging.info(f'writing to sqlite-db: {db_path}')
         logging.info(f'writing {parameter} to table: {table_name}')
         
-        sql_db.setup_empty(db_path, table_name, column_names, data_types)
+        sql_db.setup_empty(db_path, table_name, column_names, data_types, unique=unique)
         rows_to_insert = sql_db.prepare_for_sql_db_writing(self, parameter, method)
 
         sql_db.write_rows_to_sql_db(db_path, table_name, column_names, rows_to_insert)
+
+    def read_calibration_db(self, db_path:str|None=None):
+        """read the calibration constants from database
+        
+        time interval includes 24h before and after the actual date
+        
+        """
+        if db_path == None:
+            db_path = self.polly_config_dict['calibrationDB']
+            logging.info(f"read db_path from polly_config_dict {db_path}")
+
+        ts_interval = self.retrievals_highres['time'][0], self.retrievals_highres['time'][-1]
+        table_name = 'lidar_calibration_constant'
+        self.LC.update(sql_db.get_from_sql_db(db_path, table_name, ts_interval))
+
+        table_name = 'depol_calibration_constant'
+        self.pol_cali.update(sql_db.get_from_sql_db(db_path, table_name, ts_interval))
+        
 
 
     def adding_retrieving_infos_2_polly_config_dict(self):

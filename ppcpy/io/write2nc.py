@@ -80,7 +80,7 @@ def write_channelwise_2_nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
                 ## update variable attribute
                 if "eta" in json_nc_mapping_dict['variables'][v]['attributes'].keys():
                     wv, t, tel = re.findall(r"(\d{3,4})_(\w+)_(\w+)", v)[0]
-                    json_nc_mapping_dict['variables'][v]['attributes']['eta'] = data_cube.pol_cali[f'{wv}_{tel}']['eta_best']
+                    json_nc_mapping_dict['variables'][v]['attributes']['eta'] = data_cube.etaused[f'{wv}_{tel}']
                 if "Lidar_calibration_constant_used" in json_nc_mapping_dict['variables'][v]['attributes'].keys():
                     LC_used_key = v.split("attBsc_")[-1]
                     json_nc_mapping_dict['variables'][v]['attributes']['Lidar_calibration_constant_used'] = data_cube.LCused[LC_used_key]

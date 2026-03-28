@@ -214,7 +214,7 @@
         "standard_name": "quasi_voldepol_532",
         "retrieving_info": {
             "Fixed lidar ratio": {"value": "__polly_config_dict[LR532]", "unit": "[Sr]"},
-            "eta": {"value": "__pol_cali[532_FR][eta_best]", "unit": ""}
+            "eta": {"value": "__etaused[532_FR]", "unit": ""}
             },
         "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin."
       }
@@ -233,7 +233,7 @@
         "standard_name": "quasi_pardepol_532",
         "retrieving_info": {
             "Fixed lidar ratio": {"value": "__polly_config_dict[LR532]", "unit": "[Sr]"},
-            "eta": {"value": "__pol_cali[532_FR][eta_best]", "unit": ""}
+            "eta": {"value": "__etaused[532_FR]", "unit": ""}
             },
         "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin."
       }

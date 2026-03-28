@@ -109,7 +109,7 @@ def voldepol_2d(data_cube):
             vdr, vdrStd = depolarization.calc_profile_vdr(
                 sigt, sigc, config_dict['G'][flagt], config_dict['G'][flagc],
                 config_dict['H'][flagt], config_dict['H'][flagc],
-                data_cube.pol_cali[f'{wv}_{tel}']['eta_best'], config_dict[f'voldepol_error_{wv}'],
+                data_cube.etaused[f'{wv}_{tel}'], config_dict[f'voldepol_error_{wv}'],
                 window=1)
             vdr[data_cube.retrievals_highres['depCalMask'], :] = np.nan
             data_cube.retrievals_highres[f"voldepol_{wv}_total_{tel}"] = vdr
