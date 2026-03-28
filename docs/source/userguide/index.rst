@@ -12,5 +12,7 @@ User Guide
    configfiles.rst
    preprocess.rst
 
+   cal_constants.rst
+
    meteodata.rst
    todo.rst

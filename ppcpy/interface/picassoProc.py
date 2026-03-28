@@ -674,8 +674,8 @@ class PicassoProc:
     def write_2_sql_db(self, parameter:str, db_path:str|None=None, method:str|None=None):
         """ write LC or eta to sqlite db table
 
-        Paramters
-        ---------
+        Parameters
+        ----------
         parameter : str
             can be LC (Lidar-calibration-constant) or DC (Depol-calibration-constant)
         method : str
