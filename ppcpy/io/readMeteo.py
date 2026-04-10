@@ -124,7 +124,7 @@ class MeteoNcCloudnet:
     define preferred model
     """
 
-    radiusEarth:float = 6371229.0 # [m]
+    radiusEarth:float = 6371200.0 # [m]
     acelerationEarth:float = 9.80665 # [m/s^2]
 
     def __init__(self, basepath, filepattern):

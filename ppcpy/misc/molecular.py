@@ -615,11 +615,13 @@ def calc_profiles(met_profiles:list, wavelengths:list=[355, 387, 407, 532, 607, 
     ----------
     met_profiles : list
         List of xarray averaged meteorology profiles
-    wavelengths : list
+    wavelengths : list, optional
         List of wavelengtshs to preform the rayleigh scattering calculation [nm].
         Default is [355, 387, 407, 532, 607, 1058, 1064]
-    CO2 : float
-        CO2 count [??].
+    CO2 : flaot, optional
+        CO2 concentration [ppmv].
+    flagPicassoComparison : bool, optional
+        If true, use Picasso values and logic. Default is False.
     
     Returns
     -------
@@ -656,8 +658,29 @@ def calc_profiles(met_profiles:list, wavelengths:list=[355, 387, 407, 532, 607, 
 
     return dict(m_p)
 
-def calc_2d(met, wavelengths=[355, 387, 407, 532, 607, 1058, 1064], CO2=400):
-    """ """
+
+def calc_2d(met:dict, wavelengths:list=[355, 387, 407, 532, 607, 1058, 1064], 
+            CO2:float=400, flagPicassoComparison:bool=False) -> xr.Dataset:
+    """For a two dimentional xarray dataset of meteorology profiles, calculate the rayleigh scattering.
+    
+    Parameters
+    ----------
+    met : dict
+        ....
+    wavelengths : list, optional
+        List of wavelengtshs to preform the rayleigh scattering calculation [nm].
+        Default is [355, 387, 407, 532, 607, 1058, 1064]
+    CO2 : flaot, optional
+        CO2 concentration [ppmv].
+    flagPicassoComparison : bool, optional
+        If true, use Picasso values and logic. Default is False.
+    
+    Returns
+    -------
+    ds_mol : xr.Dataset
+        xarray dataset with dimesions time and height and variables molecular
+        backscatter (mBsc) and molecular extinction (mExt) per wavelength.
+    """
 
     ds_mol = xr.Dataset(
         coords=dict(
@@ -665,6 +688,10 @@ def calc_2d(met, wavelengths=[355, 387, 407, 532, 607, 1058, 1064], CO2=400):
             height=met['height'],
         )
     )
+
+    if flagPicassoComparison:
+        CO2 = 380
+        met['rh'].values = np.ones_like(met['rh'])*0.7
     
     for wv in wavelengths:
         mBsc, mExt = rayleigh_scattering(

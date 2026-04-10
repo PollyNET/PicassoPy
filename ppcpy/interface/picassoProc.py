@@ -648,7 +648,9 @@ class PicassoProc:
         """
 
         self.mol_2d = molecular.calc_2d(
-            self.met.ds)
+            self.met.ds,
+            flagPicassoComparison=self.polly_config_dict['flagPicassoComparison']
+        )
 
 
     def quasiV1(self):
