@@ -607,9 +607,25 @@ def rayleigh_scattering(wavelength, pressure, temperature, C, rh):
     return beta_mol, alpha_mol
 
 
-def calc_profiles(met_profiles, wavelengths=[355, 387, 407, 532, 607, 1058, 1064], CO2=400):
-    """for a list of xarray averaged meteorology profiles, calculate the rayleigh scattering 
+def calc_profiles(met_profiles:list, wavelengths:list=[355, 387, 407, 532, 607, 1058, 1064],
+                  CO2:float=400, flagPicassoComparison:bool=False) -> dict:
+    """For a list of xarray averaged meteorology profiles, calculate the rayleigh scattering.
+
+    Parameters
+    ----------
+    met_profiles : list
+        List of xarray averaged meteorology profiles
+    wavelengths : list
+        List of wavelengtshs to preform the rayleigh scattering calculation [nm].
+        Default is [355, 387, 407, 532, 607, 1058, 1064]
+    CO2 : float
+        CO2 count [??].
     
+    Returns
+    -------
+    dict
+        Molecular backscatter, extinction, and number density profiles for each 
+        inputed wavelength.
     """
 
     print('len mean_profiles', len(met_profiles))
@@ -619,11 +635,24 @@ def calc_profiles(met_profiles, wavelengths=[355, 387, 407, 532, 607, 1058, 1064
     m_p = defaultdict(lambda: np.zeros(shp))
 
     for i, p in enumerate(met_profiles):
+        if flagPicassoComparison:
+            CO2 = 380
+            p['rh'].values = np.ones(shp[1])*0.7
+
         for wv in wavelengths:
-            m_p[f'mBsc_{wv}'][i,:], m_p[f'mExt_{wv}'][i,:] = rayleigh_scattering(
-                wv, p['pressure'].values/100, p['temperature'].values, CO2, p['rh'].values*100)
-        m_p['number_density'][i,:] = number_density_at_pt(
-            p['pressure'].values/100, p['temperature'].values, p['rh'].values*100, True)
+            m_p[f'mBsc_{wv}'][i, :], m_p[f'mExt_{wv}'][i, :] = rayleigh_scattering(
+                wavelength=wv,
+                pressure=p['pressure'].values/100,
+                temperature=p['temperature'].values,
+                C=CO2,
+                rh=p['rh'].values*100
+            )
+        m_p['number_density'][i, :] = number_density_at_pt(
+            pressure=p['pressure'].values/100, 
+            temperature=p['temperature'].values,
+            relative_humidity=p['rh'].values*100,
+            ideal=True
+        )
 
     return dict(m_p)
 

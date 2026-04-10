@@ -97,14 +97,13 @@ class Meteo:
         return None
 
     
-    def load(self, times, heights):
-        """load the data and resample to 15 minute intervals
-        """
+    def load(self, times:float, heights:np.ndarray, asl:float, flagPicassoComparison:bool=False):
+        """Load the data and resample to 15 minute intervals"""
 
-        self.ds = self.reader.load(times, heights)
+        self.ds = self.reader.load(times, heights, asl, flagPicassoComparison)
         self.ds = self.ds.resample(time='15min').interpolate()
 
-        return self
+        # return self
 
     def get_mean_profiles(self, time_slice):
         """get the mean meteorological profiles
@@ -114,6 +113,7 @@ class Meteo:
         mean_profiles = []
         for t in time_slice:
             mean_profiles.append(self.ds.sel(time=slice(*t)).mean(dim='time'))
+
         return mean_profiles
 
 
@@ -124,6 +124,8 @@ class MeteoNcCloudnet:
     define preferred model
     """
 
+    radiusEarth:float = 6371229.0 # [m]
+    acelerationEarth:float = 9.80665 # [m/s^2]
 
     def __init__(self, basepath, filepattern):
 
@@ -133,7 +135,7 @@ class MeteoNcCloudnet:
         self.filepattern = filepattern
 
     def find_path_for_time(self, time):
-        """find the files fo a given time """
+        """find the files for a given time """
 
         candidates = glob.glob(self.basepath + "**", recursive=True)
         #print('candidates ', candidates)
@@ -150,9 +152,9 @@ class MeteoNcCloudnet:
         return filename[0]
 
 
-    def load(self, time, height_grid):
-        """load the data
-        
+    def load(self, time:float, height_grid:np.ndarray, station_altitude:float, flagPicassoComparison:bool=False) -> xr.Dataset:
+        """Load the data
+
         not quite sure on the interface yet
         ```
         met.load(data_cube.retrievals_highres['time'][0])
@@ -166,7 +168,9 @@ class MeteoNcCloudnet:
             - regrid from (time, level) to (time, lidar heights)
 
 
-        clarify the above ground above sea level issues
+        TODO: clarify the above ground above sea level issues.
+        TODO: Check how the interpolation handles negative grid points
+        TODO: Check if we can interpolate several variables at once
 
         """
 
@@ -178,13 +182,31 @@ class MeteoNcCloudnet:
             'height',
             'temperature',
             'pressure',
-            'rh', 'q'
+            'rh', 'q',
+            'sfc_geopotential'
         ]
         ds = ds[variables_to_select]
 
-        height_2d = ds.height.values
-        #height_grid = data_cube.retrievals_highres['height']
-        time = ds.time.values.astype('datetime64[s]').astype(int)
+        height_2d = ds.height.values.copy()
+        time = ds.time.values.astype('datetime64[s]').astype(int).copy()
+
+        ## Model height correction:
+        # print("Uncorrected height[:,0]", height_2d[:, 0])
+        geopotential_surface_height = ds['sfc_geopotential'].values / self.acelerationEarth
+        surface_altitude = self.radiusEarth * geopotential_surface_height/ \
+            (self.radiusEarth - geopotential_surface_height)
+        height_shift = surface_altitude - station_altitude
+        height_2d = height_2d + height_shift[:, np.newaxis]
+
+        # print("geopotenital_surface_height:", geopotential_surface_height)
+        # print("surface_altitude", surface_altitude)
+        # print("station_altitude", station_altitude)
+        # print("heigth_shift", height_shift)
+        # print("Corrected height[:,0]", height_2d[:, 0])
+
+        if flagPicassoComparison:
+            height_2d = ds.height.values
+            height_grid = height_grid + station_altitude
         
         # for some reasons this interpolation provides strange results in the lowermost layers
         # zi = griddata((np.repeat(time, ds_dash.height.shape[1], axis=0), 
@@ -192,22 +214,16 @@ class MeteoNcCloudnet:
         #               ds_dash['temperature'].values.ravel(), 
         #               (time[None,:], height_grid[:,None]), 
         #               method='linear')
+
         temp = np.zeros((time.shape[0], height_grid.shape[0]))
-        for i in range(time.shape[0]):
-            temp[i,:] = np.interp(height_grid,
-                height_2d[i,:],ds['temperature'].values[i,:])
         p = np.zeros((time.shape[0], height_grid.shape[0]))
-        for i in range(time.shape[0]):
-            p[i,:] = np.interp(height_grid,
-                height_2d[i,:],ds['pressure'].values[i,:])
         rh = np.zeros((time.shape[0], height_grid.shape[0]))
-        for i in range(time.shape[0]):
-            rh[i,:] = np.interp(height_grid,
-                height_2d[i,:],ds['rh'].values[i,:])
         q = np.zeros((time.shape[0], height_grid.shape[0]))
         for i in range(time.shape[0]):
-            q[i,:] = np.interp(height_grid,
-                height_2d[i,:],ds['q'].values[i,:])
+            temp[i, :] = np.interp(height_grid, height_2d[i, :], ds['temperature'].values[i, :])
+            p[i, :] = np.interp(height_grid, height_2d[i, :], ds['pressure'].values[i, :])
+            rh[i, :] = np.interp(height_grid, height_2d[i, :], ds['rh'].values[i, :])
+            q[i, :] = np.interp(height_grid, height_2d[i, :], ds['q'].values[i, :])
         
         ds_new = xr.Dataset(
             data_vars=dict(
@@ -224,6 +240,3 @@ class MeteoNcCloudnet:
         )
 
         return ds_new
-
-
-

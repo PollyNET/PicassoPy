@@ -403,18 +403,21 @@ class PicassoProc:
                 del self.retrievals_profile[var]
 
     def loadMeteo(self):
-        """ Load meteorological data """
+        """Load meteorological data"""
         self.met = readMeteo.Meteo(
             self.polly_config_dict['meteorDataSource'], 
             self.polly_config_dict['meteo_folder'],
-            self.polly_config_dict['meteo_file'])
+            self.polly_config_dict['meteo_file']
+        )
         self.met.load(
             datetime.datetime.timestamp(datetime.datetime.strptime(self.date, '%Y%m%d')),
-            self.retrievals_highres['height'])
+            self.retrievals_highres['height'], float(self.polly_config_dict['asl']),
+            self.polly_config_dict['flagPicassoComparison']
+        )
 
 
     def loadAOD(self):
-        """load the AOD from a co-located fotometer
+        """Load the AOD from a co-located fotometer
         
         .. TODO:: Not yet implemented!
         """
@@ -423,7 +426,7 @@ class PicassoProc:
 
 
     def calcMolecular(self):
-        """calculate the molecular scattering for the cloud free periods
+        """Calculate the molecular scattering for the cloud free periods
         
         with the strategy of first averaging the met data and then calculating the rayleigh scattering
         
@@ -431,12 +434,12 @@ class PicassoProc:
 
         time_slices = [self.retrievals_highres['time64'][grp] for grp in self.clFreeGrps]
         print('time slices of cloud free ', time_slices)
-        mean_profiles = self.met.get_mean_profiles(time_slices) 
-        self.mol_profiles = molecular.calc_profiles(mean_profiles)
+        mean_profiles = self.met.get_mean_profiles(time_slices)
+        self.mol_profiles = molecular.calc_profiles(mean_profiles, flagPicassoComparison=self.polly_config_dict['flagPicassoComparison'])
     
 
     def rayleighFit(self):
-        """do the rayleigh fit
+        """Preform the rayleigh fit
         
         direct translation from the matlab code. There might be noticeable numerical discrepancies (especially in the residual)
         seemed to work ok for 532, 1064, but with issues for 355
