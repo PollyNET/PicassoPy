@@ -403,7 +403,7 @@ class PicassoProc:
                 del self.retrievals_profile[var]
 
     def loadMeteo(self):
-        """Load meteorological data"""
+        """Load meteorological data."""
         self.met = readMeteo.Meteo(
             self.polly_config_dict['meteorDataSource'], 
             self.polly_config_dict['meteo_folder'],
@@ -427,8 +427,7 @@ class PicassoProc:
 
     def calcMolecular(self):
         """Calculate the molecular scattering for the cloud free periods
-        
-        with the strategy of first averaging the met data and then calculating the rayleigh scattering
+        with the strategy of first averaging the met data and then calculating the rayleigh scattering.
         
         """
 
