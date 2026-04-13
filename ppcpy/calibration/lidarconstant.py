@@ -30,8 +30,8 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
     Notes
     -----
     - For NR, done directly form the optical profiles, whereas in the matlab version, the ``LC*olAttri387.sigRatio`` is taken.
-    - Through the config variable 'flagUseRetrievedExtForLC', the extinction used to calculate the LCs can be specified. if 
-      'flagUseRetrievedExtForLC' is True the retrieved extinction will be used otherwise the extinction approximated by
+    - Through the config variable 'flagUseRetrievedExt4LCCalc', the extinction used to calculate the LCs can be specified.
+      if 'flagUseRetrievedExt4LCCalc' is True the retrieved extinction will be used otherwise the extinction approximated by
       the backscatter times the assumed lidar constant will be used.
     - Missing Rotational Raman and Aeronet LC retrieval.
 
@@ -41,7 +41,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
     **History**
 
     xxxx-xx-xx: First edition by ...
-    2026-03-18: Changed beta_mol for inelastic wavelengths and added the 'flagUseRetrievedExtForLC' variable.
+    2026-03-18: Changed beta_mol for inelastic wavelengths and added the 'flagUseRetrievedExt4LCCalc' variable.
     """
 
     logging.info(f'LC retrieval: {retrieval} method')
@@ -84,7 +84,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
 
             # Backscatter and extinction retrievals:
             aerBsc = profiles[channel]['aerBsc']
-            if config_dict['flagUseRetrievedExtForLC'] & ~config_dict['flagPicassoComparison']:
+            if config_dict['flagUseRetrievedExt4LCCalc'] & ~config_dict['flagPicassoComparison']:
                 logging.info('Using Retrieved Exticntion')
                 aerExt = profiles[channel]['aerExt'].copy()
             else:
