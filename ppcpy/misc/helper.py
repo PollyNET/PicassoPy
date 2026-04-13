@@ -1,3 +1,6 @@
+
+
+from collections import defaultdict
 import sys
 import os
 import re
@@ -974,3 +977,12 @@ def idx2time(cldFreeIdx:np.ndarray[int, int], nIdx:int, nHour:int) -> str:
             cldFreeMin[i] = '0' + cldFreeMin[i]
     out = cldFreeHour[0] + cldFreeMin[0] + '_' + cldFreeHour[1] + cldFreeMin[1]
     return out
+
+
+
+
+def default_to_regular(d):
+    """defaultdict to regular dict """
+    if isinstance(d, defaultdict):
+        d = {k: default_to_regular(v) for k, v in d.items()}
+    return d

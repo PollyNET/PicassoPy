@@ -15,10 +15,10 @@ Each of these quantities has to be set for each channel (mostly depending on the
 
 .. code-block:: python
 
-    data_cube.polly_config_dict['first_range_gate_indx']
-    >>> [252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252]
-    data_cube.polly_config_dict['first_range_gate_height']
-    >>> [3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 6.75, 6.75, 6.75, 6.75, 6.75]
+    >>> data_cube.polly_config_dict['first_range_gate_indx']
+    [252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252]
+    >>> data_cube.polly_config_dict['first_range_gate_height']
+    [3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 6.75, 6.75, 6.75, 6.75, 6.75]
 
 To check the correct setting of the bin height, the ``preproSignal`` and the ``sigBGCor`` can be compared close to the trigger
 
@@ -65,7 +65,7 @@ Where the ``preproSignal`` (left) still contains the pretrigger and the laser pu
 that contains a 0 count rate.
 
 .. image:: img/first_range_gate_indx.png
-  :width: 100%
+    :width: 100%
 
 
 The ``first_range_gate_height`` affects the range corrected signal as well as the mapping from time to range. In the original labview
@@ -110,6 +110,6 @@ Later, when the range corrected signal is calculated, the the count rates are co
 
 
 .. image:: img/first_range_gate_height_correction.png
-  :width: 100%
+    :width: 100%
 
 

@@ -30,14 +30,14 @@ def transCorGHK_cube(data_cube, signal='BGCor'):
 
             print('G', config_dict['G'][flagt], config_dict['G'][flagc])
             print('H', config_dict['H'][flagt], config_dict['H'][flagc])
-            print('polCaliEta', data_cube.pol_cali[f'{wv}_{tel}']['eta_best'])
+            print('polCaliEta', data_cube.etaused[f'{wv}_{tel}'])
 
             # similar to voldepol_2d
             vdr, vdrStd = depolarization.calc_profile_vdr(
                 sigBGCor_total, sigBGCor_cross, 
                 config_dict['G'][flagt], config_dict['G'][flagc],
                 config_dict['H'][flagt], config_dict['H'][flagc],
-                data_cube.pol_cali[f'{wv}_{tel}']['eta_best'], config_dict[f'voldepol_error_{wv}'],
+                data_cube.etaused[f'{wv}_{tel}'], config_dict[f'voldepol_error_{wv}'],
             )
 
             sigTCor_total, bgTCor_total = transCor_E16_channel(
