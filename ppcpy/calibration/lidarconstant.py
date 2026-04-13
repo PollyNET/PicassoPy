@@ -6,6 +6,7 @@ contains :py:func:`get_best_LC`
 """
 import numpy as np
 from ppcpy.misc.helper import mean_stable
+import logging
 
 elastic2raman:dict = {355: 387, 532: 607}
 
@@ -34,7 +35,6 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
       the backscatter times the assumed lidar constant will be used.
     - Missing Rotational Raman and Aeronet LC retrieval.
 
-    .. TODO:: Change back to Picasso version to check if lidar calibration constants get more similar.
     .. TODO:: Check if LC's are normalized with respect to the mean of the profiles.
     .. TODO:: Add option for Aeronet and rotational Raman retrieved LC.
 
@@ -44,14 +44,11 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
     2026-03-18: Changed beta_mol for inelastic wavelengths and added the 'flagUseRetrievedExtForLC' variable.
     """
 
-    print("retival", retrieval)
+    logging.info(f'LC retrieval: {retrieval} method')
     height = data_cube.retrievals_highres['range']
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
     config_dict = data_cube.polly_config_dict
     heightFullOverlap = [np.array(config_dict['heightFullOverlap']) for i in data_cube.clFreeGrps]
-    print('LCMeanWindow', config_dict['LCMeanWindow'], 
-          'LCMeanMinIndx', config_dict['LCMeanMinIndx'],
-          'LCMeanMaxIndx', config_dict['LCMeanMaxIndx'])
     LCs = [{} for i in range(len(data_cube.clFreeGrps))]
 
     for i, cldFree in enumerate(data_cube.clFreeGrps):
@@ -82,19 +79,21 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
 
             # Check for avaiabel retrievals:
             if not ('aerExt' in profiles[channel] and 'aerBsc' in profiles[channel]):
-                print(f'No availabel retrievals, skipping {channel} {cldFree}')
+                logging.warning(f'No availabel retrievals, skipping {channel} {cldFree}')
                 continue
 
             # Backscatter and extinction retrievals:
             aerBsc = profiles[channel]['aerBsc']
             if config_dict['flagUseRetrievedExtForLC'] & ~config_dict['flagPicassoComparison']:
-                print("Using Retrieved Exticntion!")
+                logging.info('Using Retrieved Exticntion')
                 aerExt = profiles[channel]['aerExt'].copy()
-                aerExt[:hBaseInd + 1] = aerExt[hBaseInd]
             else:
-                print("using approximated Extinction!")
+                logging.info('Using approximated Extinction')
                 aerBsc[aerBsc <= 0] = np.nan
                 aerExt = aerBsc * config_dict[f'{key_LR}{wv}']
+
+            # Interpolate extinction to ground
+            aerExt[:hBaseInd + 1] = aerExt[hBaseInd]
 
             ## Optical depth (OD)
             aerOD = np.nancumsum(aerExt * np.concatenate(([height[0]], np.diff(height))))
@@ -113,10 +112,10 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
                 minBin=config_dict['LCMeanMinIndx'],
                 maxBin=config_dict['LCMeanMaxIndx']
             )
-            print(f"cldFreGrp {i}, Channel {wv} {t} {tel}, LC_stable {LC_stable}, LCStd {LCStd}")
+            logging.info(f'cldFreGrp {i}, Channel {wv} {t} {tel}, LC_stable {LC_stable}, LCStd {LCStd}')
 
             if LC_stable is None:
-                print(f'Can not find a stable LC value, skipping {wv}nm {t} {tel} channel for cloud free period {cldFree}')
+                logging.warning(f'Can not find a stable LC value, skipping {wv} nm {t} {tel} channel for cloud free period {cldFree}')
                 continue
 
             if collect_debug:
@@ -143,7 +142,9 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
 
                 ## Round-trip transmission
                 trans_r = np.exp(- (aerOD + molOD + aerOD_r + molOD_r))
-                bsc_r = molBsc_r if ~config_dict['flagPicassoComparison'] else molBsc
+                bsc_r = molBsc_r 
+                if config_dict['flagPicassoComparison']:
+                    bsc_r = molBsc
                 
                 ## Lidar clibration constant
                 LC_r = (signal_r * height**2) / (bsc_r * trans_r)
@@ -154,10 +155,10 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
                     minBin=config_dict['LCMeanMinIndx'],
                     maxBin=config_dict['LCMeanMaxIndx']
                 )
-                print(f"cldFreGrp {i}, Channel {wv_r} {t} {tel}, LC_stable {LC_r_stable}, LCStd {LCStd_r}")
+                logging.info(f'cldFreGrp {i}, Channel {wv_r} {t} {tel}, LC_stable {LC_r_stable}, LCStd {LCStd_r}')
 
                 if LC_r_stable is None:
-                    print(f'Can not find a stable LC value, skipping {wv_r}nm {t} {tel} channel for cloud free period {cldFree}')
+                    logging.warning(f'Can not find a stable LC value, skipping {wv_r} nm {t} {tel} channel for cloud free period {cldFree}')
                     continue
 
                 if collect_debug:
