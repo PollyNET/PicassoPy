@@ -438,7 +438,7 @@ class PicassoProc:
     
 
     def rayleighFit(self):
-        """Preform the rayleigh fit
+        """Perform the rayleigh fit
         
         direct translation from the matlab code. There might be noticeable numerical discrepancies (especially in the residual)
         seemed to work ok for 532, 1064, but with issues for 355
