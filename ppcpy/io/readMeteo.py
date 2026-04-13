@@ -4,7 +4,7 @@ import glob
 import re
 import datetime
 import os
-
+import logging
 import xarray as xr
 #from scipy.interpolate import griddata
 import numpy as np
@@ -275,18 +275,19 @@ class MeteoNcCloudnet:
         time = ds.time.values.astype('datetime64[s]').astype(int).copy()
 
         ## Model height correction:
-        # print("Uncorrected height[:,0]", height_2d[:, 0])
+        logging.info('Performing model height correction.')
+        logging.info(f'Uncorrected model height[:,0]:\n{height_2d[:, 0]}')
         geopotential_surface_height = ds['sfc_geopotential'].values / self.acelerationEarth
         surface_altitude = self.radiusEarth * geopotential_surface_height/ \
             (self.radiusEarth - geopotential_surface_height)
         height_shift = surface_altitude - station_altitude
         height_2d = height_2d + height_shift[:, np.newaxis]
 
-        # print("geopotenital_surface_height:", geopotential_surface_height)
-        # print("surface_altitude", surface_altitude)
-        # print("station_altitude", station_altitude)
-        # print("heigth_shift", height_shift)
-        # print("Corrected height[:,0]", height_2d[:, 0])
+        logging.info(f'Geopotenital surface height:\n{geopotential_surface_height}')
+        logging.info(f'Model surface altitude:\n{surface_altitude}')
+        logging.info(f'Station altitude: {station_altitude}')
+        logging.info(f'Heigth shift:\n{height_shift}')
+        logging.info(f'Corrected model height[:,0]:\n{height_2d[:, 0]}')
 
         if flagPicassoComparison:
             height_2d = ds.height.values
