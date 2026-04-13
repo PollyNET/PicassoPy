@@ -2,15 +2,28 @@
 import numpy as np
 from scipy.ndimage import label
 
-def segment(data_cube):
-    """ """
+def segment(data_cube) -> np.ndarray:
+    """Perform cloud free profile segmentation
 
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object
+    
+    Returns
+    -------
+    clFreeGrps : ndarray
+        Time index of the detected cloud free regions [start, end].
+
+    **History**
+
+    - xxxx-xx-xx: First edition by ...
+    - 2026-03-18: Updated flagValPrf to include 'shutterOnMask' and 'fogMask'.
+    """
+    
     config_dict = data_cube.polly_config_dict
-    # the flag in the original matlab version
-    # flagValPrf = flagCloudFree & (~ data.fogMask) & (~ data.depCalMask) & (~ data.shutterOnMask);    
-
-    # TODO for some reason data_cube.retrievals_highres['depCalMask'] is of type masked_array
-    flagValPrf = data_cube.flagCloudFree & (~data_cube.retrievals_highres['depCalMask'])
+    flagValPrf = data_cube.flagCloudFree & (~data_cube.retrievals_highres['depCalMask']) \
+            & (~data_cube.retrievals_highres['shutterOnMask']) & (~data_cube.retrievals_highres['fogMask'])
 
     print('intNProfiles', config_dict['intNProfiles'], 'minIntNProfiles', config_dict['minIntNProfiles'])
     clFreeGrps = clFreeSeg(flagValPrf, config_dict['intNProfiles'], config_dict['minIntNProfiles'])

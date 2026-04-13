@@ -352,12 +352,12 @@ class PicassoProc:
         self.pol_cali = polarization.calibrateGHK(self)
 
 
-    def cloudScreen(self):
+    def cloudScreen(self, collect_debug:bool=False):
         """basic cloud screenting
         
         https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L663
         """
-        self.flagCloudFree = cloudscreen.cloudscreen(self)
+        self.flagCloudFree = cloudscreen.cloudscreen(self, collect_debug=collect_debug)
 
 
     def cloudFreeSeg(self):

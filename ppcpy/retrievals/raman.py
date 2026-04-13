@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import norm
 
 from ppcpy.retrievals.ramanhelpers import *
-from ppcpy.misc.helper import uniform_filter
+from ppcpy.misc.helper import uniform_filter, savgol_filter
 from ppcpy.retrievals.collection import calc_snr
 
 sigma_angstroem:float = 0.2

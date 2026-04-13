@@ -735,7 +735,7 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict):
     ## Range-corrected Signal calculation
     logging.info('... calculate range-corrected Signal')
     # mask = data_dict['lowSNRMask'].mask
-    mask = data_dict['lowSNRMask']
+    # mask = data_dict['lowSNRMask']
     # masked arry might be slow
     # RCS_masked = np.ma.masked_array(sigBGCor+bg, mask=mask)
     # data_dict['RCS'] = calculate_rcs(datasignal=preproSignal, data_dict=data_dict, mShots=mShots, hRes=hRes)
