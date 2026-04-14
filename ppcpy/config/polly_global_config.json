@@ -217,7 +217,7 @@
     "LCMeanMinIndx": 70,
     "LCMeanMaxIndx": 1000,
     "LCCalibrationStatus": ["none", "Klett", "Raman", "Defaults", "History"],
-    "flagUseRetrievedExt4LC": true,
+    "flagUseRetrievedExt4LCCalc": true,
     "quasi_smooth_h": [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
     "quasi_smooth_t": [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
     "IWV_instrument": "AERONET",
