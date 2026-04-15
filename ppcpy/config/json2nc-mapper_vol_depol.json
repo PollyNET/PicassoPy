@@ -105,7 +105,7 @@
         "plot_range": "0.0, 0.3",
         "plot_scale": "linear",
         "retrieving_info": {
-            "eta": {"value": "__pol_cali[355_FR][eta_best]", "unit": ""}
+            "eta": {"value": "__etaused[355_FR]", "unit": ""}
             },
         "comment": "The depolarization ratio was calibrated with \\Delta 90\\circ method."
       }
@@ -126,7 +126,7 @@
         "plot_range": "0.0, 0.3",
         "plot_scale": "linear",
         "retrieving_info": {
-            "eta": {"value": "__pol_cali[532_FR][eta_best]", "unit": ""}
+            "eta": {"value": "__etaused[532_FR]", "unit": ""}
             },
         "comment": "The depolarization ratio was calibrated with \\Delta 90\\circ method."
       }
@@ -147,7 +147,7 @@
         "plot_range": "0.0, 0.3",
         "plot_scale": "linear",
         "retrieving_info": {
-            "eta": {"value": "__pol_cali[1064_FR][eta_best]", "unit": ""}
+            "eta": {"value": "__etaused[1064_FR]", "unit": ""}
             },
         "comment": "The depolarization ratio was calibrated with \\Delta 90\\circ method."
       }

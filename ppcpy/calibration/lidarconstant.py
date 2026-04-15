@@ -4,9 +4,11 @@ Testtext for documentation
 
 contains :py:func:`get_best_LC`
 """
+from collections import defaultdict
 import numpy as np
 from ppcpy.misc.helper import mean_stable
 import logging
+from ppcpy.misc.helper import default_to_regular
 
 elastic2raman:dict = {355: 387, 532: 607}
 
@@ -49,9 +51,13 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
     config_dict = data_cube.polly_config_dict
     heightFullOverlap = [np.array(config_dict['heightFullOverlap']) for i in data_cube.clFreeGrps]
-    LCs = [{} for i in range(len(data_cube.clFreeGrps))]
+    print('LCMeanWindow', config_dict['LCMeanWindow'], 
+          'LCMeanMinIndx', config_dict['LCMeanMinIndx'],
+          'LCMeanMaxIndx', config_dict['LCMeanMaxIndx'])
+    LCs = defaultdict(list)
 
     for i, cldFree in enumerate(data_cube.clFreeGrps):
+        cldFreeTime = np.array(data_cube.retrievals_highres['time'])[cldFree]
         cldFree = cldFree[0], cldFree[1] + 1
         profiles = data_cube.retrievals_profile[retrieval][i]
 
@@ -118,10 +124,10 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
                 logging.warning(f'Can not find a stable LC value, skipping {wv} nm {t} {tel} channel for cloud free period {cldFree}')
                 continue
 
-            if collect_debug:
-                LCs[i][channel] = {'LC': LC_stable, 'LCStd': LC_stable * LCStd, 'LC_profile': LC}
-            else:
-                LCs[i][channel] = {'LC': LC_stable, 'LCStd': LC_stable * LCStd}
+            LCs[channel].append({
+                'LC': LC_stable, 'LCStd': LC_stable * LCStd,
+                'time_start': int(cldFreeTime[0]), 'time_end': int(cldFreeTime[1])
+            })
 
             # -----------------------------------------------------------------------------------
             # LC for raman / inelastic channels
@@ -161,46 +167,10 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
                     logging.warning(f'Can not find a stable LC value, skipping {wv_r} nm {t} {tel} channel for cloud free period {cldFree}')
                     continue
 
-                if collect_debug:
-                    LCs[i][f"{wv_r}_{t}_{tel}"] =  {'LC': LC_r_stable, 'LCStd': LC_r_stable * LCStd_r, 'LC_profile': LC_r}
-                else:
-                    LCs[i][f"{wv_r}_{t}_{tel}"] =  {'LC': LC_r_stable, 'LCStd': LC_r_stable * LCStd_r}
+                LCs[f"{wv_r}_{t}_{tel}"].append({
+                    'LC': LC_stable, 'LCStd': LC_stable * LCStd,
+                    'time_start': int(cldFreeTime[0]), 'time_end': int(cldFreeTime[1])
+                })
 
-    return LCs
-
-
-def get_best_LC(LCs:list) -> dict:
-    """Get lidar constant with the lowest standard deviation.
-
-    Parameters
-    ----------
-    LCs : list
-        Lidar constant for each channel per cloud free period.
-    
-    Returns
-    -------
-    LCused : dict
-        Lidar constants with lowest standard deviation per channel.
-
-    Notes
-    -----
-
-    **History**
-
-    - 2026-02-16: Added additional checks to hinder negative LCs to be chosen.
-    - 2026-03-18: Now selects LC based on minimum relative standard deviation.
-    """
-
-    # list comprehension for nested list
-    all_channels = set([k for e in LCs for k in e.keys()])
-    
-    LCused = {}
-    for channel in all_channels:
-        lcs = np.array([e[channel]['LC'] for e in LCs if channel in e and e[channel]['LC'] >= 0])
-        lcsstd = np.array([e[channel]['LCStd'] for e in LCs if channel in e and e[channel]['LC'] >= 0])
-
-        LCused[channel] = lcs[np.argmin(lcsstd / lcs)]
-    
-    return LCused
-
+    return default_to_regular(LCs)
 

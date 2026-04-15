@@ -143,6 +143,8 @@
     "heightFullOverlap": [500, 500, 500, 500, 500, 500, 500, 500, 150, 150, 150, 150, 150],
     "minSNR_4_sigNorm": [10],
     "cloudScreenMode": 1,
+    "maxCloudSearchHeight": 7000,
+    "maxCloudSearchHeight_NR": 2000,
     "maxSigSlope4FilterCloud": 3e6,
     "maxSigSlope4FilterCloud_NR": 4e5,
     "intNProfiles": 120,

@@ -6,6 +6,7 @@ import numpy as np
 
 from ppcpy.misc.helper import uniform_filter
 from ppcpy.retrievals.collection import calc_snr
+from ppcpy.misc.helper import default_to_regular
 
 
 # Helper functions
@@ -176,7 +177,8 @@ def calibrateGHK(data_cube):
                 data_cube.polly_config_dict[f'rel_std_dminus_{wv}'],
                 data_cube.polly_config_dict[f'depol_cal_segmentLen_{wv}'],
                 data_cube.polly_config_dict[f'depol_cal_smoothWin_{wv}'], collect_debug=False)
-            logging.info(f'pol_cali_{wv}',  pol_cali[f'{wv}_{tel}'])
+            print(pol_cali[f'{wv}_{tel}'])
+            logging.info(f"pol_cali_{wv}  {pol_cali[f'{wv}_{tel}']}")
         else:
             logging.warning(f'calibrateGHK no {wv} channel')
 
@@ -371,8 +373,10 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
     pol_cali_eta_std = [float(0.5 * (dp * std_dm + dm * std_dp) / np.sqrt(dp * dm)) for 
                         dp, std_dp, dm, std_dm in zip(mean_dplus, std_dplus, mean_dminus, std_dminus)]
     
-    results =  {'eta': pol_cali_eta, 'eta_std': pol_cali_eta_std, 'time_start': pol_cali_start_time, 'time_end': pol_cali_stop_time, 'status': 1}
-    results['eta_best'] = pol_cali_eta[np.argmin(pol_cali_eta_std)]
+    results = [
+        {'eta': e[0], 'eta_std': e[1], 'time_start': e[2], 'time_end': e[3], 'status': 1}
+        for e in zip(pol_cali_eta, pol_cali_eta_std, pol_cali_nang_start_time, pol_cali_stop_time)]
+
     if collect_debug:
         results['global_attri'] = dict(global_attri)
     return results
@@ -422,17 +426,13 @@ def analyze_segments(dplus, dminus, segment_len, rel_std_dplus, rel_std_dminus):
     data.polCaliEta532=data.polCali532Attri.polCaliEta(index_min);
 """
 
-def default_to_regular(d):
-    """ """
-    if isinstance(d, defaultdict):
-        d = {k: default_to_regular(v) for k, v in d.items()}
-    return d
-
-
 def calibrateMol(data_cube):
     """calibrate the polarization with the molecular signal
     
     Converted from the matlab code to the best knowledge, but not cross-validated yet
+
+    .. todo::
+        had to calculate TR_t, TR_c again when calling depol_cali_mol()
     
     """
 
@@ -469,22 +469,18 @@ def calibrateMol(data_cube):
                     background_t=bg_total, 
                     signal_c=sigBGCor_cross[:, slice(*refHInd)],
                     background_c=bg_cross,
-                    TR_t=np.squeeze(data_cube.polly_config_dict['TR'][data_cube.gf(wv, t, tel)]),
+                    TR_t=onemx_onepx(np.squeeze(data_cube.polly_config_dict['H'][data_cube.gf(wv, t, tel)])),
                     TR_t_std=0,
-                    TR_c=np.squeeze(data_cube.polly_config_dict['TR'][data_cube.gf(wv, 'cross', tel)]),
+                    TR_c=onemx_onepx(np.squeeze(data_cube.polly_config_dict['H'][data_cube.gf(wv, 'cross', tel)])),
                     TR_c_std=0,
                     minSNR=10,
                     mdr=config_dict[f'molDepol{wv}'],
                     mdrStd=config_dict[f'molDepolStd{wv}'],
                 )
+                ret['time_start'] = int(cldFreeTime[0])
+                ret['time_end'] = int(cldFreeTime[1])
                 if not ret['status'] == 0:
-                    pol_cali[f'{wv}_{tel}']['eta'].append(ret['eta'])
-                    pol_cali[f'{wv}_{tel}']['eta_std'].append(ret['eta_std'])
-                    pol_cali[f'{wv}_{tel}']['fac'].append(ret['fac'])
-                    pol_cali[f'{wv}_{tel}']['fac_std'].append(ret['fac_std'])
-                    pol_cali[f'{wv}_{tel}']['time_start'].append(int(cldFreeTime[0]))
-                    pol_cali[f'{wv}_{tel}']['time_end'].append(int(cldFreeTime[1]))
-                    pol_cali[f'{wv}_{tel}']['status'] = 1
+                    pol_cali[f'{wv}_{tel}'].append(ret)
 
     return default_to_regular(pol_cali)
     
