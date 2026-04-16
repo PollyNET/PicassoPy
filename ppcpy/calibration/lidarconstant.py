@@ -4,10 +4,10 @@ Testtext for documentation
 
 contains :py:func:`get_best_LC`
 """
-from collections import defaultdict
 import numpy as np
-from ppcpy.misc.helper import mean_stable
 import logging
+from collections import defaultdict
+from ppcpy.misc.helper import mean_stable
 from ppcpy.misc.helper import default_to_regular
 
 elastic2raman:dict = {355: 387, 532: 607}
@@ -51,9 +51,6 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
     config_dict = data_cube.polly_config_dict
     heightFullOverlap = [np.array(config_dict['heightFullOverlap']) for i in data_cube.clFreeGrps]
-    print('LCMeanWindow', config_dict['LCMeanWindow'], 
-          'LCMeanMinIndx', config_dict['LCMeanMinIndx'],
-          'LCMeanMaxIndx', config_dict['LCMeanMaxIndx'])
     LCs = defaultdict(list)
 
     for i, cldFree in enumerate(data_cube.clFreeGrps):
@@ -80,8 +77,8 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
             sig = profiles[channel]['signal']
             signal = np.nanmean(np.squeeze(
                 data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree), :, data_cube.gf(wv, t, tel)]), axis=0)
-            molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
-            molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :]
+            molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :].copy()
+            molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :].copy()
 
             # Check for avaiabel retrievals:
             if not ('aerExt' in profiles[channel] and 'aerBsc' in profiles[channel]):
@@ -89,7 +86,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
                 continue
 
             # Backscatter and extinction retrievals:
-            aerBsc = profiles[channel]['aerBsc']
+            aerBsc = profiles[channel]['aerBsc'].copy()
             if config_dict['flagUseRetrievedExt4LCCalc'] & ~config_dict['flagPicassoComparison']:
                 logging.info('Using Retrieved Exticntion')
                 aerExt = profiles[channel]['aerExt'].copy()
@@ -123,11 +120,17 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
             if LC_stable is None:
                 logging.warning(f'Can not find a stable LC value, skipping {wv} nm {t} {tel} channel for cloud free period {cldFree}')
                 continue
-
-            LCs[channel].append({
-                'LC': LC_stable, 'LCStd': LC_stable * LCStd,
-                'time_start': int(cldFreeTime[0]), 'time_end': int(cldFreeTime[1])
-            })
+            
+            if collect_debug:
+                LCs[channel].append({
+                    'LC': LC_stable, 'LCStd': LC_stable * LCStd, 'LC_profile': LC,
+                    'time_start': int(cldFreeTime[0]), 'time_end': int(cldFreeTime[1])
+                })
+            else:
+                LCs[channel].append({
+                    'LC': LC_stable, 'LCStd': LC_stable * LCStd,
+                    'time_start': int(cldFreeTime[0]), 'time_end': int(cldFreeTime[1])
+                })
 
             # -----------------------------------------------------------------------------------
             # LC for raman / inelastic channels
@@ -138,8 +141,8 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
                 ## Inelastic signal, backscatter and extinction:
                 signal_r = np.nanmean(np.squeeze(
                     data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree), :, data_cube.gf(wv_r, t, tel)]), axis=0)
-                molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i, :]
-                molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i, :]
+                molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i, :].copy()
+                molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i, :].copy()
                 aerExt_r = aerExt * (int(wv)/int(wv_r))**config_dict['angstrexp']
 
                 ## Optical depth (OD)
@@ -166,11 +169,17 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
                 if LC_r_stable is None:
                     logging.warning(f'Can not find a stable LC value, skipping {wv_r} nm {t} {tel} channel for cloud free period {cldFree}')
                     continue
-
-                LCs[f"{wv_r}_{t}_{tel}"].append({
-                    'LC': LC_stable, 'LCStd': LC_stable * LCStd,
-                    'time_start': int(cldFreeTime[0]), 'time_end': int(cldFreeTime[1])
-                })
+                
+                if collect_debug:
+                    LCs[f"{wv_r}_{t}_{tel}"].append({
+                        'LC': LC_r_stable, 'LCStd': LC_r_stable * LCStd_r, 'LC_profile': LC_r, 
+                        'time_start': int(cldFreeTime[0]), 'time_end': int(cldFreeTime[1])
+                    })
+                else:
+                    LCs[f"{wv_r}_{t}_{tel}"].append({
+                        'LC': LC_r_stable, 'LCStd': LC_r_stable * LCStd_r,
+                        'time_start': int(cldFreeTime[0]), 'time_end': int(cldFreeTime[1])
+                    })
 
     return default_to_regular(LCs)
 

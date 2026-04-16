@@ -7,8 +7,8 @@ import pandas as pd
 import ppcpy.misc.helper as helper
 from ppcpy.misc.helper import default_to_regular
 
-mapping = {'far_range': 'FR', 'near_range': 'NR', 'dfov': 'DFOV'}
-mapping_inverse = {y: x for x, y in mapping.items()}
+mapping:dict = {'far_range': 'FR', 'near_range': 'NR', 'dfov': 'DFOV'}
+mapping_inverse:dict = {y: x for x, y in mapping.items()}
 
 def string_to_ts(s):
     """string of format %Y-%m-%d %H:%M:%S to timestamp (timezone-aware)"""

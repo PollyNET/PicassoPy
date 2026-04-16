@@ -636,7 +636,8 @@ class PicassoProc:
         
         logging.warning('reading calibration constant from database not working yet')
         # Prioritise Raman retrieved LCs but use Klett retrieved ones when no Raman retrieval exists.
-        self.LCused = select.single_best(self.LC['klett'], 'LC', 'LCStd') | select.single_best(self.LC['raman'], 'LC', 'LCStd')
+        self.LCused = select.single_best(self.LC['klett'], 'LC', 'LCStd', relative=True) |\
+              select.single_best(self.LC['raman'], 'LC', 'LCStd', relative=True)
 
 
     def attBsc_volDepol(self):

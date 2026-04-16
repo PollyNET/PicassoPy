@@ -10,8 +10,8 @@ from ppcpy.misc.helper import default_to_regular
 
 
 # Helper functions
-def onemx_onepx(x):
-    """calculate the fraction of (1-x)/(1+x)"""
+def onemx_onepx(x:float|np.ndarray) -> float|np.ndarray:
+    """Calculate the fraction of (1-x)/(1+x)"""
     return (1-x)/(1+x)
 
 def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
@@ -41,7 +41,13 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
 
 
 def loadGHK(data_cube):
-    """ prepare the GHK parameters, especially if given in TR convert them into GHK """
+    """Prepare the GHK parameters, especially if given in TR convert them into GHK.
+
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
+    """
 
     print('starting loadGHK')
     #print('flag_532_total', flag_532_total_FR)
@@ -104,11 +110,9 @@ def loadGHK(data_cube):
     data_cube.polly_config_dict['voldepol_error_532'] = np.array(data_cube.polly_config_dict['voldepol_error_532'])
     data_cube.polly_config_dict['voldepol_error_1064'] = np.array(data_cube.polly_config_dict['voldepol_error_1064'])
 
-    return data_cube
-
-
 
 """
+.. TODO:: can this be removed?
 "TR": [0.898, 1086,   1,    1, 1.45, 778.8,   1,    1,    1,    1,    1,    1,     1],
 "G":  [-999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999 ], 
 "H":  [-999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999 ], 
@@ -120,8 +124,8 @@ def loadGHK(data_cube):
 
 
 
-def calibrateGHK(data_cube):
-    """estimate the polarization calibration from the delta 90 Method [1]_
+def calibrateGHK(data_cube) -> dict:
+    """Estimate the polarization calibration from the delta 90 Method [1]_
 
     Parameters
     ----------
@@ -157,26 +161,31 @@ def calibrateGHK(data_cube):
         if np.any(data_cube.gf(wv, 'total', tel)) and np.any(data_cube.gf(wv, 'cross', tel)):
             logging.info(f'and even a {wv} channel')
 
-            sigBGCor_total = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:,:,data_cube.gf(wv, 'total', tel)])
-            bg_total = np.squeeze(data_cube.retrievals_highres['BG'][:,data_cube.gf(wv, 'total', tel)])
-            sigBGCor_cross = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:,:,data_cube.gf(wv, 'cross', tel)])
-            bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][:,data_cube.gf(wv, 'cross', tel)])
-
+            sigBGCor_total = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:, :, data_cube.gf(wv, 'total', tel)])
+            bg_total = np.squeeze(data_cube.retrievals_highres['BG'][:, data_cube.gf(wv, 'total', tel)])
+            sigBGCor_cross = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:, :, data_cube.gf(wv, 'cross', tel)])
+            bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][:, data_cube.gf(wv, 'cross', tel)])
+            
             pol_cali[f"{wv}_{tel}"] = depol_cali_ghk(
-                sigBGCor_total, bg_total, sigBGCor_cross, bg_cross, data_cube.retrievals_highres['time'],
-                data_cube.retrievals_highres['depol_cal_ang_p_time_start'],
-                data_cube.retrievals_highres['depol_cal_ang_p_time_end'],
-                data_cube.retrievals_highres['depol_cal_ang_n_time_start'],
-                data_cube.retrievals_highres['depol_cal_ang_n_time_end'],
+                signal_t=sigBGCor_total, bg_t=bg_total, 
+                signal_x=sigBGCor_cross, bg_x=bg_cross, 
+                time=data_cube.retrievals_highres['time'],
+                pol_cali_pang_start_time=data_cube.retrievals_highres['depol_cal_ang_p_time_start'],
+                pol_cali_pang_stop_time=data_cube.retrievals_highres['depol_cal_ang_p_time_end'],
+                pol_cali_nang_start_time=data_cube.retrievals_highres['depol_cal_ang_n_time_start'],
+                pol_cali_nang_stop_time=data_cube.retrievals_highres['depol_cal_ang_n_time_end'],
                 # K should be 0d?
-                np.squeeze(data_cube.polly_config_dict['K'][data_cube.gf(wv, 'total', tel)]),
-                [data_cube.polly_config_dict[f'depol_cal_minbin_{wv}'], data_cube.polly_config_dict[f'depol_cal_maxbin_{wv}']],
-                data_cube.polly_config_dict[f'depol_cal_SNRmin_{wv}'],
-                data_cube.polly_config_dict[f'depol_cal_sigMax_{wv}'],
-                data_cube.polly_config_dict[f'rel_std_dplus_{wv}'],
-                data_cube.polly_config_dict[f'rel_std_dminus_{wv}'],
-                data_cube.polly_config_dict[f'depol_cal_segmentLen_{wv}'],
-                data_cube.polly_config_dict[f'depol_cal_smoothWin_{wv}'], collect_debug=False)
+                K=np.squeeze(data_cube.polly_config_dict['K'][data_cube.gf(wv, 'total', tel)]),
+                cali_h_indx_range=[data_cube.polly_config_dict[f'depol_cal_minbin_{wv}'], 
+                                   data_cube.polly_config_dict[f'depol_cal_maxbin_{wv}']],
+                SNRmin=data_cube.polly_config_dict[f'depol_cal_SNRmin_{wv}'],
+                sig_max=data_cube.polly_config_dict[f'depol_cal_sigMax_{wv}'],
+                rel_std_dplus=data_cube.polly_config_dict[f'rel_std_dplus_{wv}'],
+                rel_std_dminus=data_cube.polly_config_dict[f'rel_std_dminus_{wv}'],
+                segment_len=data_cube.polly_config_dict[f'depol_cal_segmentLen_{wv}'],
+                smooth_win=data_cube.polly_config_dict[f'depol_cal_smoothWin_{wv}'],
+                collect_debug=False
+            )
             print(pol_cali[f'{wv}_{tel}'])
             logging.info(f"pol_cali_{wv}  {pol_cali[f'{wv}_{tel}']}")
         else:
@@ -187,11 +196,12 @@ def calibrateGHK(data_cube):
     return pol_cali
 
 
-def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_time,
-                   pol_cali_pang_stop_time, pol_cali_nang_start_time,
-                   pol_cali_nang_stop_time, K, cali_h_indx_range, SNRmin, sig_max,
-                   rel_std_dplus, rel_std_dminus, segment_len, smooth_win,
-                   collect_debug=False):
+def depol_cali_ghk(signal_t:np.ndarray, bg_t:np.ndarray, signal_x:np.ndarray, bg_x:np.ndarray, 
+                   time:np.ndarray, pol_cali_pang_start_time:np.ndarray,
+                   pol_cali_pang_stop_time:np.ndarray, pol_cali_nang_start_time:np.ndarray,
+                   pol_cali_nang_stop_time:np.ndarray, K:float, cali_h_indx_range:list|tuple, 
+                   SNRmin:list, sig_max:list, rel_std_dplus:float, rel_std_dminus:float, 
+                   segment_len:int, smooth_win:int, collect_debug:bool=False) -> dict:
     """Polarization calibration for PollyXT lidar system.
 
     Parameters
@@ -338,7 +348,7 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
 
         # translate manually 
         #  min(sqrt((std_dplus_tmp./mean_dplus_tmp).^2 + (std_dminus_tmp./mean_dminus_tmp).^2));
-        indx_best_seg = np.argmin(np.sqrt((seg[:,1]/seg[:,0])**2 + (seg[:,3]/seg[:,2])**2))
+        indx_best_seg = np.argmin(np.sqrt((seg[:, 1]/seg[:, 0])**2 + (seg[:, 3]/seg[:, 2])**2))
         # the best segment searching was flawed by the AI translate
         best_segment = seg[indx_best_seg]
         mean_dplus.append(best_segment[0])
@@ -382,8 +392,31 @@ def depol_cali_ghk(signal_t, bg_t, signal_x, bg_x, time, pol_cali_pang_start_tim
     return results
 
 
-def analyze_segments(dplus, dminus, segment_len, rel_std_dplus, rel_std_dminus): 
-    """ """
+def analyze_segments(dplus:np.ndarray, dminus:np.ndarray, segment_len:int,
+                     rel_std_dplus:float, rel_std_dminus:float) -> np.ndarray: 
+    """...
+    
+    Parameters
+    ----------
+    dplus : ndarray
+        ...
+    dminus : ndarray
+        ...
+    segment_len : int
+        Segment length for testing the variability of calibration results.
+    rel_std_dplus, rel_std_dminus : float
+        Maximum relative uncertainty of dplus and dminus allowed.
+    
+    Returns
+    -------
+    ndarray
+        ...
+    
+    Notes
+    -----
+    .. TODO:: Finish docstring.
+    """
+
     results = []
     for i in range(len(dplus) - segment_len):
         #print(i, i+segment_len)
@@ -426,14 +459,25 @@ def analyze_segments(dplus, dminus, segment_len, rel_std_dplus, rel_std_dminus):
     data.polCaliEta532=data.polCali532Attri.polCaliEta(index_min);
 """
 
-def calibrateMol(data_cube):
-    """calibrate the polarization with the molecular signal
-    
-    Converted from the matlab code to the best knowledge, but not cross-validated yet
+def calibrateMol(data_cube) -> dict:
+    """Calibrate the polarization with the molecular signal.
 
-    .. todo::
-        had to calculate TR_t, TR_c again when calling depol_cali_mol()
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
     
+    Returns
+    -------
+    dict
+        ...
+    
+    Notes
+    -----
+    - Converted from the matlab code to the best knowledge, but not cross-validated yet
+
+    .. TODO:: had to calculate TR_t, TR_c again when calling depol_cali_mol()
+    .. TODO:: Finish docstring.
     """
 
     #temp = {'eta': [], 'eta_std': [], 'fac': [], 'fac_std': [],
@@ -485,8 +529,9 @@ def calibrateMol(data_cube):
     return default_to_regular(pol_cali)
     
 
-def depol_cali_mol(signal_t, background_t, signal_c, background_c, TR_t, TR_t_std, TR_c, TR_c_std, minSNR, mdr, mdrStd):
-    """ Molecular polarization calibration.
+def depol_cali_mol(signal_t:np.ndarray, background_t:np.ndarray, signal_c:np.ndarray, background_c:np.ndarray,
+                   TR_t:float, TR_t_std:float, TR_c:float, TR_c_std:float, minSNR:float, mdr:float, mdrStd:float) -> dict:
+    """Molecular polarization calibration.
     
     Parameters
     ----------
