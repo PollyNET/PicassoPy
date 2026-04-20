@@ -16,7 +16,8 @@ usage() {
 Usage: $(basename "$0") [OPTIONS]
 
 Options:
-  --date YYYYMMDD               Date of measurement (required)
+  --startdate YYYYMMDD         StartDate of measurement (required)
+  --enddate YYYYMMDD           EndDate of measurement (required)
   --device DEVICE_NAME         Name of the Polly device (required)
   --base_dir DIR               Base directory of level‑0 data (default: $BASE_DIR)
   --picasso_config_file FILE   Picasso JSON config file (required)
@@ -33,8 +34,12 @@ log_debug()   { printf "%s [DEBUG] %s\n" "$(date +"%Y-%m-%d %H:%M:%S,%3N")" "$*"
 # ---------- argument parsing ----------
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --date)
-            TIMESTAMP="${2:?Missing argument for --date}"
+        --startdate)
+            STARTDATE="${2:?Missing argument for --startdate}"
+            shift 2
+            ;;
+        --enddate)
+            ENDDATE="${2:?Missing argument for --enddate}"
             shift 2
             ;;
         --device)
@@ -64,8 +69,12 @@ while [[ $# -gt 0 ]]; do
 done
 
 # ---------- validation ----------
-if [[ -z "$TIMESTAMP" ]]; then
-    log_error "No timestamp specified. Aborting."
+if [[ -z "$STARTDATE" ]]; then
+    log_error "No start-timestamp specified. Aborting."
+    exit 1
+fi
+if [[ -z "$ENDDATE" ]]; then
+    log_error "No end-timestamp specified. Aborting."
     exit 1
 fi
 
@@ -164,71 +173,92 @@ if result:
 "
 }
 
+create_date_ls() {
+## create DATE_LS
+    dates=()
+    for (( date=STARTDATE; date <= ENDDATE; )); do
+        dates+=( "$date" )
+        date="$(date --date="$date +1 days" +'%Y%m%d')"
+    done
+    
+    for i in ${dates[@]}; do
+    	YYYY=${i:0:4}
+    	MM=${i:4:2}
+    	DD=${i:6:2}
+    	YYYYMMDD=$YYYY$MM$DD
+    	DATE_LS+=( "$YYYYMMDD" )
+    done
+}
+
+
+create_date_ls
 
 # ---------- collect raw file names ----------
 RAW_FILES=()   # Bash array
 MERGE_SUCCESS=0
-
-if (( MERGE_SINGLE )); then
-    log_info "Merging raw files for $TIMESTAMP / $DEVICE into a single 24‑h file ..."
-    ## grep to get rid of empty lines
-    MERGED_FILE=$(call_concat_files "$TIMESTAMP" "$DEVICE" "$BASE_DIR" "$OUTPUT_PATH" | grep -v '^[[:space:]]*$') \
-        || { echo "[ERROR] concat_files failed" >&2; MERGE_SUCCESS=0; }
-
-    if [[ -z "$MERGED_FILE" ]]; then
-        log_error "concat_files.py did not return a file name."
-        MERGE_SUCCESS=0
-        
-    else
-        RAW_FILES+=("$MERGED_FILE")
-        MERGE_SUCCESS=1
-    fi
-else
-    # Call the Python helper that lists the individual level‑0 files.
-    log_info "Fetching list of level‑0 files for $TIMESTAMP / $DEVICE ..."
-   # mapfile -t RAW_FILES < <(python3 get_pollyxt_files.py \
-    mapfile -t RAW_FILES < <(call_get_files "$TIMESTAMP" "$DEVICE" "$BASE_DIR" "$OUTPUT_PATH") \
-		|| { log_error "Failed to run get_pollyxt_files.py"; exit 1; }
-fi
-
-# ---------- sanity check ----------
-if (( ${#RAW_FILES[@]} == 0 )); then
-    log_error "No files to process. Aborting."
-    exit 1
-fi
-
-# ---------- processing loop ----------
-for rawfile in "${RAW_FILES[@]}"; do
-    echo "$rawfile"
-    # Guard against empty strings that might have slipped in.
-    if [[ -z "$rawfile" ]]; then
-        log_error "Encountered an empty file name – aborting."
-        exit 1
-    fi
-
-    # verify that the file exists before processing.
-    if [[ ! -f "$rawfile" ]]; then
-        log_error "File not found: $rawfile"
-        exit 1
-    fi
-
-    log_info "Processing file: $rawfile"
-
-    # -----------------------------------------------------------------
-    # Call the actual processing script.
-    # -----------------------------------------------------------------
+for TIMESTAMP in ${DATE_LS[@]}; do
     
-    PICASSO_OP_SCRIPT="${ROOT_DIR}/ppcpy/interface/picassopy_operational.py"
-    "$PYTHON_PATH"/python3 "$PICASSO_OP_SCRIPT" \
-        --date "$TIMESTAMP" \
-        --device "$DEVICE"\
-        --base_dir "$BASE_DIR"\
-        --picasso_config_file "$PICASSO_CFG" \
-        --level0_file_to_process "$rawfile" \
-        || {
-            log_error "Processing of $rawfile failed."
+    if (( MERGE_SINGLE )); then
+        log_info "Merging raw files for $TIMESTAMP / $DEVICE into a single 24‑h file ..."
+        ## grep to get rid of empty lines
+        MERGED_FILE=$(call_concat_files "$TIMESTAMP" "$DEVICE" "$BASE_DIR" "$OUTPUT_PATH" | grep -v '^[[:space:]]*$') \
+            || { echo "[ERROR] concat_files failed" >&2; MERGE_SUCCESS=0; }
+    
+        if [[ -z "$MERGED_FILE" ]]; then
+            log_error "concat_files.py did not return a file name."
+            MERGE_SUCCESS=0
+            
+        else
+            RAW_FILES+=("$MERGED_FILE")
+            MERGE_SUCCESS=1
+        fi
+    else
+        # Call the Python helper that lists the individual level‑0 files.
+        log_info "Fetching list of level‑0 files for $TIMESTAMP / $DEVICE ..."
+       # mapfile -t RAW_FILES < <(python3 get_pollyxt_files.py \
+        mapfile -t RAW_FILES < <(call_get_files "$TIMESTAMP" "$DEVICE" "$BASE_DIR" "$OUTPUT_PATH") \
+    		|| { log_error "Failed to run get_pollyxt_files.py"; exit 1; }
+    fi
+    
+    # ---------- sanity check ----------
+    if (( ${#RAW_FILES[@]} == 0 )); then
+        log_error "No files to process. Aborting."
+        exit 1
+    fi
+    
+    # ---------- processing loop ----------
+    for rawfile in "${RAW_FILES[@]}"; do
+        echo "$rawfile"
+        # Guard against empty strings that might have slipped in.
+        if [[ -z "$rawfile" ]]; then
+            log_error "Encountered an empty file name – aborting."
             exit 1
-        }
+        fi
+    
+        # verify that the file exists before processing.
+        if [[ ! -f "$rawfile" ]]; then
+            log_error "File not found: $rawfile"
+            exit 1
+        fi
+    
+        log_info "Processing file: $rawfile"
+    
+        # -----------------------------------------------------------------
+        # Call the actual processing script.
+        # -----------------------------------------------------------------
+        
+        PICASSO_OP_SCRIPT="${ROOT_DIR}/ppcpy/interface/picassopy_operational.py"
+        "$PYTHON_PATH"/python3 "$PICASSO_OP_SCRIPT" \
+            --date "$TIMESTAMP" \
+            --device "$DEVICE"\
+            --base_dir "$BASE_DIR"\
+            --picasso_config_file "$PICASSO_CFG" \
+            --level0_file_to_process "$rawfile" \
+            || {
+                log_error "Processing of $rawfile failed."
+                exit 1
+            }
+    done
 done
 
 log_info "All files processed successfully."
