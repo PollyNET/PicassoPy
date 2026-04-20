@@ -719,6 +719,75 @@ def uniform_filter(x:np.ndarray, win:int, fill_val:float=np.nan) -> np.ndarray:
     raise ValueError("Invalid window configuration.")
 
 
+def moving_average(x:np.ndarray, win:int) -> np.ndarray:
+    """Uniform smoothing filter ala. smooth(y, span, method='moving') in Matlab.
+
+    The smoothing is applied without padding and the original dimension of the
+    input is recreated preforming a centered moving average filter for each edge.
+
+    Examples
+    --------
+    The output of __name__ for win = 5 follows the following logic:
+    out[0] = x[0]
+    out[1] = (x[0] + x[1] + x[2])/3
+    out[2] = (x[0] + x[1] + x[2] + x[3] + x[4])/5
+    out[3] = (x[1] + x[2] + x[3] + x[4] + x[5])/5
+    ...
+    out[-4] = (x[-6] + x[-5] + x[-4] + x[-3] + x[-2])/5
+    out[-3] = (x[-5] + x[-4] + x[-3] + x[-2] + x[-1])/5
+    out[-2] = (x[-3] + x[-2] + x[-1])/3
+    out[-1] = x[-1]
+
+    Parameters
+    ----------
+    x : (N,) ndarray
+        One dimensional input signal.
+    win : int
+        (M,) Width of the filter. Must be odd. If an even number is inputed the
+        function will use a filter width of win - 1.
+    
+    Returns
+    -------
+    out : ndarray
+        Smoothed signal.
+    
+    Notes
+    -----
+    - Currently only support smoothing of 1D-arrays with a constant window size.
+    
+    **History**
+    
+    - 2026-03-24: First edition by Buholdt
+
+    """
+    if isinstance(win, int):
+        if len(x.shape) > 1:
+            raise NotImplementedError('Support for smoothing of mulitdimensional arrays is not yet implemented')
+        
+        if win % 2 == 0:
+            print("Warning: Odd smoothinglengs not allowd, will preform smoothing with length win - 1.")
+            win -= 1
+        
+        f = np.ones(win)/win
+        x_smoothed = np.convolve(x, f, mode='valid')
+
+        fill_start = np.full(int((win - 1)/2), np.nan)
+        fill_end = np.full(int((win - 1)/2), np.nan)
+        for i in range(len(fill_start)):
+            fill_start[i] = np.mean(x[:i+i+1])
+            fill_end[-1-i] = np.mean(x[-(i+i+1):])
+        
+
+        out = np.hstack((fill_start, x_smoothed, fill_end))
+
+        return out
+
+    if isinstance(win, (np.ndarray, list, tuple)):
+        raise NotImplementedError("Support for smoothing with variable window size is not yet implemented.")
+    
+    raise ValueError("Invalid window configuration.")
+
+
 def savgol_filter(x:np.ndarray, window_length:int, polyorder:int=2, deriv:int=0,
                   delta:float=1.0, fill_val:float=np.nan) -> np.ndarray:
     """Savitzky-Golay filter

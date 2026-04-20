@@ -1,9 +1,12 @@
 
 import logging
 import numpy as np
-from ppcpy.misc.helper import uniform_filter
+from scipy.stats import norm
 from scipy.ndimage import uniform_filter1d
 from scipy.special import gammaincc
+
+from ppcpy.misc.helper import uniform_filter, moving_average
+
 
 #import fastrdp
 
@@ -23,35 +26,47 @@ def getVal(array:np.ndarray, indices:list) -> list:
     out : list
         Values of the array at given indices.
         If indx is NaN value is also NaN.
-    
+
     """
+    if indices[0] >= indices[1]:
+        raise ValueError('Invalid index pair.')
+    
     indices = np.asarray(indices, dtype=float)
     out = np.full(indices.shape, np.nan)
     mask = ~np.isnan(indices)
     out[mask] = array[indices[mask].astype(int)]
+
     return out.tolist()
 
 
-def rayleighfit(data_cube) -> list:
-    """Rayleighfit ...
+def rayleighfit(data_cube, collect_debug:bool=False) -> list:
+    """Perform Rayleighfit procedure using Douglas Peucker algorithm for each channel and cloud
+    free period.
 
     Parameters
     ----------
     data_cube : object
         Main PicassoProc object.
-    
+    collect_debug : bool
+        If true, collects debug information.
+   
     Returns
     -------
     refH : list of dicts
         Reference heights per channel per cloud free period.
-    
+   
     Notes
     -----
-    .. TODO:: Write docstring.
-
+    - This function uses the Douglas Peucker algorithm to segmentize the signal inside a search range
+      specified by the config variables 'heightFullOverlap' and 'maxDecomHeight'. These segments are
+      considered as potential reference height. The final reference height is chosen as the segment 
+      with the best fit to the molecular signal.
+    - Currently, only the FR reference heights are calculated, while the NR reference heights are 
+      taken from the config files.
 
     """
-    # TODO ist data.distance0 and height the same? https://github.com/PollyNET/Pollynet_Processing_Chain/blob/e413f9254094ff2c0a18fcdac4e9bebb5385d526/lib/preprocess/pollyPreprocess.m#L299
+    # ..TODO:: is data.distance0 and height the same? https://github.com/PollyNET/Pollynet_Processing_Chain/blob/e413f9254094ff2c0a18fcdac4e9bebb5385d526/lib/preprocess/pollyPreprocess.m#L299
+    # --> data.distance0 equals range, not height. However, Picasso uses a constant 7.5 m height resolution while PicassoPy uses the height resolution form the raw data dict ~ 7.475 m
     height = data_cube.retrievals_highres['range']
     logging.warning(f'rayleighfit seems to use range in matlab, but the met data should be in height >> RECHECK!')
     logging.warning(f'at 10km height this is a difference of about 4 indices')
@@ -65,48 +80,64 @@ def rayleighfit(data_cube) -> list:
             refH_cldFree = {}
 
             for wv, t, tel in [(532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]:
-                if np.any(data_cube.gf(wv, 'total', 'FR')):
+                if np.any(data_cube.gf(wv, t, tel)):
                     print(f'refH for {wv}')
-                    rcs = np.squeeze(data_cube.retrievals_profile['RCS'][i,:,data_cube.gf(wv, t, tel)])
-                    sig = np.squeeze(data_cube.retrievals_profile['sigBGCor'][i,:,data_cube.gf(wv, t, tel)])
-                    bg = np.squeeze(data_cube.retrievals_profile['BG'][i,data_cube.gf(wv, t, tel)])
+
+                    # Extract signal
+                    rcs = np.squeeze(data_cube.retrievals_profile['RCS'][i, :, data_cube.gf(wv, t, tel)])
+                    sig = np.squeeze(data_cube.retrievals_profile['sigBGCor'][i, :, data_cube.gf(wv, t, tel)])
+                    bg = np.squeeze(data_cube.retrievals_profile['BG'][i, data_cube.gf(wv, t, tel)])
 
                     mSig = (
-                        data_cube.mol_profiles[f'mBsc_{wv}'][i,:] * \
-                        np.exp(-2 * np.cumsum(data_cube.mol_profiles[f'mExt_{wv}'][i,:] * np.concatenate(([height[0]], np.diff(height))))))
+                        data_cube.mol_profiles[f'mBsc_{wv}'][i, :] * \
+                        np.exp(-2 * np.cumsum(data_cube.mol_profiles[f'mExt_{wv}'][i, :] * np.concatenate(([height[0]], np.diff(height)))))
+                    )
 
+                    # ..TODO:: should the molecular signal be calculated with respect to height or range???
+                    # mSig = (
+                    #     data_cube.mol_profiles[f'mBsc_{wv}'][i, :] * \
+                    #     np.exp(-2 * np.cumsum(data_cube.mol_profiles[f'mExt_{wv}'][i, :] *\
+                    #         np.concatenate(([data_cube.retrievals_highres['height'][0]], np.diff(data_cube.retrievals_highres['height'])))))
+                    # )
+                    
                     scaRatio = rcs/mSig
-                    #print(config_dict['minDecomLogDist532'], config_dict['heightFullOverlap'], config_dict['maxDecomHeight532'],
-                    #    config_dict['maxDecomThickness532'], config_dict['decomSmoothWin532'])
-                    # p.Results.minDecomLogDist, p.Results.heightFullOverlap, p.Results.maxDecomHeight, p.Results.maxDecomThickness, p.Results.decomSmWin);
+
+                    # signal decomposition with Douglas-Peucker algorithm
                     DPInd = DouglasPeucker(
-                        scaRatio, height, 
-                        config_dict[f'minDecomLogDist{wv}'], np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, t, tel)], 
-                        config_dict[f'maxDecomHeight{wv}'],
-                        config_dict[f'maxDecomThickness{wv}'], config_dict[f'decomSmoothWin{wv}']
-                        )
+                        signal=scaRatio,
+                        height=height, 
+                        epsilon=config_dict[f'minDecomLogDist{wv}'],
+                        heightBase=np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, t, tel)], 
+                        heightTop=config_dict[f'maxDecomHeight{wv}'],
+                        maxHThick=config_dict[f'maxDecomThickness{wv}'],
+                        window_size=config_dict[f'decomSmoothWin{wv}'],
+                        showDetails=collect_debug
+                    )
+                    print('DPInd:', DPInd)
 
-                    #print('DPInd', DPInd)
-                    #DPInd = [133,  332,  333,  533,  675,  875,  1075,  1274,  1275,  1333]
-                    #print('!!!! overwrite DPInd !!!!!!!!!!!!!!!!!!!!')
-                    #print('DPInd', DPInd)
-
-                    #p.Results.minRefThickness, p.Results.minRefDeltaExt, p.Results.minRefSNR, flagShowDetail
+                    # Rayleigh fitting
                     refInd = fit_profile(
-                        height, rcs, sig, bg, mSig, DPInd,
-                        config_dict[f'minRefThickness{wv}'], config_dict[f'minRefDeltaExt{wv}'],
-                        config_dict[f'minRefSNR{wv}'], flagShowDetail=False)
-                    print('refInd', refInd)
+                        height=height,
+                        sig_aer=rcs, 
+                        pc=sig,
+                        bg=bg,
+                        sig_mol=mSig,
+                        dpIndx=DPInd,
+                        layerThickConstrain=config_dict[f'minRefThickness{wv}'],
+                        slopeConstrain=config_dict[f'minRefDeltaExt{wv}'],
+                        SNRConstrain=config_dict[f'minRefSNR{wv}'],
+                        flagShowDetail=collect_debug,
+                        flagPicassoComparison=config_dict['flagPicassoComparison']
+                    )
+                    print('refInd:', refInd)
 
                     refHeight = getVal(data_cube.retrievals_highres['height'], refInd)
                     refRange = getVal(data_cube.retrievals_highres['range'], refInd)
 
-                    # for debugging reasons
-                    #return rcs, mSig, scaRatio
-
                     # calculate PCR after averaging or average directly PCR -> PCR from average above was cross checked
                     # with matlab. Above 15km, the relative difference increased to ~ 3%
                     # continue at https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L788
+                    
                     refH_cldFree[f"{wv}_{t}_{tel}"] = {
                         'DPInd': DPInd, 'refInd': refInd, 'refHeight': refHeight, 'refRange':refRange
                     }
@@ -116,33 +147,39 @@ def rayleighfit(data_cube) -> list:
             refH[i] = refH_cldFree
     
     else: # manual RefH
-        logging.info("manual reference height")
-        for i, cldFree in enumerate(data_cube.clFreeGrps):
-            print(i, cldFree)
-            refH_cldFree = {}
-            for wv, t, tel in [(532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]:
-                refBInd = int(np.searchsorted(height, config_dict[f'refH_{tel}_{wv}'][0]))
-                refTInd = int(np.searchsorted(height, config_dict[f'refH_{tel}_{wv}'][1]))
-                refInd = [refBInd, refTInd]
-                print('refInd', refInd)
+        logging.info("Using manualy set reference height")
+        for wv, t, tel in [(532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]:
+            if not f'refH_{tel}_{wv}' in config_dict:
+                raise ValueError('Reference height not correctly set in config file.')
+            
+            refInd = (
+                np.searchsorted(
+                    data_cube.retrievals_highres['height'], 
+                    config_dict[f'refH_{tel}_{wv}']
+                ) - [0, 1] # - [0, 1] --> make sure all values lay inside the designeted range
+            ).tolist()
 
-                refHeight = getVal(data_cube.retrievals_highres['height'], refInd)
-                refRange = getVal(data_cube.retrievals_highres['range'], refInd)
+            refHeight = getVal(data_cube.retrievals_highres['height'], refInd)
+            refRange = getVal(data_cube.retrievals_highres['range'], refInd)
 
-                refH_cldFree[f"{wv}_{t}_{tel}"] = {
+            for i, cldFree in enumerate(data_cube.clFreeGrps):
+                refH[i][f"{wv}_{t}_{tel}"] = {
                     'DPInd': [], 'refInd': refInd, 'refHeight': refHeight, 'refRange': refRange
                 }
-            refH[i] = refH_cldFree
 
     # Current methodology is to take NR refH values form the config file.
     logging.info("Using Config values for NR refH.")
     for wv, t, tel in [(532, 'total', 'NR'), (355, 'total', 'NR')]:
+        if not f'refH_{tel}_{wv}' in config_dict:
+                raise ValueError('NR reference height not correctly set in config file.')
+        
         refInd = (
             np.searchsorted(
                 data_cube.retrievals_highres['height'],
-                data_cube.polly_config_dict[f'refH_{tel}_{wv}']
+                config_dict[f'refH_{tel}_{wv}']
             ) - [0, 1] # - [0, 1] --> make sure all values lay inside the designeted range
         ).tolist()
+
         refHeight = getVal(data_cube.retrievals_highres['height'], refInd)
         refRange = getVal(data_cube.retrievals_highres['range'], refInd)
 
@@ -175,14 +212,15 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     **History**
     
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
+    - 2026-04-17: Changed to ppcpy.misc.helper.moving_average to get values at edges.
     
     """
-    return uniform_filter(signal, window_len)
     # return uniform_filter1d(signal, window_len, mode='nearest')
+    return moving_average(signal, window_len)
 
 
 def DouglasPeucker(signal:np.ndarray, height:np.ndarray, epsilon:float, heightBase:float,
-                   heightTop:float, maxHThick:float, window_size:int=1) -> np.ndarray:
+                   heightTop:float, maxHThick:float, window_size:int=1, showDetails:bool=False) -> np.ndarray:
     """Simplify signal according to Douglas-Peucker algorithm.
 
     Parameters
@@ -200,8 +238,10 @@ def DouglasPeucker(signal:np.ndarray, height:np.ndarray, epsilon:float, heightBa
     maxHThick : float
         Maximum spatial thickness of each segment. [m]
     window_size : int
-        Size of the average smooth window.
-
+        Size of the average smooth window. Default is 1.
+    showDetails : bool
+        If true, print debug information. Default is False.
+    
     Returns
     -------
     sigIndx : array
@@ -231,19 +271,21 @@ def DouglasPeucker(signal:np.ndarray, height:np.ndarray, epsilon:float, heightBa
     # Find the boundary for implementing Douglas-Peucker method
     hBaseIndx = np.argmax((height[:-1] - heightBase) * (height[1:] - heightBase) <= 0) + 1
     hTopIndx = np.argmax((height[:-1] - heightTop) * (height[1:] - heightTop) <= 0) + 1
-    #print('hBaseIndx', hBaseIndx, height[hBaseIndx])
-    #print('hTopIndx', hTopIndx, height[hTopIndx])
+    # print('hBaseIndx', hBaseIndx, height[hBaseIndx])
+    # print('hTopIndx', hTopIndx, height[hTopIndx])
 
-    if hBaseIndx == 0:
-        hBaseIndx = 1
-    if hTopIndx == 0:
+    if hBaseIndx == 1: # if np.argmax returns 0
+        logging.warning(f'The base region can not be found. Set default value to {height[0]}.')
+        hBaseIndx = 0
+    if hTopIndx == 1: # if np.argmax returns 0
+        logging.warning(f'The top region can not be found. Set default value to {height[-1]}.')
         hTopIndx = len(height)
 
     if hTopIndx <= hBaseIndx:
+        logging.warning('Invalid search range settings.')
         return []
 
     # Smooth the signal
-
     signalTmp = smooth_signal(signal[hBaseIndx:hTopIndx+1], window_size)
     heightTmp = height[hBaseIndx:hTopIndx+1]
     posIndx = np.where(signalTmp > 0)[0]
@@ -251,18 +293,15 @@ def DouglasPeucker(signal:np.ndarray, height:np.ndarray, epsilon:float, heightBa
     heightTmp = heightTmp[posIndx]
 
     if len(signalTmp) < 2:
-        return np.array([1, hTopIndx - hBaseIndx + 1])
+        return np.array([0, hTopIndx - hBaseIndx])
 
     pointList = [[heightTmp[i], np.log(signalTmp[i])] for i in range(len(signalTmp))]
-
-    #for i in range(len(signalTmp))[:10]:
-    #    print(i, heightTmp[i], np.log(signalTmp[i]), signalTmp[i])
-    #    print(pointList[i])
-    sigIndx = DP_algorithm(pointList, epsilon, maxHThick)
-    return posIndx[sigIndx] + hBaseIndx - 1
+    sigIndx = DP_algorithm(pointList, epsilon, maxHThick, showDetails=showDetails)
+    
+    return posIndx[sigIndx] + hBaseIndx
 
 
-def DP_algorithm(pointList:list, epsilon:float, maxHThick:float) -> list:
+def DP_algorithm(pointList:list, epsilon:float, maxHThick:float, recursive_depth:int=0, showDetails:bool=False) -> list:
     """Recursive implementation of the Douglas-Peucker algorithm.
 
     Parameters
@@ -273,6 +312,8 @@ def DP_algorithm(pointList:list, epsilon:float, maxHThick:float) -> list:
         Maximum distance.
     maxHThick : float
         Maximum thickness for each segment.
+    showDetails : bool
+        If True, print debug information. Default is False.
 
     Returns
     -------
@@ -281,42 +322,46 @@ def DP_algorithm(pointList:list, epsilon:float, maxHThick:float) -> list:
     
     """
     if len(pointList) == 1:
-        #print('pointList == 1')
+        if showDetails: print(f'Recursion: {recursive_depth}, len(pointList) == 1, returning [0]')
         return [0]
     elif len(pointList) == 2:
-        #print('pointList == 2')
+        if showDetails: print(f'Recursion: {recursive_depth}, len(pointList) == 2, returning [0, 1]')
         return [0, 1]
 
     dMax = 0
     index = 0
     thickness = pointList[-1][0] - pointList[0][0]
-    #print('thickness', thickness)
 
+    # Find point with maximum distance
     for i in range(1, len(pointList) - 1):
-        d = my_dist(pointList[i], pointList[0], pointList[-1])
+        d = my_dist(pointList[i], pointList[0], pointList[-1], full=False)
         if d > dMax:
             index = i
             dMax = d
-    #print('dMax', dMax)
 
     if dMax > epsilon:
-        #print('dMax > epsilon')
-        recResult1 = DP_algorithm(pointList[:index + 1], epsilon, maxHThick)
-        recResult2 = DP_algorithm(pointList[index:], epsilon, maxHThick)
+        recResult1 = DP_algorithm(pointList[:index+1], epsilon, maxHThick, recursive_depth=recursive_depth+1, showDetails=showDetails)
+        recResult2 = DP_algorithm(pointList[index:], epsilon, maxHThick, recursive_depth=recursive_depth+1, showDetails=showDetails)
+        if showDetails:
+            print(f'Recursion: {recursive_depth}, spliting at index = {index}, dmax = {dMax}, returning {recResult1[:-1] + [x + index for x in recResult2]}')
         return recResult1[:-1] + [x + index for x in recResult2]
+    
     elif thickness > maxHThick:
-        #print('thickness > maxHThick')
         for i in range(1, len(pointList) - 1):
             if pointList[i][0] - pointList[0][0] >= maxHThick:
                 break
-        recResult1 = DP_algorithm(pointList[:i + 1], epsilon, maxHThick)
-        recResult2 = DP_algorithm(pointList[i:], epsilon, maxHThick)
+        recResult1 = DP_algorithm(pointList[:i+1], epsilon, maxHThick, recursive_depth=recursive_depth+1, showDetails=showDetails)
+        recResult2 = DP_algorithm(pointList[i:], epsilon, maxHThick, recursive_depth=recursive_depth+1, showDetails=showDetails)
+        if showDetails:
+            print(f'Recursion: {recursive_depth}, spliting at index = {i}, returning {recResult1[:-1] + [x + i for x in recResult2]}')
         return recResult1[:-1] + [x + i for x in recResult2]
+    
     else:
+        if showDetails: print(f'Recursion: {recursive_depth}, returning (else) values = {[0, len(pointList) - 1]}')
         return [0, len(pointList) - 1]
 
 
-def my_dist(pointM:list, pointS:list, pointE:list) -> float:
+def my_dist(pointM:list, pointS:list, pointE:list, full:bool=True) -> float:
     """Calculate the perpendicular distance between pointM and the line
     connecting pointS and pointE.
 
@@ -328,16 +373,28 @@ def my_dist(pointM:list, pointS:list, pointE:list) -> float:
         Start point [x, y].
     pointE : list
         End point [x, y].
+    full : bool
+        If true, calculate the full distance, othrewise calculate only the numerator.
+        Default is True.
 
     Returns
     -------
     d : float
         Distance.
     
+    Notes
+    -----
+    - If pointS and pointE are constant only the numerator is neede to calculate the
+      extreme points with respect to pointM.
+
     """
-    num = abs(pointM[1] - pointS[1] + (pointS[1] - pointE[1]) / (pointS[0] - pointE[0]) * (pointS[0] - pointM[0]))
-    den = np.sqrt(1 + ((pointS[1] - pointE[1]) / (pointS[0] - pointE[0])) ** 2)
-    return num / den
+    num = abs(pointM[1] - pointS[1] + (pointS[1] - pointE[1]) / \
+               (pointS[0] - pointE[0]) * (pointS[0] - pointM[0]))
+    if full:
+        den = np.sqrt(1 + ((pointS[1] - pointE[1]) / (pointS[0] - pointE[0])) ** 2)
+        return num / den
+    
+    return num
 
 
 def chi2fit(x:np.ndarray, y:np.ndarray, measure_error:np.ndarray) -> tuple:
@@ -420,9 +477,9 @@ def chi2fit(x:np.ndarray, y:np.ndarray, measure_error:np.ndarray) -> tuple:
     return a, b, sigmaA, sigmaB, chi2, Q
 
 
-def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndarray,sig_mol:np.ndarray,
+def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndarray, sig_mol:np.ndarray,
                 dpIndx:np.ndarray, layerThickConstrain:float, slopeConstrain:float, SNRConstrain:float, 
-                flagShowDetail:bool=False) -> tuple:
+                flagShowDetail:bool=False, flagPicassoComparison:bool=False) -> tuple:
 #def rayleighfit(height, sig_aer, snr, sig_mol, dpIndx, layerThickConstrain, 
 #                slopeConstrain, SNRConstrain, flagShowDetail=False):
     """Search the clean region with rayleigh fit algorithm.
@@ -448,7 +505,9 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
     SNRConstrain : float
         minimum SNR for the signal at the reference height
     flagShowDetail : bool, optional
-        if True, calculation information will be printed (default: False)
+        If true, calculation information will be printed. Default is False.
+    flagPicassoComparison : bool, optional
+        If true, use Picasso values and logic. Default is False.
 
     Returns
     -------
@@ -456,13 +515,17 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
         (hBIndx, hTIndx) - indices of bottom and top of searched region
         Returns (nan, nan) if region not found
     
-    """
-    import numpy as np
-    from scipy.stats import norm
+    Notes
+    -----
+    - There are known numerical discrepancies between this and the Picasso versions especially in the
+      residual calculations due to the subtraction and mean of very small numbers [-1e-24, 1e-24].
+      these numerical discrepancies may cause a different reference height to be chosen compared to
+      Picasso.
 
-    if len([height, sig_aer, pc, bg, sig_mol, dpIndx]) < 6:
-    #if len([height, sig_aer, pc, bg, sig_mol, dpIndx]) < 6:
-        raise ValueError('Not enough inputs.')
+    """
+    # if len([height, sig_aer, pc, bg, sig_mol, dpIndx]) < 6:
+    # #if len([height, sig_aer, pc, bg, sig_mol, dpIndx]) < 6:
+    #     raise ValueError('Not enough inputs.')
 
     if not (isinstance(sig_aer, (list, np.ndarray)) and 
             isinstance(sig_mol, (list, np.ndarray))):
@@ -487,7 +550,7 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
     for iIndx in range(len(dpIndx) - 1):
         test1 = test2 = test3 = test4 = test5 = True
         iDpBIndx = dpIndx[iIndx]
-        iDpTIndx = dpIndx[iIndx + 1] + 1 # matlab slicing issue??
+        iDpTIndx = dpIndx[iIndx + 1] # + 1 # matlab slicing issue??
         #print(iIndx, iDpBIndx, iDpTIndx)
 
         # check layer thickness
@@ -498,16 +561,16 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
             continue
 
         # normalize the recorded signal to the molecular signal
-        if np.sum(sig_aer[iDpBIndx:iDpTIndx]) == 0:
+        if np.sum(sig_aer[iDpBIndx:iDpTIndx+1]) == 0:
             continue
 
-        sig_factor = np.nanmean(sig_mol[iDpBIndx:iDpTIndx]) / \
-                    np.nanmean(sig_aer[iDpBIndx:iDpTIndx])
+        sig_factor = np.nanmean(sig_mol[iDpBIndx:iDpTIndx+1]) / \
+                    np.nanmean(sig_aer[iDpBIndx:iDpTIndx+1])
         #print('sig factor ', sig_factor)
         sig_aer_norm = sig_aer * sig_factor
         std_aer_norm = sig_aer_norm / np.sqrt(pc + bg)
-        #print('sig_aer_norm ', sig_aer_norm.shape, sig_aer_norm[iDpBIndx:iDpTIndx])
-        #print('std_aer_norm ', std_aer_norm.shape, std_aer_norm[iDpBIndx:iDpTIndx])
+        #print('sig_aer_norm ', sig_aer_norm.shape, sig_aer_norm[iDpBIndx:iDpTIndx+1])
+        #print('std_aer_norm ', std_aer_norm.shape, std_aer_norm[iDpBIndx:iDpTIndx+1])
 
         # Quality test 2: near and far - range cross criteria
         winLen = int(layerThickConstrain / (height[1] - height[0]))
@@ -516,7 +579,7 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
             winLen = 5
 
         for jIndx in range(dpIndx[0], dpIndx[-1] - winLen, winLen):
-            slice_range = slice(jIndx, jIndx + winLen)
+            slice_range = slice(jIndx, jIndx + winLen + 1)
             deltaSig_aer = np.nanstd(sig_aer_norm[slice_range])
             meanSig_aer = np.nanmean(sig_aer_norm[slice_range])
             meanSig_mol = np.nanmean(sig_mol[slice_range])
@@ -534,15 +597,15 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
 
         # Quality test 3: white-noise criterion
         #print('white noise criterion ', iDpBIndx, iDpTIndx)
-        residual = (sig_aer_norm[iDpBIndx:iDpTIndx] - 
-                   sig_mol[iDpBIndx:iDpTIndx])
+        residual = (sig_aer_norm[iDpBIndx:iDpTIndx+1] - 
+                   sig_mol[iDpBIndx:iDpTIndx+1])
 
         #print(sig_aer_norm[iDpBIndx], sig_mol[iDpBIndx], sig_aer_norm[iDpBIndx]-sig_mol[iDpBIndx])
         #print(sig_aer_norm[iDpBIndx+1], sig_mol[iDpBIndx+1], sig_aer_norm[iDpBIndx+1]-sig_mol[iDpBIndx+1])
         #print(sig_aer_norm[iDpBIndx+2], sig_mol[iDpBIndx+2], sig_aer_norm[iDpBIndx+2]-sig_mol[iDpBIndx+2])
         #print(sig_aer_norm[iDpBIndx+3], sig_mol[iDpBIndx+3], sig_aer_norm[iDpBIndx+3]-sig_mol[iDpBIndx+3])
         #print('residual ', residual.shape, residual)
-        x = height[iDpBIndx:iDpTIndx] / 1e3
+        x = height[iDpBIndx:iDpTIndx+1] / 1e3
 
         if len(residual) <= 10:
             if flagShowDetail:
@@ -551,9 +614,9 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
             #continue
 
         # Note: chi2fit implementation needed here
-        #print('white noise chi2fit input', np.nanmean(x), np.nanmean(residual), np.nanmean(std_aer_norm[iDpBIndx:iDpTIndx]))
+        #print('white noise chi2fit input', np.nanmean(x), np.nanmean(residual), np.nanmean(std_aer_norm[iDpBIndx:iDpTIndx+1]))
         thisIntersect, thisSlope, _, _, _, _ = chi2fit(
-            x, residual, std_aer_norm[iDpBIndx:iDpTIndx])
+            x, residual, std_aer_norm[iDpBIndx:iDpTIndx+1])
         #print('white noise chi2fit ', thisIntersect, thisSlope)
         
         residual_fit = thisIntersect + thisSlope * x
@@ -568,7 +631,7 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
             #continue
 
         # Quality test 4: SNR check
-        sigsum = np.nansum(pc[dpIndx[iIndx]:dpIndx[iIndx + 1]])
+        sigsum = np.nansum(pc[dpIndx[iIndx]:dpIndx[iIndx+1]+1])
         # adaption needed for the background not given as a profile
         bgsum = bg * (dpIndx[iIndx + 1] - dpIndx[iIndx])
         SNR = sigsum / np.sqrt(sigsum + 2*bgsum)
@@ -582,10 +645,10 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
             #continue
 
         # Quality test 5: slope check
-        x = height[iDpBIndx:iDpTIndx]
-        yTmp_aer = sig_aer_norm[iDpBIndx:iDpTIndx]
-        yTmp_mol = sig_mol[iDpBIndx:iDpTIndx]
-        std_yTmp_aer = std_aer_norm[iDpBIndx:iDpTIndx]
+        x = height[iDpBIndx:iDpTIndx+1]
+        yTmp_aer = sig_aer_norm[iDpBIndx:iDpTIndx+1]
+        yTmp_mol = sig_mol[iDpBIndx:iDpTIndx+1]
+        std_yTmp_aer = std_aer_norm[iDpBIndx:iDpTIndx+1]
         
         mask = yTmp_aer > 0
         y_aer = yTmp_aer[mask]
@@ -627,24 +690,26 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
             continue
 
         # save statistics
-        numTest += 1
-        hIndxB_Test[numTest-1] = dpIndx[iIndx]
-        hIndxT_Test[numTest-1] = dpIndx[iIndx + 1]
-        mean_resid[numTest-1] = np.nanmean(residual)
-        std_resid[numTest-1] = np.nanstd(residual)
-        slope_resid[numTest-1] = thisSlope
-        msre_resid[numTest-1] = np.sum(et**2)
-        SNR_ref[numTest-1] = SNR
+        hIndxB_Test[numTest] = dpIndx[iIndx]
+        hIndxT_Test[numTest] = dpIndx[iIndx+1]
+        mean_resid[numTest] = np.nanmean(residual)
+        std_resid[numTest] = np.nanstd(residual)
+        slope_resid[numTest] = thisSlope
+        msre_resid[numTest] = np.sum(et**2)
+        SNR_ref[numTest] = SNR
 
         # Anderson Darling test
-        normP = norm.pdf((residual - mean_resid[numTest-1]) / 
-                        std_resid[numTest-1])
+        normP = norm.pdf((residual - mean_resid[numTest]) / 
+                        std_resid[numTest])
         indices = np.arange(1, len(residual) + 1)
         A = np.sum((2 * indices - 1) * np.log(normP) + 
                   (2 * (len(residual) - indices) + 1) * np.log(1 - normP))
         A = -len(residual) - A/len(residual)
-        Astat[numTest-1] = A * (1 + 0.75/len(residual) + 
+        Astat[numTest] = A * (1 + 0.75/len(residual) + 
                                2.25/len(residual)**2)
+        
+        # Update numTest
+        numTest += 1
 
     if numTest == 0:
         if flagShowDetail:
@@ -656,27 +721,29 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
              np.abs(msre_resid) * np.abs(Astat) / SNR_ref)
     X_val[X_val == 0] = np.nan
 
-    # QuicFix for all NaN arrays:
-    if np.isnan(X_val).all():
-        print("None valid clean region found.")
-        return np.nan, np.nan
-    indxBest_Int = np.nanargmin(X_val)
+    if flagPicassoComparison:
+        # # Matlab equivalent code:
+        if np.isnan(X_val).all():
+            indxBest_Int = 0
+        else:
+            indxBest_Int = np.nanargmin(X_val)
+    else:
+        # QuicFix for all NaN arrays:
+        if np.isnan(X_val).all():
+            print("None valid clean region found.")
+            return np.nan, np.nan
+        indxBest_Int = np.nanargmin(X_val)
 
-    # # Matlab equivalent code:
-    # try:
-    #     indxBest_Int = np.nanargmin(X_val)
-    # except ValueError:
-    #     indxBest_Int = 0
-    
-    # print('hIndB_Test', hIndxB_Test)
-    # print('hIndT_Test', hIndxT_Test)
-    # print('mean_resid', mean_resid)
-    # print('std_resid', std_resid)
-    # print('slope_resid', slope_resid)
-    # print('msre_resid', msre_resid)
-    # print('SNR_ref', SNR_ref)
-    # print('Astat', Astat)
-    # print('X_val', X_val)
+    if flagShowDetail:
+        print('hIndB_Test', hIndxB_Test)
+        print('hIndT_Test', hIndxT_Test)
+        print('mean_resid', mean_resid)
+        print('std_resid', std_resid)
+        print('slope_resid', slope_resid)
+        print('msre_resid', msre_resid)
+        print('SNR_ref', SNR_ref)
+        print('Astat', Astat)
+        print('X_val', X_val)
 
     if flagShowDetail:
         print(f'The best interval is {height[int(hIndxB_Test[indxBest_Int])]} - '

@@ -440,22 +440,20 @@ class PicassoProc:
         self.mol_profiles = molecular.calc_profiles(mean_profiles)
     
 
-    def rayleighFit(self):
-        """do the rayleigh fit
+    def rayleighFit(self, collect_debug:bool=False):
+        """Perform the rayleigh fit procedure.
         
-        direct translation from the matlab code. There might be noticeable numerical discrepancies (especially in the residual)
-        seemed to work ok for 532, 1064, but with issues for 355
+        Direct translation from the matlab code. There might be noticeable numerical discrepancies (especially in the residual)
+        seemed to work ok for 532, 1064, but with issues for 355.
+        --> The Douglas Peucker algorithm works fine (gives the same result as the Matlab version). However, due the numerical discrepancies
+        In the residuals of the fit algorithm sometimes different refH segments are chosen.
         """
 
         print('Start Rayleigh Fit')
-        logging.warning(f'Potential for differences to matlab code du to numerical issues (subtraction of two small values)')
+        logging.warning(f'Potential for differences to matlab code due to numerical issues (subtraction of two small values)')
 
-        # self.refH =  rayleighfit.rayleighfit(self)
-        self.retrievals_profile['refH'] = rayleighfit.rayleighfit(self)
-        # return self.refH
+        self.retrievals_profile['refH'] = rayleighfit.rayleighfit(self, collect_debug)
 
-        # example
-        # self.retrievals_profile['klett'][cldFreeGrp]['355_total_NR']['refH']
 
     def polarizationCaliMol(self):
         """calibration with molecular signal in reference height
