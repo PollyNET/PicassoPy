@@ -163,6 +163,9 @@ class MeteoNcCloudnet:
 
     radiusEarth:float = 6371200.0 # [m]
     acelerationEarth:float = 9.80665 # [m/s^2]
+    avgMoistLapsRate:float = 0.005 # [K/m]
+    meanMolMasAirAtSeeLvl:float = 28.9644 # [kg/kmol] as of 1976 [wikipedia]
+    universalGasConstant:float = 8.31432e3 # [N m/(kmol K)]
 
 
     def __init__(self, basepath, filepattern):
@@ -253,8 +256,9 @@ class MeteoNcCloudnet:
 
 
         .. TODO:: clarify the above ground above sea level issues.
-        .. TODO:: Check how the interpolation handles negative grid points
-        .. TODO:: Check if we can interpolate several variables at once
+        .. TODO:: Check how the interpolation handles negative grid points.
+        .. TODO:: Check if we can interpolate several variables at once.
+        .. TODO:: Extrapolate the meterological data to ground.
 
         """
 
@@ -304,11 +308,37 @@ class MeteoNcCloudnet:
         p = np.zeros((time.shape[0], height_grid.shape[0]))
         rh = np.zeros((time.shape[0], height_grid.shape[0]))
         q = np.zeros((time.shape[0], height_grid.shape[0]))
+
+        # Interpolate to local height grid
         for i in range(time.shape[0]):
             temp[i, :] = np.interp(height_grid, height_2d[i, :], ds['temperature'].values[i, :])
             p[i, :] = np.interp(height_grid, height_2d[i, :], ds['pressure'].values[i, :])
             rh[i, :] = np.interp(height_grid, height_2d[i, :], ds['rh'].values[i, :])
             q[i, :] = np.interp(height_grid, height_2d[i, :], ds['q'].values[i, :])
+
+            # For values outside the local height grid
+            maskLower = height_grid < height_2d[i, 0]
+            maskHigher = height_grid > height_2d[i, -1]
+
+            ## Extrapolate temperature based on mean moist lapse rate of 5K/km
+            temp[i, maskLower] = ds['temperature'].values[i, 0] + self.avgMoistLapsRate*(height_2d[i, 0] - height_grid[maskLower])
+            temp[i, maskHigher] = ds['temperature'].values[i, -1] - self.avgMoistLapsRate*(height_grid[maskHigher] - height_2d[i, -1])
+
+            ## Extrapolate Pressure based on U.S. Standard Atmosphere
+            p[i, maskLower] = self.pressure_calculations(
+                H=height_grid[maskLower], 
+                Hb=height_2d[i, 0],
+                Pb=ds['pressure'].values[i, 0],
+                Tb=ds['temperature'].values[i, 0],
+            )
+            p[i, maskHigher] = self.pressure_calculations(
+                H=height_grid[maskHigher], 
+                Hb=height_2d[i, -1],
+                Pb=ds['pressure'].values[i, -1],
+                Tb=ds['temperature'].values[i, -1],
+            )
+
+            ## ..TODO:: The same needs to be done relative humididty (rh) and specific humididty (q)
         
         ds_new = xr.Dataset(
             data_vars=dict(
@@ -323,5 +353,29 @@ class MeteoNcCloudnet:
             ),
             attrs=ds.attrs,
         )
-
+        ds_new.to_netcdf('meteoData.nc')
         return ds_new
+
+    def pressure_calculations(self, H:float|np.ndarray, Hb:float, Pb:float, Tb:float) -> float|np.ndarray:
+        """U.S. Standard Atmosphere Pressure calcualtion.
+        
+        Parameters
+        ----------
+        H : float or ndarray
+            Geopotential haight of calculated pressure [m].
+        Hb : float
+            Geprotential height of reference [m].
+        Pb : float
+            Pressure level of reference [bar].
+        Tb : float
+            Temperature of reference [K].
+        
+        Returns
+        -------
+        P : float or ndarray
+            Pressure level at H.
+        """
+        P = Pb*(Tb/(Tb + self.avgMoistLapsRate*(H - Hb)))** \
+            (self.acelerationEarth * self.meanMolMasAirAtSeeLvl / \
+              (self.universalGasConstant * self.avgMoistLapsRate))
+        return P
