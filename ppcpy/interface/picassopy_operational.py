@@ -229,9 +229,11 @@ data_cube.LidarCalibration()
 
 ## write depolarization calibration factors and LIDAR calibration constants to sqlite-db
 base_dir = Path(data_cube.picasso_config_dict['results_folder'])
-db_path = base_dir.joinpath(polly_device,polly_config_dict['calibrationDB'])
-#data_cube.write_2_sql_db(db_path=str(db_path),parameter='LC',method='Raman')
-#data_cube.write_2_sql_db(db_path=str(db_path),parameter='DC')
+#db_path = base_dir.joinpath(polly_device,polly_config_dict['calibrationDB'])
+db_path = "/data/level1b/polly24h/pollyxt_cpv/pollyxt_cpv_calibration_picassopy.db"
+data_cube.write_2_sql_db(db_path=str(db_path),parameter='LC',method='Raman')
+data_cube.write_2_sql_db(db_path=str(db_path),parameter='LC',method='Klett')
+data_cube.write_2_sql_db(db_path=str(db_path),parameter='DC')
 
 ## LC_column_names = ['cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
 
@@ -256,7 +258,6 @@ write2nc_file(data_cube=data_cube, prod_ls=["att_bsc", "NR_att_bsc", "OC_att_bsc
 data_cube.quasiV1()
 data_cube.quasiV2()
 
-exit()
 ## saving high-resolution quasi retrievals and target classification to nc files
 write2nc_file(data_cube=data_cube,prod_ls=["quasi_results","quasi_results_V2","target_classification","target_classification_V2"])
 

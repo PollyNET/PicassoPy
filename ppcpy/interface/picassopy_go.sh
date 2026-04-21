@@ -8,6 +8,7 @@ BASE_DIR="/data/level0/polly"
 MERGE_SINGLE=0   # false
 TIMESTAMP=""
 DEVICE=""
+UNZIPPING="True"
 PICASSO_CFG=""
 
 # ---------- helper functions ----------
@@ -21,6 +22,7 @@ Options:
   --device DEVICE_NAME         Name of the Polly device (required)
   --base_dir DIR               Base directory of level‑0 data (default: $BASE_DIR)
   --picasso_config_file FILE   Picasso JSON config file (required)
+  --unzipping                  Set to True or False, default is True; choose False i.e. for level0b 24h-file
   --merge_to_single_24h_file   Merge all level‑0 files of the day into one 24‑h file
   -h, --help                   Show this help and exit
 EOF
@@ -52,6 +54,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --picasso_config_file)
             PICASSO_CFG="${2:?Missing argument for --picasso_config_file}"
+            shift 2
+            ;;
+        --unzipping)
+            UNZIPPING="$2"
             shift 2
             ;;
         --merge_to_single_24h_file)
@@ -129,18 +135,22 @@ call_get_files() {
     local dev="$2"
     local raw_folder="$3"
     local out_path="$4"
+    local unzip="$5"
 
     "$PYTHON_PATH"/python3 -c "
 import sys
 from ppcpy.misc.concat import get_pollyxt_files
 
 ts, dev, raw, out = '$ts', '$dev', '$raw_folder', '$out_path'
+# Parse the unzip variable: compare string to 'true'
+unzip_bool = '$unzip'.lower() == 'true'
 
 #  Call the function.
 result = get_pollyxt_files(timestamp=ts,
                      device=dev,
                      raw_folder=raw,
-                     output_path=out)
+                     output_path=out,
+                     unzipping=unzip_bool)
 
 #  Print the result – Bash captures STDOUT.
 if result is not None:
@@ -154,18 +164,22 @@ call_concat_files() {
     local dev="$2"
     local raw_folder="$3"
     local out_path="$4"
+    local unzip="$5"
 
     "$PYTHON_PATH"/python3 -c "
 import sys
 from ppcpy.misc.concat import concat_files
 
 ts, dev, raw, out = '$ts', '$dev', '$raw_folder', '$out_path'
+# Parse the unzip variable: compare string to 'true'
+unzip_bool = '$unzip'.lower() == 'true'
 
 #  Call the function.
 result = concat_files(timestamp=ts,
                      device=dev,
                      raw_folder=raw,
-                     output_path=out)
+                     output_path=out,
+                     unzipping=unzip_bool)
 
 #  Print the result – Bash captures STDOUT.
 if result:
@@ -201,7 +215,7 @@ for TIMESTAMP in ${DATE_LS[@]}; do
     if (( MERGE_SINGLE )); then
         log_info "Merging raw files for $TIMESTAMP / $DEVICE into a single 24‑h file ..."
         ## grep to get rid of empty lines
-        MERGED_FILE=$(call_concat_files "$TIMESTAMP" "$DEVICE" "$BASE_DIR" "$OUTPUT_PATH" | grep -v '^[[:space:]]*$') \
+        MERGED_FILE=$(call_concat_files "$TIMESTAMP" "$DEVICE" "$BASE_DIR" "$OUTPUT_PATH" "$UNZIPPING" | grep -v '^[[:space:]]*$') \
             || { echo "[ERROR] concat_files failed" >&2; MERGE_SUCCESS=0; }
     
         if [[ -z "$MERGED_FILE" ]]; then
@@ -216,7 +230,7 @@ for TIMESTAMP in ${DATE_LS[@]}; do
         # Call the Python helper that lists the individual level‑0 files.
         log_info "Fetching list of level‑0 files for $TIMESTAMP / $DEVICE ..."
        # mapfile -t RAW_FILES < <(python3 get_pollyxt_files.py \
-        mapfile -t RAW_FILES < <(call_get_files "$TIMESTAMP" "$DEVICE" "$BASE_DIR" "$OUTPUT_PATH") \
+        mapfile -t RAW_FILES < <(call_get_files "$TIMESTAMP" "$DEVICE" "$BASE_DIR" "$OUTPUT_PATH" "$UNZIPPING") \
     		|| { log_error "Failed to run get_pollyxt_files.py"; exit 1; }
     fi
     

@@ -26,12 +26,22 @@ def date_splitting(timestamp):
     DD = timestamp[6:8]
     return YYYY,MM,DD
 
-def get_input_path(timestamp, device, raw_folder):
-    """"""
+def get_input_path(timestamp, device, base_dir):
+    """
+        Checking for the correct subpath
+        TODO: using glob or similiar to be more flexible in terms of level0b or martha...
+    """
     YYYY,MM,DD = date_splitting(timestamp)
-    input_path = Path(raw_folder, device, "data_zip", f"{YYYY}{MM}")
+    search_root_normal = Path(base_dir) / device
+    search_root_special = Path(base_dir)
+    search_pattern = f"**/*{YYYY}_{MM}_{DD}*.nc*"
     logging.info(f'checking data availability for {device} at {YYYY}-{MM}-{DD}')
-    return input_path
+    for file_path in search_root_normal.rglob(search_pattern):
+        return file_path.parent.resolve()
+    for file_path in search_root_special.rglob(search_pattern):
+        return file_path.parent.resolve()
+
+    return None
 
 
 def get_pollyxt_zipfiles(timestamp, device, raw_folder):
@@ -40,7 +50,10 @@ def get_pollyxt_zipfiles(timestamp, device, raw_folder):
         and returns a list of zip-files
     """
     input_path = get_input_path(timestamp, device, raw_folder)
-    path_exist = Path(input_path)
+    if input_path:
+        path_exist = Path(input_path)
+    else:
+        return None
 
     if path_exist.exists() == True:
 
@@ -57,6 +70,31 @@ def get_pollyxt_zipfiles(timestamp, device, raw_folder):
         #polly_zip_files_list = []
         #for file in polly_zip_files_list0:
         #    polly_zip_files_list.append(str(file))
+
+def get_pollyxt_nc_files(timestamp, device, raw_folder):
+    """
+        This function locates pollyxt level0 nc-files (i.e. already 24h-merged level0b files) from one day measurements,
+        and returns a list of nc-files
+    """
+    input_path = get_input_path(timestamp, device, raw_folder)
+    if input_path:
+        path_exist = Path(input_path)
+    else:
+        return None
+
+    if path_exist.exists() == True:
+
+        ## set the searchpattern for the zipped-nc-files:
+        YYYY,MM,DD = date_splitting(timestamp)
+
+        nc_searchpattern = str(YYYY)+'_'+str(MM)+'_'+str(DD)+'*_*[0-9].nc'
+
+        polly_files = Path(r'{}'.format(input_path)).glob('{}'.format(nc_searchpattern))
+        polly_files_list = [x for x in polly_files if x.is_file()]
+        return polly_files_list
+    else:
+        return None
+
 
 def unzipping_pollyxt_files(polly_zip_files_list,timestamp,output_path):
     """
@@ -119,28 +157,39 @@ def unzipping_pollyxt_files(polly_zip_files_list,timestamp,output_path):
         return None
 
 
-def get_pollyxt_files(timestamp, device, raw_folder, output_path):
+def get_pollyxt_files(timestamp, device, raw_folder, output_path, **kwargs):
     """
         This function locates multiple pollyxt level0 nc-zip files from one day measurements,
         unzipps the files to output_path
         and returns a list of files to be merged
     """
+    unzip = kwargs.get('unzipping', True)
 
-    ## search for files
-    polly_zip_files_list = get_pollyxt_zipfiles(timestamp, device, raw_folder)
-    if polly_zip_files_list:
-        pass
-    else:
-        logging.error('No files found. Aborting')
-        sys.exit()
+    if str(unzip).lower() == 'true':
+        ## search for zipped nc-files
+        polly_zip_files_list = get_pollyxt_zipfiles(timestamp, device, raw_folder)
+        if polly_zip_files_list:
+            pass
+        else:
+            logging.error('No files found. Aborting')
+            sys.exit()
 
-    ## unzip files
-    polly_files_list = unzipping_pollyxt_files(polly_zip_files_list,timestamp,output_path)
-    if polly_files_list:
-        pass
+        ## unzip files
+        polly_files_list = unzipping_pollyxt_files(polly_zip_files_list,timestamp,output_path)
+        if polly_files_list:
+            pass
+        else:
+            logging.error('No files found. Aborting')
+            sys.exit()
     else:
-        logging.error('No files found. Aborting')
-        sys.exit()
+        ## search for nc-files
+        polly_files_list = get_pollyxt_nc_files(timestamp, device, raw_folder)
+        if polly_files_list:
+            pass
+        else:
+            logging.error('No files found. Aborting')
+            sys.exit()
+
 
     ## sort lists
     polly_files_list.sort()
@@ -242,7 +291,7 @@ def add_to_list(element, from_list, to_list):
 
 
 
-def checking_vars(timestamp, device, raw_folder, output_path):
+def checking_vars(timestamp, device, raw_folder, output_path, **kwargs):
     """"""
     ## select only those nc-files where the values of some specific variables haven't changed
     vars_of_interest = [
@@ -264,7 +313,7 @@ def checking_vars(timestamp, device, raw_folder, output_path):
                         'zenithangle'
                         ]
 
-    polly_files_list = get_pollyxt_files(timestamp, device, raw_folder, output_path)
+    polly_files_list = get_pollyxt_files(timestamp, device, raw_folder, output_path, **kwargs)
     if len(polly_files_list) == 1:
         return polly_files_list
 
@@ -322,7 +371,7 @@ def checking_vars(timestamp, device, raw_folder, output_path):
     return selected_var_nc_ls
 
 
-def checking_attr(timestamp, device, raw_folder, output_path):
+def checking_attr(timestamp, device, raw_folder, output_path, **kwargs):
     """...
     
     Parameters
@@ -343,7 +392,7 @@ def checking_attr(timestamp, device, raw_folder, output_path):
     TODO: Variables 'force' and 'polly_files_list' are not defined anywhere
     """
     ## select only those nc-files where the global attributes and the var-attributes haven't changed
-    selected_var_nc_ls = checking_vars(timestamp, device, raw_folder, output_path)
+    selected_var_nc_ls = checking_vars(timestamp, device, raw_folder, output_path, **kwargs)
     if len(selected_var_nc_ls) == 1:
         return selected_var_nc_ls
 
@@ -442,9 +491,9 @@ def checking_attr(timestamp, device, raw_folder, output_path):
     return selected_att_nc_ls
 
 
-def checking_timestamp(timestamp, device, raw_folder, output_path):
+def checking_timestamp(timestamp, device, raw_folder, output_path, **kwargs):
     """"""
-    selected_timestamp_nc_ls = checking_attr(timestamp, device, raw_folder, output_path)
+    selected_timestamp_nc_ls = checking_attr(timestamp, device, raw_folder, output_path, **kwargs)
     if len(selected_timestamp_nc_ls) == 1:
         return selected_timestamp_nc_ls
     selected_cor_timestamp_nc_ls = []
@@ -621,11 +670,11 @@ def write_netcdf_robust(ds: xr.Dataset, out_file: Path,
     
     return False
 
-def concat_files(timestamp, device, raw_folder, output_path):
+def concat_files(timestamp, device, raw_folder, output_path, **kwargs):
     """"""
     ## merge selected files
 
-    sel_polly_files_list = checking_timestamp(timestamp,device,raw_folder,output_path)
+    sel_polly_files_list = checking_timestamp(timestamp,device,raw_folder,output_path, **kwargs)
 
     if len(sel_polly_files_list) == 0:
         logging.info('no files found for this day. no merging.')
