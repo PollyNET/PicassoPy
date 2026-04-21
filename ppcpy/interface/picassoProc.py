@@ -408,18 +408,21 @@ class PicassoProc:
                 del self.retrievals_profile[var]
 
     def loadMeteo(self):
-        """ Load meteorological data """
+        """Load meteorological data."""
         self.met = readMeteo.Meteo(
             self.polly_config_dict['meteorDataSource'], 
             self.polly_config_dict['meteo_folder'],
-            self.polly_config_dict['meteo_file'])
+            self.polly_config_dict['meteo_file']
+        )
         self.met.load(
             datetime.datetime.timestamp(datetime.datetime.strptime(self.date, '%Y%m%d')),
-            self.retrievals_highres['height'])
+            self.retrievals_highres['height'], float(self.polly_config_dict['asl']),
+            self.polly_config_dict['flagPicassoComparison']
+        )
 
 
     def loadAOD(self):
-        """load the AOD from a co-located fotometer
+        """Load the AOD from a co-located fotometer
         
         .. TODO:: Not yet implemented!
         """
@@ -428,16 +431,15 @@ class PicassoProc:
 
 
     def calcMolecular(self):
-        """calculate the molecular scattering for the cloud free periods
-        
-        with the strategy of first averaging the met data and then calculating the rayleigh scattering
+        """Calculate the molecular scattering for the cloud free periods
+        with the strategy of first averaging the met data and then calculating the rayleigh scattering.
         
         """
 
         time_slices = [self.retrievals_highres['time64'][grp] for grp in self.clFreeGrps]
         print('time slices of cloud free ', time_slices)
-        mean_profiles = self.met.get_mean_profiles(time_slices) 
-        self.mol_profiles = molecular.calc_profiles(mean_profiles)
+        mean_profiles = self.met.get_mean_profiles(time_slices)
+        self.mol_profiles = molecular.calc_profiles(mean_profiles, flagPicassoComparison=self.polly_config_dict['flagPicassoComparison'])
     
 
     def rayleighFit(self, collect_debug:bool=False):
@@ -616,19 +618,26 @@ class PicassoProc:
             self.retrievals_profile[ret_prof_name] = angstroem.ae_cldFreeGrps(
                 self, ret_prof_name) 
 
-    def LidarCalibration(self):
+    def LidarCalibration(self, collect_debug:bool=False):
         """calculate the lidar constant
 
         .. TODO:: Find out how we prioritise raman, klett, and database retrieved LC...
         """
         self.LC['klett'] = lidarconstant.lc_for_cldFreeGrps(
-            self, 'klett')
+            self, 
+            retrieval='klett', 
+            collect_debug=collect_debug
+        )
         self.LC['raman'] = lidarconstant.lc_for_cldFreeGrps(
-            self, 'raman')
+            self, 
+            retrieval='raman', 
+            collect_debug=collect_debug
+        )
         
         logging.warning('reading calibration constant from database not working yet')
         # Prioritise Raman retrieved LCs but use Klett retrieved ones when no Raman retrieval exists.
-        self.LCused = select.single_best(self.LC['klett'], 'LC', 'LCStd') | select.single_best(self.LC['raman'], 'LC', 'LCStd')
+        self.LCused = select.single_best(self.LC['klett'], 'LC', 'LCStd', relative=True) |\
+              select.single_best(self.LC['raman'], 'LC', 'LCStd', relative=True)
 
 
     def attBsc_volDepol(self):
@@ -648,7 +657,9 @@ class PicassoProc:
         """
 
         self.mol_2d = molecular.calc_2d(
-            self.met.ds)
+            self.met.ds,
+            flagPicassoComparison=self.polly_config_dict['flagPicassoComparison']
+        )
 
 
     def quasiV1(self):

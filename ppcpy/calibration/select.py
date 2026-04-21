@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import matplotlib
 
 
-def single_best(d, name_val, name_min):
-    """select the best calibration constant
+def single_best(d:dict, name_val:str, name_min:str, relative:bool=False) -> dict:
+    """Select the best calibration constant
     
 
     generalization of lidarconstant.get_best_LC    
@@ -19,6 +19,8 @@ def single_best(d, name_val, name_min):
         designator for the actual value
     name_min : str
         designator of the minimum
+    relative : bool
+        If true, choose calibration constant based on the relative error. 
     
     
     Returns
@@ -41,7 +43,11 @@ def single_best(d, name_val, name_min):
     for k, l in d.items():
         val = np.array([e[name_val] for e in l if e[name_val] >= 0])
         min = np.array([e[name_min] for e in l if e[name_val] >= 0])
-        best[k] = val[np.argmin(min)]
+
+        if relative:
+            best[k] = val[np.argmin(min / val)]
+        else:
+            best[k] = val[np.argmin(min)]
 
     return best
 
