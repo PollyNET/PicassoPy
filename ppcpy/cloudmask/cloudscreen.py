@@ -2,6 +2,7 @@ import numpy as np
 from scipy.ndimage import label, uniform_filter1d
 from ppcpy.misc.helper import uniform_filter, savgol_filter
 import matplotlib.pyplot as plt
+import logging
 
 
 def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
@@ -30,7 +31,7 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     """
 
     # return uniform_filter(signal, window_len)
-    return uniform_filter1d(signal, window_len, mode='nearest')
+    return uniform_filter1d(signal, window_len, mode='nearest') # <- Should switch to the incoming moving average filter here!
 
 
 def cloudscreen(data_cube, wv:int=532, collect_debug:bool=False) -> np.ndarray:
@@ -52,14 +53,22 @@ def cloudscreen(data_cube, wv:int=532, collect_debug:bool=False) -> np.ndarray:
     
     Notes
     -----
+    - The config variable 'cloudScreenMode' decides the cloud screening method used.
+          cloudScreenMode = 0
+              No cloud screening is performed, falgCloudFree = True for all timestamps.
+          cloudScreenMode = 1
+              Cloud screen with maximum signal gradient algorithm.
+          cloudScreenMode = 2
+              Cloud screen based on Zhao's algorithm.
     - The cloud screening is done for both the far range and near range total channels of
-      wavelength wv if the channels exist.
-    
+      wavelength wv, if the channels exist.
+   
     **History**
-    
+   
     - xxxx-xx-xx: First edition by ...
     - 2026-03-18: Updated to include necessary configurations for cloudScreen_Zhao.
     - 2026-04-09: Added 'maxCloudSearchHeight' config parameters.
+    - 2026-04-20: Added option for no cloud screening ie. 'cloudScreenMode' = 0
     """
 
     print('Starting cloud screen')
@@ -69,15 +78,19 @@ def cloudscreen(data_cube, wv:int=532, collect_debug:bool=False) -> np.ndarray:
     hFullOL = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, 'total', 'FR')][0]
 
     # Cloud screen mode dependent configuration
-    if config_dict['cloudScreenMode'] == 1:
-        print(f'cloud screen mode {config_dict['cloudScreenMode']}: MSG method')
+    if config_dict['cloudScreenMode'] == 0: # No cloud screening
+        logging.warning(f'cloud screen mode {config_dict['cloudScreenMode']}: No cloud screening.')
+        return np.ones(bg.shape, dtype=bool)
+    
+    elif config_dict['cloudScreenMode'] == 1: # MSG method
+        logging.info(f'cloud screen mode {config_dict['cloudScreenMode']}: MSG method.')
         screenfunc = cloudScreen_MSG
         sig = 'RCS'
         kwargs = {
             'slope_thres': config_dict['maxSigSlope4FilterCloud'],
         }
-    elif config_dict['cloudScreenMode'] == 2:
-        print(f"cloud screen mode {config_dict['cloudScreenMode']}: Zhao's method")
+    elif config_dict['cloudScreenMode'] == 2: # Zhao's method
+        logging.info(f"cloud screen mode {config_dict['cloudScreenMode']}: Zhao's method.")
         screenfunc = cloudScreen_Zhao
         sig = 'PCR_slice'
         kwargs = {
@@ -155,7 +168,7 @@ def cloudScreen_MSG(height:np.ndarray, signal:np.ndarray, slope_thres:float, sea
         raise ValueError("Not a valid search_region.")
 
     if search_region[0] < height[0]:
-        print(f"Warning: Base of search_region is lower than {height[0]}, setting it to {height[0]}")
+        logging.warning(f"Base of search_region is lower than {height[0]}, setting it to {height[0]}.")
         search_region[0] = height[0]
 
     flagCloudFree = np.zeros(signal.shape[0], dtype=bool)
@@ -166,7 +179,7 @@ def cloudScreen_MSG(height:np.ndarray, signal:np.ndarray, slope_thres:float, sea
 
     for indx in range(signal.shape[0]):
         if np.isnan(signal[indx]).all():
-            print(f'Skipping timestamp {indx}')
+            logging.info(f'Skipping cloud screening for timestamp {indx}.')
             continue
 
         slope = np.concatenate(([0], np.diff(smooth_signal(signal[indx, :], smooth_win)))) / (height[1] - height[0])
@@ -235,7 +248,7 @@ def cloudScreen_Zhao(height:np.ndarray, signal:np.ndarray, bg:np.ndarray, search
             print(f"--------- iTime: {iTime} ---------")
 
         if np.isnan(signal[iTime, flagDetectBins]).all():
-            print(f'Skipping timestamp {iTime}')
+            logging.info(f'Skipping cloud screening for timestamp {iTime}.')
             continue
 
         ## layer detection
