@@ -618,19 +618,26 @@ class PicassoProc:
             self.retrievals_profile[ret_prof_name] = angstroem.ae_cldFreeGrps(
                 self, ret_prof_name) 
 
-    def LidarCalibration(self):
+    def LidarCalibration(self, collect_debug:bool=False):
         """calculate the lidar constant
 
         .. TODO:: Find out how we prioritise raman, klett, and database retrieved LC...
         """
         self.LC['klett'] = lidarconstant.lc_for_cldFreeGrps(
-            self, 'klett')
+            self, 
+            retrieval='klett', 
+            collect_debug=collect_debug
+        )
         self.LC['raman'] = lidarconstant.lc_for_cldFreeGrps(
-            self, 'raman')
+            self, 
+            retrieval='raman', 
+            collect_debug=collect_debug
+        )
         
         logging.warning('reading calibration constant from database not working yet')
         # Prioritise Raman retrieved LCs but use Klett retrieved ones when no Raman retrieval exists.
-        self.LCused = select.single_best(self.LC['klett'], 'LC', 'LCStd') | select.single_best(self.LC['raman'], 'LC', 'LCStd')
+        self.LCused = select.single_best(self.LC['klett'], 'LC', 'LCStd', relative=True) |\
+              select.single_best(self.LC['raman'], 'LC', 'LCStd', relative=True)
 
 
     def attBsc_volDepol(self):
