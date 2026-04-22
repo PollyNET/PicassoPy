@@ -81,6 +81,7 @@ class PicassoProc:
         DD = mdate[2]
         return f"{YYYY}{MM}{DD}"
 
+
     def gf(self, wavelength, meth, telescope):
         """get flag shorthand
 
@@ -131,6 +132,7 @@ class PicassoProc:
         mdate_infilename = self.rawdata_dict['measurement_time']['var_data'][0][0]
         return f"{mdate_infilename}"
 
+
     def check_for_correct_mshots(self):
         """check if mshots are more than 1.1 * laser_prf * deltatime or smaller 0"""
         laser_rep_rate = self.rawdata_dict['laser_rep_rate']['var_data']
@@ -141,6 +143,7 @@ class PicassoProc:
         condition_check_matrix = (mShots > mShotsPerPrf*1.1) | (mShots <= 0)
         
         return condition_check_matrix
+
 
     def filter_or_correct_false_mshots(self):
         """ filter or correct the mshots (currently only logging)
@@ -161,6 +164,7 @@ class PicassoProc:
         ##TODO
         return self
 
+
     def mdate_consistency(self) -> bool:
         """check mdate consistency"""
         if self.mdate_filename() == self.mdate_infile():
@@ -169,6 +173,7 @@ class PicassoProc:
         else:
             logging.warning('... date in nc-file differs from date of filename')
             return False
+
 
     def reset_date_infile(self):
         """correct the date in the file """
@@ -180,6 +185,7 @@ class PicassoProc:
             np_array[:, 0] = mdate ## assign new date value to the whole first column of the 2d-numpy-array
             self.rawdata_dict['measurement_time']['var_data'] = np_array
             return self
+
 
     def setChannelTags(self):
         """set the channel tags
@@ -274,63 +280,70 @@ class PicassoProc:
 
         return self
 
+
     def preprocessing(self, collect_debug:bool=False):
-        """
-        Preprocessing of Lidar data. Including in the followin processes in order:
-            Dead time correction
-            Background correction
-            Range correction
-            etc. 
+        """Preprocessing of Lidar data. Including in the followin processes in order:
+            1. Deadtime correction
+            2. Background correction
+            3. First-bin shift
+            4. Mask for low-SNR
+            5. Mask for depolarization-calibration process
+            6. Range correction.
         
-        Returns:
-            - Background corrected signal including the background per channel.
-            - Range corrected signal.
-            - etc.
+        Parameters
+        ----------
+        collect_debug : bool
+            If true, collects debug information. Default is False.
+        
+        Yelds
+        -----
+        Background corrected signal including the background per channel.
+        Range corrected signal.
+        etc.
 
         .. TODO:: This is just a first draft for a docstring. Improve it. There is more processes and outputs of the function.        
         """
         preproc_dict = pollyPreprocess.pollyPreprocess(
             self.rawdata_dict,
             deltaT=self.polly_config_dict['deltaT'],
-            flagForceMeasTime = self.polly_config_dict['flagForceMeasTime'],
-            maxHeightBin = self.polly_config_dict['max_height_bin'],
-            firstBinIndex = self.polly_config_dict['first_range_gate_indx'],
-            firstBinHeight = self.polly_config_dict['first_range_gate_height'],
-            pollyType = self.polly_config_dict['name'],
-            flagDeadTimeCorrection = self.polly_config_dict['flagDTCor'],
-            deadtimeCorrectionMode = self.polly_config_dict['dtCorMode'],
-            deadtimeParams = self.polly_config_dict['dt'],
-            flagSigTempCor = self.polly_config_dict['flagSigTempCor'],
-            tempCorFunc = self.polly_config_dict['tempCorFunc'],
-            meteorDataSource = self.polly_config_dict['meteorDataSource'],
-            gdas1Site = self.polly_config_dict['gdas1Site'],
-            gdas1_folder = self.picasso_config_dict['gdas1_folder'],
-            radiosondeSitenum = self.polly_config_dict['radiosondeSitenum'],
-            radiosondeFolder = self.polly_config_dict['radiosondeFolder'],
-            radiosondeType = self.polly_config_dict['radiosondeType'],
-            bgCorrectionIndexLow = self.polly_config_dict['bgCorRangeIndxLow'],
-            bgCorrectionIndexHigh = self.polly_config_dict['bgCorRangeIndxHigh'],
-            asl = self.polly_config_dict['asl'],
-            initialPolAngle = self.polly_config_dict['init_depAng'],
-            maskPolCalAngle = self.polly_config_dict['maskDepCalAng'],
-            minSNRThresh = self.polly_config_dict['mask_SNRmin'],
-            minPC_fog = self.polly_config_dict['minPC_fog'],
-            flagFarRangeChannel = self.polly_config_dict['isFR'],
-            flag532nmChannel = self.polly_config_dict['is532nm'],
-            flagTotalChannel = self.polly_config_dict['isTot'],
-            flag355nmChannel = self.polly_config_dict['is355nm'],
-            flag607nmChannel = self.polly_config_dict['is607nm'],
-            flag387nmChannel = self.polly_config_dict['is387nm'],
-            flag407nmChannel = self.polly_config_dict['is407nm'],
-            flag355nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is355nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
-            flag532nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is532nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
-            flag1064nmRotRaman = np.bitwise_and(np.array(self.polly_config_dict['is1064nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
-            isUseLatestGDAS = self.polly_config_dict['flagUseLatestGDAS'],
+            flagForceMeasTime=self.polly_config_dict['flagForceMeasTime'],
+            maxHeightBin=self.polly_config_dict['max_height_bin'],
+            firstBinIndex=self.polly_config_dict['first_range_gate_indx'],
+            firstBinHeight=self.polly_config_dict['first_range_gate_height'],
+            pollyType=self.polly_config_dict['name'],
+            flagDeadTimeCorrection=self.polly_config_dict['flagDTCor'],
+            deadtimeCorrectionMode=self.polly_config_dict['dtCorMode'],
+            deadtimeParams=self.polly_config_dict['dt'],
+            flagSigTempCor=self.polly_config_dict['flagSigTempCor'],
+            tempCorFunc=self.polly_config_dict['tempCorFunc'],
+            meteorDataSource=self.polly_config_dict['meteorDataSource'],
+            gdas1Site=self.polly_config_dict['gdas1Site'],
+            gdas1_folder=self.picasso_config_dict['gdas1_folder'],
+            radiosondeSitenum=self.polly_config_dict['radiosondeSitenum'],
+            radiosondeFolder=self.polly_config_dict['radiosondeFolder'],
+            radiosondeType=self.polly_config_dict['radiosondeType'],
+            bgCorrectionIndexLow=self.polly_config_dict['bgCorRangeIndxLow'],
+            bgCorrectionIndexHigh=self.polly_config_dict['bgCorRangeIndxHigh'],
+            asl=self.polly_config_dict['asl'],
+            initialPolAngle=self.polly_config_dict['init_depAng'],
+            maskPolCalAngle=self.polly_config_dict['maskDepCalAng'],
+            minSNRThresh=self.polly_config_dict['mask_SNRmin'],
+            minPC_fog=self.polly_config_dict['minPC_fog'],
+            flagFarRangeChannel=self.polly_config_dict['isFR'],
+            flag532nmChannel=self.polly_config_dict['is532nm'],
+            flagTotalChannel=self.polly_config_dict['isTot'],
+            flag355nmChannel=self.polly_config_dict['is355nm'],
+            flag607nmChannel=self.polly_config_dict['is607nm'],
+            flag387nmChannel=self.polly_config_dict['is387nm'],
+            flag407nmChannel=self.polly_config_dict['is407nm'],
+            flag355nmRotRaman=np.bitwise_and(np.array(self.polly_config_dict['is355nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
+            flag532nmRotRaman=np.bitwise_and(np.array(self.polly_config_dict['is532nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
+            flag1064nmRotRaman=np.bitwise_and(np.array(self.polly_config_dict['is1064nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
+            isUseLatestGDAS=self.polly_config_dict['flagUseLatestGDAS'],
             collect_debug=collect_debug,
         )
         self.retrievals_highres.update(preproc_dict)
 
-        return self
 
     def SaturationDetect(self):
         """Saturation Detection
@@ -339,10 +352,9 @@ class PicassoProc:
         """
 
         self.flagSaturation = pollySaturationDetect.pollySaturationDetect(
-            data_cube = self,
-            sigSaturateThresh = self.polly_config_dict['saturate_thresh'])
-
-        return self
+            data_cube=self,
+            sigSaturateThresh=self.polly_config_dict['saturate_thresh']
+        )
 
 
     def polarizationCaliD90(self):
@@ -380,6 +392,7 @@ class PicassoProc:
         """
         self.clFreeGrps = profilesegment.segment(self)
 
+
     def aggregate_profiles(self, var=None):
         """Aggregate highres profiles over cloud free segments
 
@@ -406,6 +419,7 @@ class PicassoProc:
             # Remove empty dict keys (temporarly solution)
             if self.retrievals_profile[var] is None:
                 del self.retrievals_profile[var]
+
 
     def loadMeteo(self):
         """Load meteorological data."""
@@ -555,7 +569,8 @@ class PicassoProc:
         self.retrievals_profile['overlap'] = {}
         self.retrievals_profile['overlap']['frnr'] = overlapEst.run_frnr_cldFreeGrps(self, collect_debug=collect_debug)
         self.retrievals_profile['overlap']['raman'] = overlapEst.run_raman_cldFreeGrps(self, collect_debug=collect_debug)
-    
+
+
     def overlapFixLowestBins(self):
         """the lowest bins are affected by stange near range effects"""
         if not self.polly_config_dict["flagOLCor"]:
@@ -602,6 +617,7 @@ class PicassoProc:
             self.retrievals_profile[ret_prof_name] = depolarization.pardepol_cldFreeGrps(
                 self, ret_prof_name) 
 
+
     def estQualityMask(self):
         """estimate the quality mask
 
@@ -617,6 +633,7 @@ class PicassoProc:
         
             self.retrievals_profile[ret_prof_name] = angstroem.ae_cldFreeGrps(
                 self, ret_prof_name) 
+
 
     def LidarCalibration(self, collect_debug:bool=False):
         """calculate the lidar constant
@@ -671,6 +688,7 @@ class PicassoProc:
         quasi.quasi_angstrom(self, version='V1')
         quasi.target_cat(self, version='V1')
 
+
     def quasiV2(self):
         """quasiV2 retrivals and target categorisation.
         """
@@ -679,6 +697,7 @@ class PicassoProc:
         quasi.quasi_pdr(self, version='V2')
         quasi.quasi_angstrom(self, version='V2')
         quasi.target_cat(self, version='V2')
+
 
     def write_2_sql_db(self, parameter:str, db_path:str|None=None, method:str|None=None):
         """ write LC or eta to sqlite db table
@@ -727,6 +746,7 @@ class PicassoProc:
 
         sql_db.write_rows_to_sql_db(db_path, table_name, column_names, rows_to_insert)
 
+
     def read_calibration_db(self, db_path:str|None=None):
         """read the calibration constants from database
         
@@ -744,7 +764,6 @@ class PicassoProc:
         table_name = 'depol_calibration_constant'
         self.pol_cali.update(sql_db.get_from_sql_db(db_path, table_name, ts_interval))
         
-
 
     def adding_retrieving_infos_2_polly_config_dict(self):
         """ some infos from the polly_config_dict should have there own keys, e.g. reference_search_range
@@ -768,8 +787,10 @@ class PicassoProc:
     
         return self
 
+
 #    def __str__(self):
 #        return f"{self.rawdata_dict}"
+
 
     def __del__(self):
         type(self).counter -= 1
