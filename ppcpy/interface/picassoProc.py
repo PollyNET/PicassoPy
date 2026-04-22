@@ -341,6 +341,7 @@ class PicassoProc:
             flag1064nmRotRaman=np.bitwise_and(np.array(self.polly_config_dict['is1064nm']), np.array(self.polly_config_dict['isRR'])).tolist(),
             isUseLatestGDAS=self.polly_config_dict['flagUseLatestGDAS'],
             collect_debug=collect_debug,
+            flagPicassoComparison=self.polly_config_dict['flagPicassoComparison'],
         )
         self.retrievals_highres.update(preproc_dict)
 

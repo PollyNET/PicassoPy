@@ -2,7 +2,7 @@
 
 import numpy as np
 
-def calc_snr(signal, bg):
+def calc_snr(signal:np.ndarray, bg:np.ndarray) -> np.ndarray:
     """Calculate signal-to-noise ratio (SNR).
 
     .. TODO:: 
@@ -11,14 +11,14 @@ def calc_snr(signal, bg):
 
     Parameters
     ----------
-    signal : numpy.ndarray
+    signal : ndarray
         Signal strength.
-    bg : numpy.ndarray
+    bg : ndarray
         Background noise. 
 
     Returns
     -------
-    SNR : numpy.ndarray
+    SNR : ndarray
         Signal-to-noise ratio. For negative signal values, the SNR is set to 0.
 
     References

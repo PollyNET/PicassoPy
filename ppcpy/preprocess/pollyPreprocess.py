@@ -12,6 +12,94 @@ from multiprocessing import Pool, cpu_count
 from ppcpy.retrievals.collection import calc_snr
 
 
+def photonCount2PCR(signal:np.ndarray, mShots:np.ndarray, hRes:float) -> np.ndarray:
+    """Compute PCR from photon counts.
+
+        PCR = (c * signal)/(2 * hRes * mShots)
+
+    Parameters
+    ----------
+    signal : ndarray
+        Signal [Photon Count] (shape: [M, N, P]).
+    mShots : ndarray 
+        Mesurments shots [counts] (shape: [M, P]).
+    hRes : float
+        Reight or range resolution [m].
+    
+    Returns
+    -------
+    PCR : ndarray
+        Photon count rate signal [MCPS].
+
+    Note
+    ----
+    - The speed of light `c` is given in meter per microsecond to directly get MCPS.
+    """
+    c = 3e2 # meter / microsecond
+    PCR = (c * signal)/(2 * hRes * mShots[:, np.newaxis, :])
+    return PCR
+
+
+def PCR2PhotonCount(PCR:np.ndarray, mShots:np.ndarray, hRes:float) -> np.ndarray:
+    """Compute photon counts from PCR.
+
+        photonCount = 2 * PCR * mShot * hRes / c
+
+    Parameters
+    ----------
+    PCR : ndarray
+        Photon count rate signal [MCPS] (shape: [M, N, P]).
+    mShots : ndarray 
+        Mesurments shots [counts] (shape: [M, P]).
+    hRes : float
+        Reight or range resolution [m].
+    
+    Returns
+    -------
+    photonCount : ndarray
+        Signal [Photon Count] (shape: [M, N, P]).
+
+    Note
+    ----
+    - The speed of light `c` is given in meter per microsecond to directly translate form MCPS.
+    """
+    c = 3e2 # meter / microsecond
+    photonCount = 2 * hRes * PCR * mShots[:, np.newaxis, :] / c
+    return photonCount
+
+
+def compute_channel_photon_count(args:tuple) -> np.ndarray:
+    """Computes Photon count from PCR for a single channel.
+
+        Photons = 2 * PCR * mShot * hRes / c
+
+    Parameters
+    ----------
+    args : tuple
+        PCR : ndarray
+            Photon Count Rate signal [MCPS] (shape: [M, N, P]).
+        mShots : ndarray[time, channels]
+            Mesurments shots [counts] (shape: [M, P]).
+        scale_factor : flaot
+            Scaling factor for the computation: c / (2 * hRes).
+        channel_index : int
+            Index of the channel to compute the PCR for.
+
+    Returns
+    -------
+    ndarray
+        Computed PCR for the given channel (shape: [M, N, P]).
+    
+    Notes
+    -----
+    .. TODO:: change scale factor with hRes and include c/2 as a part
+              of the function. Could even add an flag option for MCPS or CPS.
+    """
+
+    PCR, mShots, scale_factor, ch = args
+    return PCR[:, :, ch] * mShots[:, np.newaxis, ch] / scale_factor
+
+
 def compute_channel_pcr(args:tuple) -> np.ndarray:
     """Computes PCR for a single channel.
 
@@ -25,7 +113,7 @@ def compute_channel_pcr(args:tuple) -> np.ndarray:
         mShots : ndarray[time, channels]
             Mesurments shots [counts] (shape: [M, P]).
         scale_factor : flaot
-            Scaling factor for the computation: c/(2*hRes).
+            Scaling factor for the computation: c / (2 * hRes).
         channel_index : int
             Index of the channel to compute the PCR for.
 
@@ -128,17 +216,13 @@ def faster_polyval(p:np.ndarray, x:float|np.ndarray) -> float|np.ndarray:
 
 
 #@profile
-def pollyDTCor(rawSignal:np.ndarray, mShots:np.ndarray, hRes:float, **varargin:dict) -> np.ndarray:
+def pollyDTCor(PCR:np.ndarray, **varargin:dict) -> np.ndarray:
     """Dead Time Correction.
 
     Parameters
     ----------
-    rawSignal : ndarray
-        Raw signal [Photon counts].
-    mShots : ndarray
-        Number of measurment shots for each profile.
-    hRes : ndarray
-        Height resolution [m].
+    PCR : ndarray
+        Photon count rate signal [MCPS].
     
     Keyword arguments
     -----------------
@@ -154,14 +238,14 @@ def pollyDTCor(rawSignal:np.ndarray, mShots:np.ndarray, hRes:float, **varargin:d
             3: paralyzable correction with user defined parameters,
             4: no deadtime correction,
     deadtimeParams : list
-        Deadtime parameters from config-file. Default is [].
+        Deadtime parameters from config-file at MCPS scale. Default is [].
     deadtime : list
-        Deadtime parameters from level0 nc-file. Default is [].
+        Deadtime parameters from level0 nc-file at MCPS scale. Default is [].
     
     Returns
     -------
-    signalDTCor : ndarray
-        Dead time corrected signal [Photon counts].
+    PCR_DTCor : ndarray
+        Dead time corrected photon count rate signal [MCPS].
 
     Notes
     -----
@@ -170,93 +254,55 @@ def pollyDTCor(rawSignal:np.ndarray, mShots:np.ndarray, hRes:float, **varargin:d
     """
 
     ## Defining default values for param keys (key initialization), if not explictly defined when calling the function
-    polly_device = varargin.get('device', False)
+    polly_device = varargin.get('device', False) # <-- is this needed??
     flagDeadTimeCorrection = varargin.get('flagDeadTimeCorrection', False)
     DeadTimeCorrectionMode = varargin.get('DeadTimeCorrectionMode', 2)
     deadtimeParams = varargin.get('deadtimeParams', [])
     deadtime = varargin.get('deadtime', [])
 
-    # print('mShots', np.all(mShots[:, 0] == mShots[0, 0]), mShots[0, 0], np.min(mShots[:, 0]), np.max(mShots[:, 0]))
-    if not np.all(mShots[:, 0] == mShots[0, 0]):
-        logging.warning(f"... mShots not constant min {np.min(mShots)} max {np.max(mShots)}")
-    mShots_norm = np.repeat(np.mean(mShots, axis=0)[np.newaxis, :], mShots.shape[0], axis=0)
-    print('mShots_norm', mShots_norm.shape, 'mShots_norm', mShots_norm[0, :])
-
     logging.info(f'... Deadtime-correction (Mode: {DeadTimeCorrectionMode})')
 
-    Nchannels = mShots.shape[1]
-
-    scale_factor = 150.0 / hRes
-
-    ## convert photon counts to Photon-Count-Rate PCR [MHz]
-    # start_time_command1 = time.time()
-    # compute_pcr(rawSignal.astype(np.float64), mShots.astype(np.float64), scale_factor, PCR)
-    # Compute PCR in parallel
-    # end_time_command1 = time.time()
-    # elapsed_time_command1 = end_time_command1 - start_time_command1
-    # print(f"Time taken: {elapsed_time_command1:.4f} seconds")
-    PCR = rawSignal * scale_factor / mShots[:, np.newaxis, :]
-    #PCR_Cor = np.zeros_like(PCR)
-    signalDTCor = np.zeros_like(PCR)
+    Nchannels = PCR.shape[-1]
+    PCR_DTCor = np.zeros_like(PCR)
 
     ## Deadtime correction
     if flagDeadTimeCorrection:
-
         ## polynomial correction with parameters saved in the level0 netcdf-file under variable 'deadtime_polynomial'
         if DeadTimeCorrectionMode == 1:
             for iCh in range(Nchannels):
-                # Extract polynomial coefficients for the channel and reverse their order
-                # coeffs = deadtime[:, iCh][::-1]                                           # <-- Not used
-                # PCR_Cor[:, :, iCh] = np.polyval(deadtime[:, iCh][::-1], PCR[:, :, iCh])
-                # PCR_Cor[:, :, iCh] = faster_polyval(deadtime[:, iCh], PCR[:, :, iCh])
-                # signalDTCor[:, :, iCh] = PCR_Cor[:, :, iCh] * mShots_norm[:, np.newaxis, iCh] / (150./hRes)
-                signalDTCor[:, :, iCh] = faster_polyval(deadtime[:, iCh], PCR[:, :, iCh]) * mShots_norm[:, np.newaxis, iCh] / scale_factor
-
+                PCR_DTCor[:, :, iCh] = faster_polyval(deadtime[:, iCh], PCR[:, :, iCh])
 
         ## nonparalyzable correction: PCR_cor = PCR / (1 - tau*PCR), with tau beeing the dead-time
         ## reading from polly-config file under key 'dT' (only the first value from each channel)
         elif DeadTimeCorrectionMode == 2:
             for iCh in range(Nchannels):
-                # PCR_Cor[:, :, iCh] = PCR[:, :, iCh] / (1.0 - deadtimeParams[iCh][0] * 10**(-3) * PCR[:, :, iCh])
-                # signalDTCor[:, :, iCh] = PCR_Cor[:, :, iCh] * mShots_norm[:, np.newaxis, iCh] / scale_factor
-                signalDTCor[:, :, iCh] = PCR[:, :, iCh] / (1.0 - deadtimeParams[iCh][0] * 10**(-3) * PCR[:, :, iCh]) * mShots_norm[:, np.newaxis, iCh] / scale_factor
-
+                PCR_DTCor[:, :, iCh] = PCR[:, :, iCh] / (1.0 - deadtimeParams[iCh][0] * 10**(-3) * PCR[:, :, iCh])
 
         ## user defined deadtime, reading from polly-config file under key 'dT' (the whole matrix, polynome) 
         elif DeadTimeCorrectionMode == 3:
             if np.array(deadtimeParams).size != 0:
-                # deadtimeParams=np.array(deadtimeParams)
-                # signal_out = np.zeros_like(PCR)
-                # process_signal(PCR, mShots.astype(np.float64), deadtimeParams, Nchannels, scale_factor, signal_out)
-                # PCR_Cor = PCR
-                # Pre-extract polynomial coefficients for all channels and reverse their order
                 coeffs_matrix = np.array([np.array(deadtimeParams[ch][::-1]) for ch in range(Nchannels)])
                 for iCh in range(Nchannels):
-                    # Evaluate the polynomial for the current channel
-                    # PCR_Cor[:, :, iCh] = np.polyval(coeffs_matrix[iCh], PCR[:, :, iCh])
-                    # PCR_Cor[:, :, iCh] = faster_polyval(coeffs_matrix[iCh][::-1], PCR[:, :, iCh])
-                    # signalDTCor[:, :, iCh] = PCR_Cor[:, :, iCh] * mShots_norm[:, np.newaxis, iCh] / scale_factor
-                    signalDTCor[:, :, iCh] = faster_polyval(coeffs_matrix[iCh][::-1], PCR[:, :, iCh]) * mShots_norm[:, np.newaxis, iCh] / scale_factor
+                    PCR_DTCor[:, :, iCh] = faster_polyval(coeffs_matrix[iCh][::-1], PCR[:, :, iCh])
             else:
                 logging.warning(f'User defined deadtime parameters were not found in polly-config file.')
                 logging.warning(f'In order to continue the current processing, deadtime correction will not be implemented.')
 
         ## No deadtime correction
         elif DeadTimeCorrectionMode == 4:
-            signalDTCor = rawSignal.astype(np.float64)
+            PCR_DTCor = PCR.astype(np.float64)
             logging.warning(f'Deadtime correction was turned off. Be careful to check the signal strength.')
 
         else:
             logging.error(f'Unknow deadtime correction setting! Please go back to check the configuration.')
             logging.error(f'For deadtimeCorrectionMode, only 1-4 is allowed.')
     
-    ## flagDeadTimeCorrection = False
+    ## flagDeadTimeCorrection equals False
     else:
-        signalDTCor = rawSignal.astype(np.float64)
+        PCR_DTCor = PCR.astype(np.float64)
         logging.warning(f'Deadtime correction was turned off. Be careful to check the signal strength.')
 
-    # return PCR_Cor, signalDTCor
-    return signalDTCor
+    return PCR_DTCor
 
 
 def pollyRemoveBG(rawSignal:np.ndarray, bgCorrectionIndexLow:list, bgCorrectionIndexHigh:list,
@@ -266,22 +312,22 @@ def pollyRemoveBG(rawSignal:np.ndarray, bgCorrectionIndexLow:list, bgCorrectionI
     Parameters
     ----------
     rawSignal : ndarray
-        Lidar Signal to be processed
+        Signal to be processed [MCPS or Photon counts].
     bgCorrectionIndexLow : list of int
-        lower index of background noise per channel
+        Lower index of background noise per channel.
     bgCorrectionIndexHigh : list of int
-        upper index of background noise per channel
+        Upper index of background noise per channel.
     maxHeightBin : int
-        maximum height bin index (default: 3000)
+        Maximum height bin index. Default is 3000).
     firstBinIndex : list of int
-        first height bin index per channel (default: 0 per chanel)
+        First height bin index per channel. Default is 0 per channel.
 
     Returns
     -------
     signal_out : ndarray
-        Background corrected signal
+        Background corrected signal [MCPs or Photon counts].
     bg : ndarray
-        Removed background noise
+        Removed background noise [MCPS or Photon counts].
     """
 
     logging.info(f'... removing background from signal')
@@ -307,16 +353,16 @@ def slicerange(array:np.ndarray, maxHeightBin:int, firstBinIndex:list) -> np.nda
     Parameters
     ----------
     array : ndarray
-        array to be sliced
+        Array to be sliced.
     maxHeightBin : int
-        length of slice
+        Length of slice.
     firstBinIndex : list of int
-        start hight/range index of slice per channel
+        Start hight/range index of slice per channel.
 
     Returns
     -------
     out : ndarray
-        sliced array
+        Sliced array.
     """
 
     assert len(firstBinIndex) == array.shape[2], f"first bin index and array do not match {len(firstBinIndex)}, {array.shape}"
@@ -468,7 +514,7 @@ def calculate_rcs(signal:np.ndarray, ranges:np.ndarray) -> np.ndarray:
     return RCS
 
 
-def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict) -> dict:
+def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, flagPicassoComparison:bool=False, **param:dict) -> dict:
     """Preprocessing of Lidar-data.
 
     Includes the following processes in order:
@@ -481,7 +527,7 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict) -
     
     Parameters
     ----------
-    rawdata_dict : struct
+    rawdata_dict : dict
         rawSignal : ndarray
             Signal [Photon Count].
         mShots : ndarray
@@ -501,37 +547,39 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict) -
             Measurement site.
     collect_debug : bool
         If true, collects debug information. Default is False.
+    flagPicassoComparison : bool
+        If true, use Picasso values and logic.
     
     Keyword arguments
     -----------------
-    deltaT : numeric
-        integration time (in seconds) for single profile. Default is 30.
-    flagForceMeasTime : logical
-        flag to control whether to align measurement time with file creation
+    deltaT : float
+        Integration time (in seconds) for single profile. Default is 30.
+    flagForceMeasTime : bool
+        Flag to control whether to align measurement time with file creation
         time, instead of taking the measurement time in the data file.
         Default is False.
-    maxHeightBin : numeric
+    maxHeightBin : int
         Number of range bins to read out from data file. Default is 3000.
-    firstBinIndex : numeric
+    firstBinIndex : int
         Index of first bin to read out. Default is 1.
-    pollyType : char
+    pollyType : str
         Polly version. Default is 'arielle'.
-    flagDeadTimeCorrection : logical
+    flagDeadTimeCorrection : bool
         Flag to control whether to apply deadtime correction. Default is False.
-    deadtimeCorrectionMode : numeric
+    deadtimeCorrectionMode : int
         Deadtime correction mode. Default is 2.
             1: polynomial correction with parameters saved in data file.
-            2: non-paralyzable correction
-            3: polynomail correction with user defined parameters
-            4: disable deadtime correction
-    deadtimeParams : numeric
+            2: non-paralyzable correction.
+            3: polynomail correction with user defined parameters.
+            4: disable deadtime correction.
+    deadtimeParams : list
         Deadtime parameters. Default is [].
-    flagSigTempCor : logical
+    flagSigTempCor : bool
         Flag to implement signal temperature correction.
-    tempCorFunc : cell
+    tempCorFunc : list
         Symbolic function for signal temperature correction.
         "1": no correction
-        "exp(-0.001*T)": exponential correction function. (Unit: Kelvin)
+        "exp(-0.001*T)": exponential correction function [K].
     meteorDataSource : str
         Meteorological data type.
         e.g., 'gdas1'(default), 'standard_atmosphere', 'websonde', 'radiosonde'
@@ -539,51 +587,51 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict) -
         The GDAS1 site for the current campaign.
     meteo_folder : str
         The main folder of the GDAS1 profiles.
-    radiosondeSitenum : integer
+    radiosondeSitenum : int
         Site number, which can be found in 
         doc/radiosonde-station-list.txt.
     radiosondeFolder : str
         The folder of the sonding files.
-    radiosondeType : integer
-        File type of the radiosonde file.
-        - 1: radiosonde file for MOSAiC (default).
+    radiosondeType : int
+        File type of the radiosonde file. Default is 1.
+        - 1: radiosonde file for MOSAiC.
         - 2: radiosonde file for MUA.
-    bgCorrectionIndexLow : 1-dim. array
+    bgCorrectionIndexLow : list
         Base indecis of bins for background estimation.
         Defults is [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10].
-    bgCorrectionIndexHigh : 1-dim. array
+    bgCorrectionIndexHigh : list
         Top index of bins for background estimation.
         Defults is [240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240].
-    asl : numeric
+    asl : float
         Above sea level in meters. Default is 0.
-    initialPolAngle : numeric
+    initialPolAngle : float
         Initial polarization angle of the polarizer for polarization
         calibration. Default is 0.
-    maskPolCalAngle : cell
+    maskPolCalAngle : list
         Mask for positive and negative calibration angle of the polarizer, in
         which 'p' stands for positive angle, while 'n' for negative angle.
-        Default is {}.
-    minSNRThresh : numeric
+        Default is [].
+    minSNRThresh : list
         Lower bound of signal-noise ratio.
-    minPC_fog : numeric
+    minPC_fog : float
         Minimun number of photon count after strong attenuation by fog.
-    flagFarRangeChannel : logical
+    flagFarRangeChannel : list
         Flags of far-range channel.
-    flag532nmChannel : logical
+    flag532nmChannel : list
         Flags of channels with central wavelength (CW) at 532 nm.
-    flagTotalChannel : logical
+    flagTotalChannel : list
         Flags of channels receiving total elastic signal.
-    flag355nmChannel : logical
+    flag355nmChannel : list
         Flags of channels with CW at 355 nm.
-    flag607nmChannel : logical
+    flag607nmChannel : list
         Flags of channels with CW at 607 nm.
-    flag387nmChannel : logical
+    flag387nmChannel : list
         Flags of channels with CW at 387 nm.
-    flag407nmChannel : logical
+    flag407nmChannel : list
         Flags of channels with CW at 407 nm.
-    flag532nmRotRaman : logical
+    flag532nmRotRaman : list
         Flags of rotational Raman channels with CW at 532 nm.
-    flag1064nmRotRaman : logical
+    flag1064nmRotRaman : list
         Flags of rotational Raman channels with CW at 1064 nm.
     
     Returns
@@ -604,9 +652,9 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict) -
             Laser pulse repetition rate [s^-1].
         hRes : float
             Spatial resolution [m].
-        mSite : string
+        mSite : str
             Measurement site.
-        deadtime : matrix (channel x polynomial_orders)
+        deadtime : ndarray (channel x polynomial_orders)
             Deadtime correction parameters.
         signal : ndarray
             Background removed signal.
@@ -614,32 +662,43 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict) -
             Background.
         height : ndarray
             Height [m].
-        lowSNRMask : logical
+        lowSNRMask : ndarray
             If SNR less SNRmin, mask is set True. Otherwise, False.
-        depCalMask : logical
+        depCalMask : ndarray
             If polly was doing polarization calibration, depCalMask is set
             True. Otherwise, False.
-        fogMask : logical
+        fogMask : ndarray
             If it is foggy which means the signal will be very weak, 
             fogMask will be set True. Otherwise, False.
-        mask607Off : logical
+        mask607Off : ndarray
             Mask of PMT on/off status at 607 nm channel.
-        mask387Off : logical
+        mask387Off : ndarray
             Mask of PMT on/off status at 387 nm channel.
-        mask407Off : logical
+        mask407Off : ndarray
             Mask of PMT on/off status at 407 nm channel.
-        mask355RROff : logical
+        mask355RROff : ndarray
             Mask of PMT on/off status at 355 nm rotational Raman channel.
-        mask532RROff : logical
+        mask532RROff : ndarray
             Mask of PMT on/off status at 532 nm rotational Raman channel.
-        mask1064RROff : logical
+        mask1064RROff : ndarray
             Mask of PMT on/off status at 1064 nm rotational Raman channel.
     
     Notes
     -----
     .. TODO:: Revamp docstring.
     .. TODO:: Rewrite the function, and get rid of all unecessary comments. 
+              Could use the same logic as for the rest of the processing ie. Send
+              the PicassoProc object in as an input and then extract the info needed at
+              the start as it is already done. Example:
+                    config_dict = data_cube.polly_config_dict
+                    raw_dict = data_cube.rawdata_dict
+                    etc.
+              Would need to define the default values somwhere than.
     .. TODO:: Change to PCR in pre-range corrected space.
+    .. TODO:: Move this function up. This should be the first function in the file to match 
+              the structure of the rest of the processing chain.
+    .. TODO:: change to PCR before DT correctiong and then use PCR for the rest of the processing
+              I could also save both PCR and Photon Count version of signals. 
 
     **History**
 
@@ -653,6 +712,9 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict) -
 
     logging.info('starting data preprocessing...')
 
+    # print all of the large arrays to screen, not only starts and ends of an array
+    np.set_printoptions(threshold=np.inf)
+
     ## Extracting data from rawdata_dict
     rawSignal = rawdata_dict['raw_signal']['var_data']
     mShots = rawdata_dict['measurement_shots']['var_data']
@@ -665,9 +727,6 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict) -
 
     data_dict = {}
     
-    ## print all of the large arrays to screen, not only starts and ends of an array
-    np.set_printoptions(threshold=np.inf)
-
     ## converting raw-mTime format from [YYYYMMDD seconds-of-day] to unixtimestamp-format
     logging.info(f'... time conversion')
     date_string = str(mTime[0][0])
@@ -677,7 +736,9 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict) -
     DD = int(date_string[6:8])
     datetime_obj = datetime.datetime(YYYY, MM, DD)
     mTime_obj = [
-        datetime_obj.replace(tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=int(s)) for s in seconds_of_day]
+        datetime_obj.replace(tzinfo=datetime.timezone.utc) +\
+              datetime.timedelta(seconds=int(s)) for s in seconds_of_day
+    ]
     mTime_str = [dt.strftime('%Y%m%d %H:%M:%S') for dt in mTime_obj]
 
     # Convert to Unix timestamp
@@ -720,16 +781,7 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict) -
     flag1064nmRotRaman = param.get('flag1064nmRotRaman', False)
     isUseLatestGDAS = param.get('isUseLatestGDAS', False)
 
-    ##### Picasso code:
-    # % Determine whether number of range bins is out of range
-    # if (max(config.maxHeightBin + config.firstBinIndex - 1) > size(data.rawSignal, 2))
-    #     warning('maxHeightBin or firstBinIndex is out of range.\nTotal number of range bin is %d.\nmaxHeightBin is
-    #     %d\nfirstBinIndex is %d\n', size(data.rawSignal, 2), config.maxHeightBin, config.firstBinIndex);
-    #     fprintf('Set maxHeightBin and firstBinIndex to default values.\n');
-    #     config.maxHeightBin = ones(1, size(data.rawSignal, 1));
-    #     config.firstBinIndex = 251;
-    # end
-    ##### Unsure what this is?
+    # ## .. TODO:: What does this part do and why is it omited?
     #     logging.info(f'Total number of range bin is: {len(rawSignal[0])}\nmaxHeightBin is: {maxHeightBin}\nfirstBinIndex is {firstBinIndex}.')
     #     if (maxHeightBin + np.max(firstBinIndex) -1) > len(rawSignal[0]):
     #         logging.warning(f'maxHeightBin or firstBinIndex is out of range. Total number of range bin is: {len(rawSignal[0])}\nmaxHeightBin is: {maxHeightBin}\nfirstBinIndex is {firstBinIndex}.')
@@ -738,59 +790,75 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict) -
     #         logging.info(f'maxHeightBin: {maxHeightBin}')
     #         firstBinIndex = 251
 
-    mShotsPerPrf = deltaT * repRate
-    if len(mTime) > 1:
-        # nInt = np.round(deltaT / (np.nanmean(np.diff(np.array(mTime[:, 1]))) * 24 * 3600)) ## number of profiles to be integrated. Usually, 600 shots per 30 s
-        nInt = np.round(deltaT / (np.nanmean(np.diff(np.array(mTime[:, 1]))))) ## number of profiles to be integrated. Usually, 600 shots per 30 s
-    else:
-        nInt = np.round(mShotsPerPrf / np.nanmean(np.array(mShots[0, :])))
+    # ## .. TODO:: This part is currently not used! Should we use it?
+    # mShotsPerPrf = deltaT * repRate
+    # if len(mTime) > 1:
+    #     # nInt = np.round(deltaT / (np.nanmean(np.diff(np.array(mTime[:, 1]))) * 24 * 3600)) ## number of profiles to be integrated. Usually, 600 shots per 30 s
+    #     nInt = np.round(deltaT / (np.nanmean(np.diff(np.array(mTime[:, 1]))))) ## number of profiles to be integrated. Usually, 600 shots per 30 s
+    # else:
+    #     nInt = np.round(mShotsPerPrf / np.nanmean(np.array(mShots[0, :])))
 
 
-    # ----------------------------------------------------
+    # ------------------------------------------------------------------------
+    # Transform to Photon Count Rate (MCPS)
+    # ------------------------------------------------------------------------
+    if not np.all(mShots[:, 0] == mShots[0, 0]):
+        logging.warning(f"... mShots not constant min {np.min(mShots)} max {np.max(mShots)}")
+    mShots_norm = np.repeat(np.mean(mShots, axis=0)[np.newaxis, :], mShots.shape[0], axis=0)
+    PCR = photonCount2PCR(rawSignal, mShots, hRes) # Use mShots directly
+    # PCR = photonCount2PCR(rawSignal, mShots_norm, hRes) # Use mean mShots per channel
+
+
+    # ------------------------------------------------------------------------
     # Deadtime correction
-    # ----------------------------------------------------
-    # PCR_Cor, preproSignal = pollyDTCor(rawSignal = rawSignal,
+    # ------------------------------------------------------------------------
     preproSignal = pollyDTCor(
-        rawSignal=rawSignal,
-        mShots=mShots,
-        hRes=hRes, 
+        PCR=PCR,
         polly_device=pollyType,
-        flagDeadTimeCorrection=flagDeadTimeCorrection, 
+        flagDeadTimeCorrection=flagDeadTimeCorrection,
         DeadTimeCorrectionMode=deadtimeCorrectionMode,
         deadtimeParams=deadtimeParams,
         deadtime=rawdata_dict['deadtime_polynomial']['var_data']
     )
-    # most likely the preprocesssed deadtime corrected signal can be omitted
-    if collect_debug:
-        # data_dict['PCR_cor'] = PCR_Cor
-        data_dict['preproSignal'] = preproSignal 
-    # data_dict['PCR_slice'] = slicerange(PCR_Cor, maxHeightBin, firstBinIndex)
 
-    # ----------------------------------------------------
+    if flagPicassoComparison:
+        # preproSignal = PCR2PhotonCount(preproSignal, mShots, hRes) # Use mShots directly
+        preproSignal = PCR2PhotonCount(preproSignal, mShots_norm, hRes) # Use mean mShots per channel
+    
+    if collect_debug:
+        # Store dead time corrected signal
+        data_dict['preproSignal'] = preproSignal
+
+
+    # ------------------------------------------------------------------------
     # Background Correction
-    # ----------------------------------------------------
+    # ------------------------------------------------------------------------
     sigBGCor, bg =  pollyRemoveBG(
         rawSignal=preproSignal,
         bgCorrectionIndexLow=bgCorrectionIndexLow,
-        bgCorrectionIndexHigh=bgCorrectionIndexHigh, 
+        bgCorrectionIndexHigh=bgCorrectionIndexHigh,
         maxHeightBin=maxHeightBin,
         firstBinIndex=firstBinIndex
     )
+    # Store the background and background corrected signal
     data_dict['BG'] = bg[:, 1, :] ## reshaping the3-dim. BG-matrix to 2-dim matrix
-    # Store the background corrected signal
-    data_dict['sigBGCor'] = sigBGCor 
+    data_dict['sigBGCor'] = sigBGCor
 
-    # ----------------------------------------------------
+
+    # ------------------------------------------------------------------------
     # Height and first bin height correction
-    # ----------------------------------------------------
+    # ------------------------------------------------------------------------
     logging.info('... height bin calculations')
-    # TODO first bin hight might change for different telescopes...
+    # .. TODO:: first bin hight might change for different telescopes... --> should expand range to be channel spesific.
     data_dict['range'] = np.arange(0, sigBGCor.shape[1]) * hRes + firstBinHeight[0]
     data_dict['height'] = data_dict['range'].copy() * np.cos(zenithAng*np.pi/180)
 
-    correction_firstBinHight = ((
-        (np.arange(0, sigBGCor.shape[1]) * hRes)[:,np.newaxis] + firstBinHeight)**2
-        / data_dict['range'][:,np.newaxis]**2)
+    # correction firstBinHight = range per channel ^ 2 / range first channel ^ 2
+    correction_firstBinHight = (
+        ((np.arange(0, sigBGCor.shape[1]) * hRes)[:, np.newaxis] + firstBinHeight)**2
+        / data_dict['range'][:, np.newaxis]**2
+    )
+
     data_dict['sigBGCor'] = data_dict['sigBGCor'] * correction_firstBinHight[np.newaxis, :, :]
 
     data_dict['alt'] = data_dict['height'] + float(asl) ## geopotential height
@@ -798,71 +866,67 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict) -
     data_dict['time64'] = np.array([np.datetime64(t) for t in mTime_obj])
 
 
-    # ----------------------------------------------------
+    # ------------------------------------------------------------------------
     # Mask for bins with low SNR
-    # ----------------------------------------------------
+    # ------------------------------------------------------------------------
     logging.info('... mask bins with low SNR')
-    SNR = calc_snr(sigBGCor, bg)
+    # SNR = calc_snr(sigBGCor, bg) # This do not consider the correction for different first bin heights.
+    SNR = calc_snr(data_dict['sigBGCor'], bg)
     data_dict['SNR'] = SNR
 
-    ## create mask and mask every entry, where SNR < minSNRThresh
-    # data_dict['lowSNRMask'] = np.ma.array(np.zeros(sigBGCor.shape, dtype=bool), mask=np.ones(sigBGCor.shape, dtype=bool))
-    # a plain bool mask should be faster. Let's give it a try
+    ## Create mask and mask every entry, where SNR < minSNRThresh 
+    # .. TODO:: check the low SNR mask
     data_dict['lowSNRMask'] = np.zeros_like(sigBGCor).astype(bool)
-
     for iCh in range(0, sigBGCor.shape[2]):
-        #data_dict['lowSNRMask'][:,:,iCh].mask = SNR[:,:,iCh].data < minSNRThresh[iCh]
-        #data_dict['lowSNRMask'][:,:,iCh] = np.ma.masked_where(SNR[:,:,iCh].data < minSNRThresh[iCh], SNR[:,:,iCh])
-        data_dict['lowSNRMask'][:,:,iCh][SNR[:,:,iCh] < minSNRThresh[iCh]] = True
-    # TODO check the low SNR mask
+        data_dict['lowSNRMask'][:, :, iCh][SNR[:, :, iCh] < minSNRThresh[iCh]] = True
 
-    # TODO mask for laser shutter?
+    # .. TODO:: mask for laser shutter?
     flag532FR = (np.array(flag532nmChannel) & np.array(flagFarRangeChannel) & np.array(flagTotalChannel)).astype(bool)
     flag355FR = (np.array(flag355nmChannel) & np.array(flagFarRangeChannel) & np.array(flagTotalChannel)).astype(bool)
-    print('flag 532 FR', flag532FR)
-    print('flag 355 FR', flag355FR)
 
     if any(flag532FR):
-        data_dict['shutterOnMask'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag532FR]))
+        data_dict['shutterOnMask'] = any_signal(np.squeeze(data_dict['sigBGCor'][:, :, flag532FR]))
     elif any(flag355FR):
-        data_dict['shutterOnMask'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag355FR]))
+        data_dict['shutterOnMask'] = any_signal(np.squeeze(data_dict['sigBGCor'][:, :, flag355FR]))
     else:
-        raise ValueError('No suitable channel to determine the shutter status')
+        raise ValueError('No suitable channel to determine the shutter status.')
 
-    # TODO mask for fog?
-    # the original matlab code raises questions. Why 40:120 and why hard coded?
+    ## Create Fog mask
+    # .. TODO:: mask for fog? the original matlab code raises questions. Why 40:120 and why hard coded?
     # When sum is used (as in matlab), minPC_fog is range resolution dependent
-    fogsum = np.sum(np.squeeze(data_dict['sigBGCor'][:,39:120,flag532FR]), axis=1)
+    fogsum = np.sum(np.squeeze(data_dict['sigBGCor'][:, 39:120, flag532FR]), axis=1)
     data_dict['fogMask'] = fogsum < minPC_fog 
 
-    # TODO mask for single channels on 607, 387, 407, 355RR 532RR 1064RR
+    ## Create single channel masks
+    # .. TODO:: mask for single channels on 607, 387, 407, 355RR 532RR 1064RR
     flag607FR = (np.array(flag607nmChannel) & np.array(flagFarRangeChannel)).astype(bool)
     if any(flag607FR):
-        data_dict['mask607Off'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag607FR]))
+        data_dict['mask607Off'] = any_signal(np.squeeze(data_dict['sigBGCor'][:, :, flag607FR]))
 
     flag387FR = (np.array(flag387nmChannel) & np.array(flagFarRangeChannel)).astype(bool)
     if any(flag387FR):
-        data_dict['mask387Off'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag387FR]))
+        data_dict['mask387Off'] = any_signal(np.squeeze(data_dict['sigBGCor'][:, :, flag387FR]))
 
     flag407FR = (np.array(flag407nmChannel) & np.array(flagFarRangeChannel)).astype(bool)
     if any(flag407FR):
-        data_dict['mask407Off'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag407FR]))
+        data_dict['mask407Off'] = any_signal(np.squeeze(data_dict['sigBGCor'][:, :, flag407FR]))
 
     flag355RRFR = (np.array(flag355nmRotRaman) & np.array(flagFarRangeChannel)).astype(bool)
     if any(flag355RRFR):
-        data_dict['mask355_RROff'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag355RRFR]))
+        data_dict['mask355_RROff'] = any_signal(np.squeeze(data_dict['sigBGCor'][:, :, flag355RRFR]))
 
     flag532RRFR = (np.array(flag532nmRotRaman) & np.array(flagFarRangeChannel)).astype(bool)
     if any(flag532RRFR):
-        data_dict['mask532_RROff'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag532RRFR]))
+        data_dict['mask532_RROff'] = any_signal(np.squeeze(data_dict['sigBGCor'][:, :, flag532RRFR]))
 
     flag1064RRFR = (np.array(flag1064nmRotRaman) & np.array(flagFarRangeChannel)).astype(bool)
     if any(flag1064RRFR):
-        data_dict['mask1064_RROff'] = any_signal(np.squeeze(data_dict['sigBGCor'][:,:,flag1064RRFR]))
+        data_dict['mask1064_RROff'] = any_signal(np.squeeze(data_dict['sigBGCor'][:, :, flag1064RRFR]))
 
-    # ----------------------------------------------------
+
+    # ------------------------------------------------------------------------
     # Mask for polarization calibration
-    # ----------------------------------------------------
+    # ------------------------------------------------------------------------
     logging.info('... mask for polarization calibration')
     (data_dict['depol_cal_ang_p_time_start'], data_dict['depol_cal_ang_p_time_end'], 
      data_dict['depol_cal_ang_n_time_start'], data_dict['depol_cal_ang_n_time_end'], 
@@ -872,33 +936,24 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, **param:dict) -
          init_depAng=initialPolAngle,
          maskDepCalAng=maskPolCalAngle
     )
-    ##### Picasso code:
-    # % Mask for polarization calibration
-    # [data.depol_cal_ang_p_time_start, data.depol_cal_ang_p_time_end, ...
-    # data.depol_cal_ang_n_time_start, data.depol_cal_ang_n_time_end, ...
-    # depCalMask] = pollyPolCaliTime(data.depCalAng, data.mTime, ...
-    #                                config.initialPolAngle, config.maskPolCalAngle);
-    # data.depCalMask = transpose(depCalMask);
+    
 
-    # ----------------------------------------------------
+    # ------------------------------------------------------------------------
     # Range-corrected Signal calculation
-    # ----------------------------------------------------
+    # ------------------------------------------------------------------------
     logging.info('... calculate range-corrected Signal')
-    # mask = data_dict['lowSNRMask'].mask
-    # mask = data_dict['lowSNRMask']
-    # masked arry might be slow
-    # RCS_masked = np.ma.masked_array(sigBGCor+bg, mask=mask)
-    # data_dict['RCS'] = calculate_rcs(datasignal=preproSignal, data_dict=data_dict, mShots=mShots, hRes=hRes)
-    mShots_norm = np.repeat(np.mean(mShots, axis=0)[np.newaxis, :], mShots.shape[0], axis=0)
-    data_dict['PCR_slice'] = data_dict['sigBGCor']*(150/hRes)/mShots_norm[:, np.newaxis, :]
-    data_dict['RCS'] = calculate_rcs(data_dict['PCR_slice'], data_dict['range'])
+    data_dict['RCS'] = calculate_rcs(data_dict['sigBGCor'], data_dict['range'])
+
+    if flagPicassoComparison:
+        # data_dict['RCS'] = calculate_rcs(photonCount2PCR(data_dict['sigBGCor'].copy(), mShots, hRes), data_dict['range']) # Use mShots directly
+        data_dict['RCS'] = calculate_rcs(photonCount2PCR(data_dict['sigBGCor'].copy(), mShots_norm, hRes), data_dict['range']) # Use mean mShots per channel
 
     logging.info('finished data preprocessing.')
     return data_dict
 
 
-def any_signal(sig: np.ndarray) -> np.ndarray:
-    """check if there is any signal
+def any_signal(sig:np.ndarray) -> np.ndarray:
+    """Check if there is any signal
     POLLYISLASERSHUTTERON determine whether the laser shutter is on due to the flying object.
 
     Parameters
@@ -925,91 +980,7 @@ def any_signal(sig: np.ndarray) -> np.ndarray:
     std_sig = np.std(sig, axis=1, ddof=0)
 
     # Detect when both mean and std dev are below threshold
-    # for some reason had to set the thresholds higher than in matlab version
+    # for some reason had to set the thresholds higher than in matlab version .. TODO:: <-- Check this!!
     flag = (mean_sig <= 0.02) & (std_sig <= 0.9)
 
     return flag
-
-
-##### Picasso Code???:
-#% Temperature effect correction (for Raman signal)
-# if config.flagSigTempCor
-#     temperature = loadMeteor(mean(data.mTime), data.alt, ...
-#         'meteorDataSource', config.meteorDataSource, ...
-#         'gdas1Site', config.gdas1Site, ...
-#         'meteo_folder', config.meteo_folder, ...
-#         'radiosondeSitenum', config.radiosondeSitenum, ...
-#         'radiosondeFolder', config.radiosondeFolder, ...
-#         'radiosondeType', config.radiosondeType, ...
-#         'method', 'linear', ...
-#         'isUseLatestGDAS', config.flagUseLatestGDAS);
-#     absTemp = temperature + 273.17;
-
-#     for iCh = 1:size(data.signal, 1)
-#         leadingChar = config.tempCorFunc{iCh}(1);
-#         if (leadingChar == '@')
-#             % valid matlab anonymous function
-#             tempCorFunc = config.tempCorFunc{iCh};
-#         else
-#             tempCorFunc = vectorize(['@(T) ', '(', config.tempCorFunc{iCh}, ') .* ones(size(T))']);
-#             % fprintf('%s is not a valid matlab anonymous function. Redefine it as %s\n', config.tempCorFunc{iCh}, tempCorFunc);
-#         end
-
-#         corFunc = str2func(tempCorFunc);
-#         corFac = corFunc(absTemp);
-#         data.signal(iCh, :, :) = data.signal(iCh, :, :) ./ repmat(reshape(corFac, 1, [], 1), 1, 1, size(data.signal, 3));
-#     end
-# end
-#
-#
-#% Mask for polarization calibration
-# [data.depol_cal_ang_p_time_start, data.depol_cal_ang_p_time_end, ...
-# data.depol_cal_ang_n_time_start, data.depol_cal_ang_n_time_end, ...
-# depCalMask] = pollyPolCaliTime(data.depCalAng, data.mTime, ...
-#                                config.initialPolAngle, config.maskPolCalAngle);
-# data.depCalMask = transpose(depCalMask);
-#
-#% Mask for laser shutter
-# flagChannel532FR = config.flagFarRangeChannel & config.flag532nmChannel & config.flagTotalChannel;
-# flagChannel355FR = config.flagFarRangeChannel & config.flag355nmChannel & config.flagTotalChannel;
-# if any(flagChannel532FR)
-#     data.shutterOnMask = pollyIsLaserShutterOn(...
-#         squeeze(data.signal(flagChannel532FR, :, :)));
-# elseif any(flagChannel355FR)
-#     data.shutterOnMask = pollyIsLaserShutterOn(...
-#         squeeze(data.signal(flagChannel355FR, :, :)));
-# else
-    # warning('No suitable channel to determine the shutter status');
-    # data.shutterOnMask = false(size(data.mTime));
-# end
-#
-#% Mask for fog
-# data.fogMask = false(1, size(data.signal, 3));
-# is_channel_532_FR_Tot = config.flagFarRangeChannel & config.flag532nmChannel & config.flagTotalChannel;
-# data.fogMask(transpose(squeeze(sum(data.signal(is_channel_532_FR_Tot, 40:120, :), 2)) <= config.minPC_fog) & (~ data.shutterOnMask)) = true;
-#
-#% Mask for PMT on/off status of 607 nm channel
-# flagChannel607 = config.flagFarRangeChannel & config.flag607nmChannel;
-# data.mask607Off = pollyIs607Off(squeeze(data.signal(flagChannel607, :, :)));
-#
-#% Mask for PMT of 387 nm channel
-# flagChannel387 = config.flagFarRangeChannel & config.flag387nmChannel;
-# data.mask387Off = pollyIs387Off(squeeze(data.signal(flagChannel387, :, :)));
-#
-#% Mask for PMT of 407 nm channel
-# flagChannel407 = config.flagFarRangeChannel & config.flag407nmChannel;
-# data.mask407Off = pollyIs407Off(squeeze(data.signal(flagChannel407, :, :)));
-#
-#% Mask for PMT of 355 nm rotation Raman channel
-# flagChannel355RR = config.flagFarRangeChannel & config.flag355nmRotRaman;
-# data.mask355RROff = pollyIs607Off(squeeze(data.signal(flagChannel355RR, :, :)));
-#
-#% Mask for PMT of 532 nm rotation Raman channel
-# flagChannel532RR = config.flagFarRangeChannel & config.flag532nmRotRaman;
-# data.mask532RROff = pollyIs607Off(squeeze(data.signal(flagChannel532RR, :, :)));
-#
-#% Mask for 1064 nm rotation Raman channel
-# flagChannel1064RR = config.flag1064nmRotRaman;
-# data.mask1064RROff = pollyIs607Off(squeeze(data.signal(flagChannel1064RR, :, :)));
-#
-# end
