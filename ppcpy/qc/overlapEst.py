@@ -347,12 +347,12 @@ def overlapCalcRaman(
             ovl_norm, normRange, _ = mean_stable(olFunc, 40, fullOverlapIndx - round(37.5 / hres), fullOverlapIndx + round(2250 / hres), 0.1)
             ovl_norm0, normRange0, _ = mean_stable(olFunc0, 40, fullOverlapIndx - round(37.5 / hres), fullOverlapIndx + round(2250 / hres), 0.1)
 
-            if ovl_norm.size == 1:
+            if ovl_norm is not None and ovl_norm.size == 1:
                 olFunc /= ovl_norm
             else:
                 olFunc /= np.nanmean(olFunc[fullOverlapIndx + round(150 / hres):fullOverlapIndx + round(1500 / hres)])
 
-            if ovl_norm0.size == 1:
+            if ovl_norm0 is not None and ovl_norm0.size == 1:
                 olFunc0 /= ovl_norm0
             else:
                 olFunc0 /= np.nanmean(olFunc0[fullOverlapIndx + round(150 / hres):fullOverlapIndx + round(1500 / hres)])
