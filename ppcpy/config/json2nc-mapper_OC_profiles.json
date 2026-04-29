@@ -181,7 +181,7 @@
         "plot_scale": "linear",
         "source": "__device",
         "retrieving_info": {
-            "Fixed lidar ratio": {"value": "", "unit": "[Sr]"},
+            "Fixed lidar ratio": {"value": "__polly_config_dict[LR1064]", "unit": "[Sr]"},
             "Reference value": {"value": "__polly_config_dict[refBeta1064]", "unit":"[Mm^{-1}*Sr^{-1}]"},
             "Reference search range": {"value": "__polly_config_dict[reference_search_range_1064_total_FR]", "unit": "[m]"},
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_klett_1064]", "unit": "[m]"}

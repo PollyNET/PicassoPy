@@ -105,6 +105,7 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
     elif method == 'klett':
         method_db = 'Klett_Method'
 
+    print(data_cube.LC.keys())
     if parameter == 'LC':
         for e in data_cube.LC[method].keys():
             wv, pol, tel =  helper.get_wv_pol_telescope_from_dictkeyname(e)

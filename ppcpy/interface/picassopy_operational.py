@@ -14,7 +14,8 @@ import ppcpy.interface.picassoProc as picassoProc
 import ppcpy.misc.helper as helper
 import ppcpy.misc.concat as concat
 import ppcpy.misc.startscreen as startscreen
-from ppcpy.io.write2nc import write_channelwise_2_nc_file, write2nc_file, write_profile2nc_file
+#from ppcpy.io.write2nc import write_channelwise_2_nc_file, write2nc_file, write_profile2nc_file
+import ppcpy.io.write2nc as write2nc
 from ppcpy._version import __version__
 
 ## getting root dir of PicassoPy
@@ -147,7 +148,7 @@ if isinstance(polly_config_dict["first_range_gate_height"],str) or isinstance(po
 data_cube.preprocessing()
 
 ## write channelwise infos to nc-files (e.g.: SNR, Background, RangeCorrectedSignal)
-write_channelwise_2_nc_file(data_cube=data_cube,prod_ls=["SNR","BG","RCS"])
+write2nc.write_channelwise_2_nc_file(data_cube=data_cube,prod_ls=["SNR","BG","RCS"])
 
 ## saturation detection
 data_cube.SaturationDetect()
@@ -219,27 +220,29 @@ data_cube.retrievalRaman(oc=True)
 
 ## calc. volume and particle depolarization of profiles
 data_cube.calcDepol()
+#print(data_cube.pol_cali))
+#print(f'eta_used: {data_cube.etaused}')
+
 
 ## calc. Angstroem Exponent of profiles
 data_cube.Angstroem()
 
-## calc. LIDAR calibration constants
-data_cube.LidarCalibration()
-## gives also data_cube.pol_cali, data_cube.LCused (e.g.: data_cube.LCused['532_total_FR'])
 
 ## write depolarization calibration factors and LIDAR calibration constants to sqlite-db
 base_dir = Path(data_cube.picasso_config_dict['results_folder'])
 #db_path = base_dir.joinpath(polly_device,polly_config_dict['calibrationDB'])
 db_path = "/data/level1b/polly24h/pollyxt_cpv/pollyxt_cpv_calibration_picassopy.db"
-data_cube.write_2_sql_db(db_path=str(db_path),parameter='LC',method='Raman')
-data_cube.write_2_sql_db(db_path=str(db_path),parameter='LC',method='Klett')
+## calc. LIDAR calibration constants
+data_cube.LidarCalibration(db_path=db_path)
+## gives also data_cube.pol_cali, data_cube.LCused (e.g.: data_cube.LCused['532_total_FR'])
+data_cube.write_2_sql_db(db_path=str(db_path),parameter='LC',method='raman')
+data_cube.write_2_sql_db(db_path=str(db_path),parameter='LC',method='klett')
 data_cube.write_2_sql_db(db_path=str(db_path),parameter='DC')
 
 ## LC_column_names = ['cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
 
-
 ## write profile retrievals to nc files
-write_profile2nc_file(data_cube=data_cube, prod_ls=["profiles","NR_profiles","OC_profiles"])
+write2nc.write_profile2nc_file(data_cube=data_cube, prod_ls=["profiles","NR_profiles","OC_profiles"])
 
 ## calc. high resolution retrievals of attenuated backscatter and volume depolarization
 data_cube.attBsc_volDepol()
@@ -252,14 +255,14 @@ data_cube.estQualityMask()
 
 
 ## saving high-resolution retrievals to nc file
-write2nc_file(data_cube=data_cube, prod_ls=["att_bsc", "NR_att_bsc", "OC_att_bsc", "vol_depol"])
+write2nc.write2nc_file(data_cube=data_cube, prod_ls=["att_bsc", "NR_att_bsc", "OC_att_bsc", "vol_depol"])
 
 ## Calculating Quasi retrievals and target classification
 data_cube.quasiV1()
 data_cube.quasiV2()
 
 ## saving high-resolution quasi retrievals and target classification to nc files
-write2nc_file(data_cube=data_cube,prod_ls=["quasi_results","quasi_results_V2","target_classification","target_classification_V2"])
+write2nc.write2nc_file(data_cube=data_cube,prod_ls=["quasi_results","quasi_results_V2","target_classification","target_classification_V2"])
 
 
 logging.info('processing finished!')

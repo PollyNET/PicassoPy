@@ -13,7 +13,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 import numpy as np
 from scipy.sparse import diags
-
+import tracemalloc # memory usage tracking
 
 def os_name():
     """"""
@@ -586,7 +586,118 @@ def checking_timestamp(timestamp, device, raw_folder, output_path, **kwargs):
     return selected_cor_timestamp_nc_ls
 
 
+def get_memory_usage():
+    """Get current memory usage using tracemalloc"""
+    current, peak = tracemalloc.get_traced_memory()
+    return current / 1024 / 1024, peak / 1024 / 1024  # MB
+
 def write_netcdf_robust(ds: xr.Dataset, out_file: Path,
+                       comp_level: int = 1,
+                       max_retries: int = 3) -> bool:
+    """
+    Robust NetCDF writing with retries and error handling
+    """
+    
+    # Start tracing memory
+    tracemalloc.start()
+    
+    for attempt in range(max_retries):
+        try:
+            logging.info(f"Attempt {attempt + 1}/{max_retries} to write NetCDF")
+            logging.info(f"Output file: {out_file}")
+
+            # Clear memory
+            gc.collect()
+            logging.info("Memory cleared")
+
+            # Validate dataset
+            if not isinstance(ds, xr.Dataset):
+                raise TypeError("Input must be an xr Dataset")
+
+            if len(ds.data_vars) == 0:
+                logging.warning("No data variables to write")
+                return True
+
+            # Check dataset integrity
+            logging.info(f"Dataset shape: {ds.sizes}")
+            dataset_size_mb = ds.nbytes / (1024**2)
+            logging.info(f"Dataset size: {dataset_size_mb:.2f} MB")
+            
+            # Get memory usage
+            current_mem, peak_mem = get_memory_usage()
+            logging.info(f"Current memory usage: {current_mem:.2f} MB")
+            logging.info(f"Peak memory usage: {peak_mem:.2f} MB")
+
+            # Create encoding
+            enc = {}
+            valid_vars = []
+
+            logging.info("Creating encoding for variables...")
+            for var_name in ds.data_vars:
+                var = ds[var_name]
+                if var.ndim >= 2 and var.size > 0:
+                    enc[var_name] = {
+                        "zlib": True,
+                        "complevel": comp_level,
+                    }
+                    valid_vars.append(var_name)
+                    logging.debug(f"Added variable {var_name} to encoding")
+
+            logging.info(f"Found {len(valid_vars)} valid variables to encode")
+
+            # Remove existing file
+            if out_file.exists():
+                logging.info(f"Removing existing file: {out_file}")
+                out_file.unlink()
+                logging.info("File removal completed")
+
+            # Write with various safety measures
+            logging.info(f"Writing {len(valid_vars)} variables to {out_file}...")
+            start_time = time.time()
+            
+            logging.info("Starting NetCDF write operation...")
+            ds.to_netcdf(
+                out_file,
+                format="NETCDF4",
+                engine="netcdf4",
+                encoding=enc,
+                compute=True,
+            )
+            end_time = time.time()
+            
+            write_duration = end_time - start_time
+            logging.info(f"NetCDF write completed in {write_duration:.2f} seconds")
+
+            # Verify successful write
+            if out_file.exists() and out_file.stat().st_size > 0:
+                final_size_mb = out_file.stat().st_size / (1024**2)
+                logging.info(f"Successfully wrote {out_file} ({final_size_mb:.2f} MB)")
+                return True
+            else:
+                raise RuntimeError("File was not created or is empty")
+
+        except Exception as e:
+            logging.error(f"Attempt {attempt + 1} failed: {e}")
+            logging.error(f"Exception type: {type(e).__name__}")
+            
+            # More detailed error information
+            import traceback
+            logging.error(f"Full traceback:\n{traceback.format_exc()}")
+            
+            gc.collect()
+            logging.info("Memory garbage collected")
+
+            if attempt < max_retries - 1:
+                logging.info("Retrying...")
+                time.sleep(1)  # Brief pause before retry
+            else:
+                logging.error(f"All {max_retries} attempts failed")
+                return False
+
+    return False
+
+
+def write_netcdf_robust_old(ds: xr.Dataset, out_file: Path,
                        comp_level: int = 1,
                        max_retries: int = 3,
                        timeout_seconds: int = 600) -> bool:
@@ -635,13 +746,15 @@ def write_netcdf_robust(ds: xr.Dataset, out_file: Path,
                     }
                     valid_vars.append(var_name)
             
-            logging.info(f"Writing {len(valid_vars)} variables")
             
             # Remove existing file
             if out_file.exists():
+                logging.info(f"Removing existing file: {out_file}")
                 out_file.unlink()
+                logging.info(f"Removing finished.")
             
             # Write with various safety measures
+            logging.info(f"Writing {len(valid_vars)} variables...")
             ds.to_netcdf(
                 out_file,
                 format="NETCDF4",
@@ -649,6 +762,7 @@ def write_netcdf_robust(ds: xr.Dataset, out_file: Path,
                 encoding=enc,
                 compute=True,
             )
+            logging.info(f"Finished writing.")
             
             # Verify successful write
             if out_file.exists() and out_file.stat().st_size > 0:

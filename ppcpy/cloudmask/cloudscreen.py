@@ -70,7 +70,7 @@ def cloudscreen(data_cube, wv:int=532, collect_debug:bool=False) -> np.ndarray:
 
     # Cloud screen mode dependent configuration
     if config_dict['cloudScreenMode'] == 1:
-        print(f'cloud screen mode {config_dict['cloudScreenMode']}: MSG method')
+        print(f"cloud screen mode {config_dict['cloudScreenMode']}: MSG method")
         screenfunc = cloudScreen_MSG
         sig = 'RCS'
         kwargs = {
@@ -87,7 +87,7 @@ def cloudscreen(data_cube, wv:int=532, collect_debug:bool=False) -> np.ndarray:
             'showDetails': collect_debug
         }
     else:
-        raise ValueError(f'cloudScreenMode {config_dict['cloudScreenMode']} not properly defined.')
+        raise ValueError(f"cloudScreenMode {config_dict['cloudScreenMode']} not properly defined.")
 
     signal = np.squeeze(data_cube.retrievals_highres[sig][:, :, data_cube.gf(wv, 'total', 'FR')])
 
