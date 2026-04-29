@@ -5,7 +5,8 @@ set -euo pipefail   # safety: exit on error, treat undefined vars as errors
 
 # ---------- default values ----------
 BASE_DIR="/data/level0/polly"
-MERGE_SINGLE=0   # false
+FLAG_MERGE_SINGLE=0   # false
+FLAG_PROCESSING=0   # false
 TIMESTAMP=""
 DEVICE=""
 UNZIPPING="True"
@@ -20,10 +21,11 @@ Options:
   --startdate YYYYMMDD         StartDate of measurement (required)
   --enddate YYYYMMDD           EndDate of measurement (required)
   --device DEVICE_NAME         Name of the Polly device (required)
-  --base_dir DIR               Base directory of level‑0 data (default: $BASE_DIR)
+  --base_dir DIR               Base directory of level0 data (default: $BASE_DIR)
   --picasso_config_file FILE   Picasso JSON config file (required)
   --unzipping                  Set to True or False, default is True; choose False i.e. for level0b 24h-file
-  --merge_to_single_24h_file   Merge all level‑0 files of the day into one 24‑h file
+  --merge_to_single_24h_file   Flag to merge all level0 files of the day into one 24h file, default: false
+  --processing                 Flag if processing or not (e.g. merge-only), default: false
   -h, --help                   Show this help and exit
 EOF
     exit 1
@@ -61,7 +63,11 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --merge_to_single_24h_file)
-            MERGE_SINGLE=1
+            FLAG_MERGE_SINGLE=1
+            shift
+            ;;
+        --processing)
+            FLAG_PROCESSING=1
             shift
             ;;
         -h|--help)
@@ -210,9 +216,10 @@ create_date_ls
 # ---------- collect raw file names ----------
 RAW_FILES=()   # Bash array
 MERGE_SUCCESS=0
+error_list=()
 for TIMESTAMP in ${DATE_LS[@]}; do
     
-    if (( MERGE_SINGLE )); then
+    if (( FLAG_MERGE_SINGLE )); then
         log_info "Merging raw files for $TIMESTAMP / $DEVICE into a single 24‑h file ..."
         ## grep to get rid of empty lines
         MERGED_FILE=$(call_concat_files "$TIMESTAMP" "$DEVICE" "$BASE_DIR" "$OUTPUT_PATH" "$UNZIPPING" | grep -v '^[[:space:]]*$') \
@@ -227,8 +234,8 @@ for TIMESTAMP in ${DATE_LS[@]}; do
             MERGE_SUCCESS=1
         fi
     else
-        # Call the Python helper that lists the individual level‑0 files.
-        log_info "Fetching list of level‑0 files for $TIMESTAMP / $DEVICE ..."
+        # Call the Python helper that lists the individual level0 files.
+        log_info "Fetching list of level0 files for $TIMESTAMP / $DEVICE ..."
        # mapfile -t RAW_FILES < <(python3 get_pollyxt_files.py \
         mapfile -t RAW_FILES < <(call_get_files "$TIMESTAMP" "$DEVICE" "$BASE_DIR" "$OUTPUT_PATH" "$UNZIPPING") \
     		|| { log_error "Failed to run get_pollyxt_files.py"; exit 1; }
@@ -255,25 +262,33 @@ for TIMESTAMP in ${DATE_LS[@]}; do
             exit 1
         fi
     
-        log_info "Processing file: $rawfile"
     
         # -----------------------------------------------------------------
         # Call the actual processing script.
         # -----------------------------------------------------------------
         
-        PICASSO_OP_SCRIPT="${ROOT_DIR}/ppcpy/interface/picassopy_operational.py"
-        "$PYTHON_PATH"/python3 "$PICASSO_OP_SCRIPT" \
-            --date "$TIMESTAMP" \
-            --device "$DEVICE"\
-            --base_dir "$BASE_DIR"\
-            --picasso_config_file "$PICASSO_CFG" \
-            --level0_file_to_process "$rawfile" \
-            || {
-                log_error "Processing of $rawfile failed."
-                exit 1
-            }
+        if (( FLAG_PROCESSING )); then
+            log_info "Processing file: $rawfile"
+            PICASSO_OP_SCRIPT="${ROOT_DIR}/ppcpy/interface/picassopy_operational.py"
+            "$PYTHON_PATH"/python3 "$PICASSO_OP_SCRIPT" \
+                --date "$TIMESTAMP" \
+                --device "$DEVICE"\
+                --base_dir "$BASE_DIR"\
+                --picasso_config_file "$PICASSO_CFG" \
+                --level0_file_to_process "$rawfile" \
+                || {
+                    log_error "Processing of $rawfile failed."
+                    error_list+=("Failed processing: $rawfile")
+                    #exit 1
+                    continue
+                }
+        fi
     done
 done
-
-log_info "All files processed successfully."
+if (( FLAG_PROCESSING )); then
+    printf '%s\n' "${error_list[@]}"
+    log_info "Processing finished."
+else
+    log_info "Nothing to process. finished."
+fi
 exit 0
