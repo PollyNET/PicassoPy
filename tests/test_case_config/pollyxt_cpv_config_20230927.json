@@ -44,6 +44,7 @@
 
     "init_depAng": 0,
     "first_range_gate_indx": [251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252, 251, 251, 251, 251],
+    "first_range_gate_indx": [253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 255, 251],
     "first_range_gate_height": [3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 6.75, 6.75, 6.75, 6.75, 3.75, 3.75, 3.75, 3.75],
     "dtCorModeLabel": ["Polynomial coefficients stores in netcdf file", "nonparalyzable correction", "User defined polynomial cofficients"],
     "dtCorMode": 1,
