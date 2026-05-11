@@ -548,6 +548,10 @@ class PicassoProc:
 
         different to the matlab version, where an average over all cloud
         free periods is taken, it is done here per cloud free segment
+
+        .. TODO::
+            The data structure of retrievals_profile['overlap'] differs from
+            retrievals_profile['raman']!
             
         """
         if not self.polly_config_dict["flagOLCor"]:
@@ -618,7 +622,7 @@ class PicassoProc:
             self.retrievals_profile[ret_prof_name] = angstroem.ae_cldFreeGrps(
                 self, ret_prof_name) 
 
-    def LidarCalibration(self, db_path, collect_debug:bool=False):
+    def LidarCalibration(self, db_path:str=None, collect_debug:bool=False):
         """calculate the lidar constant
 
         .. TODO:: Find out how we prioritise raman, klett, and database retrieved LC...
@@ -633,20 +637,25 @@ class PicassoProc:
             retrieval='raman', 
             collect_debug=collect_debug
         )
-        #db_path = self.polly_config_dict['calibrationDB']
-        table_name = 'lidar_calibration_constant'
-        ts_interval = self.retrievals_highres['time'][0], self.retrievals_highres['time'][-1]
-        self.LC['klett_db'] = sql_db.get_from_sql_db(db_path, table_name, ts_interval)['klett_db']
-        self.LC['raman_db'] = sql_db.get_from_sql_db(db_path, table_name, ts_interval)['raman_db']
         
-        logging.warning('reading calibration constant from database not working yet')
+        logging.info("Choosing best LC per channel...")
+        if db_path is None:
+            logging.info("No database path found. Using retrieved LC values.")
+            self.LC['klett_db'] = {}
+            self.LC['raman_db'] = {}
+        else:
+            logging.info("Database LC values will be used when no retrieved ones are available.")
+            # db_path = self.polly_config_dict['calibrationDB']
+            table_name = 'lidar_calibration_constant'
+            ts_interval = self.retrievals_highres['time'][0], self.retrievals_highres['time'][-1]
+            self.LC['klett_db'] = sql_db.get_from_sql_db(db_path, table_name, ts_interval)['klett_db']
+            self.LC['raman_db'] = sql_db.get_from_sql_db(db_path, table_name, ts_interval)['raman_db']
+        
         # Prioritise Raman retrieved LCs but use Klett retrieved ones when no Raman retrieval exists.
-        #self.LCused = select.single_best(self.LC['klett'], 'LC', 'LCStd', relative=True) |\
-        #      select.single_best(self.LC['raman'], 'LC', 'LCStd', relative=True)
-        self.LCused =  select.single_best(self.LC['klett'], 'LC', 'LCStd', relative=True) |\
-                         select.single_best(self.LC['raman'], 'LC', 'LCStd', relative=True) |\
-                         select.single_best(self.LC['klett_db'], 'LC', 'LCStd', relative=True) |\
-                         select.single_best(self.LC['raman_db'], 'LC', 'LCStd', relative=True)
+        self.LCused =  select.single_best(self.LC['klett_db'], 'LC', 'LCStd', relative=True) |\
+                         select.single_best(self.LC['raman_db'], 'LC', 'LCStd', relative=True) |\
+                         select.single_best(self.LC['klett'], 'LC', 'LCStd', relative=True) |\
+                         select.single_best(self.LC['raman'], 'LC', 'LCStd', relative=True)
 
 
     def attBsc_volDepol(self):

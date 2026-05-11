@@ -4,6 +4,7 @@
 import numpy as np
 import ppcpy.misc.helper as helper
 import ppcpy.retrievals.depolarization as depolarization
+import logging
 
 from scipy.interpolate import interp1d
 
@@ -21,6 +22,10 @@ def quasi_bsc(data_cube):
                 ((1064, 'total', 'FR'), (607, 'total', 'FR')),]
 
     for (wv, t, tel), (wv_r, t_r, tel_r) in channels:
+        if not {f'attBsc_{wv}_{t}_{tel}', f'attBsc_{wv_r}_{t}_{tel}'}.issubset(data_cube.retrievals_highres):
+            logging.info(f"{wv}_{t}_{tel} skipped at quasi bsc")
+            continue
+        
         att_beta_qsi = data_cube.retrievals_highres[f'attBsc_{wv}_{t}_{tel}'].copy()
         # TODO check if halving the window is needed
         smooth_t = int(np.array(config_dict['quasi_smooth_t'])[data_cube.gf(wv, t, tel)][0] / 2)
