@@ -3,6 +3,7 @@
 import numpy as np
 import ppcpy.misc.helper as helper
 import ppcpy.retrievals.depolarization as depolarization
+import logging
 
 from scipy.interpolate import interp1d
 
@@ -88,6 +89,13 @@ def target_cat(data_cube, version='V1'):
             heightFullOverlap[data_cube.gf(1064, 'total', 'FR')][0]])
     else:
         hFullOL = 0
+    
+    if not {'attBsc_532_total_FR', f'quasiBsc{version}_1064_total_FR', f'quasiBsc{version}_532_total_FR', 
+            f'quasiPdr{version}_532_total_FR', f'quasiVdr{version}_532_total_FR', f'quasiAE{version}_532_1064'
+            }.issubset(data_cube.retrievals_highres):
+        logging.warning(f"Failed to produce tcMask{version}, missing necessary retrievals.")
+        return
+
 
     tcMask = target_classify(data_cube.retrievals_highres['range'],
         data_cube.retrievals_highres['attBsc_532_total_FR'], 
