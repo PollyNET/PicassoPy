@@ -100,7 +100,7 @@ def cloudscreen(data_cube, wv:int=532, collect_debug:bool=False) -> np.ndarray:
             'showDetails': collect_debug
         }
     else:
-        raise ValueError(f'cloudScreenMode {config_dict['cloudScreenMode']} not properly defined.')
+        raise ValueError(f"cloudScreenMode {config_dict['cloudScreenMode']} not properly defined.")
 
     signal = np.squeeze(data_cube.retrievals_highres[sig][:, :, data_cube.gf(wv, 'total', 'FR')])
 
