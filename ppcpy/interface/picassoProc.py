@@ -342,10 +342,7 @@ class PicassoProc:
             data_cube = self,
             sigSaturateThresh = self.polly_config_dict['saturate_thresh'])
 
-        return self
-
-
-    def polarizationCaliD90(self):
+    def polarizationCaliD90(self, db_path:str=None):
         """calibration with the Delta-90 method
         
         The stuff that starts here in the matlab version
@@ -354,7 +351,20 @@ class PicassoProc:
 
         polarization.loadGHK(self)
         self.pol_cali['D90'] = polarization.calibrateGHK(self)
-        self.etaused = select.single_best(self.pol_cali['D90'], 'eta', 'eta_std') 
+        isUsable = [element['status'] for key, val in self.pol_cali['D90'].items() for element in val]
+
+        if np.sum(isUsable) > 0:
+            logging.info("Using retieved polarization calibration constants.")
+            self.etaused = select.single_best(self.pol_cali['D90'], 'eta', 'eta_std')
+        elif db_path is not None:
+            logging.warning("Can not retieve viable polarization calibration constants, uses constants form the database.")
+            table_name = 'depol_calibration_constant'
+            ts_interval = self.retrievals_highres['time'][0], self.retrievals_highres['time'][-1]
+            self.pol_cali['D90_db'] = sql_db.get_from_sql_db(db_path, table_name, ts_interval)['D90_db']
+            self.etaused = select.single_best(self.pol_cali['D90_db'], 'eta', 'eta_std')
+        else:
+            logging.critical("Can not retieve viable polarization calibration constants, and no database detected.")
+            raise ValueError("Can not retieve viable polarization calibration constants, and no database detected.")
 
 
     def cloudScreen(self, collect_debug:bool=False):
@@ -637,7 +647,7 @@ class PicassoProc:
             retrieval='raman', 
             collect_debug=collect_debug
         )
-        
+
         logging.info("Choosing best LC per channel...")
         if db_path is None:
             logging.info("No database path found. Using retrieved LC values.")
