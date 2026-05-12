@@ -21,20 +21,19 @@ They are stored as variables in the ``data_cube``:
     data_cube.polly_config_dict
     data_cube.picasso_config_dict
 
-
-picasso_config_file
-===================
-
-+-----------------+-------------+
-| Key             | Description |
-+=================+=============+
-| ``path_config`` | ....        |
-+-----------------+-------------+
-| ...             | ...         |
-+-----------------+-------------+
-
-polly_config_file
+Overview on Keys
 =================
 
+picasso_config_file
+-------------------
 
+.. csv-table::
+    :header: "Key", "Description", "Obsolete"
+    :file: ../picasso_config_keys.csv
 
+polly_config_file
+-------------------
+
+.. csv-table::
+    :header: "Key", "Description", "Obsolete"
+    :file: ../polly_config_keys.csv

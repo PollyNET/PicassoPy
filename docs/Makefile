@@ -18,4 +18,6 @@ help:
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
 	cp ../README.md "$(SOURCEDIR)"
+	cp ../ppcpy/config/polly_config_keys.csv "$(SOURCEDIR)"
+	cp ../ppcpy/config/picasso_config_keys.csv "$(SOURCEDIR)"
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
