@@ -29,7 +29,7 @@ Overview on Keys
 
 .. todo::
     The docstrings below are taken from the original matlab documentation.
-    They might not reflect also the latest version.`picasso config docs`_.
+    They might not reflect also the latest version. `picasso config docs`_.
 
 
 
