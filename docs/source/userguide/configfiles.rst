@@ -21,8 +21,19 @@ They are stored as variables in the ``data_cube``:
     data_cube.polly_config_dict
     data_cube.picasso_config_dict
 
+.. note::
+    Compared to the matlab version, the defaults and template (polly_default_default) was merged into the `polly_config_dict`.
+
 Overview on Keys
 =================
+
+.. todo::
+    The docstrings below are taken from the original matlab documentation.
+    They might not reflect also the latest version.`picasso config docs`_.
+
+
+
+.. _picasso config docs: https://pollynet.github.io/Pollynet_Processing_Chain/modules/config.html
 
 picasso_config_file
 -------------------

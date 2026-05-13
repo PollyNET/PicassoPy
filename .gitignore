@@ -9,3 +9,8 @@ docs/source/_autosummary/*
 tests/*.png
 tests/plots/*.png
 tests/test_case_data/*.nc
+
+docs/source/picasso_config_keys.csv
+docs/source/polly_config_keys.csv
+
+
