@@ -81,12 +81,10 @@ def quasi_pdr(data_cube, wvs:list=[532], version:str='V1'):
 
         # Flag unvalid data.
         if config_dict['flagOnlyUseValidQuasiData']:
-            quality_mask = np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, data_cube.gf(wv, t, tel)])
-            quasi_pdr[quality_mask != 0] = np.nan
-            vdr[quality_mask != 0] = np.nan
-            # quality_mask_vdr = data_cube.retrievals_highres['quality_mask_vdr_532'] # This does not exist yet in PicassoPy
-            # quasi_pdr[quality_mask_vdr != 0] = np.nan
-            # vdr[quality_mask_pdr != 0] = np.nan
+            quality_mask_t = np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, flagt])
+            quality_mask_c = np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, flagc])
+            quasi_pdr[(quality_mask_t != 0) | (quality_mask_c != 0)] = np.nan
+            vdr[(quality_mask_t != 0) | (quality_mask_c != 0)] = np.nan
 
         data_cube.retrievals_highres[f"quasiPdr{version}_{wv}_{t}_{tel}"] = quasi_pdr
         data_cube.retrievals_highres[f"quasiVdr{version}_{wv}_{t}_{tel}"] = vdr
@@ -147,6 +145,7 @@ def target_cat(data_cube, version:str='V1'):
     config_dict = data_cube.polly_config_dict
     heightFullOverlap = np.array(config_dict['heightFullOverlap'])
 
+    # Version spesific configurations
     if version == 'V1':
         hFullOL = np.max([
             heightFullOverlap[data_cube.gf(532, 'total', 'FR')][0],
@@ -154,12 +153,14 @@ def target_cat(data_cube, version:str='V1'):
     else:
         hFullOL = 0
     
+    # Check for necessary inputs
     if not {'attBsc_532_total_FR', f'quasiBsc{version}_1064_total_FR', f'quasiBsc{version}_532_total_FR', 
             f'quasiPdr{version}_532_total_FR', f'quasiVdr{version}_532_total_FR', f'quasiAE{version}_532_1064'
             }.issubset(data_cube.retrievals_highres):
         logging.warning(f"Failed to produce tcMask{version}, missing necessary retrievals.")
         return
 
+    # Retrieve target categories
     tcMask = target_classify(
         height=data_cube.retrievals_highres['range'].copy(), # Should target_calssify use range or height? in matlab height is used.
         attBeta532=data_cube.retrievals_highres['attBsc_532_total_FR'].copy(), 
@@ -186,9 +187,13 @@ def target_cat(data_cube, version:str='V1'):
         hFullOL=hFullOL
     )
     
-    tcMask[np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, data_cube.gf(532, 'total', 'FR')]) != 0] = 0
-    tcMask[np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, data_cube.gf(1064, 'total', 'FR')]) != 0] = 0
-    # tcMask[data_cube.retrievals_highres['quality_mask_vdr_532_FR'] != 0, :] = 0
+    # Mask invalid data
+    if 'quality_mask' in data_cube.retrievals_highres:
+        tcMask[np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, data_cube.gf(532, 'total', 'FR')]) != 0] = 0
+        tcMask[np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, data_cube.gf(532, 'cross', 'FR')]) != 0] = 0
+        tcMask[np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, data_cube.gf(1064, 'total', 'FR')]) != 0] = 0
+        if version == 'V2':
+                tcMask[np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, data_cube.gf(607, 'total', 'FR')]) != 0] = 0
 
     data_cube.retrievals_highres[f"tcMask{version}"] = tcMask
 
