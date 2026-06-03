@@ -19,6 +19,7 @@ import ppcpy.cloudmask.profilesegment as profilesegment
 import ppcpy.preprocess.profiles as preprocprofiles
 import ppcpy.io.readMeteo as readMeteo
 import ppcpy.misc.molecular as molecular
+import ppcpy.calibration.watervapor as watervapor
 import ppcpy.calibration.rayleighfit as rayleighfit
 import ppcpy.retrievals.klettfernald as klettfernald
 import ppcpy.retrievals.raman as raman
@@ -468,6 +469,12 @@ class PicassoProc:
         mean_profiles = self.met.get_mean_profiles(time_slices)
         self.mol_profiles = molecular.calc_profiles(mean_profiles, flagPicassoComparison=self.polly_config_dict['flagPicassoComparison'])
     
+    def watervaporCali(self):
+        """Perform water vapor calibration on aggregated profiles"""
+
+        logging.info('Start calibration')
+
+        watervapor.wvc_for_cldFreeGrps(self)
 
     def rayleighFit(self, collect_debug:bool=False):
         """Perform the rayleigh fit procedure.
