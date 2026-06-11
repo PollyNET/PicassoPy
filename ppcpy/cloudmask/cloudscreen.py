@@ -79,11 +79,11 @@ def cloudscreen(data_cube, wv:int=532, collect_debug:bool=False) -> np.ndarray:
 
     # Cloud screen mode dependent configuration
     if config_dict['cloudScreenMode'] == 0: # No cloud screening
-        logging.warning(f'cloud screen mode {config_dict['cloudScreenMode']}: No cloud screening.')
+        logging.warning(f"cloud screen mode {config_dict['cloudScreenMode']}: No cloud screening.")
         return np.ones(bg.shape, dtype=bool)
     
     elif config_dict['cloudScreenMode'] == 1: # MSG method
-        logging.info(f'cloud screen mode {config_dict['cloudScreenMode']}: MSG method.')
+        logging.info(f"cloud screen mode {config_dict['cloudScreenMode']}: MSG method.")
         screenfunc = cloudScreen_MSG
         sig = 'RCS'
         kwargs = {
