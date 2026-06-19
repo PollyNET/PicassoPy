@@ -24,6 +24,14 @@ def get_git_info(path="."):
     except Exception:
         return None, None
 
+def date_splitting(timestamp):
+    """ """
+    YYYY = timestamp[0:4]
+    MM = timestamp[4:6]
+    DD = timestamp[6:8]
+    return YYYY,MM,DD
+
+
 def adding_fixed_vars(data_cube, json_nc_mapping_dict):
     """ """
     ## adding fixed variables
@@ -90,7 +98,10 @@ def write_channelwise_2_nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
 
 
         """ Create the NetCDF file """
-        output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{prod}.nc")
+        yyyy,mm,dd = date_splitting(data_cube.date)
+        output_path = Path(data_cube.picasso_config_dict["results_folder"],data_cube.device,yyyy,mm,dd)
+        output_path.mkdir(parents=True, exist_ok=True)
+        output_filename = Path(output_path, f"{data_cube.date}_{data_cube.device}_{prod}.nc")
         json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1, prod=prod)
 
 def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
@@ -141,7 +152,10 @@ def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
 
 
         """ Create the NetCDF file """
-        output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{prod}.nc")
+        yyyy,mm,dd = date_splitting(data_cube.date)
+        output_path = Path(data_cube.picasso_config_dict["results_folder"],data_cube.device,yyyy,mm,dd)
+        output_path.mkdir(parents=True, exist_ok=True)
+        output_filename = Path(output_path, f"{data_cube.date}_{data_cube.device}_{prod}.nc")
         json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1, prod=prod)
 
 
@@ -232,7 +246,10 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], col
             #print(data_dict_copy['variables'].keys())
 
             """ Create the NetCDF file """
-            output_filename = Path(data_cube.picasso_config_dict["results_folder"], f"{data_cube.date}_{data_cube.device}_{start}_{stop}_{prod}.nc")
+            yyyy,mm,dd = date_splitting(data_cube.date)
+            output_path = Path(data_cube.picasso_config_dict["results_folder"],data_cube.device,yyyy,mm,dd)
+            output_path.mkdir(parents=True, exist_ok=True)
+            output_filename = Path(output_path, f"{data_cube.date}_{data_cube.device}_{start}_{stop}_{prod}.nc")
             json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1, prod=prod, cldFreeIndx=n)
 
 

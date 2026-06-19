@@ -117,7 +117,7 @@ def overlapCalc(height:np.ndarray, sigFR:np.ndarray, bgFR:np.ndarray, sigNR:np.n
 
         # print('is normRange index or slice?', normRange) # -> is list of indices
         # Calculate the overlap of the far-range channel
-        if normRange.shape[0] > 0:
+        if normRange is not None and normRange.shape[0] > 0:
             if collect_debug:
                 print("bgFR.shape", bgFR.shape)
                 print("bgNR.shape", bgNR.shape)

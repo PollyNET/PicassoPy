@@ -16,8 +16,24 @@ from scipy.sparse import diags
 from scipy.signal import savgol_coeffs
 
 
-def detect_path_type(fullpath):
-    """Detect the type of path (Windows or Linux) based on the input."""
+def detect_path_type(fullpath:str):
+    """Detect the type of path (Windows or Linux) based on the input.
+    
+    Parameters
+    ----------
+    fullpath : str
+        ...
+    
+    Returns
+    -------
+    Path
+        ...
+    
+    Notes
+    -----
+    - TODO: Finish docstring.
+    """
+
     def is_windows_path(fullpath):
         """returns True or False"""
         return '\\' in str(fullpath)
@@ -42,12 +58,32 @@ def detect_path_type(fullpath):
 
 
 def os_name():
-    """"""
+    """..."""
     return platform.system()
 
 
 def get_input_path(timestamp, device, raw_folder):
-    """"""
+    """...
+
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : ...
+        ...
+    raw_folder : ...
+        ...
+    
+    Returns
+    -------
+    input_path : ...
+        ...
+    
+    Notes
+    -----
+    - TODO: Finish docstring.
+    """
+
     YYYY=timestamp[0:4]
     MM=timestamp[4:6]
     DD=timestamp[6:8]
@@ -56,13 +92,32 @@ def get_input_path(timestamp, device, raw_folder):
     return input_path
 
 
-def get_pollyxt_files(timestamp, device, raw_folder, output_path):
+def get_pollyxt_files(timestamp, device, raw_folder, output_path) -> list:
+    """This function locates multiple pollyxt level0 nc-zip files from one day measurements,
+    unzipps the files to output_path and returns a list of files to be merged and the title
+    of the new merged nc-file.
+
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : ...
+        ...
+    raw_folder : ...
+        ...
+    output_path : ...
+        ...
+    
+    Returns
+    -------
+    polly_files_list : list
+        ...
+    
+    Notes
+    -----
+    - TODO: Finish docstring.
     """
-    This function locates multiple pollyxt level0 nc-zip files from one day measurements,
-    unzipps the files to output_path
-    and returns a list of files to be merged
-    and the title of the new merged nc-file
-    """
+
     input_path = get_input_path(timestamp, device, raw_folder)
     path_exist = Path(input_path)
 
@@ -159,11 +214,26 @@ def get_pollyxt_files(timestamp, device, raw_folder, output_path):
 
 
 def get_pollyxt_logbook_files(timestamp, device, raw_folder, output_path):
+    """This function locates multiple pollyxt logbook-zip files from one day measurements,
+    unzipps the files to output_path and merge them to one file.
+
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : ...
+        ...
+    raw_folder : ...
+        ...
+    output_path : ...
+        ...
+    
+    Notes
+    -----
+    - TODO: Finish docstring.
+    - TODO: Is returning () needed??
     """
-    This function locates multiple pollyxt logbook-zip files from one day measurements,
-    unzipps the files to output_path
-    and  merge them to one file
-    """
+
     input_path = get_input_path(timestamp, device, raw_folder)
     path_exist = Path(input_path)
 
@@ -244,7 +314,22 @@ def get_pollyxt_logbook_files(timestamp, device, raw_folder, output_path):
 
 
 def add_to_list(element, from_list, to_list):
-    """"""
+    """Add element form dict to list.
+
+    Parameters
+    ----------
+    element : str
+        ...
+    from_list : dict
+        ...
+    to_list : list
+        ...
+    
+    Notes
+    -----
+    - TODO: Finish docstring.
+    """
+
     if from_list[element] in to_list:
         pass
     else:
@@ -252,8 +337,29 @@ def add_to_list(element, from_list, to_list):
 
 
 
-def checking_vars(timestamp, device, raw_folder, output_path):
-    """"""
+def checking_vars(timestamp, device, raw_folder, output_path:str):
+    """Check variables ...
+
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : ...
+        ...
+    raw_folder : ...
+        ...
+    output_path : str
+        ...
+    
+    Returns
+    -------
+    ...
+
+    Notes
+    -----
+    - TODO: Finish docstring.
+    """
+
     ## select only those nc-files where the values of some specific variables haven't changed
     vars_of_interest = [
                         'measurement_height_resolution',
@@ -350,8 +456,12 @@ def checking_attr(timestamp, device, raw_folder, output_path):
     -------
     ...
     
+    Notes
+    -----
+    .. TODO:: Finish docstring.
     .. TODO:: Variables 'force' and 'polly_files_list' are not defined anywhere
     """
+
     ## select only those nc-files where the global attributes and the var-attributes haven't changed
     selected_var_nc_ls = checking_vars(timestamp, device, raw_folder, output_path)
     if len(selected_var_nc_ls) == 1:
@@ -453,7 +563,28 @@ def checking_attr(timestamp, device, raw_folder, output_path):
 
 
 def checking_timestamp(timestamp, device, raw_folder, output_path):
-    """"""
+    """Check timestamps of ...
+
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : ...
+        ...
+    raw_folder : ...
+        ...
+    output_ path : ...
+        ...
+    
+    Returns
+    -------
+    ...
+    
+    Notes
+    -----
+    - TODO: Finish docstring.
+    """
+
     selected_timestamp_nc_ls = checking_attr(timestamp, device, raw_folder, output_path)
     if len(selected_timestamp_nc_ls) == 1:
         return selected_timestamp_nc_ls
@@ -547,13 +678,34 @@ def checking_timestamp(timestamp, device, raw_folder, output_path):
     return selected_cor_timestamp_nc_ls
 
 
-def concat_files(timestamp, device, raw_folder, output_path):
-    """"""
+def concat_files(timestamp, device, raw_folder, output_path:str):
+    """Concatinate ... files
+    
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : ...
+        ...
+    raw_folder : ...
+        ...
+    output_path : str
+        ...
+    
+    Returns
+    -------
+    ...
+
+    Notes
+    -----
+    - TODO: Finish docstring.
+    """
+
     ## merge selected files
 
 #    concat='concat'
 
-    sel_polly_files_list = checking_timestamp(timestamp,device,raw_folder,output_path)
+    sel_polly_files_list = checking_timestamp(timestamp, device, raw_folder, output_path)
 
     if len(sel_polly_files_list) == 0:
         print('no files found for this day. no merging.')
@@ -565,7 +717,7 @@ def concat_files(timestamp, device, raw_folder, output_path):
 
     if len(sel_polly_files_list) == 1:
         print("\nOnly one file found. Nothing to merge!\n")
-        os.rename(sel_polly_files_list[0],Path(output_path,filestring))
+        os.rename(sel_polly_files_list[0], Path(output_path, filestring))
         return ()
     else:
 #        sel_polly_files_list = [ str(el) for el in sel_polly_files_list]
@@ -595,7 +747,7 @@ def concat_files(timestamp, device, raw_folder, output_path):
 
             ds.to_netcdf(out_file, format="NETCDF4", engine="netcdf4", encoding=enc)
 
-        write_netcdf(ds=ds,out_file=Path(output_path,filestring_dummy))
+        write_netcdf(ds=ds, out_file=Path(output_path, filestring_dummy))
 
         ds.close()
 
@@ -603,10 +755,10 @@ def concat_files(timestamp, device, raw_folder, output_path):
     for el in sel_polly_files_list:
         print(el)
         os.remove(el)
-    destination_file = Path(output_path,filestring)
+    destination_file = Path(output_path, filestring)
     if os.path.exists(destination_file):
         os.remove(destination_file)  # Remove the existing destination file
-    os.rename(Path(output_path,filestring_dummy),destination_file)
+    os.rename(Path(output_path, filestring_dummy), destination_file)
     print('done!')
     return destination_file
 
@@ -624,23 +776,27 @@ def remove_whitespaces_and_replace_dash_with_underscore(string:str) -> str:
     new_string : str
         Modified string
     """
+
     new_string  = string.replace(" ", "").replace("-", "_")
     return new_string
 
 
-def find_matching_dimension(array, reference_list):
-    """
-    Finds the dimension of a 3D array that matches the length of the reference list.
+def find_matching_dimension(array:np.ndarray, reference_list:list) -> int:
+    """Finds the dimension of a 3D array that matches the length of the reference list.
 
     Parameters
     ----------
-    array (np.ndarray): The 3D NumPy array to check.
-    reference_list (list): The list to compare the dimension lengths with. This can also be a dict.
+    array : np.ndarray
+        The 3D NumPy array to check.
+    reference_list : list
+        The list to compare the dimension lengths with. This can also be a dict.
 
     Returns
     -------
-    int: The index of the matching dimension, or -1 if no match is found.
+    int
+        The index of the matching dimension, or -1 if no match is found.
     """
+
     list_length = len(reference_list)
     for dim_index, dim_size in enumerate(array.shape):
         if dim_size == list_length:
@@ -649,6 +805,21 @@ def find_matching_dimension(array, reference_list):
 
 
 def channel_2_variable_mapping(data_retrievals, var, channeltags_dict):
+    """...
+
+    Parameters
+    ----------
+    data_retrievals : ...
+        ...
+    var : ...
+        ...
+    channeltags_dict : ...
+        ...
+    
+    Notes
+    -----
+    - TODO: Finish docstring.
+    """
     ## check length of channeltags_dict vs. length of data_retrievals[var].shape
     channel_dim = find_matching_dimension(array=data_retrievals[var], reference_list=channeltags_dict)
     for ch in channeltags_dict.keys():
@@ -957,12 +1128,20 @@ def smooth2a(matrix_in:np.ndarray, Nr:int, Nc:int=None) -> np.ndarray:
     -------
     matrix_out : ndarray
         Smoothed version of the input matrix.
+    
+    Notes
+    -----
+    .. TODO:: change smoothing inputs Nr and Nc to be window size insted of int(window size / 2)
 
     References
     ----------
     - Written by Greg Reeves, March 2009, Division of Biology, Caltech.
     - Inspired by "smooth2" by Kelly Hilands, October 2004, Applied Research Laboratory, Penn State University.
     - Developed from code by Olof Liungman, 1997, Dept. of Oceanography, Earth Sciences Centre, Göteborg University.
+
+    ** History **
+
+    - xxxx-xx-xx: Translated to python
     """
 
     if Nc is None:
@@ -1033,6 +1212,7 @@ def idx2time(cldFreeIdx:np.ndarray[int, int], nIdx:int, nHour:int) -> str:
     out : str
         Time stamps of cldFreeIdx as a string (eg. 0920_1020)
     """
+
     minPerIdx = (nHour*60)/nIdx
     cldFreeMin = cldFreeIdx*minPerIdx
     cldFreeHour = cldFreeMin//60
@@ -1048,10 +1228,8 @@ def idx2time(cldFreeIdx:np.ndarray[int, int], nIdx:int, nHour:int) -> str:
     return out
 
 
-
-
-def default_to_regular(d):
-    """defaultdict to regular dict """
+def default_to_regular(d:defaultdict):
+    """defaultdict to regular dict"""
     if isinstance(d, defaultdict):
         d = {k: default_to_regular(v) for k, v in d.items()}
     return d

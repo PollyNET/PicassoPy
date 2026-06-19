@@ -36,22 +36,21 @@ import ppcpy.io.sql_interaction as sql_db
 class PicassoProc:
     counter = 0
 
-    def __init__(self, rawdata_dict, polly_config_dict, picasso_config_dict):
-        """initialize the data_cube
+    def __init__(self, rawdata_dict:dict, polly_config_dict:dict, picasso_config_dict:dict):
+        """Initialize the data_cube.
 
         Parameters
         ----------
-        rawdata_dict
-            the dict returned by readPollyRawData.readPollyRawData(filename=rawfile)
-        polly_config_dict
-            the configuration specific to the specific polly loadConfigs.loadPollyConfig(polly_config_file_fullname, polly_default_config_file)
-        picasso_config_dict
-            the general picasso config loadConfigs.loadPicassoConfig(args.picasso_config_file,picasso_default_config_file)
-
+        rawdata_dict : dict
+            The dict returned by readPollyRawData.readPollyRawData(filename=rawfile)
+        polly_config_dict : dict
+            The configuration specific to the specific polly loadConfigs.loadPollyConfig(polly_config_file_fullname, polly_default_config_file)
+        picasso_config_dict : dict
+            The general picasso config loadConfigs.loadPicassoConfig(args.picasso_config_file,picasso_default_config_file)
 
         Notes
         -----
-        The `polly_default_dict` is not longer available as a separate variable, but is included into the `polly_config_dict`
+        - The `polly_default_dict` is not longer available as a separate variable, but is included into the `polly_config_dict`
         
         """
         type(self).counter += 1
@@ -73,7 +72,7 @@ class PicassoProc:
 
 
     def mdate_filename(self):
-        """get the date from filename in YYYYMMDD"""
+        """Get the date from filename in YYYYMMDD."""
         filename = self.rawdata_dict['filename']
         mdate = re.split(r'_',filename)[0:3]
         YYYY = mdate[0]
@@ -83,7 +82,7 @@ class PicassoProc:
 
 
     def gf(self, wavelength, meth, telescope):
-        """get flag shorthand
+        """Get flag shorthand.
 
         i.e., the following two calls are equivalent
         ```
@@ -128,13 +127,13 @@ class PicassoProc:
 #        return mdate
 
     def mdate_infile(self):
-        """first date in file as string"""
+        """First date in file as string."""
         mdate_infilename = self.rawdata_dict['measurement_time']['var_data'][0][0]
         return f"{mdate_infilename}"
 
 
     def check_for_correct_mshots(self):
-        """check if mshots are more than 1.1 * laser_prf * deltatime or smaller 0"""
+        """Check if mshots are more than 1.1 * laser_prf * deltatime or smaller 0."""
         laser_rep_rate = self.rawdata_dict['laser_rep_rate']['var_data']
         mShotsPerPrf = laser_rep_rate * self.polly_config_dict['deltaT']
         mShots = self.rawdata_dict['measurement_shots']['var_data']
@@ -146,7 +145,7 @@ class PicassoProc:
 
 
     def filter_or_correct_false_mshots(self):
-        """ filter or correct the mshots (currently only logging)
+        """Filter or correct the mshots (currently only logging).
         
         .. TODO::
             that might be covered via the mcps conversion
@@ -166,7 +165,7 @@ class PicassoProc:
 
 
     def mdate_consistency(self) -> bool:
-        """check mdate consistency"""
+        """Check mdate consistency."""
         if self.mdate_filename() == self.mdate_infile():
             logging.info('... date in nc-file equals date of filename')
             return True
@@ -176,7 +175,7 @@ class PicassoProc:
 
 
     def reset_date_infile(self):
-        """correct the date in the file """
+        """Correct the date in the file."""
         logging.info('date consistency-check... ')
         if self.mdate_consistency() == False:
             logging.info('date in nc-file will be replaced with date of filename.')
@@ -188,7 +187,7 @@ class PicassoProc:
 
 
     def setChannelTags(self):
-        """set the channel tags
+        """Set the channel tags.
 
         they are stored as dictionary in
         ```
@@ -347,19 +346,22 @@ class PicassoProc:
 
 
     def SaturationDetect(self):
-        """Saturation Detection
-        
-        
-        """
+        """Saturation Detection."""
 
         self.flagSaturation = pollySaturationDetect.pollySaturationDetect(
-            data_cube=self,
-            sigSaturateThresh=self.polly_config_dict['saturate_thresh']
+            data_cube = self,
+            sigSaturateThresh = self.polly_config_dict['saturate_thresh']
         )
 
 
-    def polarizationCaliD90(self):
-        """calibration with the Delta-90 method
+    def polarizationCaliD90(self, db_path:str=None):
+        """Calibration with the Delta-90 method.
+
+        Parameters
+        ----------
+        db_path : str
+            Path to database to read DC values from in case none
+            are successfully retrieved. Default is None.
         
         The stuff that starts here in the matlab version
         https://github.com/PollyNET/Pollynet_Processing_Chain/blob/5efd7d35596c67ef8672f5948e47d1f9d46ab867/lib/interface/picassoProcV3.m#L442
@@ -367,11 +369,24 @@ class PicassoProc:
 
         polarization.loadGHK(self)
         self.pol_cali['D90'] = polarization.calibrateGHK(self)
-        self.etaused = select.single_best(self.pol_cali['D90'], 'eta', 'eta_std') 
+        isUsable = [element['status'] for key, val in self.pol_cali['D90'].items() for element in val]
+
+        if np.sum(isUsable) > 0:
+            logging.info("Using retieved polarization calibration constants.")
+            self.etaused = select.single_best(self.pol_cali['D90'], 'eta', 'eta_std')
+        elif db_path is not None:
+            logging.warning("Can not retieve viable polarization calibration constants, uses constants form the database.")
+            table_name = 'depol_calibration_constant'
+            ts_interval = self.retrievals_highres['time'][0], self.retrievals_highres['time'][-1]
+            self.pol_cali['D90_db'] = sql_db.get_from_sql_db(db_path, table_name, ts_interval)['D90_db']
+            self.etaused = select.single_best(self.pol_cali['D90_db'], 'eta', 'eta_std')
+        else:
+            logging.critical("Can not retieve viable polarization calibration constants, and no database detected.")
+            raise ValueError("Can not retieve viable polarization calibration constants, and no database detected.")
 
 
     def cloudScreen(self, collect_debug:bool=False):
-        """basic cloud screenting
+        """Basic cloud screenting.
         
         https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L663
         """
@@ -379,7 +394,7 @@ class PicassoProc:
 
 
     def cloudFreeSeg(self):
-        """cloud free profile segmentation
+        """Cloud free profile segmentation.
         
         https://github.com/PollyNET/Pollynet_Processing_Chain/blob/b3b8ec7726b75d9db6287dcba29459587ca34491/lib/interface/picassoProcV3.m#L707
         
@@ -397,6 +412,14 @@ class PicassoProc:
     def aggregate_profiles(self, var=None):
         """Aggregate highres profiles over cloud free segments
 
+        Parameters
+        ----------
+        var : str
+            Name of variables to aggregate.
+            Default is `RCS`, `sigBGCor`, and `BG`.
+
+        Notes
+        -----
         .. TODO:: Decide on a consistent way for doing the aggregation, do not mix mean and sum
         """
 
@@ -447,8 +470,8 @@ class PicassoProc:
 
     def calcMolecular(self):
         """Calculate the molecular scattering for the cloud free periods
-        with the strategy of first averaging the met data and then calculating the rayleigh scattering.
-        
+        with the strategy of first averaging the met data and then
+        calculating the rayleigh scattering.
         """
 
         time_slices = [self.retrievals_highres['time64'][grp] for grp in self.clFreeGrps]
@@ -459,23 +482,28 @@ class PicassoProc:
 
     def rayleighFit(self, collect_debug:bool=False):
         """Perform the rayleigh fit procedure.
+
+        Parameters
+        ----------
+        collect_debug : bool
+            If true, collects debug information. Default is False.
         
-        Direct translation from the matlab code. There might be noticeable numerical discrepancies (especially in the residual)
-        seemed to work ok for 532, 1064, but with issues for 355.
-        --> The Douglas Peucker algorithm works fine (gives the same result as the Matlab version). However, due the numerical discrepancies
-        In the residuals of the fit algorithm sometimes different refH segments are chosen.
+        Notes
+        -----
+        - Direct translation from the matlab code. There might be noticeable numerical discrepancies (especially in the residual)
+          seemed to work ok for 532, 1064, but with issues for 355.
+        - The Douglas Peucker algorithm works fine (gives the same result as the Matlab version). However, due the numerical discrepancies
+          In the residuals of the fit algorithm sometimes different refH segments are chosen.
         """
 
-        print('Start Rayleigh Fit')
+        logging.info('Start Rayleigh Fit')
         logging.warning(f'Potential for differences to matlab code due to numerical issues (subtraction of two small values)')
 
         self.retrievals_profile['refH'] = rayleighfit.rayleighfit(self, collect_debug)
 
 
     def polarizationCaliMol(self):
-        """calibration with molecular signal in reference height
-        
-        """
+        """Calibration with molecular signal in reference height."""
 
         logging.warning(f'not checked against the matlab code')
         if self.polly_config_dict['flagMolDepolCali']:
@@ -485,7 +513,7 @@ class PicassoProc:
 
 
     def transCor(self):
-        """transmission correction
+        """GHK-Transmission correction
 
         .. TODO::
 
@@ -511,8 +539,7 @@ class PicassoProc:
 
 
     def retrievalKlett(self, oc=False, nr=False):
-        """apply the klett retrieval
-        """
+        """Apply Klett retrieval."""
 
         retrievalname = 'klett'
         kwargs = {}
@@ -532,8 +559,7 @@ class PicassoProc:
 
 
     def retrievalRaman(self, oc=False, nr=False, collect_debug=False):
-        """apply the raman retrieval (nighttime only)
-        """
+        """Apply Raman retrieval (nighttime only)."""
 
         retrievalname = 'raman'
         kwargs = {}
@@ -558,11 +584,22 @@ class PicassoProc:
             self.retrievals_profile['avail_optical_profiles'].append(retrievalname)
 
 
-    def overlapCalc(self, collect_debug=False):
-        """estimate the overlap function
+    def overlapCalc(self, collect_debug:bool=False):
+        """Estimate the overlap function.
 
-        different to the matlab version, where an average over all cloud
-        free periods is taken, it is done here per cloud free segment
+        Parameters
+        ----------
+        collect_debug : bool
+            If true, collects debug information. Default is False.
+        
+        Notes
+        -----
+        - Different to the matlab version, where an average over all cloud
+          free periods is taken, it is done here per cloud free segment
+
+        .. TODO::
+            The data structure of retrievals_profile['overlap'] differs from
+            retrievals_profile['raman']!
             
         """
         if not self.polly_config_dict["flagOLCor"]:
@@ -573,7 +610,7 @@ class PicassoProc:
 
 
     def overlapFixLowestBins(self):
-        """the lowest bins are affected by stange near range effects"""
+        """The lowest bins are affected by stange near range effects."""
         if not self.polly_config_dict["flagOLCor"]:
             return
         height = self.retrievals_highres['range']
@@ -583,7 +620,7 @@ class PicassoProc:
 
 
     def overlapCor(self):
-        """overlap correction
+        """Overlap correction
 
         the overlap correction is implemented differently to the matlab version
         first a 2d (time, height) correction array is constructed then it is applied.
@@ -607,8 +644,7 @@ class PicassoProc:
 
 
     def calcDepol(self):
-        """calculate the volume depol and the particle depol
-        """
+        """Calculate the volume depol and the particle depol."""
 
         for ret_prof_name in self.retrievals_profile['avail_optical_profiles']:
             print(ret_prof_name)
@@ -620,23 +656,20 @@ class PicassoProc:
 
 
     def estQualityMask(self):
-        """estimate the quality mask
-
-        """
+        """Estimate the quality mask."""
+        logging.info("Estimate quality mask")
         self.retrievals_highres['quality_mask'] = qualityMask.qualityMask(self)
 
 
     def Angstroem(self):
-        """calculate the angstrom exponent
-        """
+        """Calculate the angstrom exponent."""
         for ret_prof_name in self.retrievals_profile['avail_optical_profiles']:
             print(ret_prof_name)
         
             self.retrievals_profile[ret_prof_name] = angstroem.ae_cldFreeGrps(
                 self, ret_prof_name) 
 
-
-    def LidarCalibration(self, collect_debug:bool=False):
+    def LidarCalibration(self, db_path:str=None, collect_debug:bool=False):
         """calculate the lidar constant
 
         .. TODO:: Find out how we prioritise raman, klett, and database retrieved LC...
@@ -651,16 +684,29 @@ class PicassoProc:
             retrieval='raman', 
             collect_debug=collect_debug
         )
+
+        logging.info("Choosing best LC per channel...")
+        if db_path is None:
+            logging.info("No database path found. Using retrieved LC values.")
+            self.LC['klett_db'] = {}
+            self.LC['raman_db'] = {}
+        else:
+            logging.info("Database LC values will be used when no retrieved ones are available.")
+            # db_path = self.polly_config_dict['calibrationDB']
+            table_name = 'lidar_calibration_constant'
+            ts_interval = self.retrievals_highres['time'][0], self.retrievals_highres['time'][-1]
+            self.LC['klett_db'] = sql_db.get_from_sql_db(db_path, table_name, ts_interval)['klett_db']
+            self.LC['raman_db'] = sql_db.get_from_sql_db(db_path, table_name, ts_interval)['raman_db']
         
-        logging.warning('reading calibration constant from database not working yet')
         # Prioritise Raman retrieved LCs but use Klett retrieved ones when no Raman retrieval exists.
-        self.LCused = select.single_best(self.LC['klett'], 'LC', 'LCStd', relative=True) |\
-              select.single_best(self.LC['raman'], 'LC', 'LCStd', relative=True)
+        self.LCused =  select.single_best(self.LC['klett_db'], 'LC', 'LCStd', relative=True) |\
+                         select.single_best(self.LC['raman_db'], 'LC', 'LCStd', relative=True) |\
+                         select.single_best(self.LC['klett'], 'LC', 'LCStd', relative=True) |\
+                         select.single_best(self.LC['raman'], 'LC', 'LCStd', relative=True)
 
 
     def attBsc_volDepol(self):
-        """highres attBsc and voldepol in 2d
-        """
+        """highres attBsc and voldepol in 2D."""
 
         # for now try with mutable state in data_cube
         logging.info('attBsc 2d retrieval')
@@ -671,8 +717,7 @@ class PicassoProc:
 
 
     def molecularHighres(self):
-        """calculate the molecular signal for the 2d high resolution
-        """
+        """calculate the molecular signal for the 2d high resolution."""
 
         self.mol_2d = molecular.calc_2d(
             self.met.ds,
@@ -681,27 +726,39 @@ class PicassoProc:
 
 
     def quasiV1(self):
-        """quasiV1 retrivals and target categorisation.
-        """
+        """QuasiV1 retrivals and target categorisation."""
 
+        logging.info('Calculating Quasi V1 particle backscatter coefficient')
         quasiV1.quasi_bsc(self)
+
+        logging.info('Calculating Quasi V1 particle Depolarization ratio')
         quasi.quasi_pdr(self, version='V1')
+
+        logging.info('Calculating Quasi V1 Ångström Exponent')
         quasi.quasi_angstrom(self, version='V1')
+
+        logging.info('Producing V1 target categorization')
         quasi.target_cat(self, version='V1')
 
 
     def quasiV2(self):
-        """quasiV2 retrivals and target categorisation.
-        """
+        """QuasiV2 retrivals and target categorisation."""
 
+        logging.info('Calculating Quasi V2 particle backscatter coefficient')
         quasiV2.quasi_bsc(self)
+
+        logging.info('Calculating Quasi V2 particle Depolarization ratio')
         quasi.quasi_pdr(self, version='V2')
+
+        logging.info('Calculating Quasi V2 Ångström Exponent')
         quasi.quasi_angstrom(self, version='V2')
+
+        logging.info('Producing V2 target categorization')
         quasi.target_cat(self, version='V2')
 
 
     def write_2_sql_db(self, parameter:str, db_path:str|None=None, method:str|None=None):
-        """ write LC or eta to sqlite db table
+        """Write LC or eta to sqlite db table.
 
         Parameters
         ----------
@@ -715,10 +772,10 @@ class PicassoProc:
             
         Notes
         -----
-        The unique columns are needed that new entries overwrite old ones, 
-        otherwise they are just added to the table with same timestamps.
-
+        - The unique columns are needed that new entries overwrite old ones, 
+          otherwise they are just added to the table with same timestamps.
         """
+
         if db_path == None:
             db_path = self.polly_config_dict['calibrationDB']
             logging.info(f"read db_path from polly_config_dict {db_path}")
@@ -749,11 +806,16 @@ class PicassoProc:
 
 
     def read_calibration_db(self, db_path:str|None=None):
-        """read the calibration constants from database
+        """Read the calibration constants from database.
+
+        Parameters
+        ----------
+        db_path : str
+            path to database of calibration values.
         
-        time interval includes 24h before and after the actual date
-        
+        Time interval includes 24h before and after the actual date
         """
+
         if db_path == None:
             db_path = self.polly_config_dict['calibrationDB']
             logging.info(f"read db_path from polly_config_dict {db_path}")
@@ -767,16 +829,10 @@ class PicassoProc:
         
 
     def adding_retrieving_infos_2_polly_config_dict(self):
-        """ some infos from the polly_config_dict should have there own keys, e.g. reference_search_range
-
-        Parameters
-        ----------
-        self
-        
-        Returns
-        -------
-        self (with added polly_config dict_keys)
+        """Some infos from the polly_config_dict should have there own keys,
+        e.g. reference_search_range.
         """
+
         lower_overlap = np.array(self.polly_config_dict['heightFullOverlap'])
         reference_search_range_355_total_FR = [int(lower_overlap[self.flag_355_total_FR][0]),self.polly_config_dict['maxDecomHeight355']]
         reference_search_range_532_total_FR = [int(lower_overlap[self.flag_532_total_FR][0]),self.polly_config_dict['maxDecomHeight532']]

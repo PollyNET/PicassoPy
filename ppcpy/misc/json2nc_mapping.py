@@ -118,16 +118,23 @@ def create_netcdf_from_dict(nc_file_path:str, data_cube, data_dict:dict,
                                 #print(after)
                                 if '[' and ']' in after:
                                     dict_name = after.split('[')[0]
-                                    #print(dict_name)
+                                    #print(after)
                                     nested_keys = extract_bracket_values(after)
+                                    #print(nested_keys)
                                     extraction = getattr(data_cube, dict_name)
                                     for nested_key in nested_keys:
                                         if nested_key in extraction:
+                                            #print(f'nested_key: {nested_key} in extraction')
                                             extraction = extraction[nested_key]
+                                            #print(extraction)
                                         elif nested_key == '*' and isinstance(cldFreeIndx, (int, float)) and len(extraction) > cldFreeIndx:
+                                            #print(f'nested_key in *: {nested_key} in extraction')
                                             extraction = extraction[int(cldFreeIndx)]
+                                            #print(extraction)
                                         else:
+                                            #print(f'nested_key: {nested_key} NOT in extraction')
                                             extraction = attr_value[key]['value']
+                                            #print(extraction)
                                             break
                             
                                     if 'smoothwin' in nested_key.lower() and isinstance(extraction, (float, int, np.ndarray)):
@@ -135,6 +142,8 @@ def create_netcdf_from_dict(nc_file_path:str, data_cube, data_dict:dict,
                                     elif "refbeta" in nested_key.lower() and isinstance(extraction, (float, int)):
                                         result = extraction*1e6 # [m^{-1}*Sr^{-1} --> [Mm^{-1}*Sr^{-1}
                                         attr_value[key]['value'] = f"{result:.2e}"
+                                    elif "eta" in nested_key.lower():
+                                        attr_value[key]['value'] = f"{extraction:.2f}"
                                     else:
                                         attr_value[key]['value'] = extraction
 
