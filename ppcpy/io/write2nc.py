@@ -101,7 +101,8 @@ def write_channelwise_2_nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
         yyyy,mm,dd = date_splitting(data_cube.date)
         output_path = Path(data_cube.picasso_config_dict["results_folder"],data_cube.device,yyyy,mm,dd)
         output_path.mkdir(parents=True, exist_ok=True)
-        output_filename = Path(output_path, f"{data_cube.date}_{data_cube.device}_{prod}.nc")
+        date_string = datetime.datetime.strptime(data_cube.date, "%Y%m%d").strftime("%Y_%m_%d")
+        output_filename = Path(output_path, f"{date_string}_{data_cube.device}_{prod}.nc")
         json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1, prod=prod)
 
 def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
@@ -155,7 +156,8 @@ def write2nc_file(data_cube, root_dir=root_dir, prod_ls=[]):
         yyyy,mm,dd = date_splitting(data_cube.date)
         output_path = Path(data_cube.picasso_config_dict["results_folder"],data_cube.device,yyyy,mm,dd)
         output_path.mkdir(parents=True, exist_ok=True)
-        output_filename = Path(output_path, f"{data_cube.date}_{data_cube.device}_{prod}.nc")
+        date_string = datetime.datetime.strptime(data_cube.date, "%Y%m%d").strftime("%Y_%m_%d")
+        output_filename = Path(output_path, f"{date_string}_{data_cube.device}_{prod}.nc")
         json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1, prod=prod)
 
 
@@ -249,7 +251,8 @@ def write_profile2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[], col
             yyyy,mm,dd = date_splitting(data_cube.date)
             output_path = Path(data_cube.picasso_config_dict["results_folder"],data_cube.device,yyyy,mm,dd)
             output_path.mkdir(parents=True, exist_ok=True)
-            output_filename = Path(output_path, f"{data_cube.date}_{data_cube.device}_{start}_{stop}_{prod}.nc")
+            date_string = datetime.datetime.strptime(data_cube.date, "%Y%m%d").strftime("%Y_%m_%d")
+            output_filename = Path(output_path, f"{date_string}_{data_cube.device}_{start}_{stop}_{prod}.nc")
             json2nc_mapping.create_netcdf_from_dict(output_filename, data_cube, json_nc_mapping_dict, compression_level=1, prod=prod, cldFreeIndx=n)
 
 
