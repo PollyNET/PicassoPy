@@ -1150,7 +1150,7 @@ def pollyDisplay_profile_summary(nc_dict_profile,nc_dict_profile_NR,config_dict,
 
 
         for n,p in enumerate(param_dict[parameter]["NR"]):
-            if p == None:
+            if p == None or p not in nc_dict_profile_NR.keys():
                 continue
             color_ls = ['cyan','lime']
 

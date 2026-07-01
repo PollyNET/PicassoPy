@@ -420,14 +420,18 @@ def calc_ANGEXP(nc_dict):
 
     window_size = 25
 
-    log_klett_355_532 = compute_valid_log(smoothed_data(data=nc_dict['aerBsc_klett_355']['data'],window_size=window_size),smoothed_data(data=nc_dict['aerBsc_klett_532']['data'],window_size=window_size))
-    if 'aerBsc_klett_1064' in nc_dict.keys():
+    if 'aerBsc_klett_355' in nc_dict.keys() and 'aerBsc_klett_532' in nc_dict.keys():
+        log_klett_355_532 = compute_valid_log(smoothed_data(data=nc_dict['aerBsc_klett_355']['data'],window_size=window_size),smoothed_data(data=nc_dict['aerBsc_klett_532']['data'],window_size=window_size))
+    if 'aerBsc_klett_532' in nc_dict.keys() and 'aerBsc_klett_1064' in nc_dict.keys():
         log_klett_532_1064 = compute_valid_log(smoothed_data(data=nc_dict['aerBsc_klett_532']['data'],window_size=window_size),smoothed_data(data=nc_dict['aerBsc_klett_1064']['data'],window_size=window_size))
-    log_raman_355_532 = compute_valid_log(smoothed_data(data=nc_dict['aerBsc_raman_355']['data'],window_size=window_size),smoothed_data(data=nc_dict['aerBsc_raman_532']['data'],window_size=window_size))
-    if 'aerBsc_raman_1064' in nc_dict.keys():
+    if 'aerBsc_raman_355' in nc_dict.keys() and 'aerBsc_raman_532' in nc_dict.keys():
+        log_raman_355_532 = compute_valid_log(smoothed_data(data=nc_dict['aerBsc_raman_355']['data'],window_size=window_size),smoothed_data(data=nc_dict['aerBsc_raman_532']['data'],window_size=window_size))
+    if 'aerBsc_raman_532' in nc_dict.keys() and 'aerBsc_raman_1064' in nc_dict.keys():
         log_raman_532_1064 = compute_valid_log(smoothed_data(data=nc_dict['aerBsc_raman_532']['data'],window_size=window_size),smoothed_data(data=nc_dict['aerBsc_raman_1064']['data'],window_size=window_size))
-    log_LR_355_532 = compute_valid_log(smoothed_data(data=nc_dict['aerLR_raman_355']['data'],window_size=window_size),smoothed_data(data=nc_dict['aerLR_raman_532']['data'],window_size=window_size))
-    log_Ext_raman_355_532 = compute_valid_log(smoothed_data(data=nc_dict['aerExt_raman_355']['data'],window_size=window_size),smoothed_data(data=nc_dict['aerExt_raman_532']['data'],window_size=window_size))
+    if 'aerLR_raman_355' in nc_dict.keys() and 'aerLR_raman_532' in nc_dict.keys():
+        log_LR_355_532 = compute_valid_log(smoothed_data(data=nc_dict['aerLR_raman_355']['data'],window_size=window_size),smoothed_data(data=nc_dict['aerLR_raman_532']['data'],window_size=window_size))
+    if 'aerExt_raman_355' in nc_dict.keys() and 'aerExt_raman_532' in nc_dict.keys():
+        log_Ext_raman_355_532 = compute_valid_log(smoothed_data(data=nc_dict['aerExt_raman_355']['data'],window_size=window_size),smoothed_data(data=nc_dict['aerExt_raman_532']['data'],window_size=window_size))
 
 #    log_klett_355_532 = compute_valid_log(nc_dict['aerBsc_klett_355'],nc_dict['aerBsc_klett_532'])
 #    log_klett_532_1064 = compute_valid_log(nc_dict['aerBsc_klett_532'],nc_dict['aerBsc_klett_1064'])
@@ -436,36 +440,40 @@ def calc_ANGEXP(nc_dict):
 #    log_LR_355_532 = compute_valid_log(nc_dict['aerLR_raman_355'],nc_dict['aerLR_raman_532'])
 #    log_Ext_raman_355_532 = compute_valid_log(nc_dict['aerExt_raman_355'],nc_dict['aerExt_raman_532'])
 
-    AE_beta_355_532_Klett = log_klett_355_532/np.log(532/355)
-    if 'aerBsc_klett_1064' in nc_dict.keys():
+    if 'log_klett_355_532' in locals():
+        AE_beta_355_532_Klett = log_klett_355_532/np.log(532/355)
+    if 'aerBsc_klett_1064' in nc_dict.keys() and 'log_klett_532_1064' in locals():
         AE_beta_532_1064_Klett = log_klett_532_1064/np.log(1064/532)
-    AE_beta_355_532_Raman = log_raman_355_532/np.log(532/355)
-    if 'aerBsc_raman_1064' in nc_dict.keys():
+    if 'log_raman_355_532' in locals():
+        AE_beta_355_532_Raman = log_raman_355_532/np.log(532/355)
+    if 'aerBsc_raman_1064' in nc_dict.keys() and 'log_raman_532_1064' in locals():
         AE_beta_532_1064_Raman = log_raman_532_1064/np.log(1064/532)
-    AE_LR_355_532_Raman = log_LR_355_532/np.log(532/355)
+    if 'log_LR_355_532' in locals():
+        AE_LR_355_532_Raman = log_LR_355_532/np.log(532/355)
     #AE_parExt_355_532_Raman = AE_beta_355_532_Raman + AE_LR_355_532_Raman
-    AE_parExt_355_532_Raman = log_Ext_raman_355_532/np.log(532/355)
+    if 'log_Ext_raman_355_532' in locals():
+        AE_parExt_355_532_Raman = log_Ext_raman_355_532/np.log(532/355)
 
-    nc_dict['AE_beta_355_532_Klett']   = {}
-    nc_dict['AE_beta_355_532_Raman']   = {}
-    nc_dict['AE_beta_532_1064_Klett']  = {}
-    nc_dict['AE_beta_532_1064_Raman']  = {}
-    nc_dict['AE_LR_355_532_Raman']     = {}
-    nc_dict['AE_parExt_355_532_Raman'] = {}
 
-    nc_dict['AE_beta_355_532_Klett']['data'] = AE_beta_355_532_Klett
-    nc_dict['AE_beta_355_532_Raman']['data'] = AE_beta_355_532_Raman
-    if 'aerBsc_klett_1064' in nc_dict.keys():
+    if 'AE_beta_355_532_Klett' in locals():
+        nc_dict['AE_beta_355_532_Klett']   = {}
+        nc_dict['AE_beta_355_532_Klett']['data'] = AE_beta_355_532_Klett
+    if 'AE_beta_355_532_Raman' in locals():
+        nc_dict['AE_beta_355_532_Raman']   = {}
+        nc_dict['AE_beta_355_532_Raman']['data'] = AE_beta_355_532_Raman
+    if 'AE_beta_532_1064_Klett' in locals():
+        nc_dict['AE_beta_532_1064_Klett']  = {}
         nc_dict['AE_beta_532_1064_Klett']['data'] = AE_beta_532_1064_Klett
-    else:
-        del nc_dict['AE_beta_532_1064_Klett']
-    if 'aerBsc_raman_1064' in nc_dict.keys():
+    if 'AE_beta_532_1064_Raman' in locals():
+        nc_dict['AE_beta_532_1064_Raman']  = {}
         nc_dict['AE_beta_532_1064_Raman']['data'] = AE_beta_532_1064_Raman
-    else:
-        del nc_dict['AE_beta_532_1064_Raman']
 
-    nc_dict['AE_LR_355_532_Raman']['data'] = AE_LR_355_532_Raman
-    nc_dict['AE_parExt_355_532_Raman']['data'] = AE_parExt_355_532_Raman
+    if 'AE_LR_355_532_Raman' in locals():
+        nc_dict['AE_LR_355_532_Raman']     = {}
+        nc_dict['AE_LR_355_532_Raman']['data'] = AE_LR_355_532_Raman
+    if 'AE_parExt_355_532_Raman' in locals():
+        nc_dict['AE_parExt_355_532_Raman'] = {}
+        nc_dict['AE_parExt_355_532_Raman']['data'] = AE_parExt_355_532_Raman
 
 #    nc_dict['AE_beta_355_532_Klett'] = smoothed_data(data=AE_beta_355_532_Klett,window_size=window_size)
 #    nc_dict['AE_beta_355_532_Raman'] = smoothed_data(data=AE_beta_355_532_Raman,window_size=window_size)
@@ -731,3 +739,13 @@ def extract_wavelength_from_parameterkey(parameter):
     else:
         result = None
     return result
+
+def gf(full_var_name):
+    """
+    get parameters var, wavelength, polarization, telescope from full_var_name, e.g RCS_355_total_FR --> returns RCS, 355, total, FR
+    """
+
+    splitted = re.split(r'_',full_var_name)
+    return splitted[0],splitted[1],splitted[2],splitted[3]
+
+

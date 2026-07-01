@@ -149,7 +149,7 @@ data_cube.preprocessing()
 
 ## write channelwise infos to nc-files (e.g.: SNR, Background, RangeCorrectedSignal)
 write2nc.write_channelwise_2_nc_file(data_cube=data_cube,prod_ls=["SNR","BG","RCS"])
-
+exit()
 ## saturation detection
 data_cube.SaturationDetect()
 
@@ -230,8 +230,10 @@ data_cube.Angstroem()
 
 ## write depolarization calibration factors and LIDAR calibration constants to sqlite-db
 base_dir = Path(data_cube.picasso_config_dict['results_folder'])
-#db_path = base_dir.joinpath(polly_device,polly_config_dict['calibrationDB'])
-db_path = "/data/level1b/polly24h/pollyxt_cpv/pollyxt_cpv_calibration_picassopy.db"
+db_path = base_dir.joinpath(polly_device,polly_config_dict['calibrationDB'])
+#db_path = "/data/level1b/polly24h/arielle/arielle_calibration_neumeyer.db"
+logging.info(f'db_file: {db_path}')
+#db_path = "/data/level1b/polly24h/pollyxt_cpv/pollyxt_cpv_calibration_picassopy.db"
 ## calc. LIDAR calibration constants
 data_cube.LidarCalibration(db_path=db_path)
 ## gives also data_cube.pol_cali, data_cube.LCused (e.g.: data_cube.LCused['532_total_FR'])

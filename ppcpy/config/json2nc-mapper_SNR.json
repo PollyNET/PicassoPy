@@ -89,7 +89,7 @@
         "calendar": "julian"
       }
     },
-    "SNR_FR_total_355nm": {
+    "SNR_355_total_FR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -101,13 +101,13 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "signal to noise ratio FR_total_355nm",
-        "standard_name": "SNR_FR_total_355nm",
+        "standard_name": "SNR_355_total_FR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
       }
     },
-    "SNR_FR_cross_355nm": {
+    "SNR_355_cross_FR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -119,13 +119,13 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "signal to noise ratio FR_cross_355nm",
-        "standard_name": "SNR_FR_cross_355nm",
+        "standard_name": "SNR_355_cross_FR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
       }
     },
-    "SNR_FR_387nm": {
+    "SNR_387_total_FR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -143,7 +143,7 @@
         "comment": ""
       }
     },
-    "SNR_FR_407nm": {
+    "SNR_407_total_FR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -161,7 +161,7 @@
         "comment": ""
       }
     },
-    "SNR_FR_total_532nm": {
+    "SNR_532_total_FR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -173,13 +173,13 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "signal to noise ratio FR_total_532nm",
-        "standard_name": "SNR_FR_total_532nm",
+        "standard_name": "SNR_532_total_FR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
       }
     },
-    "SNR_FR_cross_532nm": {
+    "SNR_532_cross_FR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -191,7 +191,7 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "signal to noise ratio FR_cross_532nm",
-        "standard_name": "SNR_FR_cross_532nm",
+        "standard_name": "SNR_532_cross_FR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
@@ -215,7 +215,7 @@
         "comment": ""
       }
     },
-    "SNR_FR_607nm": {
+    "SNR_607_total_FR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -233,7 +233,7 @@
         "comment": ""
       }
     },
-    "SNR_FR_total_1064nm": {
+    "SNR_1064_total_FR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -245,7 +245,7 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "signal to noise ratio FR_total_1064nm",
-        "standard_name": "SNR_FR_total_1064nm",
+        "standard_name": "SNR_1064_total_FR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
@@ -269,7 +269,7 @@
         "comment": ""
       }
     },
-    "SNR_NR_total_355nm": {
+    "SNR_355_total_NR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -281,13 +281,13 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "signal to noise ratio NR_total_355nm",
-        "standard_name": "SNR_NR_total_355nm",
+        "standard_name": "SNR_355_total_NR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
       }
     },
-    "SNR_NR_387nm": {
+    "SNR_387_total_NR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -305,7 +305,7 @@
         "comment": ""
       }
     },
-    "SNR_NR_total_532nm": {
+    "SNR_532_total_NR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -317,13 +317,13 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "signal to noise ratio NR_total_532nm",
-        "standard_name": "SNR_NR_total_532nm",
+        "standard_name": "SNR_532_total_NR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
       }
     },
-    "SNR_NR_cross_532nm": {
+    "SNR_532_cross_NR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -335,13 +335,13 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "signal to noise ratio NR_cross_532nm",
-        "standard_name": "SNR_NR_cross_532nm",
+        "standard_name": "SNR_532_cross_NR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
       }
     },
-    "SNR_NR_607nm": {
+    "SNR_607_total_NR": {
       "dtype": "f8",
       "shape": [
         "time",
