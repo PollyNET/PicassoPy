@@ -222,6 +222,7 @@
     "flagUseRetrievedExt4LCCalc": true,
     "quasi_smooth_h": [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
     "quasi_smooth_t": [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+    "flagOnlyUseValidQuasiData": true,
     "IWV_instrument": "AERONET",
     "maxIWVTLag": 0.0833,
     "tTwilight": 0.0347,
