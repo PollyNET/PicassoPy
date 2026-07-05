@@ -426,6 +426,7 @@ class PicassoProc:
 
         if isinstance(flagVal, (np.ndarray, list)):
             flagVal = np.asarray(flagVal)
+            self.flagValPrf = flagVal
         elif flagVal and not isinstance(flagVal, (np.ndarray, list)):
             flagVal = self.flagValPrf
 
