@@ -424,9 +424,9 @@ class PicassoProc:
         .. TODO:: Decide on a consistent way for doing the aggregation, do not mix mean and sum
         """
 
-        if isinstance(flagVal, np.ndarray):
-            flagVal = flagVal
-        elif flagVal and not isinstance(flagVal, np.ndarray):
+        if isinstance(flagVal, (np.ndarray, list)):
+            flagVal = np.asarray(flagVal)
+        elif flagVal and not isinstance(flagVal, (np.ndarray, list)):
             flagVal = self.flagValPrf
 
         if var == None:
