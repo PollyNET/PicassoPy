@@ -2643,7 +2643,12 @@ def pollyDisplay_preprocessed_BG(nc_dict, config_dict, polly_conf_dict, saveFold
     ## trimm matrix to last available timestamp if neccessary
     data_matrix_h = readout.trimm_matrix_to_last_timestamp(flagPlotLastProfilesOnly=config_dict['flagPlotLastProfilesOnly'],matrix=data_matrix_h,mdate=date_00,profile_length=int(np.nanmean(np.diff(time))),last_timestamp=nc_dict['time']['data'][-1])
 
-    data_matrix = np.squeeze(data_matrix_h, axis=1)[0:len(perfect_day_timestamps)]
+    data_matrix = np.squeeze(data_matrix_h, axis=1)
+    if len(perfect_day_timestamps) < len(data_matrix):
+        data_matrix = data_matrix[0:len(perfect_day_timestamps)]
+    elif len(perfect_day_timestamps) > len(data_matrix):
+        perfect_day_timestamps = perfect_day_timestamps[0:len(data_matrix)]
+
     data_matrix = np.where(data_matrix > 0, data_matrix, 0)
 
 

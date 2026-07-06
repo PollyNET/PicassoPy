@@ -50,6 +50,9 @@ my_parser.add_argument('--level0_file_to_process',
                        type=str,
                        default=None,
                        help='specify a level0 polly file to be processed')
+my_parser.add_argument('--preproc_only',
+                        action='store_true',
+                        help='switch to run only the preprocessing, including the storage of SNR, BG and RCS files')
 
 ## init parser
 args = my_parser.parse_args()
@@ -149,7 +152,9 @@ data_cube.preprocessing()
 
 ## write channelwise infos to nc-files (e.g.: SNR, Background, RangeCorrectedSignal)
 write2nc.write_channelwise_2_nc_file(data_cube=data_cube,prod_ls=["SNR","BG","RCS"])
-exit()
+if args.preproc_only:
+    exit()
+
 ## saturation detection
 data_cube.SaturationDetect()
 
@@ -244,6 +249,7 @@ data_cube.write_2_sql_db(db_path=str(db_path),parameter='DC')
 ## LC_column_names = ['cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
 
 ## write profile retrievals to nc files
+write2nc.write_profile2nc_file(data_cube=data_cube, prod_ls=["overlap_profiles"])
 write2nc.write_profile2nc_file(data_cube=data_cube, prod_ls=["profiles","NR_profiles","OC_profiles"])
 
 ## calc. high resolution retrievals of attenuated backscatter and volume depolarization

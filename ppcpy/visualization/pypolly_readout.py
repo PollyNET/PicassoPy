@@ -59,13 +59,13 @@ def get_nc_filename(date, device, inputfolder, param=""):
     if path_exist.exists() == True:
 #        print(inputfolder)
         
-        #file_searchpattern = f"{YYYY}_{MM}_{DD}_*[0-9]_{param}.nc"
-        if not "profile" in param:
-            #file_searchpattern = f"{date}_{device}_{param}.nc"
-            file_searchpattern = f"{YYYY}_{MM}_{DD}_{device}_{param}.nc"
-        else:
-            #file_searchpattern = f"{date}_{device}_*[0-9][0-9]_{param}.nc"
-            file_searchpattern = f"{YYYY}_{MM}_{DD}_{device}_*[0-9][0-9]_{param}.nc"
+        file_searchpattern = f"{YYYY}_{MM}_{DD}_{device}_*_{param}.nc"
+       # if not "profile" in param:
+       #     #file_searchpattern = f"{date}_{device}_{param}.nc"
+       #     file_searchpattern = f"{YYYY}_{MM}_{DD}_{device}_*_{param}.nc"
+       # else:
+       #     #file_searchpattern = f"{date}_{device}_*[0-9][0-9]_{param}.nc"
+       #     file_searchpattern = f"{YYYY}_{MM}_{DD}_{device}_*[0-9][0-9]_{param}.nc"
 
         res_file = Path(r'{}'.format(inputfolder)).glob('{}'.format(file_searchpattern))
         ## convert type path to type string

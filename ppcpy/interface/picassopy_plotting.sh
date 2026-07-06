@@ -138,7 +138,7 @@ main() {
             ## check number of available level1-files
             ## 24h-file vs. multiple individual processed files
             #PATTERN="*[0-9][0-9]_att_bsc*.nc"
-            PATTERN="*${DEVICE}_att_bsc.nc"
+            PATTERN="*${DEVICE}_*_RCS.nc"
             echo $PATTERN
             YYYY=${DATE:0:4}
             MM=${DATE:4:2}

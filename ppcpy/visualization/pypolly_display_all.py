@@ -63,7 +63,7 @@ my_parser.add_argument('--outdir', dest='outdir', metavar='outputdir',
                        help='the output folder to put the png files to.')
 my_parser.add_argument('--retrieval', dest='retrieval', metavar='retrieval parameter',
                        default=['all'],
-                       choices=['all','attbsc','voldepol','cloudinfo','target_class','wvmr_rh','quasi_results','profiles','overlap','LC','HKD','longterm_cali','profile_summary','poliphon','RCS','SNR','BG'],
+                       choices=['all','attbsc','voldepol','cloudinfo','target_class','wvmr_rh','quasi_results','profiles','overlap','LC','HKD','longterm_cali','profile_summary','poliphon','RCS','SNR','BG','overlap_profiles'],
                        nargs='+',
                        type=str,
                        help='the retrievals to be plotted; default: "all".')
@@ -446,14 +446,27 @@ def main():
     else:
         pass
     
-    if ('all' in args.retrieval) or ('overlap' in args.retrieval):
+    #if ('all' in args.retrieval) or ('overlap' in args.retrieval):
+    #    ## plotting overlap 
+    #    try:
+    #        nc_files = readout.get_nc_filename(date, device, inputfolder, param='overlap')
+    #        for data_file in nc_files:
+    #            nc_dict = readout.read_nc_file(data_file,date,device,location)
+    #            print('plotting overlap:')
+    #            display_3d.pollyDisplay_Overlap(nc_dict, config_dict, polly_conf_dict, outputfolder,donefilelist_dict=donefilelist_dict)
+    #    except Exception as e:
+    #        logging.exception("An error occurred")
+
+    if ('all' in args.retrieval) or ('overlap_profiles' in args.retrieval):
         ## plotting overlap 
         try:
-            nc_files = readout.get_nc_filename(date, device, inputfolder, param='overlap')
+            nc_files = readout.get_nc_filename(date, device, inputfolder, param='overlap_profiles')
+            print(nc_files)
             for data_file in nc_files:
+                print(data_file)
                 nc_dict = readout.read_nc_file(data_file,date,device,location)
-                print('plotting overlap:')
-                display_3d.pollyDisplay_Overlap(nc_dict, config_dict, polly_conf_dict, outputfolder,donefilelist_dict=donefilelist_dict)
+                print('plotting overlap profiles:')
+                display_profiles.pollyDisplay_Overlap_Profiles(nc_dict, config_dict, polly_conf_dict, outputfolder,donefilelist_dict=donefilelist_dict)
         except Exception as e:
             logging.exception("An error occurred")
 
