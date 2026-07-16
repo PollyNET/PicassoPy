@@ -333,7 +333,7 @@ def main():
     if ('all' in args.retrieval) or ('quasi_results' in args.retrieval):
     ## plotting Quasi results V1
         try:
-            q_params_ls = ["angexp", "bsc_532", "bsc_1064", "par_depol_532"] 
+            q_params_ls = ["angexp", "bsc_355", "bsc_532", "bsc_1064", "ext_355", "ext_532", "ext_1064", "par_depol_532", "vol_depol_532"]
             nc_files = readout.get_nc_filename(date, device, inputfolder, param='quasi_results')
             for data_file in nc_files:
                 nc_dict = readout.read_nc_file(data_file,date,device,location)

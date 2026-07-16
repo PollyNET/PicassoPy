@@ -1932,10 +1932,20 @@ def pollyDisplayQR(nc_dict,config_dict, polly_conf_dict, saveFolder, q_param, q_
         zLim = polly_conf_dict['zLim_quasi_beta_1064']
     elif q_param == "angexp":
         zLim = polly_conf_dict['zLim_quasi_ANG']
+    elif q_param == "bsc_355":
+        zLim = polly_conf_dict['zLim_quasi_beta_355']        
     elif q_param == "bsc_532":
         zLim = polly_conf_dict['zLim_quasi_beta_532']        
     elif q_param == "par_depol_532":
         zLim = polly_conf_dict['zLim_quasi_Par_DR_532']
+    elif q_param == "vol_depol_532":
+        zLim = polly_conf_dict['zLim_quasi_Vol_DR_532']
+    elif q_param == "ext_355":
+        zLim = polly_conf_dict['zLim_quasi_ext']        
+    elif q_param == "ext_532":
+        zLim = polly_conf_dict['zLim_quasi_ext']        
+    if q_param == "ext_1064":
+        zLim = polly_conf_dict['zLim_quasi_ext']
 
     partnerLabel = polly_conf_dict['partnerLabel']
     colormap_basic = polly_conf_dict['colormap_basic']
@@ -1945,17 +1955,31 @@ def pollyDisplayQR(nc_dict,config_dict, polly_conf_dict, saveFolder, q_param, q_
 
     if q_param == "angexp":
         matrix = nc_dict['quasi_ang_532_1064']['data']
-        quality_mask = np.where(matrix > 0, 0, 0)
+        #quality_mask = np.where(matrix > 0, 0, 0)
+    elif q_param == "bsc_355":
+        matrix = nc_dict['quasi_bsc_355']['data']
+        #quality_mask = nc_dict['quality_mask_355']['data']
     elif q_param == "bsc_532":
         matrix = nc_dict['quasi_bsc_532']['data']
-        quality_mask = nc_dict['quality_mask_532']['data']
+        #quality_mask = nc_dict['quality_mask_532']['data']
     elif q_param == "bsc_1064":
         matrix = nc_dict['quasi_bsc_1064']['data']
-        quality_mask = nc_dict['quality_mask_1064']['data']
+        #quality_mask = nc_dict['quality_mask_1064']['data']
+    elif q_param == "ext_355":
+        matrix = nc_dict['quasi_ext_355']['data']
+        #quality_mask = nc_dict['quality_mask_355']['data']
+    elif q_param == "ext_532":
+        matrix = nc_dict['quasi_ext_532']['data']
+        #quality_mask = nc_dict['quality_mask_532']['data']
+    elif q_param == "ext_1064":
+        matrix = nc_dict['quasi_ext_1064']['data']
+        #quality_mask = nc_dict['quality_mask_1064']['data']
+    elif q_param == "vol_depol_532":
+        matrix = nc_dict['quasi_voldepol_532']['data']
     elif q_param == "par_depol_532":
         matrix = nc_dict['quasi_pardepol_532']['data']
         #quality_mask = nc_dict['quality_mask_voldepol']
-        quality_mask = nc_dict['quality_mask_voldepol_532']['data']
+        #quality_mask = nc_dict['quality_mask_voldepol_532']['data']
     
     height = nc_dict['height']['data']
     time = nc_dict['time']['data']
@@ -1976,6 +2000,14 @@ def pollyDisplayQR(nc_dict,config_dict, polly_conf_dict, saveFolder, q_param, q_
         if q_version == "V2":
             plotfile = f'{dataFilename}_Quasi_ANGEXP_532_1064_V2.{imgFormat}'
         quasi_title = f'Quasi BSC Angstroem Exponent 532-1064 ({q_version}) of {pollyVersion} at {location}'
+    if q_param == "bsc_355":
+        prodtype = "Quasi_Bsc_355"
+        wavelength = 355
+        if q_version == "V1":
+            plotfile = f'{dataFilename}_Quasi_Bsc_355.{imgFormat}'
+        if q_version == "V2":
+            plotfile = f'{dataFilename}_Quasi_Bsc_355_V2.{imgFormat}'
+        quasi_title = f'Quasi backscatter coefficient ({q_version}) at 355 nm from {pollyVersion} at {location}'
     if q_param == "bsc_532":
         prodtype = "Quasi_Bsc_532"
         wavelength = 532
@@ -1992,6 +2024,30 @@ def pollyDisplayQR(nc_dict,config_dict, polly_conf_dict, saveFolder, q_param, q_
         if q_version == "V2":
             plotfile = f'{dataFilename}_Quasi_Bsc_1064_V2.{imgFormat}'
         quasi_title = f'Quasi backscatter coefficient ({q_version}) at 1064 nm from {pollyVersion} at {location}'
+    if q_param == "ext_355":
+        prodtype = "Quasi_Ext_355"
+        wavelength = 355
+        if q_version == "V1":
+            plotfile = f'{dataFilename}_Quasi_Ext_355.{imgFormat}'
+        if q_version == "V2":
+            plotfile = f'{dataFilename}_Quasi_Ext_355_V2.{imgFormat}'
+        quasi_title = f'Quasi extinction ({q_version}) at 355 nm from {pollyVersion} at {location}'
+    if q_param == "ext_532":
+        prodtype = "Quasi_Ext_532"
+        wavelength = 532
+        if q_version == "V1":
+            plotfile = f'{dataFilename}_Quasi_Ext_532.{imgFormat}'
+        if q_version == "V2":
+            plotfile = f'{dataFilename}_Quasi_Ext_532_V2.{imgFormat}'
+        quasi_title = f'Quasi extinction ({q_version}) at 532 nm from {pollyVersion} at {location}'
+    if q_param == "ext_1064":
+        prodtype = "Quasi_Ext_1064"
+        wavelength = 1064
+        if q_version == "V1":
+            plotfile = f'{dataFilename}_Quasi_Ext_1064.{imgFormat}'
+        if q_version == "V2":
+            plotfile = f'{dataFilename}_Quasi_Ext_1064_V2.{imgFormat}'
+        quasi_title = f'Quasi extinction ({q_version}) at 1064 nm from {pollyVersion} at {location}'
     if q_param == "par_depol_532":
         prodtype = "Quasi_PDR_532"
         wavelength = 532
@@ -2000,10 +2056,19 @@ def pollyDisplayQR(nc_dict,config_dict, polly_conf_dict, saveFolder, q_param, q_
         if q_version == "V2":
             plotfile = f'{dataFilename}_Quasi_PDR_532_V2.{imgFormat}'
         quasi_title = f'Quasi particle depolarization ratio ({q_version}) at 532 nm from {pollyVersion} at {location}'
+    if q_param == "vol_depol_532":
+        prodtype = "Quasi_VDR_532"
+        wavelength = 532
+        if q_version == "V1":
+            plotfile = f'{dataFilename}_Quasi_VDR_532.{imgFormat}'
+        if q_version == "V2":
+            plotfile = f'{dataFilename}_Quasi_VDR_532_V2.{imgFormat}'
+        quasi_title = f'Quasi volume depolarization ratio ({q_version}) at 532 nm from {pollyVersion} at {location}'
 
     saveFilename = os.path.join(saveFolder,plotfile)
 
     ## fill time gaps in att_bsc matrix
+    quality_mask = np.full_like(matrix, fill_value=np.nan, dtype=float) ## dummy-quality_mask
     matrix, quality_mask = readout.fill_time_gaps_of_matrix(time, matrix, quality_mask)
 
     ## get date and convert to datetime object
@@ -2024,7 +2089,7 @@ def pollyDisplayQR(nc_dict,config_dict, polly_conf_dict, saveFolder, q_param, q_
     extent = [ x_lims[0], x_lims[-1], max_height[0], max_height[-1] ]
 
     ## mask matrix
-    matrix = np.ma.masked_where(quality_mask < 0, matrix)
+    #matrix = np.ma.masked_where(quality_mask < 0, matrix)
     
     ## slice matrix to max_height
     matrix = matrix[:,0:len(max_height)]
