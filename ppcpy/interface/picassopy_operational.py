@@ -50,6 +50,9 @@ my_parser.add_argument('--level0_file_to_process',
                        type=str,
                        default=None,
                        help='specify a level0 polly file to be processed')
+my_parser.add_argument('--preproc_only',
+                        action='store_true',
+                        help='switch to run only the preprocessing, including the storage of SNR, BG and RCS files')
 
 ## init parser
 args = my_parser.parse_args()
@@ -149,6 +152,8 @@ data_cube.preprocessing()
 
 ## write channelwise infos to nc-files (e.g.: SNR, Background, RangeCorrectedSignal)
 write2nc.write_channelwise_2_nc_file(data_cube=data_cube,prod_ls=["SNR","BG","RCS"])
+if args.preproc_only:
+    exit()
 
 ## saturation detection
 data_cube.SaturationDetect()
@@ -230,8 +235,10 @@ data_cube.Angstroem()
 
 ## write depolarization calibration factors and LIDAR calibration constants to sqlite-db
 base_dir = Path(data_cube.picasso_config_dict['results_folder'])
-#db_path = base_dir.joinpath(polly_device,polly_config_dict['calibrationDB'])
-db_path = "/data/level1b/polly24h/pollyxt_cpv/pollyxt_cpv_calibration_picassopy.db"
+db_path = base_dir.joinpath(polly_device,polly_config_dict['calibrationDB'])
+#db_path = "/data/level1b/polly24h/arielle/arielle_calibration_neumeyer.db"
+logging.info(f'db_file: {db_path}')
+#db_path = "/data/level1b/polly24h/pollyxt_cpv/pollyxt_cpv_calibration_picassopy.db"
 ## calc. LIDAR calibration constants
 data_cube.LidarCalibration(db_path=db_path)
 ## gives also data_cube.pol_cali, data_cube.LCused (e.g.: data_cube.LCused['532_total_FR'])
@@ -242,6 +249,7 @@ data_cube.write_2_sql_db(db_path=str(db_path),parameter='DC')
 ## LC_column_names = ['cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
 
 ## write profile retrievals to nc files
+write2nc.write_profile2nc_file(data_cube=data_cube, prod_ls=["overlap_profiles"])
 write2nc.write_profile2nc_file(data_cube=data_cube, prod_ls=["profiles","NR_profiles","OC_profiles"])
 
 ## calc. high resolution retrievals of attenuated backscatter and volume depolarization
