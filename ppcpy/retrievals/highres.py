@@ -8,7 +8,7 @@ import logging
 
 
 def attbsc_2d(data_cube, nr:bool=True, collect_debug:bool=False):
-    """Attenuated Backscatter
+    """Attenuated Backscatter.
 
     Parameters
     ----------
@@ -39,11 +39,10 @@ def attbsc_2d(data_cube, nr:bool=True, collect_debug:bool=False):
         sig = np.squeeze(
             data_cube.retrievals_highres[f'sigTCor'][:, :, data_cube.gf(wv, t, tel)])
         
-        if channel in data_cube.LCused.keys():
-            pass
-        else:
+        if channel not in data_cube.LCused.keys():
             logging.info(f'{channel} skipped at attbsc_2d')
             continue
+
         attBsc = sig * ranges2d / data_cube.LCused[channel]
         attBsc[data_cube.retrievals_highres['depCalMask'], :] = np.nan
 
@@ -53,7 +52,7 @@ def attbsc_2d(data_cube, nr:bool=True, collect_debug:bool=False):
     # experimental, the calibration constant requires the OL corrected signal
     if 'sigOLCor' in data_cube.retrievals_highres:
         print(f"Exprimental, attenuated backscatter solution for {channel}")
-        sigOLTCor, _ = transCor.transCorGHK_cube(data_cube, signal='OLCor') 
+        sigOLTCor, _ = transCor.transCorGHK_cube(data_cube, signal='OLCor')
         channels = [(355, 'total', 'FR'), (532, 'total', 'FR'), (1064, 'total', 'FR')]
         for wv, t, tel in channels:
             channel = f"{wv}_{t}_{tel}"
@@ -62,9 +61,7 @@ def attbsc_2d(data_cube, nr:bool=True, collect_debug:bool=False):
             #    data_cube.retrievals_highres[f'sigOLCor'][:, :, data_cube.gf(wv, t, tel)])
             sig = np.squeeze(sigOLTCor[:, :, data_cube.gf(wv, t, tel)])
 
-            if channel in data_cube.LCused.keys():
-                pass
-            else:
+            if channel not in data_cube.LCused.keys():
                 logging.info(f'{channel} skipped at attbsc_2d OL')
                 continue
             
@@ -75,7 +72,7 @@ def attbsc_2d(data_cube, nr:bool=True, collect_debug:bool=False):
     
 
 def voldepol_2d(data_cube):
-    """Calculate the volume depolarisation ratio
+    """Calculate the volume depolarisation ratio.
 
     Parameters
     ----------
@@ -88,7 +85,7 @@ def voldepol_2d(data_cube):
 
     channels = [
             (532, 'FR'), (355, 'FR'), (1064, 'FR')]
-    if '532_DFOV' in data_cube.pol_cali:
+    if '532_DFOV' in data_cube.etaused:
         channels += [(532, 'DFOV')]
         print('voldepol also for DFOV')
 
@@ -107,9 +104,12 @@ def voldepol_2d(data_cube):
 
 
             vdr, vdrStd = depolarization.calc_profile_vdr(
-                sigt, sigc, config_dict['G'][flagt], config_dict['G'][flagc],
-                config_dict['H'][flagt], config_dict['H'][flagc],
-                data_cube.etaused[f'{wv}_{tel}'], config_dict[f'voldepol_error_{wv}'],
-                window=1)
+                sigt=sigt, sigc=sigc,
+                Gt=config_dict['G'][flagt], Gr=config_dict['G'][flagc],
+                Ht=config_dict['H'][flagt], Hr=config_dict['H'][flagc],
+                eta=data_cube.etaused[f'{wv}_{tel}'],
+                voldepol_error=config_dict[f'voldepol_error_{wv}'],
+                window=1
+            )
             vdr[data_cube.retrievals_highres['depCalMask'], :] = np.nan
             data_cube.retrievals_highres[f"voldepol_{wv}_total_{tel}"] = vdr
