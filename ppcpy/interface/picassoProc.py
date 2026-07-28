@@ -382,7 +382,7 @@ class PicassoProc:
         .. TODO::
             - Several channels are still missing channelFlags.
             - We are not consistant in the naming scheam of the RR-channels.
-            - Need to implement new config flags for fluorescence and HSRL.
+            - Need to implement new config flags for fluorescence and high intensity channels.
         """
 
         ChannelTags = pollyChannelTags.pollyChannelTags( 
@@ -735,14 +735,18 @@ class PicassoProc:
             logging.info(f"Aggregating variable: {variable} ...")
             if variable in self.retrievals_highres:
                 if variable == "RCS":
-                    self.retrievals_profile[variable] = pollyPreprocess.calculate_rcs(
-                        signal=pollyPreprocess.photonCount2PCR(
-                            signal=preprocprofiles.aggregate_clFreeGrps(self, 'sigBGCor', func),
-                            mShots=preprocprofiles.aggregate_clFreeGrps(self, 'mShots', func),
-                            hRes=self.rawdata_dict['measurement_height_resolution']['var_data']
-                        ),
-                        ranges=self.retrievals_highres['range']
-                    )
+                    if self.polly_config_dict['flagPicassoComparison']:
+                        self.retrievals_profile[variable] = \
+                            preprocprofiles.aggregate_clFreeGrps(self, variable, np.nanmean)
+                    else:
+                        self.retrievals_profile[variable] = pollyPreprocess.calculate_rcs(
+                            signal=pollyPreprocess.photonCount2PCR(
+                                signal=preprocprofiles.aggregate_clFreeGrps(self, 'sigBGCor', func),
+                                mShots=preprocprofiles.aggregate_clFreeGrps(self, 'mShots', func),
+                                hRes=self.rawdata_dict['measurement_height_resolution']['var_data']
+                            ),
+                            ranges=self.retrievals_highres['range']
+                        )
                 else:
                     self.retrievals_profile[variable] = \
                         preprocprofiles.aggregate_clFreeGrps(self, variable, func)

@@ -205,7 +205,7 @@ def loadPollyConfig(polly_config_file:str, polly_default_config_file:str) -> dic
     -----
     .. TODO:: 
         - Maybe change `polly_default_config_file` to `polly_global_config_file`
-          as the defualt on is no longer used.
+          as the defualt one is no longer used.
     """
 
     polly_default_config_file_path = Path(polly_default_config_file)
