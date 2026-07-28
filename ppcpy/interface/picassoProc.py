@@ -681,8 +681,35 @@ class PicassoProc:
 
 
     def estQualityMask(self):
-        """Estimate the quality mask."""
-        logging.info("Estimate quality mask")
+        """Estimate the quality mask.
+        
+        Yields
+        ------
+        self.retrievals_highres['quality_mask'] : ndarray
+            High resolution (time, height) quality masks per channel.
+                0 : good data
+                1 : low-SNR data
+                2 : depolarization calibration periods
+                3 : shutter on
+                4 : fog
+                5 : saturated (NEW)
+        
+        Notes
+        -----
+        - If the config variables `flagUseImprovedSNR=True`, SNR and the lowSNRMask are
+          recalculated with quasi-smoothed signals to improve data quality.
+
+        ** History **
+        
+        - xxxx-xx-xx: First edition by ...
+        - 2026-07-17: Added quasi-smoothed SNR and lowSNRMask.
+
+        """
+
+        logging.info("Estimate quality masks ...")
+        if self.polly_config_dict['flagUseImprovedSNR']:
+            self.retrievals_highres['SNR_quasi'], self.retrievals_highres['lowSNRMask_quasi'] = qualityMask.improvedSNR(self)
+
         self.retrievals_highres['quality_mask'] = qualityMask.qualityMask(self)
 
 
