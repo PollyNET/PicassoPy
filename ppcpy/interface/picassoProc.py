@@ -409,40 +409,65 @@ class PicassoProc:
         self.clFreeGrps = profilesegment.segment(self)
 
 
-    def aggregate_profiles(self, var=None):
-        """Aggregate highres profiles over cloud free segments
+    def aggregate_profiles(self, var:str|list=None, func=np.nansum):
+        """Aggregate highres profiles over cloud free segments.
 
         Parameters
         ----------
-        var : str
-            Name of variables to aggregate.
-            Default is `RCS`, `sigBGCor`, and `BG`.
-
+        var : str or array_like
+            Name of variable to aggregate. Default is None.
+        func : function, optional
+            Function to do the aggregation (mean, sum, median, etc.). Default is np.nansum.
+        
+        Yields
+        ------
+        self.retrievals_profiles[`var`] : ndarray
+            Aggregated profile.
+        
         Notes
         -----
-        .. TODO:: Decide on a consistent way for doing the aggregation, do not mix mean and sum
+        - The variable(s) `var` need to be stored in the dictionary data_cube.retrievals_highres.
+          All aggregated profiles will be stored in the dictionary data_cube.retrievals_profiles under the
+          the same key.
+        - If var is None. The following variables will be aggregated:
+          `sigBGCor`, `BG`, `RCS`, `mShots`, `mask387Off`, `mask607Off`, `mask407Off`
+        - `func=np.nansum` is needed for correct SNR calculations.
+
+        ** History **
+
+        - xxxx-xx-xx: First edition by ...
+        - 2026-07-28: Added option to aggregate multiple variables in the same call.
+                      And corrected the aggregation for PCR-signals like `RCS`.
+        
         """
 
-        if var == None:
-            self.retrievals_profile['RCS'] = \
-                preprocprofiles.aggregate_clFreeGrps(self, 'RCS', func=np.nanmean)
-            self.retrievals_profile['sigBGCor'] = \
-                preprocprofiles.aggregate_clFreeGrps(self, 'sigBGCor')
-            self.retrievals_profile['BG'] = \
-                preprocprofiles.aggregate_clFreeGrps(self, 'BG')
-            
-            # Remove empty dict keys (temporarly solution)
-            for v in ['RCS', 'sigBGCor', 'BG']:
-                if self.retrievals_profile[v] is None:
-                    del self.retrievals_profile[v]
+        if var is None:
+            # Take care of the default scenario
+            self.aggregate_profiles(['sigBGCor', 'BG', 'RCS', 'mShots'])
+            self.aggregate_profiles(['mask387Off', 'mask607Off', 'mask407Off'], np.nanmean)
+            return
 
-        else:
-            self.retrievals_profile[var] = \
-                preprocprofiles.aggregate_clFreeGrps(self, var)
-            
-            # Remove empty dict keys (temporarly solution)
-            if self.retrievals_profile[var] is None:
-                del self.retrievals_profile[var]
+        if isinstance(var, str):
+            var = [var]
+
+        for variable in var:
+            logging.info(f"Aggregating variable: {variable} ...")
+            if variable in self.retrievals_highres:
+                if variable == "RCS":
+                    self.retrievals_profile[variable] = pollyPreprocess.calculate_rcs(
+                        signal=pollyPreprocess.photonCount2PCR(
+                            signal=preprocprofiles.aggregate_clFreeGrps(self, 'sigBGCor', func),
+                            mShots=preprocprofiles.aggregate_clFreeGrps(self, 'mShots', func),
+                            hRes=self.rawdata_dict['measurement_height_resolution']['var_data']
+                        ),
+                        ranges=self.retrievals_highres['range']
+                    )
+                else:
+                    self.retrievals_profile[variable] = \
+                        preprocprofiles.aggregate_clFreeGrps(self, variable, func)
+            else:
+                logging.critical(f"{variable} is NOT in data_cube.retrievals_highres")
+                raise ValueError(f"Could not locate variable '{variable}'.")
 
 
     def loadMeteo(self):
