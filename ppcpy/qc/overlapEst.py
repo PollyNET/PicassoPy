@@ -20,8 +20,6 @@ def run_frnr_cldFreeGrps(data_cube, collect_debug:bool=True) -> list:
     
     Returns
     -------
-    overlap : list of dicts
-        Per channel per cloud free period:
     overlap : ndarray
         Overlap function.
     overlapStd : ndarray
@@ -31,14 +29,13 @@ def run_frnr_cldFreeGrps(data_cube, collect_debug:bool=True) -> list:
     normRange : list
         Height index of the signal normalization range.
 
-    
     Notes
     -----
     - The matlab version preforms some convertio from PC to PCR after calculating the overlap function (this might just be relevent at all)
     - The matlab version also uses calculates 1 overlap function for each channel while we calculate 1 per clFreeGrp per channel...
     - The frnr overlap calculations are very unstable and frequently results in values outside the range [0,1].
-
     """
+
     height = data_cube.retrievals_highres['range']
     logging.warning(f'rayleighfit seems to use range in matlab, but the met data should be in height >> RECHECK!')
     logging.warning(f'at 10km height this is a difference of about 4 indices')
@@ -46,26 +43,32 @@ def run_frnr_cldFreeGrps(data_cube, collect_debug:bool=True) -> list:
 
     overlap = [{} for i in range(len(data_cube.clFreeGrps))]
 
-    print('Starting Overlap retrieval')
+    logging.info('Starting Overlap retrieval')
     for i, cldFree in enumerate(data_cube.clFreeGrps):
-        print('cldFree', i, cldFree)
+        logging.info(f"Cloud free segment: {i}. Time: {data_cube.retrievals_highres['time64'][cldFree[0]]} - {data_cube.retrievals_highres['time64'][cldFree[1]]}.")
         cldFree = cldFree[0], cldFree[1] + 1
-        print('cldFree mod', cldFree)
         for wv in [355, 387, 532, 607]:
             if np.any(data_cube.gf(wv, 'total', 'FR')) and np.any(data_cube.gf(wv, 'total', 'NR')):
-                print(wv, 'both telescopes available')
+                logging.info(f"Channels: {wv} total FR | {wv} total NR.")
                 sigFR = np.squeeze(data_cube.retrievals_profile['sigTCor'][i, :, data_cube.gf(wv, 'total', 'FR')])
                 bgFR = np.squeeze(data_cube.retrievals_profile['BGTCor'][i, data_cube.gf(wv, 'total', 'FR')])
                 sigNR = np.squeeze(data_cube.retrievals_profile['sigTCor'][i, :, data_cube.gf(wv, 'total', 'NR')])
                 bgNR = np.squeeze(data_cube.retrievals_profile['BGTCor'][i, data_cube.gf(wv, 'total', 'NR')])
                 hFullOverlap = np.array(config_dict['heightFullOverlap'])[data_cube.gf(wv, 'total', 'FR')][0]
-                ol = overlapCalc(height=height, sigFR=sigFR, bgFR=bgFR, sigNR=sigNR, bgNR=bgNR, hFullOverlap=hFullOverlap, collect_debug=collect_debug)
+                ol = overlapCalc(
+                    height=height,
+                    sigFR=sigFR, bgFR=bgFR,
+                    sigNR=sigNR, bgNR=bgNR,
+                    hFullOverlap=hFullOverlap,
+                    collect_debug=collect_debug
+                )
                 overlap[i][f"{wv}_total_FR"] = ol
     
     return overlap
 
 
-def overlapCalc(height:np.ndarray, sigFR:np.ndarray, bgFR:np.ndarray, sigNR:np.ndarray, bgNR:np.ndarray, hFullOverlap:float=600, collect_debug=False) -> dict:
+def overlapCalc(height:np.ndarray, sigFR:np.ndarray, bgFR:np.ndarray, sigNR:np.ndarray,
+                bgNR:np.ndarray, hFullOverlap:float=600, collect_debug=False) -> dict:
     """Calculate overlap function.
 
     Parameters
@@ -88,9 +91,9 @@ def overlapCalc(height:np.ndarray, sigFR:np.ndarray, bgFR:np.ndarray, sigNR:np.n
 
     Returns
     -------
-    overlap : ndarray
+    olFunc : ndarray
         Overlap function.
-    overlapStd : ndarray
+    olFuncStd : ndarray
         Standard deviation of overlap function.
     sigRatio : float
         Signal ratio between near-range and far-range signals.
@@ -99,42 +102,59 @@ def overlapCalc(height:np.ndarray, sigFR:np.ndarray, bgFR:np.ndarray, sigNR:np.n
 
     Notes
     -----
+    .. TODO:: Define the Default values of the output ei. olFunc = 1 & olFuncStd = 0.
+
+    .. TODO:: Is the first if-statment needed?
+    
+    .. TODO:: are bgFR and bgNR actually ndarrays of floats??
 
     **History**
     
     - 2021-05-18: First edition by Zhenping
 
     """
-    if sigNR.shape[0] > 0 and sigFR.shape[0] > 0:
-        # Find the height index with full overlap
-        full_overlap_index = np.where(height >= hFullOverlap)[0]
-        if full_overlap_index.size == 0:
-            raise ValueError("The index with full overlap cannot be found.")
-        full_overlap_index = full_overlap_index[0]
+    
+    if not (sigNR.shape[0] > 0 and sigFR.shape[0] > 0):
+        logging.critical("sigNR and/or sigFR can not be empty.")
+        raise ValueError("sigNR and/or sigFR can not be empty.") # TODO: This check seams unecescery. Might be something leftover from the matlab version.
+    
+    # Find the height index with full overlap
+    full_overlap_index = np.where(height >= hFullOverlap)[0]
+    if full_overlap_index.size == 0:
+        raise ValueError("The index with full overlap cannot be found.")
+    full_overlap_index = full_overlap_index[0]
 
-        # Calculate the channel ratio of near and far range total signals
-        sigRatio, normRange, _ = mean_stable(sigNR / sigFR , 40, full_overlap_index, len(sigNR), 0.1)
+    # Calculate the channel ratio of near and far range total signals
+    sigRatio, normRange, _ = mean_stable(sigNR / sigFR , 40, full_overlap_index, len(sigNR), 0.1)
 
-        # print('is normRange index or slice?', normRange) # -> is list of indices
-        # Calculate the overlap of the far-range channel
-        if normRange is not None and normRange.shape[0] > 0:
-            if collect_debug:
-                print("bgFR.shape", bgFR.shape)
-                print("bgNR.shape", bgNR.shape)
-                print("normRange.shape", normRange.shape)
-                print("normRange", normRange)
-                print("bgFR*normRange.shape[0]", bgFR*normRange.shape[0])
-                print("bgFR*normRange.shape[0]", bgFR*normRange.shape[0])
-            SNRnormRangeFR = calc_snr(np.sum(sigFR[normRange], keepdims=True), bgFR*normRange.shape[0])
-            SNRnormRangeNR = calc_snr(np.sum(sigNR[normRange], keepdims=True), bgNR*normRange.shape[0])
-            sigRatioStd = sigRatio * np.sqrt(1 / (SNRnormRangeFR**2) + 1 / (SNRnormRangeNR**2))
-            overlap = (sigFR / (sigNR + 1e-6)) * sigRatio
-            overlapStd = overlap * np.sqrt((sigRatioStd / sigRatio)**2 + 1 / (sigFR + 1e-6)**2 + 1 / (sigNR + 1e-6)**2)
-
+    # print('is normRange index or slice?', normRange) # -> is list of indices
+    # Calculate the overlap of the far-range channel
+    if normRange is not None and normRange.shape[0] > 0:
+        if collect_debug:
+            print("bgFR.shape", bgFR.shape)
+            print("bgNR.shape", bgNR.shape)
+            print("normRange.shape", normRange.shape)
+            print("normRange", normRange)
+            print("bgFR*normRange.shape[0]", bgFR*normRange.shape[0])
+            print("bgFR*normRange.shape[0]", bgFR*normRange.shape[0])
+        SNRnormRangeFR = calc_snr(np.sum(sigFR[normRange], keepdims=True), bgFR*normRange.shape[0])
+        SNRnormRangeNR = calc_snr(np.sum(sigNR[normRange], keepdims=True), bgNR*normRange.shape[0]) 
+        sigRatioStd = sigRatio * np.sqrt(1 / (SNRnormRangeFR**2) + 1 / (SNRnormRangeNR**2))
+        overlap = (sigFR / (sigNR + 1e-6)) * sigRatio
+        overlapStd = overlap * np.sqrt((sigRatioStd / sigRatio)**2 + 1 / (sigFR + 1e-6)**2 + 1 / (sigNR + 1e-6)**2)
+    
+    else:
+        # .. TODO:: Implement default values for the overlap function and its Std for when mean_stable fails.
+        #           What shape do the ovelap function have. Does it go only up to height full overlap or does
+        #           it spann the whole height grid?
+        # overlap = np.ones(...)
+        # overlapStd = np.zeros(...)
+        raise NotImplementedError('Default overlap values are not yet implemented')
+    
     ret = {'olFunc': overlap, 'olFuncStd': overlapStd, 
            'sigRatio': sigRatio, 'normRange': normRange}
-    return ret
 
+    return ret
 
 
 def run_raman_cldFreeGrps(data_cube, collect_debug:bool=True) -> list:
@@ -157,8 +177,8 @@ def run_raman_cldFreeGrps(data_cube, collect_debug:bool=True) -> list:
         Standard deviation of overlap function.
     olFunc0 : ndarray
         Overlap function with no smoothing.
-        
     """
+
     height = data_cube.retrievals_highres['range']
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
     logging.warning(f'rayleighfit seems to use range in matlab, but the met data should be in height >> RECHECK!')
@@ -167,29 +187,24 @@ def run_raman_cldFreeGrps(data_cube, collect_debug:bool=True) -> list:
 
     overlap = [{} for i in range(len(data_cube.clFreeGrps))]
 
-    print('Starting Raman Overlap retrieval')
+    logging.info('Starting Raman Overlap retrieval')
     for i, cldFree in enumerate(data_cube.clFreeGrps):
-        print('cldFree ', i, cldFree)
+        logging.info(f"Cloud free segment: {i}. Time: {data_cube.retrievals_highres['time64'][cldFree[0]]} - {data_cube.retrievals_highres['time64'][cldFree[1]]}.")
         cldFree = cldFree[0], cldFree[1] + 1
-        print('cldFree mod', cldFree)
         channels = [((532, 'total', 'FR'), (607, 'total', 'FR')),((355, 'total', 'FR'), (387, 'total', 'FR'))]
         for (wv, t, tel), (wv_r, t_r, tel_r) in channels:
             if np.any(data_cube.gf(wv, t, tel)) and np.any(data_cube.gf(wv_r, t_r, tel_r)):
-                print(wv, wv_r, 'both wavelengths available')
+                logging.info(f"Channels: {wv} {t} {tel} | {wv_r} {t_r} {tel_r}.")
                 sig = np.squeeze(data_cube.retrievals_profile['sigTCor'][i, :, data_cube.gf(wv, t, tel)])
                 # bg = np.nansum(np.squeeze(data_cube.retrievals_highres['BGTCor'][slice(*cldFree), data_cube.gf(wv, t, tel)]), axis=0)
-                molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
+                # molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
                 molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :]
 
-                if f"{wv}_{t}_{tel}" in data_cube.retrievals_profile['raman'][i].keys():
-                    pass
-                else:
+                if f"{wv}_{t}_{tel}" not in data_cube.retrievals_profile['raman'][i] or \
+                    'aerBsc' not in data_cube.retrievals_profile['raman'][i][f"{wv}_{t}_{tel}"]:
+                    logging.info(f"Skipping channel pair {wv} {t} {tel} and {wv_r} {t_r} {tel_r}.")
                     continue
 
-                if 'aerBsc' in data_cube.retrievals_profile['raman'][i][f"{wv}_{t}_{tel}"].keys():
-                    pass
-                else:
-                    continue
                 aerBsc = data_cube.retrievals_profile['raman'][i][f"{wv}_{t}_{tel}"]['aerBsc']
 
                 sig_r = np.squeeze(data_cube.retrievals_profile['sigTCor'][i, :, data_cube.gf(wv_r, t, tel)])
@@ -271,14 +286,23 @@ def overlapCalcRaman(
     -------
     olFunc : ndarray
         Overlap function.
-    olStd : float
-        Standard deviation of overlap function.
-    olFunc0 : ndarray
+    olFunc_raw : ndarray
         Overlap function with no smoothing.
+    LR : float
+        Optimal Lidar Ratio for ...
+    normRange : list
+        Height index of the signal normalization range.
+         
+    References
+    ----------
+    Wandinger, U. and Ansmann, A. (2002) ‘Experimental determination of the lidar overlap profile with 
+    Raman lidar’, Applied Optics, 41(3), pp. 511–514. Available at: https://doi.org/10.1364/ao.41.000511.
 
+    
     Notes
     -----
-    .. TODO:: What is returned by the function and what is described in the docstring does not corresponed.
+    .. TODO::
+       Finish docsting! (LR output...)
 
     .. TODO:: 
         This function uses a mix of ppcpy.misc.helper.unifrom_filter and scipy.ndimage.uniform_filter1d
@@ -293,112 +317,118 @@ def overlapCalcRaman(
         be considered. Optimally, should we designe our own filter for this purpuse that do not have
         the issue with propagating NaN values, Like what is used in the rest of the modules. However,
         without reducing dimension or filling in NaN values.
+    
+    .. TODO::
+        Is the if statment that privusly checked if len(aerBsc) > 0, now len(aerBsc) > 6 to be consistant
+        with the action of the statment actually needed. I believe it might be a leftover from the Matlab
+        version where they often used staments like this to check if the aerBsc existed or not...
 
     ** History **
     
     - 2023-06-06: First edition by Cristofer
+    - xxxx-xx-xx: Translated to python
 
     """
-    if len(aerBsc) > 0:
+    aerBsc = aerBsc.copy()
+    aerBsc = np.array([1, 2, 3])
 
-        sigFRRa0 = sigFRRa.copy()
-        for _ in range(5):
-            sigFRRa = uniform_filter1d(sigFRRa, smoothbins)
-            sigFRel = uniform_filter1d(sigFRel, smoothbins)
+    sigFRRa0 = sigFRRa.copy()
+    for _ in range(5):
+        sigFRRa = uniform_filter1d(sigFRRa, smoothbins)
+        sigFRel = uniform_filter1d(sigFRel, smoothbins)
 
-        aerBsc = aerBsc.copy()
-        if len(aerBsc) > 0:
-            aerBsc[:5] = aerBsc[5]
+    aerBsc = aerBsc.copy()
+    if len(aerBsc) > 6: # TODO: is this even necessary?....
+        aerBsc[:5] = aerBsc[5]
+    else:
+        aerBsc = np.zeros_like(height)
+
+    aerBsc0 = aerBsc.copy()
+    # Use ppcpy.misc.helper.unifrom_filter here to avoid propagating the NaN-values in aerBse througout the smoothed array.
+    aerBsc = uniform_filter(aerBsc, smoothbins)
+
+    LR0 = np.arange(30, 82, 2)  # LR array to search best LR.
+
+    diff_norm = []
+
+    for ii in range(len(LR0) + 1):
+        if ii == len(LR0):
+            indx_min = np.argmin(diff_norm)
+            LR = LR0[indx_min]
         else:
-            aerBsc = 0
+            LR = LR0[ii]
 
-        aerBsc0 = aerBsc.copy()
-        # Use ppcpy.misc.helper.unifrom_filter here to avoid propagating the NaN-values in aerBse througout the smoothed array.
-        aerBsc = uniform_filter(aerBsc, smoothbins)
+        # Overlap calculation (direct version)
+        transRa = np.exp(-np.nancumsum((molExt_r + LR * aerBsc * (Lambda_el / Lambda_Ra) ** AE) * np.concatenate(([height[0]], np.diff(height)))))
+        transel = np.exp(-np.nancumsum((molExt + LR * aerBsc) * np.concatenate(([height[0]], np.diff(height)))))
+        transRa0 = np.exp(-np.nancumsum((molExt_r + LR * aerBsc0 * (Lambda_el / Lambda_Ra) ** AE) * np.concatenate(([height[0]], np.diff(height)))))
+        transel0 = np.exp(-np.nancumsum((molExt + LR * aerBsc0) * np.concatenate(([height[0]], np.diff(height)))))
 
-        LR0 = np.arange(30, 82, 2)  # LR array to search best LR.
+        if sigFRRa.shape[0] > 0 and sigFRel.shape[0] > 0:
+            fullOverlapIndx = np.searchsorted(height, hFullOverlap)
+            if fullOverlapIndx == len(height):
+                raise ValueError('The index with full overlap cannot be found.')
 
-        diff_norm = []
+        olFunc = sigFRRa * height ** 2 / molBsc_r / transel / transRa
+        olFunc0 = sigFRRa0 * height ** 2 / molBsc_r / transel0 / transRa0
 
-        for ii in range(len(LR0) + 1):
-            if ii == len(LR0):
-                indx_min = np.argmin(diff_norm)
-                LR = LR0[indx_min]
-            else:
-                LR = LR0[ii]
+        for _ in range(5):
+            olFunc = uniform_filter1d(olFunc, 3)
 
-            # Overlap calculation (direct version)
-            transRa = np.exp(-np.nancumsum((molExt_r + LR * aerBsc * (Lambda_el / Lambda_Ra) ** AE) * np.concatenate(([height[0]], np.diff(height)))))
-            transel = np.exp(-np.nancumsum((molExt + LR * aerBsc) * np.concatenate(([height[0]], np.diff(height)))))
-            transRa0 = np.exp(-np.nancumsum((molExt_r + LR * aerBsc0 * (Lambda_el / Lambda_Ra) ** AE) * np.concatenate(([height[0]], np.diff(height)))))
-            transel0 = np.exp(-np.nancumsum((molExt + LR * aerBsc0) * np.concatenate(([height[0]], np.diff(height)))))
+        ovl_norm, normRange, _ = mean_stable(olFunc, 40, fullOverlapIndx - round(37.5 / hres), fullOverlapIndx + round(2250 / hres), 0.1)
+        ovl_norm0, normRange0, _ = mean_stable(olFunc0, 40, fullOverlapIndx - round(37.5 / hres), fullOverlapIndx + round(2250 / hres), 0.1)
 
-            if sigFRRa.shape[0] > 0 and sigFRel.shape[0] > 0:
-                fullOverlapIndx = np.searchsorted(height, hFullOverlap)
-                if fullOverlapIndx == len(height):
-                    raise ValueError('The index with full overlap cannot be found.')
+        if ovl_norm is not None and ovl_norm.size == 1:
+            olFunc /= ovl_norm
+        else:
+            olFunc /= np.nanmean(olFunc[fullOverlapIndx + round(150 / hres):fullOverlapIndx + round(1500 / hres)])
 
-            olFunc = sigFRRa * height ** 2 / molBsc_r / transel / transRa
-            olFunc0 = sigFRRa0 * height ** 2 / molBsc_r / transel0 / transRa0
+        if ovl_norm0 is not None and ovl_norm0.size == 1:
+            olFunc0 /= ovl_norm0
+        else:
+            olFunc0 /= np.nanmean(olFunc0[fullOverlapIndx + round(150 / hres):fullOverlapIndx + round(1500 / hres)])
 
-            for _ in range(5):
-                olFunc = uniform_filter1d(olFunc, 3)
+        # first bin to start searching full overlap height. % Please replace the 180 by a paramter in future.
+        bin_ini = int(np.ceil(180 / hres))
 
-            ovl_norm, normRange, _ = mean_stable(olFunc, 40, fullOverlapIndx - round(37.5 / hres), fullOverlapIndx + round(2250 / hres), 0.1)
-            ovl_norm0, normRange0, _ = mean_stable(olFunc0, 40, fullOverlapIndx - round(37.5 / hres), fullOverlapIndx + round(2250 / hres), 0.1)
+        full_ovl_indx = np.argmax(np.diff(olFunc[bin_ini:]) <= 0) + bin_ini
 
-            if ovl_norm is not None and ovl_norm.size == 1:
-                olFunc /= ovl_norm
-            else:
-                olFunc /= np.nanmean(olFunc[fullOverlapIndx + round(150 / hres):fullOverlapIndx + round(1500 / hres)])
+        if full_ovl_indx == 0:
+            full_ovl_indx = fullOverlapIndx
 
-            if ovl_norm0 is not None and ovl_norm0.size == 1:
-                olFunc0 /= ovl_norm0
-            else:
-                olFunc0 /= np.nanmean(olFunc0[fullOverlapIndx + round(150 / hres):fullOverlapIndx + round(1500 / hres)])
+        diff_norm.append(np.nansum(np.abs(1 - olFunc[full_ovl_indx:full_ovl_indx + round(1500 / hres)])))
 
-            # first bin to start searching full overlap height. % Please replace the 180 by a paramter in future.
-            bin_ini = int(np.ceil(180 / hres))
+        olFunc[full_ovl_indx:] = olFunc[full_ovl_indx]
+        olFunc /= olFunc[full_ovl_indx] # renormalization
 
-            full_ovl_indx = np.argmax(np.diff(olFunc[bin_ini:]) <= 0) + bin_ini
+        if (full_ovl_indx - bin_ini) < 1:
+            full_ovl_indx = bin_ini + 1
 
-            if full_ovl_indx == 0:
-                full_ovl_indx = fullOverlapIndx
+        norm_index0 = np.argmax(olFunc[full_ovl_indx - bin_ini:full_ovl_indx + bin_ini * 3])
+        norm_index = norm_index0 + full_ovl_indx - bin_ini - 1
+        olFunc /= np.mean(olFunc[norm_index - 1:norm_index + 2])
 
-            diff_norm.append(np.nansum(np.abs(1 - olFunc[full_ovl_indx:full_ovl_indx + round(1500 / hres)])))
+        half_ovl_indx = np.argmax(olFunc >= 0.95)
 
-            olFunc[full_ovl_indx:] = olFunc[full_ovl_indx]
-            olFunc /= olFunc[full_ovl_indx] # renormalization
+        if half_ovl_indx == 0:
+            half_ovl_indx = full_ovl_indx - int(np.floor(180 / hres))
+        # smoothing before full overlap to avoid oscilations on that part.
+        for _ in range(6):
+            # smoothing before full overlap to avoid S-shape near to the
+            # full overlap.
+            olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)] = uniform_filter1d(olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)], 5)
 
-            if (full_ovl_indx - bin_ini) < 1:
-                full_ovl_indx = bin_ini + 1
+    olFunc[olFunc < 1e-5] = 1e-5
 
-            norm_index0 = np.argmax(olFunc[full_ovl_indx - bin_ini:full_ovl_indx + bin_ini * 3])
-            norm_index = norm_index0 + full_ovl_indx - bin_ini - 1
-            olFunc /= np.mean(olFunc[norm_index - 1:norm_index + 2])
-
-            half_ovl_indx = np.argmax(olFunc >= 0.95)
-
-            if half_ovl_indx == 0:
-                half_ovl_indx = full_ovl_indx - int(np.floor(180 / hres))
-            # smoothing before full overlap to avoid oscilations on that part.
-            for _ in range(6):
-                # smoothing before full overlap to avoid S-shape near to the
-                # full overlap.
-                olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)] = uniform_filter1d(olFunc[half_ovl_indx:norm_index + round(bin_ini / 2)], 5)
-
-        olFunc[olFunc < 1e-5] = 1e-5
-
-    #olFunc = olFunc.T
-    #olFunc0 = olFunc0.T
+    # olFunc = olFunc.T
+    # olFunc0 = olFunc0.T
 
     ret = {'olFunc': olFunc, 'olFunc_raw': olFunc0, 'LR': LR, 'normRange': normRange}
     return ret
 
 
-
 def load(data_cube) -> list:
-    """read the overlap function from files into a structure similar to the others.
+    """Read the overlap function from files into a structure similar to the others.
 
     Parameters
     ----------
@@ -408,34 +438,35 @@ def load(data_cube) -> list:
     Returns
     -------
     overlap : list of dicts
-
+        ...
     """
-    print(data_cube.picasso_config_dict['defaultFile_folder'])
-    print(data_cube.polly_config_dict)
-    print(data_cube.polly_default_dict)
+
+    # print(data_cube.picasso_config_dict['defaultFile_folder'])
+    # print(data_cube.polly_config_dict)
+    # print(data_cube.polly_default_dict)
 
     ovl_files_for = [k for k in data_cube.polly_default_dict.keys() if 'overlapFile_' in k]
-    print(ovl_files_for)
+    # print(ovl_files_for)
 
     height = data_cube.retrievals_highres['range']
     polly_default = data_cube.polly_default_dict
     folder = Path(data_cube.picasso_config_dict['defaultFile_folder'])
-    #data_cube.retrievals_profile['overlap']['raman'][i][f'{wv}_total_NR']['olFunc']
+    # data_cube.retrievals_profile['overlap']['raman'][i][f'{wv}_total_NR']['olFunc']
     overlap = [{}]
 
     for k in ovl_files_for:
-        print(k)
+        # print(k)
         full_f = folder.joinpath(polly_default[k])
-        print(full_f)
+        # print(full_f)
         if polly_default[k] == "":
-            print('empty string')
+            # print('empty string')
             continue
         dat = np.loadtxt(full_f, skiprows=1, delimiter=',')
-        print(dat.shape)
+        # print(dat.shape)
         h_ovl = dat[:, 0]
         ovl = dat[:, 1]
-        print(h_ovl.shape, h_ovl[:10], h_ovl[-10:])
-        print(ovl.shape, ovl[:20])
+        # print(h_ovl.shape, h_ovl[:10], h_ovl[-10:])
+        # print(ovl.shape, ovl[:20])
         if height.shape != h_ovl.shape or not np.all(np.isclose(height, h_ovl)):
             logging.warning('Heights not equal, need interpolating')
             ovl = np.interp(height, h_ovl, ovl, left=0, right=1)
