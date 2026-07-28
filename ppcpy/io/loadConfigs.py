@@ -4,20 +4,30 @@ import pandas as pd
 import numpy as np
 import traceback
 
-def loadPicassoConfig(picasso_config_file, picasso_default_config_file):
-    """load the general Picasso config file
+
+configIdxKeys:list = [
+    'first_range_gate_indx', 'bgCorRangeIndx', 'bgCorRangeIndxLow', 'bgCorRangeIndxHigh', 
+    'LCMeanMinIndx', 'LCMeanMaxIndx', 'depol_cal_minbin_355', 'depol_cal_minbin_532',
+    'depol_cal_minbin_1064'
+]
+
+
+def loadPicassoConfig(picasso_config_file:str, picasso_default_config_file:str) -> dict:
+    """Load the general Picasso config file.
 
     Parameters
     ----------
     picasso_config_file : str or path
-        the specific config file
+        The specific config file.
     picasso_default_config_fil : str or path
-        the default (template) file
+        The default (template) file.
         
     Returns
     -------
-    picasso_config_dict
+    picasso_config_dict : dict
+        Mereged config file containing all config variables.
     """
+
     picasso_default_config_file_path = Path(picasso_default_config_file)
     picasso_config_file_path = Path(picasso_config_file)
     picasso_config_dict = {}
@@ -48,7 +58,7 @@ def loadPicassoConfig(picasso_config_file, picasso_default_config_file):
                         picasso_config_dict[key] = picasso_config_file_dict[key]
                 return picasso_config_dict
             except Exception:
-                logging.critical('picasso_default_config_file: {picasso_default_config_file} can not be read.', exc_info=True)
+                logging.critical(f'picasso_default_config_file: {picasso_default_config_file} can not be read.', exc_info=True)
 
         else:
             logging.warning(f'picasso config file: {picasso_config_file} does not exist')
@@ -59,9 +69,24 @@ def loadPicassoConfig(picasso_config_file, picasso_default_config_file):
         return None
 
 
-def readPollyNetConfigLinkTable(polly_config_table_file, timestamp, device):
+def readPollyNetConfigLinkTable(polly_config_table_file:str, timestamp:str, device:str) -> pd.DataFrame:
+    """Read PollyNet processing chain config link table.
+
+    Parameters
+    ----------
+    polly_config_table_file : str
+        Path to the link tabele file.
+    timestamp : str
+        Date of measurement.
+    device : str
+        Name of polly device.
+    
+    Returns
+    -------
+    config_array : pd.DataFrame
+        Row of intrest in the PollyNet processing chain config link table.
     """
-    """
+
     polly_config_table_file_path = Path(polly_config_table_file)
 
     if polly_config_table_file_path.is_file():
@@ -73,12 +98,12 @@ def readPollyNetConfigLinkTable(polly_config_table_file, timestamp, device):
         before_end_date = excel_file_ds['Stoptime of config'] >= timestamp
         between_two_dates = after_start_date & before_end_date
         filtered_result = excel_file_ds.loc[between_two_dates]
-    #    print(filtered_result)
+        # print(filtered_result)
         ## get config-file for timeperiod and instrument
         config_array = filtered_result.loc[(filtered_result['Instrument'] == device)]
         if len(config_array) > 0:
-            #polly_config_file = str(config_array['Config file'].to_string(index=False)).strip() ## get rid of whtiespaces
-            #return polly_config_file
+            # polly_config_file = str(config_array['Config file'].to_string(index=False)).strip() ## get rid of whtiespaces
+            # return polly_config_file
             return config_array
         else:
             logging.warning(f'no polly-config file could be found for {device}@{timestamp}.')
@@ -88,9 +113,20 @@ def readPollyNetConfigLinkTable(polly_config_table_file, timestamp, device):
         return pd.DataFrame()
 
 
-# def fix_indexing(config_dict, keys=['first_range_gate_indx', ]):
-def fix_indexing(config_dict, keys=['first_range_gate_indx', 'bgCorRangeIndx', 'bgCorRangeIndxLow', 'bgCorRangeIndxHigh', 'LCMeanMinIndx', 'LCMeanMaxIndx', ]):
-    """
+def fix_indexing(config_dict:dict, keys:list=configIdxKeys) -> dict:
+    """Fix indexing convention of config variables to 0based.
+
+    Parameters
+    ----------
+    config_dict : dict
+        A dictionary containing all config variables.
+    keys : list
+        Key(s) of `config_dict` variables to fix indexing convention.
+
+    Returns
+    -------
+    config_dict : dict
+        `config_dict` with 0based indexing.  
     """
 
     if not 'indexing_convention' in config_dict:
@@ -108,38 +144,39 @@ def fix_indexing(config_dict, keys=['first_range_gate_indx', 'bgCorRangeIndx', '
     return config_dict
 
 
-def getPollyConfigfromArray(polly_config_array, picasso_config_dict):
-    """function to load the config for the time identified
+def getPollyConfigfromArray(polly_config_array:pd.DataFrame, picasso_config_dict:dict) -> dict:
+    """Function to load the config for the time identified.
     
-    aim is to declutter the runscript
+    Aim is to declutter the runscript
 
-    
     Parameters
     ----------
     polly_config_array : pandas dataframe
-        selected line form the links.xlsx
+        Selected line form the links.xlsx.
     picasso_config_dict : dict
-        general picasso config
+        General picasso config.
 
     Returns
     -------
     polly_config_dict : dict
-    
+        A dictionary with the polly config / default parameters.
     """
+
     assert len(polly_config_array) == 1, 'given config array has more than one value'
 
     polly_config_file = Path(
         picasso_config_dict['polly_config_folder'],
-        polly_config_array['Config file'].item())
-    #print(polly_config_file)
+        polly_config_array['Config file'].item()
+    )
+    # print(polly_config_file)
     polly_default_config_file = Path(
         picasso_config_dict['path_config'],
         'polly_global_config.json'
     )
-    #print(polly_default_config_file)
+    # print(polly_default_config_file)
     polly_config_dict = loadPollyConfig(
-        polly_config_file, polly_default_config_file)
-
+        polly_config_file, polly_default_config_file
+    )
     polly_config_dict['name'] = polly_config_array['Instrument'].item()
     polly_config_dict['site'] = polly_config_array['Location'].item()
     polly_config_dict['asl'] = polly_config_array['asl.'].item()
@@ -149,9 +186,28 @@ def getPollyConfigfromArray(polly_config_array, picasso_config_dict):
     return polly_config_dict
 
 
-def loadPollyConfig(polly_config_file, polly_default_config_file):
+def loadPollyConfig(polly_config_file:str, polly_default_config_file:str) -> dict:
+    """Load the spesific and default config files and combine them into one dictionary.
+
+    Parameters
+    ----------
+    polly_config_file : str
+        Path to polly config file.
+    polly_default_config_file : str
+        path to polly default file.
+
+    Returns
+    -------
+    dict
+        A dictionary with the polly config / default parameters.
+
+    Notes
+    -----
+    .. TODO:: 
+        - Maybe change `polly_default_config_file` to `polly_global_config_file`
+          as the defualt on is no longer used.
     """
-    """
+
     polly_default_config_file_path = Path(polly_default_config_file)
     polly_config_file_path = Path(polly_config_file)
     polly_config_dict = {}
@@ -212,8 +268,10 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                 if 'first_range_gate_indx' in polly_default_config_file_dict.keys():
                     fix_indexing_keys = ['first_range_gate_indx']
                 elif 'LC' in polly_default_config_file_dict.keys():
-                    fix_indexing_keys = ['LC']
-                return fix_indexing(polly_config_dict, keys=fix_indexing_keys + ['bgCorRangeIndx', 'bgCorRangeIndxLow', 'bgCorRangeIndxHigh', 'LCMeanMinIndx', 'LCMeanMaxIndx'])
+                    fix_indexing_keys = ['LC'] # TODO: Why are we subtracting one from LC???
+                return fix_indexing(polly_config_dict, keys=fix_indexing_keys + [
+                    'bgCorRangeIndx', 'bgCorRangeIndxLow', 'bgCorRangeIndxHigh', 'LCMeanMinIndx', 
+                    'LCMeanMaxIndx', 'depol_cal_minbin_355', 'depol_cal_minbin_532', 'depol_cal_minbin_1064'])
                 
             except Exception:
                 logging.warning(f'polly_config_file: {polly_config_file} can not be processed.', exc_info=True)
@@ -224,21 +282,29 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
             if 'first_range_gate_indx' in polly_default_config_file_dict.keys():
                 fix_indexing_keys = ['first_range_gate_indx']
             elif 'LC' in polly_default_config_file_dict.keys():
-                fix_indexing_keys = ['LC']
-            return fix_indexing(polly_default_config_file_dict, keys=fix_indexing_keys + ['bgCorRangeIndx', 'bgCorRangeIndxLow', 'bgCorRangeIndxHigh', 'LCMeanMinIndx', 'LCMeanMaxIndx'])
-    else:
+                fix_indexing_keys = ['LC'] # TODO: Why are we subtracting one from LC???
+            return fix_indexing(polly_default_config_file_dict, keys=fix_indexing_keys +  [
+                    'bgCorRangeIndx', 'bgCorRangeIndxLow', 'bgCorRangeIndxHigh', 'LCMeanMinIndx', 
+                    'LCMeanMaxIndx', 'depol_cal_minbin_355', 'depol_cal_minbin_532', 'depol_cal_minbin_1064'])
+        
         logging.critical(f'polly_default_config_file:  {polly_default_config_file} can not be found. Aborting')
         return None
 
-def checkPollyConfigDict(polly_config_dict:dict) -> dict:
-    """
-    Check and potentially modify polly config dict
 
-    Parameters:
-    - polly_config_dict (dict): polly config dict to be checked
-    Output:
-    - new_polly_config_dict (dict): checked (and modified) polly config dict
+def checkPollyConfigDict(polly_config_dict:dict) -> dict:
+    """Check and potentially modify polly config dict.
+
+    Parameters
+    ----------
+    polly_config_dict : dict
+        Polly config dict to be checked.
+    
+    Returns
+    -------
+    new_polly_config_dict : dict
+        Checked (and modified) polly config dict.
     """
+    
     logging.info(".. checking polly config dict")
     new_polly_config_dict = polly_config_dict.copy()
 

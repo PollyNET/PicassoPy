@@ -38,33 +38,33 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:b
     retrieval : str
         Name of retrieval type, eg. 'klett'.
     signal : str
-        Name of the signal used for the retrievals, eg. 'TCor'.
+        Name of the signal used for the retrieval, eg. 'TCor'.
+    refBeta : float
+        Reference value used for the retrieval [m^{-1}Sr^{-1}].
     
     Notes
     -----
+    .. TODO:: Should sigBGCor, sigTCor or RCS be used for the Klett retrievals?
 
     **History**
 
     - xxxx-xx-xx: TODO: First edition by ...
     - 2026-02-09: Modified and cleaned by Buholdt
-    
-    .. TODO:: Should sigBGCor, sigTCor or RCS be used for the Klett retrievals?
 
     """
 
-    height = data_cube.retrievals_highres['range']
-    config_dict = data_cube.polly_config_dict
+    height = data_cube.retrievals_highres['range'].copy()
+    config_dict = data_cube.polly_config_dict.copy()
 
     logging.warning(f'rayleighfit seems to use range in matlab, but the met data should be in height >> RECHECK!')
     logging.warning(f'at 10km height this is a difference of about 4 indices')
 
     opt_profiles = [{} for i in range(len(data_cube.clFreeGrps))]
 
-    print('Starting Klett retrieval')
+    # print('Starting Klett retrieval')
     for i, cldFree in enumerate(data_cube.clFreeGrps):
-        print('cldFree ', i, cldFree)
+        logging.info(f"Cloud free segment {i}, Time: {data_cube.retrievals_highres['time64'][cldFree[0]]} - {data_cube.retrievals_highres['time64'][cldFree[1]]}.")
         cldFree = cldFree[0], cldFree[1] + 1
-        print('cldFree mod', cldFree)
 
         # Define channels to run the retrieval for
         channels = [(532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]
@@ -73,7 +73,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:b
 
         for wv, t, tel in channels:
             if np.any(data_cube.gf(wv, t, tel)):
-                print(f'== {wv}, {t}, {tel} klett =================================')
+                logging.info(f"Channel: {wv}, {t}, {tel} klett.")
 
                 # Telescope type dependent configurations
                 if tel == 'NR':
@@ -81,8 +81,6 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:b
                     keyminSNR = 'minRefSNR_NR_'
                     key_LR = 'LR_NR_'
                     refBeta = config_dict[f"refBeta_NR_{wv}"] if f"refBeta_NR_{wv}" in config_dict else None
-                    # TODO seperate klett and raman refBeta in config file?
-                    # refBeta = config_dict[f"refBeta_NR_klett_{wv}"] if f"refBeta_NR_klett_{wv}" in config_dict else None
                 else:
                     key_smooth = 'smoothWin_klett_'
                     keyminSNR = 'minRefSNR'
@@ -90,18 +88,18 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:b
                     refBeta = config_dict[f'refBeta{wv}']
 
                 # Elastic signals
-                sig = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv, t, tel)])
-                bg = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv, t, tel)])
-                molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
+                sig = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv, t, tel)]).copy()
+                bg = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv, t, tel)]).copy()
+                molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :].copy()
                 if np.isnan(sig).any():
                     # Current temporary version of fernald() does not support NaN values in the signal.
-                    print(f'NaN-values detected in signal {signal}, skipping Klett retrieval for this channel.')
+                    logging.warning(f"NaN-values detected in signal {signal}, skipping Klett retrieval for this channel.")
                     continue
 
                 # Reference height
                 refHInd = data_cube.retrievals_profile['refH'][i][f'{wv}_{t}_{tel}']['refInd']
                 if np.isnan(refHInd).any():
-                    print('No valid refHInd found, skipping Klett retrieval for this channel.')
+                    logging.warning("No valid refHInd found, skipping Klett retrieval for this channel.")
                     continue
 
                 # Calculate SNR in the reference height
@@ -112,7 +110,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:b
 
                 # Checking SNR treshold
                 if SNRRef < config_dict[f'{keyminSNR}{wv}']:
-                    print('Signal is too noisy at the reference height, skipping Klett retrival for this channel.', SNRRef, config_dict[f'{keyminSNR}{wv}'])
+                    logging.warning("Signal is too noisy at the reference height, skipping Klett retrival for this channel.")
                     continue
 
                 if refBeta is None and tel == 'NR':
@@ -121,10 +119,10 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', nr:bool=False, collect_debug:b
                         if 'aerBsc' in opt_profiles[i][f'{wv}_{t}_FR']:
                             refBeta = np.nanmean(opt_profiles[i][f'{wv}_{t}_FR']['aerBsc'][refHInd[0]:refHInd[1] + 1])
                         else:
-                            print('No valid refBeta found, skipping Klett retrieval for this channel')
+                            logging.warning("No valid refBeta found, skipping Klett retrieval for this channel.")
                             continue
                     else:
-                        print('No valid refBeta found, skipping Klett retrieval for this channel')
+                        logging.warning("No valid refBeta found, skipping Klett retrieval for this channel.")
                         continue
                 
                 # Print debug info
@@ -227,6 +225,7 @@ def fernald(
                   propagating NaN-values in the backward and farward retrievals.
 
     """
+    
     # Convert units
     height = height / 1e3  # Convert to km
     molBsc = np.array(molBsc) * 1e3  # Convert to km^-1 sr^-1

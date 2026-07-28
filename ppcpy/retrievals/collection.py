@@ -1,5 +1,3 @@
-
-
 import numpy as np
 
 def calc_snr(signal:np.ndarray, bg:np.ndarray) -> np.ndarray:
@@ -14,12 +12,12 @@ def calc_snr(signal:np.ndarray, bg:np.ndarray) -> np.ndarray:
     signal : ndarray
         Signal strength.
     bg : ndarray
-        Background noise. 
-
+        Background noise.
+    
     Returns
     -------
     SNR : ndarray
-        Signal-to-noise ratio. For negative signal values, the SNR is set to 0.
+        Signal-to-noise ratio. For negative signal values the SNR is set to 0.
 
     References
     ----------
@@ -30,12 +28,22 @@ def calc_snr(signal:np.ndarray, bg:np.ndarray) -> np.ndarray:
 
     Notes
     -----
+    - `signal` and `background` must be in Photon counts!
 
     **History**
 
     - 2021-04-21: First edition by Zhenping
     - 2024-12-10: Translated with AI, moved to own function
+
+    Example
+    -------
+    >>> # SNR for time-height array
+    >>> SNR_array = calc_snr(signal_array, bg_array)
+
+    >>> # SNR for aggregated signal
+    >>> SNR = calc_snr(np.sum(signal_array, keepdims=True), np.sum(bg_array, keepdims=True))
     """
+
     tot = signal + 2 * bg
     tot[tot <= 0] = np.nan
 
@@ -44,5 +52,3 @@ def calc_snr(signal:np.ndarray, bg:np.ndarray) -> np.ndarray:
     SNR[np.isnan(SNR)] = 0
     
     return SNR
-
-

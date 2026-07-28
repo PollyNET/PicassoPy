@@ -21,30 +21,46 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     
     Notes
     -----
+    .. TODO:: Check which smoothing shoule be used here!
+
     **History**
-    
+
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
     
     """
+
     return uniform_filter(signal, window_len)
 
 
-def voldepol_cldFreeGrps(data_cube, ret_prof_name):
-    """
+def voldepol_cldFreeGrps(data_cube, ret_prof_name:str) -> dict:
+    """...
+
+    Parameters
+    ----------
+    ret_prof_name : str
+        ...
+    
+    Returns
+    -------
+    opt_profiles : dict
+        ...
+    
+    Notes
+    -----
+    .. TODO:: Finish the docstring.
     .. TODO:: Should the GHK-Transmission corrected (TCor) or the Background corrected (BGCor)
         signal be used for calculating the volume depolarisation ratio?
-
-
-    With the GHK formula the BGCor signal has to be used (in the current implementation, the voldepol is even 
-    needed to perform the polarization-transmission-correction
+            - With the GHK formula the BGCor signal has to be used (in the current implementation, 
+              the voldepol is even needed to perform the polarization-transmission-correction.
+    .. TODO:: Is the return in this function actually needed??
     """
 
-    config_dict = data_cube.polly_config_dict
-    opt_profiles = data_cube.retrievals_profile[ret_prof_name]
-    print('no_profiles ', len(opt_profiles))
-    print(opt_profiles[0].keys())
+    config_dict = data_cube.polly_config_dict.copy()
+    opt_profiles = data_cube.retrievals_profile[ret_prof_name].copy()
+    logging.debug(f"no_profiles: {len(opt_profiles)}")
+    logging.debug(f"{opt_profiles[0].keys()}")
 
-    signal = 'TCor'
+    # signal = 'TCor'
     signal = 'BGCor'
 
     for i, cldFree in enumerate(data_cube.clFreeGrps):
@@ -53,61 +69,67 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name):
             wv, t, tel = channel.split('_')
             flagt = data_cube.gf(wv, 'total', tel)
             flagc = data_cube.gf(wv, 'cross', tel)
-            #indxt = np.where(flagt)[0]
+            # indxt = np.where(flagt)[0]
             retrieval = opt_profiles[i][channel]['retrieval']
             if np.any(flagt) and np.any(flagc):
                 logging.info(f'voldepol at channel {wv} cldFree {i} {cldFree}')
 
-                sigt = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i,:,flagt])
-                #bgt = np.nansum(np.squeeze(
-                #    data_cube.retrievals_highres[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, 'total', tel)]), axis=0)
-                sigc = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i,:,flagc])
+                sigt = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, flagt])
+                # bgt = np.nansum(np.squeeze(
+                #     data_cube.retrievals_highres[f'BG{signal}'][slice(*cldFree),data_cube.gf(wv, 'total', tel)]), axis=0)
+                sigc = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, flagc])
 
-                print(channel, data_cube.etaused[f'{wv}_{tel}'])
+                logging.debug(f"{channel} {data_cube.etaused[f'{wv}_{tel}']}")
 
                 vdr, vdrStd = calc_profile_vdr(
-                    sigt, sigc, config_dict['G'][flagt], config_dict['G'][flagc],
-                    config_dict['H'][flagt], config_dict['H'][flagc],
-                    data_cube.etaused[f'{wv}_{tel}'], config_dict[f'voldepol_error_{wv}'],
+                    sigt=sigt, sigc=sigc, 
+                    Gt=config_dict['G'][flagt], Gr=config_dict['G'][flagc],
+                    Ht=config_dict['H'][flagt], Hr=config_dict['H'][flagc],
+                    eta=data_cube.etaused[f'{wv}_{tel}'], 
+                    voldepol_error=config_dict[f'voldepol_error_{wv}'],
                     window=config_dict[f'smoothWin_{retrieval}_{wv}']
-                    )
+                )
                 opt_profiles[i][channel]['vdr'] = vdr
                 opt_profiles[i][channel]['vdrStd'] = vdrStd
 
                 if np.isnan(data_cube.retrievals_profile['refH'][i][f"{wv}_{t}_{tel}"]['refInd']).any():
+                    logging.warning("No valid refHInd found, skipping retrieval for this channel.")
                     continue
+
                 mdr, mdrStd, flgaDeftMdr = get_MDR(
-                    vdr, vdrStd, data_cube.retrievals_profile['refH'][i][f"{wv}_{t}_{tel}"]['refInd'],
+                    vdr=vdr, vdrStd=vdrStd, 
+                    refHInd=data_cube.retrievals_profile['refH'][i][f"{wv}_{t}_{tel}"]['refInd']
                 )
                 if config_dict["flagUseTheoreticalMDR"]:
-                    logging.info("use the theoretical MDR value")
+                    logging.info("Use the theoretical MDR value.")
                     mdr = data_cube.polly_config_dict[f"molDepol{wv}"]
-                print(f"est. mdr {channel}  {mdr} {mdrStd}")
+                
+                logging.debug(f"est. mdr {channel}  {mdr} {mdrStd}")
                 opt_profiles[i][channel]['mdr'] = mdr
                 opt_profiles[i][channel]['mdrStd'] = mdrStd
                 
                 # experimental code to calculate the mdr without smoothing(?)
                 vdr, vdrStd = calc_profile_vdr(
-                    sigt, sigc, config_dict['G'][flagt], config_dict['G'][flagc],
-                    config_dict['H'][flagt], config_dict['H'][flagc],
-                    data_cube.etaused[f'{wv}_{tel}'], config_dict[f'voldepol_error_{wv}'],
+                    sigt=sigt, sigc=sigc, 
+                    Gt=config_dict['G'][flagt], Gr=config_dict['G'][flagc],
+                    Ht=config_dict['H'][flagt], Hr=config_dict['H'][flagc],
+                    eta=data_cube.etaused[f'{wv}_{tel}'], 
+                    voldepol_error=config_dict[f'voldepol_error_{wv}'],
                     window=1
-                    )
-                mdr, mdrStd, flgaDeftMdr = get_MDR(
-                    vdr, vdrStd, data_cube.retrievals_profile['refH'][i][f"{wv}_{t}_{tel}"]['refInd'],
                 )
-                print(f"est. mdr {channel}  {mdr} {mdrStd}  (smooth1)")
+                mdr, mdrStd, flgaDeftMdr = get_MDR(
+                    vdr=vdr, vdrStd=vdrStd, 
+                    refHInd=data_cube.retrievals_profile['refH'][i][f"{wv}_{t}_{tel}"]['refInd']
+                )
+                logging.debug(f"est. mdr {channel}  {mdr} {mdrStd}  (smooth1)")
 
-                print(opt_profiles[i][channel].keys())
+                logging.debug(f"{opt_profiles[i][channel].keys()}")
 
     return opt_profiles
 
 
-def calc_profile_vdr(sigt, sigc, Gt, Gr, Ht, Hr, eta, 
-                     voldepol_error, window=1, flag_smooth_before=True):
-#def polly_vdr_ghk(sig_tot, sig_cross, GT, GR, HT, HR, eta, 
-#                  voldepol_error_a0, voldepol_error_a1, voldepol_error_a2, 
-#                  smooth_window=1, flag_smooth_before=True):
+def calc_profile_vdr(sigt:np.ndarray, sigc:np.ndarray, Gt:float, Gr:float, Ht:float, Hr:float, eta:float, 
+                     voldepol_error:float, window:int=1, flag_smooth_before:bool=True) -> tuple:
     """Calculate volume depolarization ratio using GHK parameters.
 
     Parameters
@@ -118,11 +140,11 @@ def calc_profile_vdr(sigt, sigc, Gt, Gr, Ht, Hr, eta,
         Signal strength of the cross channel [photon count].
     Gt : float
         G parameter in the total channel.
-    Gc : float
+    Gr : float
         G parameter in the cross channel.
     Ht : float
         H parameter in the total channel.
-    Hc : float
+    Hr : float
         H parameter in the cross channel.
     eta : float
         Depolarization calibration constant.
@@ -151,9 +173,14 @@ def calc_profile_vdr(sigt, sigc, Gt, Gr, Ht, Hr, eta,
     - Freudenthaler, V. About the effects of polarising optics on lidar signals and the Delta90 calibration. 
       Atmos. Meas. Tech., 9, 4181–4255 (2016).
 
+    
     Notes
     -----
-
+    - Be awere: `sigT = 0` will cause `vol_depol` and `vol_depol_std` to be NaN!
+    .. TODO:: Should consider implementing something to avoid NaN values in this function,
+              as these will also harm the qulity of the retrievals that depend on the 
+              transmission corrected signal (ei. introduce more NaN's).
+    
     **History**
 
     - 2018-09-02: First edition by Zhenping
@@ -163,7 +190,7 @@ def calc_profile_vdr(sigt, sigc, Gt, Gr, Ht, Hr, eta,
 
     """
 
-    print(f"G {Gt} {Gr} H {Ht} {Hr} Eta {eta} error {voldepol_error} Window {window} ")
+    logging.info(f"G {Gt} {Gr} H {Ht} {Hr} Eta {eta} error {voldepol_error} Window {window} ")
     # Smooth signals before or after ratio calculation
     sig_ratio = sigc / sigt
     if window > 1: # smoothing with a window size of 1 equals no smoothing
@@ -184,60 +211,105 @@ def calc_profile_vdr(sigt, sigc, Gt, Gr, Ht, Hr, eta,
 
     return vol_depol, vol_depol_std
 
-def get_MDR(vdr, vdrStd, refHInd):
-    """get the vdr at reference height
 
-    in the matlab pollynet processing chain this is done by recalculating vdr for the
-    reference height chunk 
-    (Pollynet_Processing_Chain/lib/calibration/pollyMDRGHK.m)
+def get_MDR(vdr:np.ndarray, vdrStd:np.ndarray, refHInd:list) -> float:
+    """Get the vdr at reference height.
 
-    Assuming that it is more efficient to use the precalculated vdr
+    Parameters
+    ----------
+    vdr : ndarray
+        Volume depolarization ratio.
+    vdrStd : ndarray
+        Uncertainty of the volume depolarization ratio.
+    refHInd : list
+        Reference height indcies [bottum, top].
+    
+    Returns
+    -------
+    mdr : ndarray
+        Mean volume depolarization ratio at reference height.
+    mdrStd : ndarray
+        Mean uncertainty of the volume depolarization ratio at reference height.
+    bool
+        False.
 
-    The snr criterion is missing for this very first version
+    Notes
+    -----
+    - in the matlab pollynet processing chain this is done by recalculating vdr for the
+      reference height chunk (Pollynet_Processing_Chain/lib/calibration/pollyMDRGHK.m)
+    - Assuming that it is more efficient to use the precalculated vdr
+    - The snr criterion is missing for this very first version.
+
+    ** History **
+
     """
+
     mdr = np.mean(vdr[slice(*refHInd)])
     mdrStd = np.mean(vdrStd[slice(*refHInd)])
 
     return mdr, mdrStd, False
 
 
-def pardepol_cldFreeGrps(data_cube, ret_prof_name):
-    """
+def pardepol_cldFreeGrps(data_cube, ret_prof_name:str) -> dict:
+    """...
+
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
+    ret_prof_name : str
+        ...
+    
+    Returns
+    -------
+    opt_porfiles : dict
+        ...
+    
+    Notes
+    -----
+    .. TODO::
+        - Finish docsting.
+        - Is the return here necessary?
+        - Cleare unused variables.
     """
 
-    config_dict = data_cube.polly_config_dict
-    opt_profiles = data_cube.retrievals_profile[ret_prof_name]
-    print('no_profiles ', len(opt_profiles))
-    print(opt_profiles[0].keys())
-    signal = 'BGCor'
+    # config_dict = data_cube.polly_config_dict # <-- Not used!
+    opt_profiles = data_cube.retrievals_profile[ret_prof_name].copy()
+    logging.debug(f"no_profiles {len(opt_profiles)}")
+    logging.debug(f"{opt_profiles[0].keys()}")
+    # signal = 'BGCor' # <-- Not used!
 
     for i, cldFree in enumerate(data_cube.clFreeGrps):
         cldFree = cldFree[0], cldFree[1] + 1
         for channel in opt_profiles[i]:
             wv, t, tel = channel.split('_')
-            print(f"=== {channel } ==============================================================")
+            logging.info(f"Channel: {channel}.")
             flagt = data_cube.gf(wv, 'total', tel)
             flagc = data_cube.gf(wv, 'cross', tel)
-            #indxt = np.where(flagt)[0]
-            retrieval = opt_profiles[i][channel]['retrieval']
+            # indxt = np.where(flagt)[0] # <-- Not used!
+            # retrieval = opt_profiles[i][channel]['retrieval'] # <-- Not used!
             if np.any(flagt) and np.any(flagc) and 'aerBsc' in opt_profiles[i][channel]:
-                logging.info(f'pardepol at channel {wv} cldFree {i} {cldFree}')
+                logging.info(f"pardepol at channel {wv} cldFree {i} {cldFree}")
 
                 pdr, pdrStd = calc_pdr(
-                    opt_profiles[i][channel]['vdr'], opt_profiles[i][channel]['vdrStd'],
-                    opt_profiles[i][channel]['aerBsc'], np.ones_like(opt_profiles[i][channel]['aerBscStd'])*1e-7,
-                    data_cube.mol_profiles[f'mBsc_{wv}'][i,:], opt_profiles[i][channel]['mdr'],
-                    opt_profiles[i][channel]['mdrStd'],
+                    vol_depol=opt_profiles[i][channel]['vdr'], 
+                    vol_depol_std=opt_profiles[i][channel]['vdrStd'],
+                    aer_bsc=opt_profiles[i][channel]['aerBsc'],
+                    aer_bsc_std=np.ones_like(opt_profiles[i][channel]['aerBscStd'])*1e-7, # TODO: Hard coded!
+                    mol_bsc=data_cube.mol_profiles[f'mBsc_{wv}'][i, :],
+                    mol_depol=opt_profiles[i][channel]['mdr'],
+                    mol_depol_std=opt_profiles[i][channel]['mdrStd']
                 )
 
                 opt_profiles[i][channel]['pdr'] = pdr
                 opt_profiles[i][channel]['pdrStd'] = pdrStd
-                #print('after ', opt_profiles[i][channel].keys())
+                # print('after ', opt_profiles[i][channel].keys())
 
     return opt_profiles
 
 
-def calc_pdr(vol_depol, vol_depol_std, aer_bsc, aer_bsc_std, mol_bsc, mol_depol, mol_depol_std):
+def calc_pdr(vol_depol:np.ndarray, vol_depol_std:np.ndarray, aer_bsc:np.ndarray, aer_bsc_std:np.ndarray,
+             mol_bsc:np.ndarray, mol_depol:float, mol_depol_std:float) -> tuple:
     """Calculate the particle depolarization ratio and estimate its standard deviation.
 
     Parameters
@@ -266,7 +338,8 @@ def calc_pdr(vol_depol, vol_depol_std, aer_bsc, aer_bsc_std, mol_bsc, mol_depol,
 
     References
     ----------
-    - Freudenthaler, V., et al., Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006,  Tellus B, 61, 165-179, 2009.
+    - Freudenthaler, V., et al., Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006,
+      Tellus B, 61, 165-179, 2009.
 
     Notes
     -----

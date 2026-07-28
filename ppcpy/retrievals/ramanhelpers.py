@@ -3,7 +3,8 @@ from scipy.stats import norm, poisson
 
 
 def movingslope_variedWin(signal:np.ndarray, winWidth:int|np.ndarray) -> np.ndarray:
-    """calculates the slope of the signal with a moving slope.
+    """Calculates the slope of the signal with a moving slope.
+
     This is a wrapper for the `movingslope` function to make it compatible with
     height-independent smoothing windows.
 
@@ -32,6 +33,7 @@ def movingslope_variedWin(signal:np.ndarray, winWidth:int|np.ndarray) -> np.ndar
     - 2018-08-03: First edition by Zhenping.
 
     """
+
     if winWidth is None:
         raise ValueError("Not enough inputs. `winWidth` must be specified.")
 
@@ -52,16 +54,19 @@ def movingslope_variedWin(signal:np.ndarray, winWidth:int|np.ndarray) -> np.ndar
 
     return slope
 
-def moving_smooth_varied_win(signal, winWidth):
-    """ """
+
+def moving_smooth_varied_win(signal:np.ndarray, winWidth:int|np.ndarray) -> np.ndarray:
+    """.. TODO:: Implement function!"""
     raise NotImplementedError
 
-def moving_linfit_varied_win(height, signal, winWidth):
-    """ """
+
+def moving_linfit_varied_win(height:np.ndarray, signal:np.ndarray, winWidth:int|np.ndarray) -> np.ndarray:
+    """.. TODO:: Implement function!"""
     raise NotImplementedError
+
 
 def movingslope(vec:np.ndarray, supportlength:int=3, modelorder:int=1, dt:float=1) -> np.ndarray:
-    """estimates the local slope of a sequence of points using a sliding window.
+    """Estimates the local slope of a sequence of points using a sliding window.
 
     Parameters
     ----------
@@ -86,7 +91,9 @@ def movingslope(vec:np.ndarray, supportlength:int=3, modelorder:int=1, dt:float=
     **History**
     
     - Original MATLAB implementation by John D'Errico (woodchips@rochester.rr.com)
+
     """
+
     vec = np.asarray(vec)
     n = len(vec)
 
@@ -130,6 +137,7 @@ def movingslope(vec:np.ndarray, supportlength:int=3, modelorder:int=1, dt:float=
     # Scale by spacing
     return Dvec / dt
 
+
 def _getcoef(t:np.ndarray, supportlength:int, modelorder:int) -> np.ndarray:
     """Helper function to compute the filter coefficients.
 
@@ -147,13 +155,14 @@ def _getcoef(t:np.ndarray, supportlength:int, modelorder:int) -> np.ndarray:
     coef : ndarray
         Filter coefficients for slope estimation.
     """
+
     A = np.vander(t.flatten(), modelorder + 1, increasing=True)
     pinvA = np.linalg.pinv(A)
     return pinvA[1]  # Only the linear term
 
 
 def sigGenWithNoise(signal:np.ndarray, noise:np.ndarray=None, nProfile:int=1, method:str='norm') -> np.ndarray:
-    """SIGGENWITHNOISE generate noise-containing signal with a certain noise-adding algorithm.
+    """Generate noise-containing signal with a certain noise-adding algorithm.
 
     Parameters
     ----------
@@ -180,7 +189,9 @@ def sigGenWithNoise(signal:np.ndarray, noise:np.ndarray=None, nProfile:int=1, me
     
     - 2021-06-13: First edition by Zhenping.
     - 2026-02-04: Modifications to reduce computational time, Buholdt
+
     """
+
     if noise is None:
         noise = np.sqrt(signal)
     

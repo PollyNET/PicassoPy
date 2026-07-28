@@ -169,14 +169,14 @@ def run_raman_cldFreeGrps(data_cube, collect_debug:bool=True) -> list:
     
     Returns
     -------
-    overlap : list of dicts
-        Per channel per cloud free period:
     olFunc : ndarray
         Overlap function.
-    olStd : float
-        Standard deviation of overlap function.
-    olFunc0 : ndarray
+    olFunc_raw : ndarray
         Overlap function with no smoothing.
+    LR : float
+        Optimal Lidar Ratio for ...
+    normRange : list
+        Height index of the signal normalization range.
     """
 
     height = data_cube.retrievals_highres['range']

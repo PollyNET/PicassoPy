@@ -18,7 +18,22 @@ def attbsc_2d(data_cube, nr:bool=True, collect_debug:bool=False):
         If Ture, calculate the attbsc for FR and NR channels. Default is True.
     collect_debug : bool, optional
         If True, collects debug information. Default is False.
+
+    Yeilds
+    ------
+    data_cube.retrievals_highres[f"attBsc_{channel}"] : np.ndarray
+        Attenuated backscatter per channel.
     
+    Notes
+    -----
+    - If ´nr=True´ also yeild the attenuated backscatter of the near-range
+      channels.
+    - In addition to the standard far-range channels the function also yeilds
+      the attenuated backscatter of the overlap corrected far-range channels.
+      
+    ..TODO:: is it correct to transmission correct the overlap corrected signals
+             before calculating their attenuated backscatter? Are not the OL
+             signals already transmission corrected?
     """
 
     rgs = data_cube.retrievals_highres['range']
@@ -51,7 +66,7 @@ def attbsc_2d(data_cube, nr:bool=True, collect_debug:bool=False):
 
     # experimental, the calibration constant requires the OL corrected signal
     if 'sigOLCor' in data_cube.retrievals_highres:
-        print(f"Exprimental, attenuated backscatter solution for {channel}")
+        logging.warning(f"Exprimental, attenuated backscatter solution for {channel}")
         sigOLTCor, _ = transCor.transCorGHK_cube(data_cube, signal='OLCor')
         channels = [(355, 'total', 'FR'), (532, 'total', 'FR'), (1064, 'total', 'FR')]
         for wv, t, tel in channels:
@@ -79,6 +94,11 @@ def voldepol_2d(data_cube):
     data_cube : object
         Main PicassoProc object
     
+    Yeilds
+    ------
+    data_cube.retrievals_highres[f"voldepol_{wv}_total_{tel}"] : np.ndarray
+        Time-hight volume depolarization ratio at wavelengths:
+        353 nm, 532 nm, 1064 nm, and 532 nm DFOV.
     """
 
     config_dict = data_cube.polly_config_dict
@@ -87,7 +107,7 @@ def voldepol_2d(data_cube):
             (532, 'FR'), (355, 'FR'), (1064, 'FR')]
     if '532_DFOV' in data_cube.etaused:
         channels += [(532, 'DFOV')]
-        print('voldepol also for DFOV')
+        logging.info("voldepol also for DFOV")
 
     for wv, tel in channels:
         if tel == 'DFOV':
