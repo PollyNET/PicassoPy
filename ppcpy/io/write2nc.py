@@ -173,7 +173,7 @@ def write_channelwise_2_nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[
 
         ## adding dynamical variables
         for v in list(json_nc_mapping_dict['variables'].keys()): ## use list here to suppress RuntimeError: dictionary changed size during iteration
-        #for v in json_nc_mapping_dict['variables'].keys():
+        # for v in json_nc_mapping_dict['variables'].keys():
             if v in data_cube.retrievals_highres.keys():
                 json_nc_mapping_dict['variables'][v]['data'] = data_cube.retrievals_highres[v]
                 ## update variable attribute
@@ -235,30 +235,33 @@ def write2nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[]):
         ## adding dynamical variables
         json_nc_translator = json2nc_mapping.read_json_to_dict(Path(root_dir, 'ppcpy', 'config', f'json2nc_translator.json'))
         for var in json_nc_translator[prod]['variables'].keys():
-            #print(f'var: {var}')
             if var in json_nc_mapping_dict['variables'].keys():
                 pass
             else:
                 logging.warning(f'variable {var} not in json2nc_mapper_file')
                 continue
             parameter = json_nc_translator[prod]['variables'][var]['parameter']
-            if "quality_mask" in var:
+            if "quality_mask" in var and 'quality_mask' in data_cube.retrievals_highres:
                 ch = getattr(data_cube, parameter)
                 qm = np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, ch])
                 json_nc_mapping_dict['variables'][var]['data'] = qm
+            elif "SNR" in var:
+                ch = getattr(data_cube, parameter)
+                if data_cube.polly_config_dict['flagUseImprovedSNR'] and 'SNR_quasi' in data_cube.retrievals_highres:
+                    snr = np.squeeze(data_cube.retrievals_highres['SNR_quasi'][:, :, ch])
+                    json_nc_mapping_dict['variables'][var]['data'] = snr
+                elif 'SNR' in data_cube.retrievals_highres:
+                    snr = np.squeeze(data_cube.retrievals_highres['SNR'][:, :, ch])
+                    json_nc_mapping_dict['variables'][var]['data'] = snr
             else:
                 pass
 
-            #print(f'para: {parameter}')
-
             if parameter in data_cube.retrievals_highres.keys():
-                #print(f'para in retrievals_highres: {parameter}')
                 json_nc_mapping_dict['variables'][var]['data'] = data_cube.retrievals_highres[parameter]
             
         ### remove empty key-value-pairs
         for var in list(json_nc_mapping_dict['variables'].keys()):  ## use list here to suppress RuntimeError: dictionary changed size during iteration
             if json_nc_mapping_dict['variables'][var]['data'] is None:
-                print(f'removing variable: {var}')
                 json2nc_mapping.remove_variable_from_json_dict_mapper(data_dict=json_nc_mapping_dict, key_to_remove=var)
 
 
