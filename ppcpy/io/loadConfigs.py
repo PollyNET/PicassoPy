@@ -194,8 +194,10 @@ def loadPollyConfig(polly_config_file, polly_default_config_file):
                             elif isinstance(polly_default_config_file_dict[key], list) and len(polly_default_config_file_dict[key]) > 4 and len(polly_default_config_file_dict[key]) != channels:
                                 ## number of channels from the default-polly-config has to be adapted to the correct number of channels, taken from the local-polly-config
                                 if len(polly_default_config_file_dict[key]) > channels:
+                                    logging.warning(f'length of {key} exceeds the number of channels ({len(polly_default_config_file_dict[key])} vs {channels}). Only the first {channels} values will be considered.', exc_info=True)
                                     polly_config_dict[key] = polly_default_config_file_dict[key][:channels]
                                 elif len(polly_default_config_file_dict[key]) < channels:
+                                    logging.warning(f'length of {key} is less than the number of channels ({len(polly_default_config_file_dict[key])} vs {channels}). The last value {polly_default_config_file_dict[key][-1]} will be used for the last {channels - len(polly_default_config_file_dict[key])} channels.')
                                     polly_config_dict[key] = polly_default_config_file_dict[key]
                                     last_element = polly_default_config_file_dict[key][-1]
                                     extension_length = channels - len(polly_default_config_file_dict[key])
