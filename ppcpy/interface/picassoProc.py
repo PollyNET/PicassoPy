@@ -203,75 +203,93 @@ class PicassoProc:
         ```
         data_cube.flag_355_total_FR
         ```
-
-        Returns
-        -------
-        self
         
         """
-        ChannelTags = pollyChannelTags.pollyChannelTags( 
+        ## Construct channel flags
+        channelTags = pollyChannelTags.pollyChannelTags( 
             self.polly_config_dict['channelTag'],   # TODO key: channelTags vs channelTag???
-            flagFarRangeChannel=self.polly_config_dict['isFR'],
-            flagNearRangeChannel=self.polly_config_dict['isNR'],
-            flagRotRamanChannel=self.polly_config_dict['isRR'],
-            flagTotalChannel=self.polly_config_dict['isTot'],
-            flagCrossChannel=self.polly_config_dict['isCross'],
-            flagParallelChannel=self.polly_config_dict['isParallel'],
-            flag355nmChannel=self.polly_config_dict['is355nm'],
-            flag387nmChannel=self.polly_config_dict['is387nm'],
-            flag407nmChannel=self.polly_config_dict['is407nm'],
-            flag532nmChannel=self.polly_config_dict['is532nm'],
-            flag607nmChannel=self.polly_config_dict['is607nm'],
-            flag1064nmChannel=self.polly_config_dict['is1064nm'],
-            flagDFOVChannel=self.polly_config_dict['isDFOV'],
+            flagFarRange=self.polly_config_dict['isFR'],
+            flagNearRange=self.polly_config_dict['isNR'],
+            flagRotRaman=self.polly_config_dict['isRR'],
+            flagTotal=self.polly_config_dict['isTot'],
+            flagCross=self.polly_config_dict['isCross'],
+            flagParallel=self.polly_config_dict['isParallel'],
+            flag355nm=self.polly_config_dict['is355nm'],
+            flag387nm=self.polly_config_dict['is387nm'],
+            flag407nm=self.polly_config_dict['is407nm'],
+            flag532nm=self.polly_config_dict['is532nm'],
+            flag607nm=self.polly_config_dict['is607nm'],
+            flag1064nm=self.polly_config_dict['is1064nm'],
+            flagDFOV=self.polly_config_dict['isDFOV'],
+            flag460nm=self.polly_config_dict['is460nm'],
+            flag353nm=self.polly_config_dict['is353nm'],
+            flag530nm=self.polly_config_dict['is530nm'],
+            flag1058nm=self.polly_config_dict['is1058nm'],
         )
 
-        ChannelTags, self.polly_config_dict = pollyChannelTags.polly_config_channel_corrections(chTagsOut_ls=ChannelTags, polly_config_dict=self.polly_config_dict)
+        ## Remove "none" channels
+        channelTags, self.polly_config_dict = pollyChannelTags.polly_config_channel_corrections(
+            chTagsOut_ls=channelTags,
+            polly_config_dict=self.polly_config_dict
+        )
+        self.retrievals_highres['channel'] = channelTags
+        self.polly_config_dict['channelTags'] = channelTags
+        self.channel_dict = {i: item for i, item in enumerate(channelTags)}
+        logging.info(f'ChannelTags: {channelTags}')
 
-        self.retrievals_highres['channel'] = ChannelTags
-        self.polly_config_dict['channelTags'] = ChannelTags
-        self.channel_dict = {i: item for i, item in enumerate(ChannelTags)}
-
-        ChannelFlags = pollyChannelTags.pollyChannelflags(
+        ## Construct channel flags
+        channelFlags = pollyChannelTags.pollyChannelFlags(
             channel_dict_length=len(self.channel_dict),
-            flagFarRangeChannel=self.polly_config_dict['isFR'],
-            flagNearRangeChannel=self.polly_config_dict['isNR'],
-            flagRotRamanChannel=self.polly_config_dict['isRR'],
-            flagTotalChannel=self.polly_config_dict['isTot'],
-            flagCrossChannel=self.polly_config_dict['isCross'],
-            flagParallelChannel=self.polly_config_dict['isParallel'],
-            flag355nmChannel=self.polly_config_dict['is355nm'],
-            flag387nmChannel=self.polly_config_dict['is387nm'],
-            flag407nmChannel=self.polly_config_dict['is407nm'],
-            flag532nmChannel=self.polly_config_dict['is532nm'],
-            flag607nmChannel=self.polly_config_dict['is607nm'],
-            flag1064nmChannel=self.polly_config_dict['is1064nm'],
-            flagDFOVChannel=self.polly_config_dict['isDFOV'],
+            flagFarRange=self.polly_config_dict['isFR'],
+            flagNearRange=self.polly_config_dict['isNR'],
+            flagRotRaman=self.polly_config_dict['isRR'],
+            flagTotal=self.polly_config_dict['isTot'],
+            flagCross=self.polly_config_dict['isCross'],
+            flagParallel=self.polly_config_dict['isParallel'],
+            flag355nm=self.polly_config_dict['is355nm'],
+            flag387nm=self.polly_config_dict['is387nm'],
+            flag407nm=self.polly_config_dict['is407nm'],
+            flag532nm=self.polly_config_dict['is532nm'],
+            flag607nm=self.polly_config_dict['is607nm'],
+            flag1064nm=self.polly_config_dict['is1064nm'],
+            flagDFOV=self.polly_config_dict['isDFOV'],
+            flag460nm=self.polly_config_dict['is460nm'],
+            flag353nm=self.polly_config_dict['is353nm'],
+            flag530nm=self.polly_config_dict['is530nm'],
+            flag1058nm=self.polly_config_dict['is1058nm'],
         )
 
-        self.flags = ChannelFlags
-        self.flag_355_total_FR = ChannelFlags[0]
-        self.flag_355_cross_FR = ChannelFlags[1]
-        self.flag_355_parallel_FR = ChannelFlags[2]
-        self.flag_355_total_NR = ChannelFlags[3]
-        self.flag_387_total_FR = ChannelFlags[4]
-        self.flag_387_total_NR = ChannelFlags[5]
-        self.flag_407_total_FR = ChannelFlags[6]
-        self.flag_407_total_NR = ChannelFlags[7]
-        self.flag_532_total_FR = ChannelFlags[8]
-        self.flag_532_cross_FR = ChannelFlags[9]
-        self.flag_532_parallel_FR = ChannelFlags[10]
-        self.flag_532_total_NR = ChannelFlags[11]
-        self.flag_532_cross_DFOV = ChannelFlags[12]
-        self.flag_532_rr_FR = ChannelFlags[13]
-        self.flag_607_total_FR = ChannelFlags[14]
-        self.flag_607_total_NR = ChannelFlags[15]
-        self.flag_1058_total_FR = ChannelFlags[16]
-        self.flag_1064_total_FR = ChannelFlags[17]
-        self.flag_1064_cross_FR = ChannelFlags[18]
-        self.flag_1064_total_NR = ChannelFlags[19]
+        ## Store channel flags
+        self.flags = list(channelFlags.values())
+        self.flag_353_total_FR = channelFlags['far-range total 353 nm'] 
+        self.flag_355_total_FR = channelFlags['far-range total 355 nm'] 
+        self.flag_355_cross_FR = channelFlags['far-range cross 355 nm']
+        self.flag_355_parallel_FR = channelFlags['far-range parallel 355 nm']
+        self.flag_355_total_NR = channelFlags['near-range total 355 nm']
+        self.flag_387_total_FR = channelFlags['far-range 387 nm']
+        self.flag_387_total_NR = channelFlags['near-range 387 nm']
+        self.flag_407_total_FR = channelFlags['far-range 407 nm']
+        self.flag_407_total_NR = channelFlags['near-range 407 nm']
+        self.flag_460_total_FR = channelFlags['far-range 460 nm']
+        self.flag_530_total_FR = channelFlags['far-range total 530 nm']
+        self.flag_532_total_FR = channelFlags['far-range total 532 nm']
+        self.flag_532_cross_FR = channelFlags['far-range cross 532 nm']
+        self.flag_532_parallel_FR = channelFlags['far-range parallel 532 nm']
+        self.flag_532_total_NR = channelFlags['near-range total 532 nm']
+        self.flag_532_cross_DFOV = channelFlags['near-range cross 532 nm']
+        self.flag_607_total_FR = channelFlags['far-range 607 nm']
+        self.flag_607_total_NR = channelFlags['near-range 607 nm']
+        self.flag_1058_total_FR = channelFlags['far-range total 1058 nm']
+        self.flag_1064_total_FR = channelFlags['far-range total 1064 nm']
+        self.flag_1064_cross_FR = channelFlags['far-range cross 1064 nm']
+        self.flag_1064_parallel_FR = channelFlags['far-range parallel 1064 nm']
+        self.flag_1064_total_NR = channelFlags['near-range total 1064 nm']
+        self.flag_unknown = channelFlags['unknown']
 
-        return self
+        logging.debug(f"channelFlags: {channelFlags}")
+        if np.sum(self.flag_unknown) > 0:
+            logging.warning(f"Unknown channels: {np.asarray(self.retrievals_highres['channel'])[self.flag_unknown]}")
+    
 
     def preprocessing(self, collect_debug:bool=False):
         """Preprocessing of Lidar data. 
