@@ -1,375 +1,424 @@
 import logging
 import numpy as np
 
-def pollyChannelTags(chTagsIn:list, **Channels) -> list:
-    chTags = {}
+
+def pollyChannelTags(chTagsIn:list, **channel_attributes) -> list:
+    """Assign channel tags.
+    
+    Parameters
+    ----------
+    chTagsIn : list
+        Original channel tags.
+    
+    Keyword arguments
+    ------------------
+    flagFR : list of bools
+        Whether the channels has a far-range telescope.
+    flagNR : list of bools
+        Whether the channels has a near-range telescope.
+    flagRR : list of bools
+        Whether the channel is intended for Rotational Raman.
+    flagTot : list
+        Whether it is a total (cross- and co-polarized) channel.
+    flagCross : list
+        Whether it is a Cross-polarized channel.
+    flagParallel : list
+        Whether it is a Co-polarized channel.
+    flag355nm : list
+        Whether the channel has a wavelength of 355 nm.
+    flag387nm : list
+        Whether the channel has a wavelength of 387 nm.
+    flag407nm : list
+        Whether the channel has a wavelength of 407 nm.
+    flag532nm : list
+        Whether the channel has a wavelength of 532 nm.
+    flag607nm : list
+        Whether the channel has a wavelength of 607 nm.
+    flag1064nm : list
+        Whether the channel has a wavelength of 1064 nm.
+    flagDFOV : list
+        Whether the channel is intended for Dual Field Of View.
+    flag460nm : list of bools
+        Whether the channel has a wavelength of 460 nm.
+    flag353nm : list of bools
+        Whether the channel has a wavelength of 353 nm.
+    flag530nm : list of bools
+        Whether the channel has a wavelength of 530 nm.
+    flag1058nm : list of bools
+        Whether the channel has a wavelength of 1058 nm.
+
+    Returns
+    -------
+    chTagsOut_ls : list
+        Channel tags.
+    
+    Notes
+    -----
+    - The key-word parameter `flagRotRaman` is a bit redundant
+      after the change to the naming of rotational raman channels
+      and may therefore be removed in the future.
+
+    ** History **
+
+    - 2021-04-23: first edition by Zhenping
+    - xxxx-xx-xx: translated to python
+    - 2026-07-30: Changed to naming rotational Raman channel by
+                  there wavelength and added channels FR-460 nm,
+                  FR-total-353 nm and FR-parallel-1064 nm.
+
+    """
+
     chTagsOut_ls = []
-    chLabels = {}
-    nChs = len(Channels['flagFarRangeChannel'])
+    nChs = len(channel_attributes['flagFarRange'])
+    defaultEncoding = np.zeros(nChs).tolist()
 
-    if len(chTagsIn) != 0:
+    ## Extract key-word parameters
+    encodings = []
+    encodings.append(channel_attributes.get('flagFarRange', defaultEncoding))
+    encodings.append(channel_attributes.get('flagNearRange', defaultEncoding))
+    encodings.append(channel_attributes.get('flagRotRaman', defaultEncoding))
+    encodings.append(channel_attributes.get('flagTotal', defaultEncoding))
+    encodings.append(channel_attributes.get('flagCross', defaultEncoding))
+    encodings.append(channel_attributes.get('flagParallel', defaultEncoding))
+    encodings.append(channel_attributes.get('flag355nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag387nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag407nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag532nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag607nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag1064nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flagDFOV', defaultEncoding))
+    encodings.append(channel_attributes.get('flag460nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag353nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag530nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag1058nm', defaultEncoding))
+    encodings = np.asarray(encodings)
+
+    if len(chTagsIn) > 0:
+        ## Use original channel tags
         chTagsOut_ls = chTagsIn
-#        if 'none' in chTagsOut_ls:
-#            chTagsOut_ls.remove("none")
-        logging.info(f'ChannelLabels: {chTagsOut_ls}')
-        return chTagsOut_ls
 
-    elif len(chTagsIn) == 0:
-
+    else:
+        ## Assign tag based on a bitmask encodings
         for iCh in range(nChs):
-            print([c[iCh] for c in Channels])
-            chTags[iCh] = sum(2 ** i * b for i, b in enumerate([c[iCh] for c in Channels]))
-            if chTags[iCh] == 73:
+            chCode = sum(2**i * b for i, b in enumerate(encodings[:, iCh]))
+            if chCode in [69, 77, 16389, 16393, 16397]:
+                ch_label = 'far-range total 353 nm'
+                chTagsOut_ls.append(ch_label)
+            elif chCode == 73:
                 ch_label = 'far-range total 355 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 74:
+            elif chCode == 74:
                 ch_label = 'near-range 355 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 81:
+            elif chCode == 81:
                 ch_label = 'far-range cross 355 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 129:
+            elif chCode == 129:
                 ch_label = 'far-range 387 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 130:
+            elif chCode == 130:
                 ch_label = 'near-range 387 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 257:
+            elif chCode == 257:
                 ch_label = 'far-range 407 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 517:
-                ch_label = 'far-range rotational Raman 532 nm'
+            elif chCode in [517, 525, 32773, 32777, 32781]:
+                ch_label = 'far-range total 530 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 521:
+            elif chCode == 521:
                 ch_label = 'far-range total 532 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 522:
+            elif chCode == 522:
                 ch_label = 'near-range total 532 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 529:
+            elif chCode == 529:
                 ch_label = 'far-range cross 532 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 4624:
+            elif chCode == 4624:
                 ch_label = 'near-range cross 532 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 545:
+            elif chCode == 545:
                 ch_label = 'far-range parallel 532 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 1025:
+            elif chCode == 1025:
                 ch_label = 'far-range 607 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 1026:
+            elif chCode == 1026:
                 ch_label = 'near-range 607 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 2053:
-                ch_label = 'far-range rotational Raman 1064 nm'
+            elif chCode in [2053, 2061, 65541, 65545, 65549]:
+                ch_label = 'far-range total 1058 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 2057:
+            elif chCode == 2057:
                 ch_label = 'far-range total 1064 nm'
                 chTagsOut_ls.append(ch_label)
-            elif chTags[iCh] == 2065:
+            elif chCode == 2058:
+                ch_label = 'near-range cross 1064 nm'
+                chTagsOut_ls.append(ch_label)
+            elif chCode == 2065:
                 ch_label = 'far-range cross 1064 nm'
+                chTagsOut_ls.append(ch_label)
+            elif chCode == 2081:
+                ch_label = 'far-range parallel 1064 nm'
+                chTagsOut_ls.append(ch_label)
+            elif chCode == 8193:
+                ch_label = 'far-range 460 nm'
                 chTagsOut_ls.append(ch_label)
             else:
                 ch_label = 'unknown'
                 chTagsOut_ls.append(ch_label)
 
-#        if 'none' in chTagsOut_ls:
-#            chTagsOut_ls.remove("none")
-        #logging.info(f'ChannelTags: {chTagsOut}')
-        #logging.info(f'ChannelLabels: {chLabels}')
-        logging.info(f'ChannelLabels: {chTagsOut_ls}')
-        return chTagsOut_ls
+    return chTagsOut_ls
 
-def polly_config_channel_corrections(chTagsOut_ls,polly_config_dict):
+
+def polly_config_channel_corrections(chTagsOut_ls:list, polly_config_dict:dict) -> tuple:
+    """Remove channel with tags 'none' as well as the respective config variables
+    for these channels.
+
+    Parameters
+    ----------
+    chTagsOut_ls : list
+        List of channel tags.
+    polly_config_dict : dict
+        Dictionary of polly config variables.
+    
+    Returns
+    --------
+    chTagsOut_ls : list
+        List of channel tags without 'none' - channels.
+    polly_config_dict : dict
+        Dictionary of polly config variables without the config variables of 'none' - channels.
+    """
+
     nChs_orig = len(chTagsOut_ls)
-    # Find indices where "none" is in the list
+
+    ## Find indices where "none" is in the list
     none_indices = [i for i, x in enumerate(chTagsOut_ls) if x == "none"]
     if len(none_indices) > 0:
-        logging.warning(f'removed none tag from channel list {none_indices}')
+        logging.warning(f"Removed 'none' tag from channel list. Indices removed: {none_indices}")
 
-    # Remove all occurrences of "none"
+    ## Remove all occurrences of "none"
     chTagsOut_ls = [x for x in chTagsOut_ls if x != "none"]
-    # remove entries from polly-config of  'none' - channel
+
+    ## remove entries from polly-config of  'none' - channel
     for key, values in polly_config_dict.items():
         if isinstance(values, list) and len(values) == nChs_orig:
             polly_config_dict[key] = [val for i, val in enumerate(values) if i not in none_indices]
+
     return chTagsOut_ls, polly_config_dict
 
-def pollyChannelflags(channel_dict_length,**Channels):
-    flags = {}
-#    nChs = len(Channels['flagFarRangeChannel'])
+
+def pollyChannelFlags(channel_dict_length:int, **channel_attributes) -> list:
+    """Assign channel flags.
+    
+    Parameters
+    ----------
+    channel_dict_length : int
+        Number of channels.
+
+    Keyword arguments
+    ------------------
+    flagFarRange : list of bools
+        Whether the channels has a far-range telescope.
+    flagNearRange : list of bools
+        Whether the channels has a near-range telescope.
+    flagRotRaman : list of bools
+        Whether the channel is intended for Rotational Raman.
+    flagTotal : list of bools
+        Whether it is a total (cross- and co-polarized) channel.
+    flagCross : list of bools
+        Whether it is a Cross-polarized channel.
+    flagParallel : list of bools
+        Whether it is a Co-polarized channel.
+    flag355nm : list of bools
+        Whether the channel has a wavelength of 355 nm.
+    flag387nm : list of bools
+        Whether the channel has a wavelength of 387 nm.
+    flag407nm : list of bools
+        Whether the channel has a wavelength of 407 nm.
+    flag532nm : list of bools
+        Whether the channel has a wavelength of 532 nm.
+    flag607nm : list of bools
+        Whether the channel has a wavelength of 607 nm.
+    flag1064nm : list of bools
+        Whether the channel has a wavelength of 1064 nm.
+    flagDFOV : list of bools
+        Whether the channel is intended for Dual Field Of View.
+    flag460nm : list of bools
+        Whether the channel has a wavelength of 460 nm.
+    flag353nm : list of bools
+        Whether the channel has a wavelength of 353 nm.
+    flag530nm : list of bools
+        Whether the channel has a wavelength of 530 nm.
+    flag1058nm : list of bools
+        Whether the channel has a wavelength of 1058 nm.
+    
+    Returns
+    -------
+    flags : list
+        Nested list with boolean flag for each channel.
+    
+    Notes
+    -----
+    - The key-word parameter `flagRotRaman` is a bit redundant
+      after the change to the naming of rotational raman channels
+      and may therefore be removed in the future. 
+    
+    ** History **
+
+    - 2021-04-23: first edition by Zhenping
+    - xxxx-xx-xx: translated to python
+    - 2026-07-30: Changed to naming rotational Raman channel by
+                  there wavelength and added channels FR-460 nm,
+                  FR-total-353 nm and FR-parallel-1064 nm.
+
+    """
+
     nChs = channel_dict_length
+    defaultEncoding = np.zeros(nChs).tolist()
 
-    ## flag initialization
-    flag_355_total_FR    = np.full(nChs, False, dtype=bool) 
-    flag_355_cross_FR    = np.full(nChs, False, dtype=bool)
-    flag_355_parallel_FR = np.full(nChs, False, dtype=bool)
-    flag_355_total_NR    = np.full(nChs, False, dtype=bool)
-    flag_387_total_FR    = np.full(nChs, False, dtype=bool)
-    flag_387_total_NR    = np.full(nChs, False, dtype=bool)
-    flag_407_total_FR    = np.full(nChs, False, dtype=bool)
-    flag_407_total_NR    = np.full(nChs, False, dtype=bool)
-    flag_532_total_FR    = np.full(nChs, False, dtype=bool)
-    flag_532_cross_FR    = np.full(nChs, False, dtype=bool)
-    flag_532_parallel_FR = np.full(nChs, False, dtype=bool)
-    flag_532_total_NR    = np.full(nChs, False, dtype=bool)
-    flag_532_cross_DFOV  = np.full(nChs, False, dtype=bool)
-    flag_532_total_RR    = np.full(nChs, False, dtype=bool)
-    flag_607_total_FR    = np.full(nChs, False, dtype=bool)
-    flag_607_total_NR    = np.full(nChs, False, dtype=bool)
-    flag_1058_total_FR   = np.full(nChs, False, dtype=bool)
-    flag_1064_total_FR   = np.full(nChs, False, dtype=bool)
-    flag_1064_cross_FR   = np.full(nChs, False, dtype=bool)
-    flag_1064_total_NR   = np.full(nChs, False, dtype=bool)
+    ## Extract key-word parameters
+    encodings = []
+    encodings.append(channel_attributes.get('flagFarRange', defaultEncoding))
+    encodings.append(channel_attributes.get('flagNearRange', defaultEncoding))
+    encodings.append(channel_attributes.get('flagRotRaman', defaultEncoding))
+    encodings.append(channel_attributes.get('flagTotal', defaultEncoding))
+    encodings.append(channel_attributes.get('flagCross', defaultEncoding))
+    encodings.append(channel_attributes.get('flagParallel', defaultEncoding))
+    encodings.append(channel_attributes.get('flag355nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag387nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag407nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag532nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag607nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag1064nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flagDFOV', defaultEncoding))
+    encodings.append(channel_attributes.get('flag460nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag353nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag530nm', defaultEncoding))
+    encodings.append(channel_attributes.get('flag1058nm', defaultEncoding))
+    encodings = np.asarray(encodings)
 
+    ## Flag initialization
+    flag_353_total_FR     = np.full(nChs, False, dtype=bool)
+    flag_355_total_FR     = np.full(nChs, False, dtype=bool) 
+    flag_355_cross_FR     = np.full(nChs, False, dtype=bool)
+    flag_355_parallel_FR  = np.full(nChs, False, dtype=bool)
+    flag_355_total_NR     = np.full(nChs, False, dtype=bool)
+    flag_387_total_FR     = np.full(nChs, False, dtype=bool)
+    flag_387_total_NR     = np.full(nChs, False, dtype=bool)
+    flag_407_total_FR     = np.full(nChs, False, dtype=bool)
+    flag_407_total_NR     = np.full(nChs, False, dtype=bool)
+    flag_460_total_FR     = np.full(nChs, False, dtype=bool)
+    flag_530_total_FR     = np.full(nChs, False, dtype=bool)
+    flag_532_total_FR     = np.full(nChs, False, dtype=bool)
+    flag_532_cross_FR     = np.full(nChs, False, dtype=bool)
+    flag_532_parallel_FR  = np.full(nChs, False, dtype=bool)
+    flag_532_total_NR     = np.full(nChs, False, dtype=bool)
+    flag_532_cross_DFOV   = np.full(nChs, False, dtype=bool)
+    flag_607_total_FR     = np.full(nChs, False, dtype=bool)
+    flag_607_total_NR     = np.full(nChs, False, dtype=bool)
+    flag_1058_total_FR    = np.full(nChs, False, dtype=bool)
+    flag_1064_total_FR    = np.full(nChs, False, dtype=bool)
+    flag_1064_cross_FR    = np.full(nChs, False, dtype=bool)
+    flag_1064_parallel_FR = np.full(nChs, False, dtype=bool)
+    flag_1064_total_NR    = np.full(nChs, False, dtype=bool)
+    flag_unknown          = np.full(nChs, False, dtype=bool)
 
-    chTags = {}
+    ## Assign flags based on a bitmask encodings
     for iCh in range(nChs):
-        chTags[iCh] = sum(2 ** i * b for i, b in enumerate([c[iCh] for c in Channels.values()]))
-        if chTags[iCh] == 73:
-            ch_label = 'far-range total 355 nm'
+        chCode = sum(2**i * b for i, b in enumerate(encodings[:, iCh]))
+        if chCode in [69, 77, 16389, 16393, 16397]:
+            ## far-range total 353 nm (rotational Raman)
+            flag_353_total_FR[iCh] = True
+        elif chCode == 73:
+            ## far-range total 355 nm
             flag_355_total_FR[iCh] = True
-        elif chTags[iCh] == 74:
-            ch_label = 'near-range 355 nm'
+        elif chCode == 74:
+            ## near-range 355 nm
             flag_355_total_NR[iCh] = True
-        elif chTags[iCh] == 81:
-            ch_label = 'far-range cross 355 nm'
+        elif chCode == 81:
+            ## far-range cross 355 nm
             flag_355_cross_FR[iCh] = True
-        elif chTags[iCh] == 129:
-            ch_label = 'far-range 387 nm'
+        elif chCode == 129:
+            ## far-range 387 nm
             flag_387_total_FR[iCh] = True
-        elif chTags[iCh] == 130:
-            ch_label = 'near-range 387 nm'
+        elif chCode == 130:
+            ## near-range 387 nm
             flag_387_total_NR[iCh] = True
-        elif chTags[iCh] == 257:
-            ch_label = 'far-range 407 nm'
+        elif chCode == 257:
+            ## far-range 407 nm
             flag_407_total_FR[iCh] = True
-        elif chTags[iCh] == 517:
-            ch_label = 'far-range rotational Raman 532 nm'
-            flag_532_total_RR[iCh] = True
-        elif chTags[iCh] == 521:
-            ch_label = 'far-range total 532 nm'
+        elif chCode in [517, 525, 32773, 32777, 32781]:
+            ## far-range total 530 nm (rotational Raman)
+            flag_530_total_FR[iCh] = True
+        elif chCode == 521:
+            ## far-range total 532 nm
             flag_532_total_FR[iCh] = True
-        elif chTags[iCh] == 522:
-            ch_label = 'near-range total 532 nm'
+        elif chCode == 522:
+            ## near-range total 532 nm
             flag_532_total_NR[iCh] = True
-        elif chTags[iCh] == 529:
-            ch_label = 'far-range cross 532 nm'
+        elif chCode == 529:
+            ## far-range cross 532 nm
             flag_532_cross_FR[iCh] = True
-        elif chTags[iCh] == 4624:
-            ch_label = 'near-range cross 532 nm'
+        elif chCode == 4624:
+            ## near-range cross 532 nm
             flag_532_cross_DFOV[iCh] = True
-        elif chTags[iCh] == 545:
-            ch_label = 'far-range parallel 532 nm'
+        elif chCode == 545:
+            ## far-range parallel 532 nm
             flag_532_parallel_FR[iCh] = True
-        elif chTags[iCh] == 1025:
-            ch_label = 'far-range 607 nm'
+        elif chCode == 1025:
+            ## far-range 607 nm
             flag_607_total_FR[iCh] = True
-        elif chTags[iCh] == 1026:
-            ch_label = 'near-range 607 nm'
+        elif chCode == 1026:
+            ## near-range 607 nm
             flag_607_total_NR[iCh] = True
-        elif chTags[iCh] == 2053:
-            ch_label = 'far-range rotational Raman 1064 nm'
+        elif chCode in [2053, 2061, 65541, 65545, 65549]:
+            ## far-range total 1058 nm (rotational Raman)
             flag_1058_total_FR[iCh] = True
-        elif chTags[iCh] == 2057:
-            ch_label = 'far-range total 1064 nm'
+        elif chCode == 2057:
+            ## far-range total 1064 nm
             flag_1064_total_FR[iCh] = True
-        elif chTags[iCh] == 2065:
-            ch_label = 'far-range cross 1064 nm'
+        elif chCode == 2058:
+            ## near-range total 1064 nm
+            flag_1064_total_NR[iCh] = True
+        elif chCode == 2065:
+            ## far-range cross 1064 nm
             flag_1064_cross_FR[iCh] = True
+        elif chCode == 2081:
+            ## far-range parallel 1064 nm
+            flag_1064_parallel_FR[iCh] = True
+        elif chCode == 8193:
+            ## far-range 460 nm (Fluorescence)
+            flag_460_total_FR[iCh] = True
         else:
-            ch_label = 'unknown'
+            ## unknown
+            flag_unknown[iCh] = True
 
-    flags = [flag_355_total_FR,
-             flag_355_cross_FR,
-             flag_355_parallel_FR,
-             flag_355_total_NR,
-             flag_387_total_FR,
-             flag_387_total_NR,
-             flag_407_total_FR,
-             flag_407_total_NR,
-             flag_532_total_FR,
-             flag_532_cross_FR,
-             flag_532_parallel_FR,
-             flag_532_total_NR,
-             flag_532_cross_DFOV,
-             flag_532_total_RR,
-             flag_607_total_FR,
-             flag_607_total_NR,
-             flag_1058_total_FR,
-             flag_1064_total_FR,
-             flag_1064_cross_FR,
-             flag_1064_total_NR
-             ]
+    flags = {
+        "far-range total 353 nm"      : flag_353_total_FR,
+        "far-range total 355 nm"      : flag_355_total_FR,
+        "far-range cross 355 nm"      : flag_355_cross_FR,
+        "far-range parallel 355 nm"   : flag_355_parallel_FR,
+        "near-range total 355 nm"     : flag_355_total_NR,
+        "far-range 387 nm"            : flag_387_total_FR,
+        "near-range 387 nm"           : flag_387_total_NR,
+        "far-range 407 nm"            : flag_407_total_FR,
+        "near-range 407 nm"           : flag_407_total_NR,
+        "far-range 460 nm"            : flag_460_total_FR,
+        "far-range total 530 nm"      : flag_530_total_FR,
+        "far-range total 532 nm"      : flag_532_total_FR,
+        "far-range cross 532 nm"      : flag_532_cross_FR,
+        "far-range parallel 532 nm"   : flag_532_parallel_FR,
+        "near-range total 532 nm"     : flag_532_total_NR,
+        "near-range cross 532 nm"     : flag_532_cross_DFOV,
+        "far-range 607 nm"            : flag_607_total_FR,
+        "near-range 607 nm"           : flag_607_total_NR,
+        "far-range total 1058 nm"     : flag_1058_total_FR,
+        "far-range total 1064 nm"     : flag_1064_total_FR,
+        "far-range cross 1064 nm"     : flag_1064_cross_FR,
+        "far-range parallel 1064 nm"  : flag_1064_parallel_FR,
+        "near-range total 1064 nm"    : flag_1064_total_NR,
+        "unknown"                     : flag_unknown
+    }
 
     return flags
-
-#function [chTagsO, chLabels, flagFarRangeChannelO, flagNearRangeChannelO, flagRotRamanChannelO, flagTotalChannelO, flagCrossChannelO, flagParallelChannelO, flag355nmChannelO, flag387nmChannelO, flag407nmChannelO, flag532nmChannelO, flag607nmChannelO, flag1064nmChannelO] = pollyChannelTags(chTagsI, varargin)
-#% POLLYCHANNELTAGS specify channel tags and labels according to logical settings.
-#%
-#% USAGE:
-#%    [chTagsO, chLabels, flagFarRangeChannelO, flagNearRangeChannelO, flagRotRamanChannelO, flagTotalChannelO, flagCrossChannelO, flagParallelChannelO, flag355nmChannelO, flag387nmChannelO, flag407nmChannelO, flag532nmChannelO, flag607nmChannelO, flag1064nmChannelO] = pollyChannelTags(chTagsI)
-#%
-#% INPUTS:
-#%    chTagsI: numeric array
-#%        manual specified channel tag for each channel. (default: [])
-#%        73: far-range total 355 nm
-#%        74: near-range 355 nm
-#%        81: far-range cross 355 nm
-#%        129: far-range 387 nm
-#%        130: near-range 387 nm
-#%        257: far-range 407 nm
-#%        517: far-range rotational Raman 532 nm
-#%        521: far-range total 532 nm
-#%        522: near-range 532 nm
-#%        529: far-range cross 532 nm
-#%        545: far-range parallel 532 nm
-#%        1025: far-range 607 nm
-#%        2057: far-range total 1064 nm
-#%        1026: near-range 607 nm
-#%        1026: near-range 607 nm
-#%        2053: far-range rotational Raman 1064 nm
-#%
-#% KEYWORDS:
-#%    flagFarRangeChannel: logical
-#%    flagNearRangeChannel: logical
-#%    flag532nmChannel: logical
-#%    flagRotRamanChannel: logical
-#%    flag355nmChannel: logical
-#%    flag1064nmChannel: logical
-#%    flagTotalChannel: logical
-#%    flagCrossChannel: logical
-#%    flagParallelChannel: logical
-#%    flag387nmChannel: logical
-#%    flag407nmChannel: logical
-#%    flag607nmChannel: logical
-#%
-#% OUTPUTS:
-#%    chTagsO: numeric array
-#%        channel tag.
-#%    chLabels: cell
-#%        channel label.
-#%    flagFarRangeChannelO: logical
-#%    flagNearRangeChannelO: logical
-#%    flag532nmChannelO: logical
-#%    flagRotRamanChannelO: logical
-#%    flag355nmChannelO: logical
-#%    flag1064nmChannelO: logical
-#%    flagTotalChannelO: logical
-#%    flagCrossChannelO: logical
-#%    flagParallelChannelO: logical
-#%    flag387nmChannelO: logical
-#%    flag407nmChannelO: logical
-#%    flag607nmChannelO: logical
-#%
-#% HISTORY:
-#%    - 2021-04-23: first edition by Zhenping
-#%
-#% .. Authors: - zhenping@tropos.de
-#
-#p = inputParser;
-#p.KeepUnmatched = true;
-#
-#addRequired(p, 'chTagsI');
-#addParameter(p, 'flagFarRangeChannel', false, @islogical);
-#addParameter(p, 'flagNearRangeChannel', false, @islogical);
-#addParameter(p, 'flagRotRamanChannel', false, @islogical);
-#addParameter(p, 'flagTotalChannel', false, @islogical);
-#addParameter(p, 'flagCrossChannel', false, @islogical);
-#addParameter(p, 'flagParallelChannel', false, @islogical);
-#addParameter(p, 'flag355nmChannel', false, @islogical);
-#addParameter(p, 'flag387nmChannel', false, @islogical);
-#addParameter(p, 'flag407nmChannel', false, @islogical);
-#addParameter(p, 'flag532nmChannel', false, @islogical);
-#addParameter(p, 'flag607nmChannel', false, @islogical);
-#addParameter(p, 'flag1064nmChannel', false, @islogical);
-#
-#parse(p, chTagsI, varargin{:});
-#
-#nChs = length(p.Results.flagFarRangeChannel);   % number of channels
-#chTagsO = NaN(1, nChs);
-#chLabels = cell(1, nChs);
-#
-#for iCh = 1:nChs
-#
-#    if (~ isempty(chTagsI))
-#        % channel tag from keyword of 'chTags'
-#        chTagsO(iCh) = chTagsI(iCh);
-#    elseif isempty(chTagsI) && (any(p.Results.flagFarRangeChannel | ...
-#                                      p.Results.flagNearRangeChannel | ...
-#                                      p.Results.flagRotRamanChannel | ...
-#                                      p.Results.flagTotalChannel | ...
-#                                      p.Results.flagCrossChannel | ...
-#                                      p.Results.flagParallelChannel | ...
-#                                      p.Results.flag355nmChannel | ...
-#                                      p.Results.flag387nmChannel | ...
-#                                      p.Results.flag407nmChannel | ...
-#                                      p.Results.flag532nmChannel | ...
-#                                      p.Results.flag607nmChannel | ...
-#                                      p.Results.flag1064nmChannel))
-#        % channel tag from logical variables
-#        chTagsO(iCh) = sum(2.^(0:(12 - 1)) .* [p.Results.flagFarRangeChannel(iCh), ...
-#        p.Results.flagNearRangeChannel(iCh), p.Results.flagRotRamanChannel(iCh), ...
-#        p.Results.flagTotalChannel(iCh), p.Results.flagCrossChannel(iCh), ...
-#        p.Results.flagParallelChannel(iCh), p.Results.flag355nmChannel(iCh), ...
-#        p.Results.flag387nmChannel(iCh), p.Results.flag407nmChannel(iCh), ...
-#        p.Results.flag532nmChannel(iCh), p.Results.flag607nmChannel(iCh), p.Results.flag1064nmChannel(iCh)]);
-#    else
-#        error('PICASSO:InvalidInput', 'Incompatile channels in chTags.');
-#    end
-#
-#    switch floor(chTagsO(iCh))
-#    case 73   % far-range total 355 nm
-#        chLabels{iCh} = 'far-range total 355 nm';
-#    case 521   % far-range total 532 nm
-#        chLabels{iCh} = 'far-range total 532 nm';
-#    case 2057   % far-range total 1064 nm
-#        chLabels{iCh} = 'far-range total 1064 nm';
-#    case 129   % far-range 387 nm
-#        chLabels{iCh} = 'far-range 387 nm';
-#    case 257   % far-range 407 nm
-#        chLabels{iCh} = 'far-range 407 nm';
-#    case 1025   % far-range 607 nm
-#        chLabels{iCh} = 'far-range 607 nm';
-#    case 81   % far-range cross 355 nm
-#        chLabels{iCh} = 'far-range cross 355 nm';
-#    case 529   % far-range cross 532 nm
-#        chLabels{iCh} = 'far-range cross 532 nm';
-#    case 74   % near-range 355 nm
-#        chLabels{iCh} = 'near-range 355 nm';
-#    case 522   % near-range 532 nm
-#        chLabels{iCh} = 'near-range 532 nm';
-#    case 130   % near-range 387 nm
-#        chLabels{iCh} = 'near-range 387 nm';
-#    case 1026   % near-range 607 nm
-#        chLabels{iCh} = 'near-range 607 nm';
-#    case 517   % far-range rotational Raman 532 nm
-#        chLabels{iCh} = 'far-range rot. Raman 532 nm';
-#    case 2053   % far-range rotational Raman 1064 nm
-#        chLabels{iCh} = 'far-range rot. Raman 1064 nm';
-#    case 545   % far-range parallel 532 nm
-#        chLabels{iCh} = 'far-range parallel 532 nm';
-#    case 2065   % far-range cross 1064 nm
-#        chLabels{iCh} = 'far-range cross 1064 nm';
-#    otherwise
-#        warning('PICASSO:InvalidInput', 'Unknown channel tags (%d) at channel %d', chTagsO(iCh), iCh);
-#        chLabels{iCh} = 'Unknown';
-#    end
-#end
-#
-#%% Extract logical variables for all channels
-#flagFarRangeChannelO = logical(mod(chTagsO, 2));
-#flagNearRangeChannelO = logical(mod(floor(chTagsO / 2), 2));
-#flagRotRamanChannelO = logical(mod(floor(chTagsO / 2^2), 2));
-#flagTotalChannelO = logical(mod(floor(chTagsO / 2^3), 2));
-#flagCrossChannelO = logical(mod(floor(chTagsO / 2^4), 2));
-#flagParallelChannelO = logical(mod(floor(chTagsO / 2^5), 2));
-#flag355nmChannelO = logical(mod(floor(chTagsO / 2^6), 2));
-#flag387nmChannelO = logical(mod(floor(chTagsO / 2^7), 2));
-#flag407nmChannelO = logical(mod(floor(chTagsO / 2^8), 2));
-#flag532nmChannelO = logical(mod(floor(chTagsO / 2^9), 2));
-#flag607nmChannelO = logical(mod(floor(chTagsO / 2^10), 2));
-#flag1064nmChannelO = logical(mod(floor(chTagsO / 2^11), 2));
-#
-#end
