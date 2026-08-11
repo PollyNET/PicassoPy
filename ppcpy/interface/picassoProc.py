@@ -3,6 +3,7 @@ import datetime
 import re
 import numpy as np
 import logging
+from pathlib import Path
 import ppcpy.misc.pollyChannelTags as pollyChannelTags
 import ppcpy.preprocess.pollyPreprocess as pollyPreprocess
 import ppcpy.qc.pollySaturationDetect as pollySaturationDetect
@@ -345,35 +346,128 @@ class PicassoProc:
             data_cube = self,
             sigSaturateThresh = self.polly_config_dict['saturate_thresh'])
 
-    def polarizationCaliD90(self, db_path:str=None):
-        """Calibration with the Delta-90 method.
+
+    def polarizationCaliD90(self, db_path:str=None, collect_debug:bool=False, **defaults):
+        """Calculate/Estimate and select optimal Depol calibration constants with
+        the Delta-90° method.
+
+        The function calculates/estimates Depol calibration constants (DCs) through
+        the Delta-90° method. If configured, DCs from a defined database are also loaded.
+        The optimal DC per channel is chosen as the DC with the lowest relative error
+        from both the calculated/estimated and loaded DCs. If no DC is found for a
+        channel its default value is taken.
 
         Parameters
         ----------
-        db_path : str
-            Path to database to read DC values from in case none
-            are successfully retrieved. Default is None.
-        
+        db_path : str, optional
+            Path to calibration constant database. If ``db_path`` is ``None``
+            and config variable ``flagUsePreviousDepolCali`` is enabled,
+            a standard path is constructed from the config variable
+            ``calibrationDB``. Default is ``None``.
+        collect_debug : bool, optional
+            If True, collects debug information. Default is False.
+        polCaliEta355 : float, optional
+            Default depol calibration constant at 355 nm.
+        polCaliEtaStd355 : float, optional
+            Default depol calibration constant error at 355 nm.
+        polCaliEta532 : float, optional
+            Default depol calibration constant at 532 nm.
+        polCaliEtaStd532 : float, optional
+            Default depol calibration constant error at 532 nm.
+        polCaliEta1064 : float, optional
+            Default depol calibration constant at 1064 nm.
+        polCaliEtaStd1064 : float, optional
+            Default depol calibration constant error at 1064 nm.
+       
+        Attributes
+        ----------
+        self.pol_cali['D90' & 'D90_db'] : dict
+            All retrieved and read delta-90° depol calibration constants
+            and retrieval information.
+        self.pol_cali['default'] : dict
+            Default depol calibration constants and retrieval information.
+        self.etaused : dict
+            The optimal depol calibration constants per channel.
+       
+        Notes
+        -----
+        The function uses the following configuration flags:
+
+        - ``flagLCCalibration``: Enables or disables calculation of Depol
+                                 calibration constants through Delta-90° method.
+
+        - ``flagUsePreviousLC``: Enables or disables loading previously determined
+                                 Depol calibration constants from the calibration
+                                 database.
+
+        All calibration constants are stored in ``self.pol_cali``.
+        The selected optimal constants are stored in ``self.etaused``.
+
+        Default values are by standard taken from their config variable but can be
+        overwritten if passed as an input to this function.
+
         The stuff that starts here in the matlab version
         https://github.com/PollyNET/Pollynet_Processing_Chain/blob/5efd7d35596c67ef8672f5948e47d1f9d46ab867/lib/interface/picassoProcV3.m#L442
+       
+        **History**
+
+        - xxxx-xx-xx: First edition by ...
+        - 2026-10-08: Consider retrieved and database constants equally
+                      and added default calibration constants.
+
         """
 
+        # Load GHK-parameters
         polarization.loadGHK(self)
-        self.pol_cali['D90'] = polarization.calibrateGHK(self)
-        isUsable = [element['status'] for key, val in self.pol_cali['D90'].items() for element in val]
 
-        if np.sum(isUsable) > 0:
-            logging.info("Using retieved polarization calibration constants.")
-            self.etaused = select.single_best(self.pol_cali['D90'], 'eta', 'eta_std')
-        elif db_path is not None:
-            logging.warning("Can not retieve viable polarization calibration constants, uses constants form the database.")
+        if self.polly_config_dict['flagDepolCali']:
+            logging.info("Performing Delta-90° Depol calibration ...")
+
+            # Estimate Depol calibration constants
+            self.pol_cali['D90'] = polarization.calibrateGHK(
+                self,
+                collect_debug=collect_debug
+            )
+            all_D90_pol_calis = self.pol_cali['D90'].copy()
+            
+            # Check retrieval
+            isUsable = sum([True for val in self.pol_cali['D90'].values() for element in val if element])
+            if not isUsable:
+                logging.warning("No viable depol calibration constants was retrieved from the measurement.")
+
+        else:
+            logging.warning("Delta-90° Depol calibration calibration is turned off.")
+            all_D90_pol_calis = {}
+
+        if self.polly_config_dict['flagUsePreviousDepolCali']:
+            if db_path is None:
+                base_dir = Path(self.picasso_config_dict['results_folder'])
+                db_path = base_dir.joinpath(self.device, self.polly_config_dict['calibrationDB'])
+            logging.info(f"Loading Depol calibration constants from database: {db_path}")
+
+            # Load DCs from database
             table_name = 'depol_calibration_constant'
             ts_interval = self.retrievals_highres['time'][0], self.retrievals_highres['time'][-1]
-            self.pol_cali['D90_db'] = sql_db.get_from_sql_db(db_path, table_name, ts_interval)['D90_db']
-            self.etaused = select.single_best(self.pol_cali['D90_db'], 'eta', 'eta_std')
-        else:
-            logging.critical("Can not retieve viable polarization calibration constants, and no database detected.")
-            raise ValueError("Can not retieve viable polarization calibration constants, and no database detected.")
+            db_table = sql_db.get_from_sql_db(db_path, table_name, ts_interval)
+            if 'D90_db' in db_table:
+                self.pol_cali['D90_db'] = db_table['D90_db']
+
+                # Combine retrieved and database D90 DCs
+                for ch in self.pol_cali['D90_db'].keys():
+                    all_D90_pol_calis[ch] = all_D90_pol_calis.get(ch, []) \
+                        + self.pol_cali['D90_db'][ch]
+
+        # Load default DCs
+        self.pol_cali['default'] = polarization.loadDefaults(self, **defaults)
+
+        # Select optimal DCs
+        self.etaused = select.single_best(self.pol_cali['default'], 'eta', 'eta_std', 'method', relative=True) |\
+                       select.single_best(all_D90_pol_calis, 'eta', 'eta_std', 'method', relative=True)
+
+        # Check if default DCs were used
+        defaultDCsUsed = [ch for ch in self.etaused if self.etaused[ch]['method'] == 'default']
+        if defaultDCsUsed:
+            logging.warning(f"Deafault Depol calibration constant used for channels: {defaultDCsUsed}")
 
 
     def cloudScreen(self, collect_debug:bool=False):
@@ -656,40 +750,136 @@ class PicassoProc:
             self.retrievals_profile[ret_prof_name] = angstroem.ae_cldFreeGrps(
                 self, ret_prof_name) 
 
-    def LidarCalibration(self, db_path:str=None, collect_debug:bool=False):
-        """calculate the lidar constant
 
-        .. TODO:: Find out how we prioritise raman, klett, and database retrieved LC...
+    def LidarCalibration(self, db_path:str=None, collect_debug:bool=False, **defaults):
+        """Calculate/Estimate and select optimal lidar calibration constants.
+
+        The function calculates/estimates lidar calibration constants (LCs) from
+        both klett and Raman retrieved optical profiles. If configured, LCs from
+        a defined database are also loaded. The optimal LC per channel is chosen as
+        the LC with the lowest relative error per channel form both the
+        calculated/estimated and loaded LCs. If no LC is found for a channel its
+        default value is taken.
+
+        Parameters
+        ----------
+        db_path : str or Path, optional
+            Path to calibration constant database. If ``db_path`` is ``None``
+            and config variable ``flagUsePreviousLC`` is enabled, a standard
+            path is constructed from the config variable ``calibrationDB``.
+            Default is ``None``.
+        collect_debug : bool, optional
+            If ``True``, collects debug information. Default is ``False``.
+        LC : list, optional
+            Default Lidar constant value per channel.
+        LCStd : list, optional
+            Default Lidar constant error per channel.
+       
+        Attributes
+        ----------
+        self.LC['klett' & 'klett_db'] : dict
+            All retrieved and read Klett lidar calibration constants
+            and retrieval information.
+        self.LC['raman' & 'raman_db'] : dict
+            All retrieved and read Raman lidar calibration constants
+            and retrieval information.
+        self.LC['default'] : dict
+            Default lidar calibration constants and retrieval information.
+        self.LCused : dict
+            The optimal lidar calibration constant per channel.
+
+        Notes
+        -----
+        The function uses the following configuration flags:
+
+        - ``flagLCCalibration``: Enables or disables calculation of Lidar
+                                 calibration constants from klett and Raman retrieval.
+
+        - ``flagUsePreviousLC``: Enables or disables loading previously determined
+                                 lidar calibration constants from the calibration
+                                 database.
+
+        All calibration constants are stored in ``self.LC``.
+        The selected optimal constants are stored in ``self.LCused``.
+
+        Default values are by standard taken from their config variable but can be
+        overwritten if passed as an input to this function.
+
+        **History**
+
+        - xxxx-xx-xx: First edition by ...
+        - 2026-10-08: Consider retrieved and database constants equally
+                      and added default calibration constants.
+        
         """
-        self.LC['klett'] = lidarconstant.lc_for_cldFreeGrps(
-            self, 
-            retrieval='klett', 
-            collect_debug=collect_debug
-        )
-        self.LC['raman'] = lidarconstant.lc_for_cldFreeGrps(
-            self, 
-            retrieval='raman', 
-            collect_debug=collect_debug
-        )
 
-        logging.info("Choosing best LC per channel...")
-        if db_path is None:
-            logging.info("No database path found. Using retrieved LC values.")
-            self.LC['klett_db'] = {}
-            self.LC['raman_db'] = {}
+        if self.polly_config_dict['flagLCCalibration']:
+            logging.info("Performing Lidar calibration ...")
+
+            # Estimate Lidar constant from klett retrieval
+            self.LC['klett'] = lidarconstant.lc_for_cldFreeGrps(
+                self,
+                retrieval='klett',
+                collect_debug=collect_debug
+            )
+            all_klett_LCs = self.LC['klett'].copy()
+
+            # Estimate Lidar constant from raman retrieval
+            self.LC['raman'] = lidarconstant.lc_for_cldFreeGrps(
+                self,
+                retrieval='raman',
+                collect_debug=collect_debug
+            )
+            all_raman_LCs = self.LC['raman'].copy()
+
+            # Check retrieval
+            isUsable = sum([True for val in list(self.LC['klett'].values()) \
+                            + list(self.LC['raman'].values()) for element in val if element])
+            if not isUsable:
+                logging.warning("No viable Lidar calibration constants was retrieved from the measurement.")
+
         else:
-            logging.info("Database LC values will be used when no retrieved ones are available.")
-            # db_path = self.polly_config_dict['calibrationDB']
+            logging.warning("Lidar calibration is turned off.")
+            all_klett_LCs, all_raman_LCs = {}, {}
+
+        if self.polly_config_dict['flagUsePreviousLC']:
+            if db_path is None:
+                base_dir = Path(self.picasso_config_dict['results_folder'])
+                db_path = base_dir.joinpath(self.device, self.polly_config_dict['calibrationDB'])
+            logging.info(f"Loading Lidar calibration constants from database: {db_path}")
+           
+            # Load LCs from database
             table_name = 'lidar_calibration_constant'
             ts_interval = self.retrievals_highres['time'][0], self.retrievals_highres['time'][-1]
-            self.LC['klett_db'] = sql_db.get_from_sql_db(db_path, table_name, ts_interval)['klett_db']
-            self.LC['raman_db'] = sql_db.get_from_sql_db(db_path, table_name, ts_interval)['raman_db']
-        
-        # Prioritise Raman retrieved LCs but use Klett retrieved ones when no Raman retrieval exists.
-        self.LCused =  select.single_best(self.LC['klett_db'], 'LC', 'LCStd', relative=True) |\
-                         select.single_best(self.LC['raman_db'], 'LC', 'LCStd', relative=True) |\
-                         select.single_best(self.LC['klett'], 'LC', 'LCStd', relative=True) |\
-                         select.single_best(self.LC['raman'], 'LC', 'LCStd', relative=True)
+            db_table = sql_db.get_from_sql_db(db_path, table_name, ts_interval)
+            if 'klett_db' in db_table:
+                self.LC['klett_db'] = db_table['klett_db']
+
+                # Combine retrieved and database Klett LCs
+                for ch in self.LC['klett_db']:
+                    all_klett_LCs[ch] = all_klett_LCs.get(ch, []) \
+                        + self.LC['klett_db'][ch]
+
+            if 'raman_db' in db_table:
+                self.LC['raman_db'] = db_table['raman_db']
+
+                # Combine retrieved and database Raman LCs
+                for ch in self.LC['raman_db']:
+                    all_raman_LCs[ch] = all_raman_LCs.get(ch, []) \
+                        + self.LC['raman_db'][ch]
+
+        # Load default LCs
+        self.LC['default'] = lidarconstant.loadDefaults(self, **defaults)
+
+        # Select optimal LCs
+        self.LCused = select.single_best(self.LC['default'], 'LC', 'LCStd', 'method', relative=True) |\
+                      select.single_best(all_klett_LCs, 'LC', 'LCStd', 'method', relative=True) |\
+                      select.single_best(all_raman_LCs, 'LC', 'LCStd', 'method', relative=True)
+
+        # Check if default LCs were used
+        defaultLCsUsed = [ch for ch in self.LCused if self.LCused[ch]['method'] == 'default']
+        if defaultLCsUsed:
+            logging.warning(f"Deafault Lidar calibration constant used for channels: {defaultLCsUsed}")
 
 
     def attBsc_volDepol(self):
