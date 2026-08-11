@@ -330,7 +330,7 @@
         "source": "__device",
         "retrieving_info": {
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_klett_355]", "unit": "[m]"},
-            "eta":{"value": "__etaused[355_FR]", "unit": ""}
+            "eta":{"value": "__etaused[355_FR][eta]", "unit": "", "method": "__etaused[355_FR][method]"}
             },
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
@@ -365,7 +365,7 @@
         "source": "__device",
         "retrieving_info": {
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_klett_532]", "unit": "[m]"},
-            "eta":{"value": "__etaused[532_FR]", "unit": ""}
+            "eta":{"value": "__etaused[532_FR][eta]", "unit": "", "method": "__etaused[532_FR][method]"}
             },
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
@@ -400,7 +400,7 @@
         "source": "__device",
         "retrieving_info": {
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_klett_1064]", "unit": "[m]"},
-            "eta":{"value": "__etaused[1064_FR]", "unit": ""}
+            "eta":{"value": "__etaused[1064_FR][eta]", "unit": "", "method": "__etaused[1064_FR][method]"}
             },
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
@@ -435,7 +435,7 @@
         "source": "__device",
         "retrieving_info": {
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_raman_355]", "unit": "[m]"},
-            "eta":{"value": "__etaused[355_FR]", "unit": ""}
+            "eta":{"value": "__etaused[355_FR][eta]", "unit": "", "method": "__etaused[355_FR][method]"}
             },
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
@@ -470,7 +470,7 @@
         "source": "__device",
         "retrieving_info": {
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_raman_532]", "unit": "[m]"},
-            "eta":{"value": "__etaused[532_FR]", "unit": ""}
+            "eta":{"value": "__etaused[532_FR][eta]", "unit": "", "method": "__etaused[532_FR][method]"}
             },
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
@@ -505,7 +505,7 @@
         "source": "__device",
         "retrieving_info": {
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_raman_1064]", "unit": "[m]"},
-            "eta":{"value": "__etaused[1064_FR]", "unit": ""}
+            "eta":{"value": "__etaused[1064_FR][eta]", "unit": "", "method": "__etaused[1064_FR][method]"}
             },
         "comment": "Depolarization channel was calibrated with +- 45 \\degree method. You can find more information in Freudenthaler, V., et al. (2009). \"Depolarization ratio profiling at several wavelengths in pure Saharan dust during SAMUM 2006.\" Tellus B 61(1): 165-179."
       }
@@ -540,7 +540,7 @@
         "source": "__device",
         "retrieving_info": {
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_klett_355]", "unit": "[m]"},
-            "eta":{"value": "__etaused[355_FR]", "unit": ""}
+            "eta":{"value": "__etaused[355_FR][eta]", "unit": "", "method": "__etaused[355_FR][method]"}
             },
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
@@ -575,7 +575,7 @@
         "source": "__device",
         "retrieving_info": {
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_klett_532]", "unit": "[m]"},
-            "eta":{"value": "__etaused[532_FR]", "unit": ""}
+            "eta":{"value": "__etaused[532_FR][eta]", "unit": "", "method": "__etaused[532_FR][method]"}
             },
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
@@ -610,7 +610,7 @@
         "source": "__device",
         "retrieving_info": {
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_klett_1064]", "unit": "[m]"},
-            "eta":{"value": "__etaused[355_FR]", "unit": ""}
+            "eta":{"value": "__etaused[355_FR][eta]", "unit": "", "method": "__etaused[1064_FR][method]"}
             },
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
@@ -645,7 +645,7 @@
         "source": "__device",
         "retrieving_info": {
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_raman_355]", "unit": "[m]"},
-            "eta":{"value": "__etaused[355_FR]", "unit": ""}
+            "eta":{"value": "__etaused[355_FR][eta]", "unit": "", "method": "__etaused[355_FR][method]"}
             },
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
@@ -680,7 +680,7 @@
         "source": "__device",
         "retrieving_info": {
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_raman_532]", "unit": "[m]"},
-            "eta":{"value": "__etaused[532_FR]", "unit": ""}
+            "eta":{"value": "__etaused[532_FR][eta]", "unit": "", "method": "__etaused[532_FR][method]"}
             },
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }
@@ -715,7 +715,7 @@
         "source": "__device",
         "retrieving_info": {
             "Smoothing window": {"value": "__polly_config_dict[smoothWin_raman_1064]", "unit": "[m]"},
-            "eta":{"value": "__etaused[1064_FR]", "unit": ""}
+            "eta":{"value": "__etaused[1064_FR][eta]", "unit": "", "method": "__etaused[1064_FR][method]"}
             },
         "comment": "The aerosol backscatter profile was retrieved by Raman method. The uncertainty of particle depolarization ratio will be very large at aerosol-free altitude. Please take care!"
       }

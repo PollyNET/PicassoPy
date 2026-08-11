@@ -103,7 +103,7 @@
         "standard_name": "quasi_bsc_355",
         "retrieving_info": {
             "Fixed lidar ratio": {"value": "__polly_config_dict[LR355]", "unit": "[Sr]"},
-            "Lidar_calibration_constant_used": {"value": "__LCused[355_total_FR]", "unit": ""}
+            "Lidar_calibration_constant_used": {"value": "__LCused[355_total_FR][LC]", "unit": "", "method": "__LCused[355_total_FR][method]"}
             },
         "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin. If the AOD is greater than 0.2, the relative uncertainty can be as large as 20%. Be careful about that!"
       }
@@ -122,7 +122,7 @@
         "standard_name": "quasi_bsc_532",
         "retrieving_info": {
             "Fixed lidar ratio": {"value": "__polly_config_dict[LR532]", "unit": "[Sr]"},
-            "Lidar_calibration_constant_used": {"value": "__LCused[532_total_FR]", "unit": ""}
+            "Lidar_calibration_constant_used": {"value": "__LCused[532_total_FR][LC]", "unit": "", "method": "__LCused[532_total_FR][method]"}
             },
         "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin. If the AOD is greater than 0.2, the relative uncertainty can be as large as 20%. Be careful about that!"
       }
@@ -141,7 +141,7 @@
         "standard_name": "quasi_bsc_1064",
         "retrieving_info": {
             "Fixed lidar ratio": {"value": "__polly_config_dict[LR1064]", "unit": "[Sr]"},
-            "Lidar_calibration_constant_used": {"value": "__LCused[1064_total_FR]", "unit": ""}
+            "Lidar_calibration_constant_used": {"value": "__LCused[1064_total_FR][LC]", "unit": "", "method": "__LCused[1064_total_FR][method]"}
             },
         "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin. If the AOD is greater than 0.2, the relative uncertainty can be as large as 20%. Be careful about that!"
       }
@@ -214,7 +214,7 @@
         "standard_name": "quasi_voldepol_532",
         "retrieving_info": {
             "Fixed lidar ratio": {"value": "__polly_config_dict[LR532]", "unit": "[Sr]"},
-            "eta": {"value": "__etaused[532_FR]", "unit": ""}
+            "eta": {"value": "__etaused[532_FR][eta]", "unit": "", "method": "__etaused[532_FR][method]"}
             },
         "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin."
       }
@@ -233,7 +233,7 @@
         "standard_name": "quasi_pardepol_532",
         "retrieving_info": {
             "Fixed lidar ratio": {"value": "__polly_config_dict[LR532]", "unit": "[Sr]"},
-            "eta": {"value": "__etaused[532_FR]", "unit": ""}
+            "eta": {"value": "__etaused[532_FR][eta]", "unit": "", "method": "__etaused[532_FR][method]"}
             },
         "comment": "This parameter is retrieved by the method demonstrated in (Holger, ATM, 2017). The retrieved results are dependent on the lidar constants and the AOD below the current bin."
       }

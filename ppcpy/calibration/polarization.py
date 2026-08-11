@@ -40,6 +40,73 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     return uniform_filter(signal, window_len)
 
 
+def loadDefaults(data_cube, **defaults) -> dict:
+    """Prepare default Depol calibration values.
+
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
+    polCaliEta355 : float, optional
+        Default Depol calibration constant at 355 nm.
+    polCaliEtaStd355 : float, optional
+        Default Depol calibration constant error at 355 nm.
+    polCaliEta532 : float, optional
+        Default Depol calibration constant at 532 nm.
+    polCaliEtaStd532 : float, optional
+        Default Depol calibration constant error at 532 nm.
+    polCaliEta1064 : float, optional
+        Default Depol calibration constant at 1064 nm.
+    polCaliEtaStd1064 : float, optional
+        Default Depol calibration constant error at 1064 nm.
+    
+    Returns
+    -------
+    defaultDict : dict
+        Default polarization calibration result per wavelength.
+        
+        Each wavelength contains a list with one single sub-dict with entries:
+
+        ``eta`` : float
+            Default Depol calibration constant.
+    
+        ``eta_std`` : float
+            Defaults uncertainty of Depol calibration constant.
+    
+        ``method`` : str
+            Name of retrieval method.
+    
+    Notes
+    -----
+    Default values are by standard taken from their config variable but can be
+    overwritten if passed as an input to this function.
+    
+    **History**
+
+    - 2026-08-07: First edition by Buholdt
+
+    
+    Example
+    -------
+    >> loadDefaults(data_cube,
+               polCaliEta355=46.7,
+               polCaliEtaStd355=2.7e-3
+               )
+    """
+
+    default_values = data_cube.polly_config_dict | defaults
+    defaultDict = {}
+
+    for wv in [355, 532, 1064]:
+        defaultDict[f'{wv}_FR'] = [{
+            'eta': float(default_values[f'polCaliEta{wv}']),
+            'eta_std': float(default_values[f'polCaliEtaStd{wv}']),
+            'method': 'default' 
+        }]
+    
+    return defaultDict
+
+
 def loadGHK(data_cube):
     """Prepare the GHK parameters, especially if given in TR convert them into GHK.
 
@@ -47,22 +114,43 @@ def loadGHK(data_cube):
     ----------
     data_cube : object
         Main PicassoProc object.
+    
+    Yields
+    ------
+    data_cube.polly_config_dict : dict
+        Updated to parameters:
+            TR  -->  Removed
+            G   -->  filled and converted to array
+            H   -->  filled and converted to array
+            K   -->  filled and converted to array
+            voldepol_error_355  -->  converted to array
+            voldepol_error_532  -->  converted to array
+            voldepol_error_1064 -->  converted to array
+    
+    Notes
+    -----
+    .. TODO::
+        - Write a proper docstring.
+    
+    ** History **
+    
+    - xx-xx-xxxx: First edition by ...
+    
     """
 
-    print('starting loadGHK')
-    #print('flag_532_total', flag_532_total_FR)
-    #print('flag_532_cross', flag_532_cross_FR)
+    logging.info("Starting loadGHK")
+    # print('flag_532_total', flag_532_total_FR)
+    # print('flag_532_cross', flag_532_cross_FR)
 
-    print('data_cube keys ', data_cube.__dict__.keys())
-    G = np.array(data_cube.polly_config_dict['G']).astype(float)
-    H = np.array(data_cube.polly_config_dict['H']).astype(float)
-    K = np.array(data_cube.polly_config_dict['K']).astype(float)
-    #print(TR[flag_532_total_FR])
-    #print(TR[flag_532_cross_FR])
-    #if data_cube.polly_config_dict['H'][0] == -999:
+    G = np.asarray(data_cube.polly_config_dict['G'], dtype=float)
+    H = np.asarray(data_cube.polly_config_dict['H'], dtype=float)
+    K = np.asarray(data_cube.polly_config_dict['K'], dtype=float)
+    # print(TR[flag_532_total_FR])
+    # print(TR[flag_532_cross_FR])
+    # if data_cube.polly_config_dict['H'][0] == -999:
     if (np.all(np.isclose(H, -999))):
-        TR = np.array(data_cube.polly_config_dict['TR']).astype(float)
-        print('H is empty -> calculate parameters')
+        TR = np.asarray(data_cube.polly_config_dict['TR'], dtype=float)
+        logging.info('H is empty -> calculate parameters')
 
         K[data_cube.flag_355_total_FR] = 1.0
         K[data_cube.flag_532_total_FR] = 1.0
@@ -83,49 +171,34 @@ def loadGHK(data_cube):
         H[data_cube.flag_1064_cross_FR] = onemx_onepx(TR[data_cube.flag_1064_cross_FR])
 
         if np.any(data_cube.flag_532_total_NR):
-            print("GHK for 532NR")
+            logging.info("GHK for 532 NR")
             K[data_cube.flag_532_total_NR] = 1.0
             G[data_cube.flag_532_total_NR] = 1.0    
             H[data_cube.flag_532_total_NR] = onemx_onepx(TR[data_cube.flag_532_total_NR])
-            print("H", H[data_cube.flag_532_total_NR])
+            logging.info(f"G: {G[data_cube.flag_532_total_NR]}, H {H[data_cube.flag_532_total_NR]}, K: {K[data_cube.flag_532_total_NR]}.")
         if np.any(data_cube.flag_532_cross_DFOV):
-            print("GHK for 532DFOV")
+            logging.info("GHK for 532 DFOV")
             K[data_cube.flag_532_cross_DFOV] = 1.0
             G[data_cube.flag_532_cross_DFOV] = 1.0    
             H[data_cube.flag_532_cross_DFOV] = onemx_onepx(TR[data_cube.flag_532_cross_DFOV])
-            print("H", H[data_cube.flag_532_cross_DFOV])
-        print('TR', TR)
+            logging.info(f"G: {G[data_cube.flag_532_cross_DFOV]}, H: {H[data_cube.flag_532_cross_DFOV]}, K: {K[data_cube.flag_532_cross_DFOV]}.")
+        logging.info(f"TR: {TR}")
     else:
-        print("Using GHK from config file")
-        #print('TR', TR)
-        #print('TR from H', (1-H)/(1+H))
-    print('G', G)
-    print('H', H)
-    print('K', K)
+        logging.info("Using GHK from config file")
+        # print('TR', TR)
+        # print('TR from H', (1-H)/(1+H))
+    logging.info(f"G: {G}, H: {H}, K: {K}")
     data_cube.polly_config_dict.pop('TR', None) # remove the TR from the config to avoid inconsistencies
-    data_cube.polly_config_dict['G'] = np.array(G)
-    data_cube.polly_config_dict['H'] = np.array(H)
-    data_cube.polly_config_dict['K'] = np.array(K)
-    data_cube.polly_config_dict['voldepol_error_355'] = np.array(data_cube.polly_config_dict['voldepol_error_355'])
-    data_cube.polly_config_dict['voldepol_error_532'] = np.array(data_cube.polly_config_dict['voldepol_error_532'])
-    data_cube.polly_config_dict['voldepol_error_1064'] = np.array(data_cube.polly_config_dict['voldepol_error_1064'])
+    data_cube.polly_config_dict['G'] = np.asarray(G)
+    data_cube.polly_config_dict['H'] = np.asarray(H)
+    data_cube.polly_config_dict['K'] = np.asarray(K)
+    data_cube.polly_config_dict['voldepol_error_355'] = np.asarray(data_cube.polly_config_dict['voldepol_error_355'])
+    data_cube.polly_config_dict['voldepol_error_532'] = np.asarray(data_cube.polly_config_dict['voldepol_error_532'])
+    data_cube.polly_config_dict['voldepol_error_1064'] = np.asarray(data_cube.polly_config_dict['voldepol_error_1064'])
 
 
-"""
-.. TODO:: can this be removed?
-"TR": [0.898, 1086,   1,    1, 1.45, 778.8,   1,    1,    1,    1,    1,    1,     1],
-"G":  [-999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999 ], 
-"H":  [-999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999 ], 
-"K":  [-999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999, -999 ], 
-"voldepol_error_355": [0.003, 0, 0], 
-"voldepol_error_532": [0.004, 0, 0], 
-"voldepol_error_1064": [0.005, 0, 0], 
-"""
-
-
-
-def calibrateGHK(data_cube) -> dict:
-    """Estimate the polarization calibration from the delta 90 Method [1]_
+def calibrateGHK(data_cube, collect_debug:bool=False) -> dict:
+    """Estimate the polarization calibration from the Delta-90° method [1]_.
 
     Parameters
     ----------
@@ -135,22 +208,38 @@ def calibrateGHK(data_cube) -> dict:
     Returns
     -------
     pol_cali : dict
-        polarization factors from delta 90 for each wavelength containing 
-        sub-dicts with 'eta', 'eta_std', 'time_start', 'time_end', 'status'
+        polarization calibration results from Delta-90° method for each wavelength.
+        
+        Each wavelength contains a list of sub-dicts. One per 
+        successful retrieval period, with entries:
 
-    Notes
-    -----
-    
-    **History**
+        ``eta`` : float
+            Depol calibration constant.
 
-    Function is called here https://github.com/PollyNET/Pollynet_Processing_Chain/blob/5f5e4d0fd3dcebe7f87220cf802fcd6f414fe235/lib/interface/picassoProcV3.m#L548
-    The two most relevant functions here are https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/pollyPolCaliGHK.m
-    which also calls https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/depolCaliGHK.m
+        ``eta_std`` : float
+            Uncertainty of Depol calibration constant.
+
+        ``time_start``, ``time_end`` : int
+            Start and stop times for successful calibration.
+
+        ``method`` : str
+            Name of retrieval method.
+        
+        The number of element in each list depends on the number of successful retrievals.
 
     References
     ----------
+    .. [1] Freudenthaler, V. About the effects of polarising optics on lidar signals and the Delta90 calibration. 
+       Atmos. Meas. Tech., 9, 4181–4255 (2016).
     
-    .. [1] Freudenthaler 2016
+    
+    Notes
+    -----
+    Function is called here https://github.com/PollyNET/Pollynet_Processing_Chain/blob/5f5e4d0fd3dcebe7f87220cf802fcd6f414fe235/lib/interface/picassoProcV3.m#L548
+    The two most relevant functions here are https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/pollyPolCaliGHK.m
+    which also calls https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/depolCaliGHK.m
+    
+    **History**
 
     """
 
@@ -158,64 +247,63 @@ def calibrateGHK(data_cube) -> dict:
 
     tel = 'FR' # currently only implemented in the far range receiver
     for wv in [355, 532, 1064]:
-        if np.any(data_cube.gf(wv, 'total', tel)) and np.any(data_cube.gf(wv, 'cross', tel)):
-            logging.info(f'and even a {wv} channel')
+        logging.info(f"Channels: {wv} total {tel} | {wv} cross {tel}")
+        if not np.any(data_cube.gf(wv, 'total', tel)) or not np.any(data_cube.gf(wv, 'cross', tel)):
+            logging.warning(f"Total or cross signal missing at {wv} {tel}. Skipping calibration for this channel.")
+            continue
 
-            sigBGCor_total = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:, :, data_cube.gf(wv, 'total', tel)])
-            bg_total = np.squeeze(data_cube.retrievals_highres['BG'][:, data_cube.gf(wv, 'total', tel)])
-            sigBGCor_cross = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:, :, data_cube.gf(wv, 'cross', tel)])
-            bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][:, data_cube.gf(wv, 'cross', tel)])
-            
-            pol_cali[f"{wv}_{tel}"] = depol_cali_ghk(
-                signal_t=sigBGCor_total, bg_t=bg_total, 
-                signal_x=sigBGCor_cross, bg_x=bg_cross, 
-                time=data_cube.retrievals_highres['time'],
-                pol_cali_pang_start_time=data_cube.retrievals_highres['depol_cal_ang_p_time_start'],
-                pol_cali_pang_stop_time=data_cube.retrievals_highres['depol_cal_ang_p_time_end'],
-                pol_cali_nang_start_time=data_cube.retrievals_highres['depol_cal_ang_n_time_start'],
-                pol_cali_nang_stop_time=data_cube.retrievals_highres['depol_cal_ang_n_time_end'],
-                # K should be 0d?
-                K=np.squeeze(data_cube.polly_config_dict['K'][data_cube.gf(wv, 'total', tel)]),
-                cali_h_indx_range=[data_cube.polly_config_dict[f'depol_cal_minbin_{wv}'], 
-                                   data_cube.polly_config_dict[f'depol_cal_maxbin_{wv}']],
-                SNRmin=data_cube.polly_config_dict[f'depol_cal_SNRmin_{wv}'],
-                sig_max=data_cube.polly_config_dict[f'depol_cal_sigMax_{wv}'],
-                rel_std_dplus=data_cube.polly_config_dict[f'rel_std_dplus_{wv}'],
-                rel_std_dminus=data_cube.polly_config_dict[f'rel_std_dminus_{wv}'],
-                segment_len=data_cube.polly_config_dict[f'depol_cal_segmentLen_{wv}'],
-                smooth_win=data_cube.polly_config_dict[f'depol_cal_smoothWin_{wv}'],
-                collect_debug=False
-            )
-            print(pol_cali[f'{wv}_{tel}'])
-            logging.info(f"pol_cali_{wv}  {pol_cali[f'{wv}_{tel}']}")
-        else:
-            logging.warning(f'calibrateGHK no {wv} channel')
-
-    # TODO handling of default and database calibrations
+        sigBGCor_total = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:, :, data_cube.gf(wv, 'total', tel)])
+        bg_total = np.squeeze(data_cube.retrievals_highres['BG'][:, data_cube.gf(wv, 'total', tel)])
+        sigBGCor_cross = np.squeeze(data_cube.retrievals_highres['sigBGCor'][:, :, data_cube.gf(wv, 'cross', tel)])
+        bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][:, data_cube.gf(wv, 'cross', tel)])
+        
+        pol_cali[f"{wv}_{tel}"] = depol_cali_ghk(
+            signal_t=sigBGCor_total, bg_t=bg_total,
+            signal_x=sigBGCor_cross, bg_x=bg_cross, 
+            time=data_cube.retrievals_highres['time'],
+            pol_cali_pang_start_time=data_cube.retrievals_highres['depol_cal_ang_p_time_start'],
+            pol_cali_pang_stop_time=data_cube.retrievals_highres['depol_cal_ang_p_time_end'],
+            pol_cali_nang_start_time=data_cube.retrievals_highres['depol_cal_ang_n_time_start'],
+            pol_cali_nang_stop_time=data_cube.retrievals_highres['depol_cal_ang_n_time_end'],
+            # K should be 0d?
+            K=np.squeeze(data_cube.polly_config_dict['K'][data_cube.gf(wv, 'total', tel)]),
+            cali_h_indx_range=[data_cube.polly_config_dict[f'depol_cal_minbin_{wv}'], 
+                                data_cube.polly_config_dict[f'depol_cal_maxbin_{wv}']],
+            SNRmin=data_cube.polly_config_dict[f'depol_cal_SNRmin_{wv}'],
+            sig_max=data_cube.polly_config_dict[f'depol_cal_sigMax_{wv}'],
+            rel_std_dplus=data_cube.polly_config_dict[f'rel_std_dplus_{wv}'],
+            rel_std_dminus=data_cube.polly_config_dict[f'rel_std_dminus_{wv}'],
+            segment_len=data_cube.polly_config_dict[f'depol_cal_segmentLen_{wv}'],
+            smooth_win=data_cube.polly_config_dict[f'depol_cal_smoothWin_{wv}'],
+            collect_debug=collect_debug,
+            flagPicassoComparison=data_cube.polly_config_dict['flagPicassoComparison']
+        )
+        logging.info(f"Calibration results at {wv} {tel}: {pol_cali[f'{wv}_{tel}']}")
 
     return pol_cali
 
 
-def depol_cali_ghk(signal_t:np.ndarray, bg_t:np.ndarray, signal_x:np.ndarray, bg_x:np.ndarray, 
+def depol_cali_ghk(signal_t:np.ndarray, bg_t:np.ndarray, signal_x:np.ndarray, bg_x:np.ndarray,
                    time:np.ndarray, pol_cali_pang_start_time:np.ndarray,
                    pol_cali_pang_stop_time:np.ndarray, pol_cali_nang_start_time:np.ndarray,
                    pol_cali_nang_stop_time:np.ndarray, K:float, cali_h_indx_range:list|tuple, 
                    SNRmin:list, sig_max:list, rel_std_dplus:float, rel_std_dminus:float, 
-                   segment_len:int, smooth_win:int, collect_debug:bool=False) -> dict:
+                   segment_len:int, smooth_win:int, collect_debug:bool=False,
+                   flagPicassoComparison:bool=False) -> list:
     """Polarization calibration for PollyXT lidar system.
 
     Parameters
     ----------
     signal_t : ndarray
         Background-removed photon count signal at the total channel.
-        Shape: (n_bins, n_profiles)
+        Shape: (n_profiles, n_bins)
     bg_t : ndarray
-        Background at the total channel. Shape: (n_bins, n_profiles)
+        Background at the total channel. Shape: (n_profiles)
     signal_x : ndarray
         Background-removed photon count signal at the cross channel.
-        Shape: (n_bins, n_profiles)
+        Shape: (n_profiles, n_bins)
     bg_x : ndarray
-        Background at the cross channel. Shape: (n_bins, n_profiles)
+        Background at the cross channel. Shape: (n_profiles)
     time : ndarray
         Datetime array representing the measurement time of each profile.
     pol_cali_pang_start_time, pol_cali_pang_stop_time : ndarray
@@ -236,38 +324,53 @@ def depol_cali_ghk(signal_t:np.ndarray, bg_t:np.ndarray, signal_x:np.ndarray, bg
         Segment length for testing the variability of calibration results.
     smooth_win : int
         Width of the sliding window for smoothing the signal.
-    collect_debug : bool, default=False
-        store and return the intermediate results
+    collect_debug : bool, optional
+        Store and return the intermediate results. Default is False.
 
     Returns
     -------
-    pol_cali_eta : list
-        Eta values from polarization calibration.
-    pol_cali_eta_std : list
-        Uncertainty of eta values from calibration.
-    pol_cali_start_time, pol_cali_stop_time : list
-        Start and stop times for successful calibration.
-    cali_status : int
-        1 if calibration is successful, 0 otherwise.
-    global_attri : dict, optional
-        Information about the depolarization calibration.
+    results : list of dicts
+        Containing successful retrieved depol calibration constant and retrieval information.
+
+        Each dict contains the following entries:
+
+        ``eta`` : float
+            Eta values from polarization calibration.
+
+        ``eta_std`` : float
+            Uncertainty of eta values from calibration.
+
+        ``time_start``, ``time_end`` : int
+            Start and stop times for successful calibration.
+
+        ``method`` : str
+            Name of retrieval method.
+        
+        The number of element in the list depends on the number of successful retrievals.
+    
+    Notes
+    -----
+    .. TODO:: Why is ``pol_cali_nang_start_time`` returned as ``time_start`` of the calibration
+              period instead of ``pol_cali_start_time``???
+
+    **History**
+
+    - xxxx-xx-xx: First edition by ...
+    - 2026-07-30: Made output datatype consistent and changed from `nanmean` to
+                  `nansum` in signal aggregation to be consistent with SNR requirement.
+    - 2026-08-06: Overhalled function structure and input output consistency.
+
     """
-    # Initialize outputs and intermediate storage
-    pol_cali_eta, pol_cali_eta_std = [], []
-    mean_dplus, mean_dminus, std_dplus, std_dminus = [], [], [], []
-    pol_cali_start_time, pol_cali_stop_time = [], []
-    if collect_debug:
-        global_attri = defaultdict(list) # the beauty of a proper programming language
+
+    ## Initialize output
+    results = []
 
     if signal_t.size == 0 or signal_x.size == 0:
-        logging.warning("Warning: No data for polarization calibration.")
-        #return pol_cali_eta, pol_cali_eta_std, pol_cali_start_time, pol_cali_stop_time, 0, global_attri
-        return {'status': 0}
+        logging.warning("No signal for calibration.")
+        return results
 
     # the iteration of days can be omitted if unixtimestamps are used
-    print('pol_cali_nang_start_time', pol_cali_nang_start_time)
-
-    time = np.array(time)
+    time = np.asarray(time)
     for i_depol_cal in range(len(pol_cali_nang_start_time)):
         indx_45p = np.where(
             (time >= pol_cali_pang_start_time[i_depol_cal]) &
@@ -276,41 +379,51 @@ def depol_cali_ghk(signal_t:np.ndarray, bg_t:np.ndarray, signal_x:np.ndarray, bg
         indx_45m = np.where(
             (time >= pol_cali_nang_start_time[i_depol_cal]) &
             (time <= pol_cali_nang_stop_time[i_depol_cal]))[0]
+        
         if len(indx_45p) < 4 or len(indx_45m) < 4:
-            logging.warning(f'calibrateGHK array to short {len(indx_45p)}{len(indx_45m)} in period {i_depol_cal}')
-            break
-        this_cali_start_time = min(pol_cali_pang_start_time[i_depol_cal],
-                                   pol_cali_nang_start_time[i_depol_cal])
-        this_cali_stop_time = max(pol_cali_pang_stop_time[i_depol_cal],
-                                  pol_cali_nang_stop_time[i_depol_cal])
-        # Exclude the first and last profiles
+            logging.warning(f"Not enough calibration profiles in clibration period {i_depol_cal}. Skipping this period.")
+            continue
+        
+        ## Get start and end time of calibration period
+        pol_cali_start_time = min(
+            pol_cali_pang_start_time[i_depol_cal],
+            pol_cali_nang_start_time[i_depol_cal]
+        )
+        pol_cali_stop_time = max(
+            pol_cali_pang_stop_time[i_depol_cal],
+            pol_cali_nang_stop_time[i_depol_cal]
+        )
+        
+        ## Exclude the first and last profiles
         indx_45m = indx_45m[1:-1]
         indx_45p = indx_45p[1:-1]
 
-        # matlab -> python swap from signal_t[:, indx_45p] to signal_t[indx_45p,:]
-        # to be a profile
-        sig_t_p = np.nanmean(signal_t[indx_45p, :], axis=0)
-        bg_t_p = np.nanmean(bg_t[indx_45p], axis=0)
+        ## Calculating SNR (only sum should be used when aggregating signals for SNR calculations!)
+        func = np.nansum
+        if flagPicassoComparison:
+            func = np.nanmean
+
+        sig_t_p = func(signal_t[indx_45p, :], axis=0)
+        bg_t_p = func(bg_t[indx_45p], axis=0)
         snr_t_p = calc_snr(sig_t_p, bg_t_p)
         indx_bad_t_p = (snr_t_p <= SNRmin[0]) | (sig_t_p >= sig_max[0])
 
-        sig_t_m = np.nanmean(signal_t[indx_45m, :], axis=0)
-        bg_t_m = np.nanmean(bg_t[indx_45m], axis=0)
+        sig_t_m = func(signal_t[indx_45m, :], axis=0)
+        bg_t_m = func(bg_t[indx_45m], axis=0)
         snr_t_m = calc_snr(sig_t_m, bg_t_m)
         indx_bad_t_m = (snr_t_m <= SNRmin[1]) | (sig_t_m >= sig_max[1])
         
-        sig_x_p = np.nanmean(signal_x[indx_45p, :], axis=0)
-        bg_x_p = np.nanmean(bg_x[indx_45p], axis=0)
+        sig_x_p = func(signal_x[indx_45p, :], axis=0)
+        bg_x_p = func(bg_x[indx_45p], axis=0)
         snr_x_p = calc_snr(sig_x_p, bg_x_p)
         indx_bad_x_p = (snr_x_p <= SNRmin[2]) | (sig_x_p >= sig_max[2])
 
-        sig_x_m = np.nanmean(signal_x[indx_45m, :], axis=0)
-        bg_x_m = np.nanmean(bg_x[indx_45m], axis=0)
+        sig_x_m = func(signal_x[indx_45m, :], axis=0)
+        bg_x_m = func(bg_x[indx_45m], axis=0)
         snr_x_m = calc_snr(sig_x_m, bg_x_m)
         indx_bad_x_m = (snr_x_m <= SNRmin[3]) | (sig_x_m >= sig_max[3])
 
-        # Calculate dplus and dminus
-        #print('smooth_win', smooth_win)
+        ## Calculate dplus and dminus
         dplus = smooth_signal(sig_x_p, smooth_win) / smooth_signal(sig_t_p, smooth_win)
         dminus = smooth_signal(sig_x_m, smooth_win) / smooth_signal(sig_t_m, smooth_win)
         dplus = np.where(np.isfinite(dplus), dplus, np.nan)
@@ -318,122 +431,145 @@ def depol_cali_ghk(signal_t:np.ndarray, bg_t:np.ndarray, signal_x:np.ndarray, bg
         dplus[indx_bad_t_p | indx_bad_x_p] = np.nan
         dminus[indx_bad_t_m | indx_bad_x_m] = np.nan
 
-        # Subset the calibration range
-        dplus = dplus[cali_h_indx_range[0]:cali_h_indx_range[1]]
-        dminus = dminus[cali_h_indx_range[0]:cali_h_indx_range[1]]
+        ## Subset the calibration range
+        dplus = dplus[cali_h_indx_range[0]:cali_h_indx_range[1]+1]
+        dminus = dminus[cali_h_indx_range[0]:cali_h_indx_range[1]+1]
 
         if np.all(np.isnan(dplus)) or np.all(np.isnan(dminus)):
-            logging.warning(f'calibrateGHK all values in dplus or dminus masked in period {i_depol_cal}')
-            print(f'calibrateGHK all values in dplus or dminus masked in period {i_depol_cal}, len(dplus) {len(dplus)}')
-            print('  snr_t_p ', np.sum((snr_t_p <= SNRmin[0])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
-            print('  sig_t_p ', np.sum((sig_t_p >= sig_max[0])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
-            print('> indx_bad_t_p in height interval', np.sum(indx_bad_t_p[cali_h_indx_range[0]:cali_h_indx_range[1]]))
-            print('  snr_t_m ', np.sum((snr_t_m <= SNRmin[1])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
-            print('  sig_t_m ', np.sum((sig_t_m >= sig_max[1])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
-            print('> indx_bad_t_m in height interval', np.sum(indx_bad_t_m[cali_h_indx_range[0]:cali_h_indx_range[1]]))
-            print('  snr_x_p ', np.sum((snr_x_p <= SNRmin[2])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
-            print('  sig_x_p ', np.sum((sig_x_p >= sig_max[2])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
-            print('> indx_bad_x_p in height interval', np.sum(indx_bad_x_p[cali_h_indx_range[0]:cali_h_indx_range[1]]))
-            print('  snr_x_m ', np.sum((snr_x_m <= SNRmin[3])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
-            print('  sig_x_m ', np.sum((sig_x_m >= sig_max[3])[cali_h_indx_range[0]:cali_h_indx_range[1]]))
-            print('> indx_bad_x_m in height interval', np.sum(indx_bad_x_m[cali_h_indx_range[0]:cali_h_indx_range[1]]))
+            logging.warning(f"No valid plus or minus 45° calibration found in calibration period {i_depol_cal}. Skipping this period.")
+
+            ## Debug info
+            logging.debug(f"CalibrateGHK all values in dplus or dminus masked in period {i_depol_cal}, len(dplus) {len(dplus)}")
+            logging.debug(f"  snr_t_p  {np.sum((snr_t_p <= SNRmin[0])[cali_h_indx_range[0]:cali_h_indx_range[1]+1])}")
+            logging.debug(f"  sig_t_p  {np.sum((sig_t_p >= sig_max[0])[cali_h_indx_range[0]:cali_h_indx_range[1]+1])}")
+            logging.debug(f"> indx_bad_t_p in height interval {np.sum(indx_bad_t_p[cali_h_indx_range[0]:cali_h_indx_range[1]+1])}")
+            logging.debug(f"  snr_t_m  {np.sum((snr_t_m <= SNRmin[1])[cali_h_indx_range[0]:cali_h_indx_range[1]+1])}")
+            logging.debug(f"  sig_t_m  {np.sum((sig_t_m >= sig_max[1])[cali_h_indx_range[0]:cali_h_indx_range[1]+1])}")
+            logging.debug(f"> indx_bad_t_m in height interval {np.sum(indx_bad_t_m[cali_h_indx_range[0]:cali_h_indx_range[1]+1])}")
+            logging.debug(f"  snr_x_p  {np.sum((snr_x_p <= SNRmin[2])[cali_h_indx_range[0]:cali_h_indx_range[1]+1])}")
+            logging.debug(f"  sig_x_p  {np.sum((sig_x_p >= sig_max[2])[cali_h_indx_range[0]:cali_h_indx_range[1]+1])}")
+            logging.debug(f"> indx_bad_x_p in height interval {np.sum(indx_bad_x_p[cali_h_indx_range[0]:cali_h_indx_range[1]+1])}")
+            logging.debug(f"  snr_x_m  {np.sum((snr_x_m <= SNRmin[3])[cali_h_indx_range[0]:cali_h_indx_range[1]+1])}")
+            logging.debug(f"  sig_x_m  {np.sum((sig_x_m >= sig_max[3])[cali_h_indx_range[0]:cali_h_indx_range[1]+1])}")
+            logging.debug(f"> indx_bad_x_m in height interval {np.sum(indx_bad_x_m[cali_h_indx_range[0]:cali_h_indx_range[1]+1])}")
             continue
             
-        # Analyze segments for stability
-        #print('before analyze segments', len(dplus), segment_len)
-        seg = analyze_segments(dplus, dminus, segment_len, rel_std_dplus, rel_std_dminus)
-        if seg.shape[0] == 0:
-            logging.warning(f'calibrateGHK no stable segment found in period {i_depol_cal}')
+        ## Analyze segments for stability
+        mean_seg_dpluses, std_seg_dpluses, mean_seg_dminuses, std_seg_dminuses =  analyze_segments(
+            dplus=dplus,
+            dminus=dminus,
+            segment_len=segment_len,
+            rel_std_dplus=rel_std_dplus,
+            rel_std_dminus=rel_std_dminus
+        )
+        if mean_seg_dpluses.size == 0:
+            logging.warning(f"No stable calibration segment found in calibration period {i_depol_cal}. Skipping this period.")
             continue
 
-        # translate manually 
-        #  min(sqrt((std_dplus_tmp./mean_dplus_tmp).^2 + (std_dminus_tmp./mean_dminus_tmp).^2));
-        indx_best_seg = np.argmin(np.sqrt((seg[:, 1]/seg[:, 0])**2 + (seg[:, 3]/seg[:, 2])**2))
-        # the best segment searching was flawed by the AI translate
-        best_segment = seg[indx_best_seg]
-        mean_dplus.append(best_segment[0])
-        std_dplus.append(best_segment[1])
-        mean_dminus.append(best_segment[2])
-        std_dminus.append(best_segment[3])
-        pol_cali_start_time.append(this_cali_start_time)
-        pol_cali_stop_time.append(this_cali_stop_time)
+        ## Find optimal segment
+        best_seg_idx = np.argmin(
+            np.sqrt((std_seg_dpluses/mean_seg_dpluses)**2 + (std_seg_dminuses/mean_seg_dminuses)**2)
+        )
+        mean_dplus = mean_seg_dminuses[best_seg_idx]
+        std_dplus = std_seg_dpluses[best_seg_idx]
+        mean_dminus = mean_seg_dminuses[best_seg_idx]
+        std_dminus = std_seg_dminuses[best_seg_idx]
 
+        ## Polarization calibration constant
+        pol_cali_eta = float(1 / K * np.sqrt(mean_dplus * mean_dminus))
+        pol_cali_eta_std = float(0.5 * (mean_dplus * std_dminus + mean_dminus * std_dplus) / np.sqrt(mean_dplus * mean_dminus))
+
+        ## save calibration result
+        results.append({
+            'eta': pol_cali_eta, 'eta_std': pol_cali_eta_std,
+            # 'time_start': pol_cali_start_time,
+            'time_start': pol_cali_nang_start_time[i_depol_cal],  # TODO: Why are we returning pol_cali_nang_start_time insted of pol_cali_start_time?
+            'time_end': pol_cali_stop_time,
+            'method': 'D90'
+        })
+
+        ## collect debug info
         if collect_debug:
-            global_attri['sig_t_p'].append(sig_t_p)
-            global_attri['sig_t_m'].append(sig_t_m)
-            global_attri['sig_x_p'].append(sig_x_p)
-            global_attri['sig_x_m'].append(sig_x_m)
-            global_attri['cali_h_indx_range'].append(cali_h_indx_range)
-            global_attri['indx_45p'].append(indx_45p)
-            global_attri['indx_45m'].append(indx_45m)
-            global_attri['dplus'].append(dplus)
-            global_attri['dminus'].append(dminus)
-            global_attri['segment_len'].append(segment_len)
-            global_attri['indx_best_seg'].append(indx_best_seg)
-            global_attri['segment_results'].append(seg)
-            global_attri['K'].append(K)
-            global_attri['cali_time'].append(np.mean([this_cali_start_time, this_cali_stop_time]))
+            results[-1]['sig_t_p'] = sig_t_p
+            results[-1]['sig_t_m'] = sig_t_m
+            results[-1]['sig_x_p'] = sig_x_p
+            results[-1]['sig_x_m'] = sig_x_m
+            results[-1]['cali_h_indx_range'] = cali_h_indx_range
+            results[-1]['indx_45p'] = indx_45p
+            results[-1]['indx_45m'] = indx_45m
+            results[-1]['dplus'] = dplus
+            results[-1]['dminus'] = dminus
+            results[-1]['segment_len'] = segment_len
+            results[-1]['indx_best_seg'] = best_seg_idx
+            results[-1]['mean_dplus_seg'] = mean_seg_dpluses
+            results[-1]['std_dplus_seg'] = std_seg_dpluses
+            results[-1]['mean_dminus_seg'] = mean_seg_dminuses
+            results[-1]['std_dminus_seg'] = std_seg_dminuses
+            results[-1]['K'] = K
+            results[-1]['cali_time'] = np.mean([
+                    pol_cali_start_time[i_depol_cal],
+                    pol_cali_stop_time[i_depol_cal]])
 
-    if not mean_dplus or not mean_dminus:
-        logging.warning("Plus or minus 45° calibration is missing.")
-        #return pol_cali_eta, pol_cali_eta_std, pol_cali_start_time, pol_cali_stop_time, 0, global_attri
-        return {'status': 0}
-
-    pol_cali_eta = [float(1 / K * np.sqrt(dp * dm)) for dp, dm in zip(mean_dplus, mean_dminus)]
-    pol_cali_eta_std = [float(0.5 * (dp * std_dm + dm * std_dp) / np.sqrt(dp * dm)) for 
-                        dp, std_dp, dm, std_dm in zip(mean_dplus, std_dplus, mean_dminus, std_dminus)]
-    
-    results = [
-        {'eta': e[0], 'eta_std': e[1], 'time_start': e[2], 'time_end': e[3], 'status': 1}
-        for e in zip(pol_cali_eta, pol_cali_eta_std, pol_cali_nang_start_time, pol_cali_stop_time)]
-
-    if collect_debug:
-        results['global_attri'] = dict(global_attri)
     return results
 
 
 def analyze_segments(dplus:np.ndarray, dminus:np.ndarray, segment_len:int,
-                     rel_std_dplus:float, rel_std_dminus:float) -> np.ndarray: 
-    """...
+                     rel_std_dplus:float, rel_std_dminus:float) -> tuple: 
+    """Analyze calibration segment.
     
     Parameters
     ----------
     dplus : ndarray
-        ...
+        Plus 45° calibration...
     dminus : ndarray
-        ...
+        Minus 45° calibration...
     segment_len : int
         Segment length for testing the variability of calibration results.
     rel_std_dplus, rel_std_dminus : float
-        Maximum relative uncertainty of dplus and dminus allowed.
+        Maximum relative uncertainty of `dplus` and `dminus` allowed.
     
     Returns
     -------
-    ndarray
-        ...
-    
-    Notes
-    -----
-    .. TODO:: Finish docstring.
+    mean_dpluses : ndarray
+        Mean plus 45° calibration per segment.
+    std_dpluses : ndarray
+        Standard deviation of plus 45° calibration per segment.
+    mean_dminuses : ndarray
+        Mean minus 45° calibration per segment.
+    std_dminuses : ndarray
+        Standard deviation of minus 45° calibration per segment.
     """
 
-    results = []
+    mean_dpluses = []
+    std_dpluses = []
+    mean_dminuses = []
+    std_dminuses = []
+
     for i in range(len(dplus) - segment_len):
-        #print(i, i+segment_len)
         seg_dplus = dplus[i:i + segment_len]
         seg_dminus = dminus[i:i + segment_len]
+
         if np.sum(~np.isnan(seg_dplus)) <= segment_len / 4 or np.sum(~np.isnan(seg_dminus)) <= segment_len / 4:
             continue
+
         mean_dp = np.nanmean(seg_dplus)
         std_dp = np.nanstd(seg_dplus)
         mean_dm = np.nanmean(seg_dminus)
         std_dm = np.nanstd(seg_dminus)
-        #print('mean_dp', mean_dp, 'std_dp', std_dp, '-> ', std_dp / mean_dp, rel_std_dplus)
-        #print('mean_dm', mean_dm, 'std_dm', std_dm, '-> ', std_dm / mean_dm, rel_std_dminus)
-        
+
         if std_dp / mean_dp <= rel_std_dplus and std_dm / mean_dm <= rel_std_dminus:
-            results.append([mean_dp, std_dp, mean_dm, std_dm])
-    return np.array(results)
+            mean_dpluses.append(mean_dp)
+            std_dpluses.append(std_dp)
+            mean_dminuses.append(mean_dm)
+            std_dminuses.append(std_dm)
+
+    # Convert to ndarray
+    mean_dpluses = np.asarray(mean_dpluses)
+    std_dpluses = np.asarray(std_dpluses)
+    mean_dminuses = np.asarray(mean_dminuses)
+    std_dminuses = np.asarray(std_dminuses)
+
+    return mean_dpluses, std_dpluses, mean_dminuses, std_dminuses
 
 """
     [data.polCaliEta532, data.polCaliEtaStd532, data.polCaliTime, data.polCali532Attri] = 
