@@ -443,22 +443,21 @@ def load(data_cube) -> list:
 
     # print(data_cube.picasso_config_dict['defaultFile_folder'])
     # print(data_cube.polly_config_dict)
-    # print(data_cube.polly_default_dict)
 
-    ovl_files_for = [k for k in data_cube.polly_default_dict.keys() if 'overlapFile_' in k]
+    ovl_files_for = [k for k in data_cube.polly_config_dict.keys() if 'overlapFile_' in k]
     # print(ovl_files_for)
 
     height = data_cube.retrievals_highres['range']
-    polly_default = data_cube.polly_default_dict
+    polly_config = data_cube.polly_config_dict
     folder = Path(data_cube.picasso_config_dict['defaultFile_folder'])
     # data_cube.retrievals_profile['overlap']['raman'][i][f'{wv}_total_NR']['olFunc']
     overlap = [{}]
 
     for k in ovl_files_for:
         # print(k)
-        full_f = folder.joinpath(polly_default[k])
+        full_f = folder.joinpath(polly_config[k])
         # print(full_f)
-        if polly_default[k] == "":
+        if polly_config[k] == "":
             # print('empty string')
             continue
         dat = np.loadtxt(full_f, skiprows=1, delimiter=',')
