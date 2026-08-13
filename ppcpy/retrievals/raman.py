@@ -364,7 +364,7 @@ def raman_ext(
         ext_aer_MC = np.full((MC_count, len(sig)), np.nan)
 
         # Generate signal with noise
-        noise = np.sqrt(sig + bg)
+        noise = np.sqrt(sig + 2*bg)
         noise[np.isnan(noise)] = 0
 
         # this should actually be a function
@@ -528,8 +528,8 @@ def raman_bsc(
         betaRefSample = sigGenWithNoise(betaRef, rel_std_betaRef * np.mean(beta_mol[hRefIdx]), MC_count[3], 'norm').T
         angstroemSample = sigGenWithNoise(angstroem, sigma_angstroem, MC_count[0], 'norm').T
         ext_aer_sample = sigGenWithNoise(ext_aer, sigma_ext_aer, MC_count[1], 'norm').T
-        sigElasticSample = sigGenWithNoise(sigElastic, np.sqrt(sigElastic + bgElastic), MC_count[2], 'norm').T
-        sigVRN2Sample = sigGenWithNoise(sigVRN2, np.sqrt(sigVRN2 + bgVRN2), MC_count[2], 'norm').T
+        sigElasticSample = sigGenWithNoise(sigElastic, np.sqrt(sigElastic + 2*bgElastic), MC_count[2], 'norm').T
+        sigVRN2Sample = sigGenWithNoise(sigVRN2, np.sqrt(sigVRN2 + 2*bgVRN2), MC_count[2], 'norm').T
 
         aerBscSample = np.full((np.prod(MC_count), len(ext_aer)), np.nan)
         for iX in range(MC_count[0]):

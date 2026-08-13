@@ -232,7 +232,7 @@ def fernald(
     refBeta = refBeta * 1e3  # Convert to km^-1 sr^-1
 
     # Signal noise and initialization
-    totSig = signal + bg
+    totSig = signal + 2*bg
     totSig[totSig < 0] = 0
     noise = np.sqrt(totSig)
 

@@ -199,13 +199,13 @@ def sigGenWithNoise(signal:np.ndarray, noise:np.ndarray=None, nProfile:int=1, me
     noise = np.array(noise).reshape(1, -1)
     noise[np.isnan(noise)] = 0
 
-    signalGen = np.full((np.prod(signal.shape), nProfile), np.nan)
+    signalGen = np.full((signal.size, nProfile), np.nan)
 
     if method == 'norm':
-        for iBin in range(np.prod(signal.shape)):
+        for iBin in range(signal.size):
             signalGen[iBin, :] = signal[0, iBin] + norm.rvs(scale=noise[0, iBin], size=nProfile)
     elif method == 'poisson':
-        for iBin in range(np.prod(signal.shape)):
+        for iBin in range(signal.size):
             signalGen[iBin, :] = poisson.rvs(signal[0, iBin], size=nProfile)
     else:
         raise ValueError('A valid method should be provided.')
