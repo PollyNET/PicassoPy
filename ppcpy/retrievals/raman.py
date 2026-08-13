@@ -45,26 +45,30 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
     retrieval : str
         Name of retrieval type eg. 'raman'.
     signal : str
-        Name of the signal used for the retrievals, eg. 'TCor'.
+        Name of the signal used for the retrieval eg. 'TCor'.
+    refBeta : float
+        Reference value used for the retrieval.
     
     Notes
     -----
+    .. TODO::
+        - sigma_angstroem and MC_count are hardcoded. Can this be automated?
+        - in raman_ext calulations we use a different hard coded MC_count than the global parameter.
+        - Should sigBGCor, sigTCor or RCS be used for the Raman retrievals? RCS dampens the effect form
+          the wrong first bin and makes the profile more straight, insted of s-shaped, in the lower bins.
+        - use flag367Off and flag607Off to give warnings or error if the channels are on less then X%of the 
+          time during a cloud free segment.
+        - Add flag for nighttime measurements.
 
     **History**
     
     - xxxx-xx-xx: TODO: First edition by ...
     - 2026-02-04: Modified and cleaned by Buholdt
     - 2026-02-27: Added ext_aer_mod and ext_mol_mod to backscatter calculations.
-    
-
-    .. TODO::
-        - sigma_angstroem and MC_count are hardcoded. Can this be automated?
-        - in raman_ext calulations we use a different hard coded MC_count than the global parameter.
-        - Should sigBGCor, sigTCor or RCS be used for the Raman retrievals? RCS dampens the effect form
-          the wrong first bin and makes the profile more straight (insted of the s-shape) in the lower bins.
 
     """
-    height = data_cube.retrievals_highres['range']
+    
+    height = data_cube.retrievals_highres['range'].copy()
     hres = data_cube.rawdata_dict['measurement_height_resolution']['var_data']
     config_dict = data_cube.polly_config_dict
     
@@ -73,15 +77,12 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
 
     opt_profiles = [{} for i in range(len(data_cube.clFreeGrps))]
     
-    if not heightFullOverlap: 
+    if not heightFullOverlap:
         heightFullOverlap = [np.array(config_dict['heightFullOverlap']) for i in data_cube.clFreeGrps]
-    print(heightFullOverlap)
 
-    print('Starting Raman retrieval')
     for i, cldFree in enumerate(data_cube.clFreeGrps):
-        print('cldFree ', i, cldFree)
+        logging.info(f"Cloud free segment {i}, Time: {data_cube.retrievals_highres['time64'][cldFree[0]]} - {data_cube.retrievals_highres['time64'][cldFree[1]]}.")
         cldFree = cldFree[0], cldFree[1] + 1
-        print('cldFree mod', cldFree)
 
         # Define channels to run the retrieval for
         channels = [((355, 'total', 'FR'), (387, 'total', 'FR')),
@@ -93,8 +94,17 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
 
         for (wv, t, tel), (wv_r, t_r, tel_r) in channels:
             if np.any(data_cube.gf(wv, t, tel)) and np.any(data_cube.gf(wv_r, t_r, tel_r)):
-                print(f'== {wv}, {t}, {tel} | {wv_r}, {t_r}, {tel_r} raman ========')
-                # TODO add flag for nighttime measurements?
+                logging.info(f"Channels: {wv}, {t}, {tel} | {wv_r}, {t_r}, {tel_r} raman.")
+
+                # Check availability of Raman channel during retireval priod
+                if data_cube.retrievals_profile[f'mask{wv_r}Off'][i] > 0:
+                    logging.warning(f'Channel {wv_r} {t_r} {tel_r} was not opertional {data_cube.retrievals_profile[f'mask{wv_r}Off'][i]*100:.2f}% of the profile retrieval period.')
+                     # .. TODO:: add this information to a quality flag for the profile based on how long wv_r was unoperational.
+                    if data_cube.retrievals_profile[f'mask{wv_r}Off'][i] > 0.5: # <-- .. TODO:: decide on a treshold for skipping the channel processing.
+                        logging.warning('Skipping Raman retrival for this channel.')
+                        continue
+
+                # .. TODO:: add flag for nighttime measurements?
 
                 # Telescope type dependent configurations
                 if tel == 'NR':
@@ -102,8 +112,6 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                     keyminSNR = 'minRamanRefSNR_NR_'
                     angstrexp = config_dict['angstrexp_NR']
                     refBeta = config_dict[f'refBeta_NR_{wv}'] if f'refBeta_NR_{wv}' in config_dict else None
-                    # TODO seperate klett and raman refBeta in config file?
-                    # refBeta = config_dict[f'refBeta_NR_raman_{wv}'] if f'refBeta_NR_raman_{wv}' in config_dict else None
                 else:
                     key_smooth = 'smoothWin_raman_'
                     keyminSNR = 'minRamanRefSNR'
@@ -117,22 +125,22 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                     print('angstrexp', angstrexp)
 
                 # Elastic signals
-                sig = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv, t, tel)])
-                bg = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv, t, tel)])
-                molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :]
-                molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :]
+                sig = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv, t, tel)]).copy()
+                bg = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv, t, tel)]).copy()
+                molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :].copy()
+                molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :].copy()
 
                 # Inelastic signals
-                sig_r = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv_r, t, tel)])
-                bg_r = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv_r, t, tel)])
-                molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i, :]
-                molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i, :]
+                sig_r = np.squeeze(data_cube.retrievals_profile[f'sig{signal}'][i, :, data_cube.gf(wv_r, t, tel)]).copy()
+                bg_r = np.squeeze(data_cube.retrievals_profile[f'BG{signal}'][i, data_cube.gf(wv_r, t, tel)]).copy()
+                molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i, :].copy()
+                molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i, :].copy()
 
-                number_density = data_cube.mol_profiles[f'number_density'][i, :]
+                number_density = data_cube.mol_profiles[f'number_density'][i, :].copy()
 
                 if wv == 1064 and wv_r == 607:
                     # calculate the extinction based on the 532nm molecular profiles and a correction afterwards
-                    molExt_mod = data_cube.mol_profiles[f'mExt_532'][i, :]
+                    molExt_mod = data_cube.mol_profiles[f'mExt_532'][i, :].copy()
                     wv_mod = 532
                 else:
                     # calculate normally
@@ -165,14 +173,12 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
 
                 refHInd = data_cube.retrievals_profile['refH'][i][f'{wv}_{t}_{tel}']['refInd']
                 if np.isnan(refHInd).any():
-                    print('No valid refHInd found, skipping Raman retrieval for this channel.')
+                    logging.warning("No valid refHInd found, skipping Raman retrieval for this channel.")
                     opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
                     continue
 
                 hFullOverlap = heightFullOverlap[i][data_cube.gf(wv, t, tel)][0]
                 hBaseInd = np.argmax(height >= (hFullOverlap + config_dict[f'{key_smooth}{wv}'] / 2 * hres))
-                print(hFullOverlap, config_dict[f'{key_smooth}{wv}'] / 2 * hres)
-                print('refHInd', refHInd, 'refH', height[np.array(refHInd)], 'hBaseInd', hBaseInd, 'hBase', height[hBaseInd])
 
                 # Calculate SNR in the reference height
                 SNRRef = calc_snr(
@@ -186,7 +192,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
 
                 # Checking SNR treshold
                 if SNRRef < config_dict[f'{keyminSNR}{wv}'] and SNRRef_r < config_dict[f'{keyminSNR}{wv_r}']:
-                    print('Signal is too noisy at the reference height, skipping Raman retrival for this channel.', SNRRef, config_dict[f'{keyminSNR}{wv}'], SNRRef_r, config_dict[f'{keyminSNR}{wv_r}'])
+                    logging.warning(f"Signal is too noisy at the reference height, skipping Raman retrival for this channel.")
                     opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
                     continue
 
@@ -196,18 +202,18 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                         if 'aerBsc' in opt_profiles[i][f'{wv}_{t}_FR']:
                             refBeta = np.nanmean(opt_profiles[i][f'{wv}_{t}_FR']['aerBsc'][refHInd[0]:refHInd[1] + 1])
                         else:
-                            print('No valid refBeta found, skipping Raman retrieval for this channel.')
+                            logging.warning("No valid refBeta found, skipping Raman retrieval for this channel.")
                             opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
                             continue
                     else:
-                        print('No valid refBeta found, skipping Raman retrieval for this channel.')
+                        logging.warning("No valid refBeta found, skipping Raman retrieval for this channel.")
                         opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
                         continue
                 
                 aerExt_tmp = prof['aerExt'].copy()
                 aerExt_tmp[:hBaseInd + 1] = aerExt_tmp[hBaseInd]
                 aerExt_mod[:hBaseInd + 1] = aerExt_mod[hBaseInd]    # should the hBaseInd for 1064 or 532 be used here for the 1064nm channel??
-                print(f'filling aerExt below overlap with {aerExt_tmp[hBaseInd]} for calculating the backscatter')
+                logging.info(f"Filling aerExt below overlap with {aerExt_tmp[hBaseInd]} for calculating the backscatter")
 
                 # Change equation back for comparison with Picasso. This is only a temporary addition that will be removed
                 # once picasso is updated or the comparison to picasso is completed.
@@ -320,21 +326,20 @@ def raman_ext(
     in cirrus clouds by using a combined Raman elastic-backscatter lidar.
     Applied Optics Vol. 31, Issue 33, pp. 7113-7131 (1992).
 
+    
     Notes
     -----
-
+    .. TODO:: `moving_smooth_varied_win` and `moving_linfit_varied_win` functions are not yet implemented.
+              Investigate what smothing function is used, Savitzky-Golay or something else?
+    
     **History**
     
     - 2021-05-31: First edition by Zhenping
     - 2025-01-05: AI supported translation
     - 2026-02-04: Cleaned by Buholdt
 
-    .. TODO::
-        - moving_smooth_varied_win function is not yet implemented.
-        - moving_linfit_varied_win function is not yet implemented.
-        - Investigate what smothing function is used, Savitzky-Golay or something else?
-
     """
+
     # Prepare variables
     temp = number_density / (sig * height**2)
     temp[temp <= 0] = np.nan
@@ -359,7 +364,7 @@ def raman_ext(
         ext_aer_MC = np.full((MC_count, len(sig)), np.nan)
 
         # Generate signal with noise
-        noise = np.sqrt(sig + bg)
+        noise = np.sqrt(sig + 2*bg)
         noise[np.isnan(noise)] = 0
 
         # this should actually be a function
@@ -487,12 +492,13 @@ def raman_bsc(
     - 2026-02-27: Added ext_aer_mod and ext_mol_mod for better consistancy with the 1064nm channel.
 
     """
+
     if isinstance(MC_count, int):
         MC_count = np.ones(4, dtype=int) * MC_count
 
     if np.prod(MC_count) > 1e5:
-        print('Warning: Too large sampling for Monte-Carlo simulation.')
-        return np.nan * np.ones_like(sigElastic), None, None
+        logging.warning("Too large sampling for Monte-Carlo simulation.")
+        return {'aerBsc': np.nan * np.ones_like(sigElastic), 'aerBscStd': None, 'LR': None}
 
     # Calculate beta_aer:
     beta_aer, LR, ODs, signalratio = calc_raman_bsc(
@@ -522,8 +528,8 @@ def raman_bsc(
         betaRefSample = sigGenWithNoise(betaRef, rel_std_betaRef * np.mean(beta_mol[hRefIdx]), MC_count[3], 'norm').T
         angstroemSample = sigGenWithNoise(angstroem, sigma_angstroem, MC_count[0], 'norm').T
         ext_aer_sample = sigGenWithNoise(ext_aer, sigma_ext_aer, MC_count[1], 'norm').T
-        sigElasticSample = sigGenWithNoise(sigElastic, np.sqrt(sigElastic + bgElastic), MC_count[2], 'norm').T
-        sigVRN2Sample = sigGenWithNoise(sigVRN2, np.sqrt(sigVRN2 + bgVRN2), MC_count[2], 'norm').T
+        sigElasticSample = sigGenWithNoise(sigElastic, np.sqrt(sigElastic + 2*bgElastic), MC_count[2], 'norm').T
+        sigVRN2Sample = sigGenWithNoise(sigVRN2, np.sqrt(sigVRN2 + 2*bgVRN2), MC_count[2], 'norm').T
 
         aerBscSample = np.full((np.prod(MC_count), len(ext_aer)), np.nan)
         for iX in range(MC_count[0]):
@@ -633,7 +639,8 @@ def calc_raman_bsc(
 
     References
     ----------
-    Ansmann, A., et al. (1992). "Independent measurement of extinction and backscatter profiles in cirrus clouds by using a combined Raman elastic-backscatter lidar." Applied optics 31(33): 7113-7131.
+    Ansmann, A., et al. (1992). "Independent measurement of extinction and backscatter profiles in cirrus clouds by 
+    using a combined Raman elastic-backscatter lidar." Applied optics 31(33): 7113-7131.
 
 
     Notes
@@ -648,8 +655,11 @@ def calc_raman_bsc(
     - 2024-11-12: Modified by HB for consistency in 2024.
     - 2026-02-04: Cleaned by Buholdt
     - 2026-02-27: Added ext_aer_el_raman and ext_mol_el_raman for better consistancy with the 1064nm channel.
+    - 2026-07-28: Added dependencies on `mask387Off` and `mask607Off`.
 
     """
+
+    ext_aer = ext_aer.copy()
     ext_aer[~np.isfinite(ext_aer)] = 0
 
     if height[HRefInd[0]] >= height[-1] or height[HRefInd[1]] <= height[0]:
@@ -753,15 +763,17 @@ def lidarratio(
 
     **History**
 
-    2021-07-20: First edition by Zhenping (translated to Python)
-    2026-02-04: Changed from scipy.signal.savgol_filter to ppcpy.retrievals.ramanhelpers.savgol_filter
+    - 2021-07-20: First edition by Zhenping (translated to Python)
+    - 2026-02-04: Changed from scipy.signal.savgol_filter to ppcpy.retrievals.ramanhelpers.savgol_filter
+
     """
+
     # Adjust smoothing window for backscatter to match extinction resolution
     if smoothWinExt >= smoothWinBsc:
         smoothWinBsc2 = round(0.625 * smoothWinExt + 0.23)  # Eq (6) in reference
         smoothWinBsc2 = max(smoothWinBsc2, 3)  # Ensure minimum value of 3
     else:
-        print("Warning: Smoothing for backscatter is larger than smoothing for extinction.")
+        logging.warning("Smoothing for backscatter is larger than smoothing for extinction.")
         smoothWinBsc2 = 3
 
     # Smooth the backscatter using Savitzky-Golay filter

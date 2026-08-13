@@ -1,14 +1,15 @@
 
 import numpy as np
+import logging
 from scipy.ndimage import label
 
 def segment(data_cube) -> np.ndarray:
-    """Perform cloud free profile segmentation
+    """Perform cloud free profile segmentation.
 
     Parameters
     ----------
     data_cube : object
-        Main PicassoProc object
+        Main PicassoProc object.
     
     Returns
     -------
@@ -19,34 +20,34 @@ def segment(data_cube) -> np.ndarray:
 
     - xxxx-xx-xx: First edition by ...
     - 2026-03-18: Updated flagValPrf to include 'shutterOnMask' and 'fogMask'.
+    
     """
     
     config_dict = data_cube.polly_config_dict
     flagValPrf = data_cube.flagCloudFree & (~data_cube.retrievals_highres['depCalMask']) \
             & (~data_cube.retrievals_highres['shutterOnMask']) & (~data_cube.retrievals_highres['fogMask'])
 
-    print('intNProfiles', config_dict['intNProfiles'], 'minIntNProfiles', config_dict['minIntNProfiles'])
+    logging.info(f"intNProfiles: {config_dict['intNProfiles']}, minIntNProfiles: {config_dict['minIntNProfiles']}")
     clFreeGrps = clFreeSeg(flagValPrf, config_dict['intNProfiles'], config_dict['minIntNProfiles'])
 
     return clFreeGrps
 
 
-
-def clFreeSeg(prfFlag, nIntPrf, minNIntPrf):
-    """splits continuous cloud-free profiles into small sections.
+def clFreeSeg(prfFlag:np.ndarray, nIntPrf:int, minNIntPrf:int) -> np.ndarray:
+    """Splits continuous cloud-free profiles into small sections.
 
     Parameters
     ----------
-    prfFlag: array-like (boolean)
+    prfFlag : array-like (boolean)
         Cloud-free flags for each profile.
-    nIntPrf: int
+    nIntPrf : int
         Number of integral profiles.
-    minNIntPrf: int
+    minNIntPrf : int
         Minimum number of integral profiles.
 
     Returns
     -------
-    clFreSegs: 2D numpy array
+    clFreSegs : 2D  ndarray
         Start and stop indexes for each cloud-free section.
         [[start1, stop1], [start2, stop2], ...]
 
@@ -57,15 +58,15 @@ def clFreeSeg(prfFlag, nIntPrf, minNIntPrf):
     
     - 2021-05-22: First edition by Zhenping
     - 2025-03-20: Translated to python 
+    
     """
 
     # Label contiguous cloud-free segments
     clFreGrpTag, nClFreGrps = label(prfFlag.astype(int))
-
     clFreSegs = []
     
     if nClFreGrps == 0:
-        print("No cloud-free segments were found.")
+        logging.warning("No cloud-free segments were found.")
     else:
         for iClFreGrp in range(1, nClFreGrps + 1):
             iClFreGrpInd = np.where(clFreGrpTag == iClFreGrp)[0]
@@ -91,7 +92,5 @@ def clFreeSeg(prfFlag, nIntPrf, minNIntPrf):
                     ]).T
                 
                 clFreSegs.extend(subClFreGrp.tolist())
+    
     return np.array(clFreSegs, dtype=int) if clFreSegs else np.empty((0, 2), dtype=int)
-
-
-

@@ -44,7 +44,7 @@ def quasi_bsc(data_cube):
         if config_dict['flagOnlyUseValidQuasiData']:
             quality_mask = np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, data_cube.gf(wv, t, tel)])
             att_beta_qsi[quality_mask != 0] = np.nan
-        # TODO check if halving the window is needed: Yes at the moment they need to be halved.
+        # TODO check if halving the window is needed: Yes, at the moment they need to be halved.
         smooth_t = int(np.array(config_dict['quasi_smooth_t'])[data_cube.gf(wv, t, tel)][0] / 2)
         smooth_h = int(np.array(config_dict['quasi_smooth_h'])[data_cube.gf(wv, t, tel)][0] / 2)
         att_beta_qsi = helper.smooth2a(att_beta_qsi, smooth_t, smooth_h)
@@ -54,7 +54,7 @@ def quasi_bsc(data_cube):
         if config_dict['flagOnlyUseValidQuasiData']:
             quality_mask_r = np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, data_cube.gf(wv_r, t_r, tel_r)])
             att_beta_r_qsi[quality_mask_r != 0] = np.nan
-        # TODO check if halving the window is needed: Yes at the moment they need to be halved.
+        # TODO check if halving the window is needed: Yes, at the moment they need to be halved.
         smooth_t_r = int(np.array(config_dict['quasi_smooth_t'])[data_cube.gf(wv_r, t_r, tel_r)][0] / 2)
         smooth_h_r = int(np.array(config_dict['quasi_smooth_h'])[data_cube.gf(wv_r, t_r, tel_r)][0] / 2)
         att_beta_r_qsi = helper.smooth2a(att_beta_r_qsi, smooth_t_r, smooth_h_r)

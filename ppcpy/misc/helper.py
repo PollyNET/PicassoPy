@@ -13,7 +13,8 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 import numpy as np
 from scipy.sparse import diags
-from scipy.signal import savgol_coeffs
+from scipy.signal import convolve, savgol_coeffs
+from scipy.ndimage import uniform_filter as _uniform_filter
 
 
 def detect_path_type(fullpath:str):
@@ -296,9 +297,9 @@ def get_pollyxt_logbook_files(timestamp, device, raw_folder, output_path):
 
         laserlog_filename = polly_laserlog_files_list[0]
         laserlog_filename = Path(laserlog_filename).name
-        laserlog_filename_left = re.split(r'_[0-9][0-9]_[0-9][0-9]_[0-9][0-9]\.nc',laserlog_filename)[0]
+        laserlog_filename_left = re.split(r'_[0-9][0-9]_[0-9][0-9]_[0-9][0-9]\.nc', laserlog_filename)[0]
         laserlog_filename = f'{laserlog_filename_left}_00_00_01.nc.laserlogbook.txt'
-        destination_file = Path(output_path,laserlog_filename)
+        destination_file = Path(output_path, laserlog_filename)
 
         # Open the source file in binary mode and read its content
         with open(result_file, 'rb') as source:
@@ -365,10 +366,10 @@ def checking_vars(timestamp, device, raw_folder, output_path:str):
                         'measurement_height_resolution',
                         'laser_rep_rate',
                         'laser_power',
-#                        'laser_flashlamp',
+                        # 'laser_flashlamp',
                         'location_height',
                         'neutral_density_filter',
-#                        'location_coordinates',
+                        # 'location_coordinates',
                         'pm_voltage',
                         'pinhole',
                         'polstate',
@@ -393,23 +394,23 @@ def checking_vars(timestamp, device, raw_folder, output_path:str):
     diff_var=0
     print('\n')
     print('checking differences in selected variables ...')
-    for ds in range(0,len(polly_file_ds_ls)-1):
-#        print('\n')
-#        print(polly_files_list[ds] + '   vs.   ' + polly_files_list[ds+1])
+    for ds in range(0, len(polly_file_ds_ls)-1):
+        # print('\n')
+        # print(polly_files_list[ds] + '   vs.   ' + polly_files_list[ds+1])
         for var in vars_of_interest:
             if var in polly_file_ds_ls[ds].variables.keys(): ## check if var is available within the polly-datastructure (depending on polly-system)
                 var_value_1=str(polly_file_ds_ls[ds].variables[var][:])
                 var_value_2=str(polly_file_ds_ls[ds+1].variables[var][:])
-    #            print(var + ": " + var_value_1)
-    #            print(var + ": " + var_value_2)
+                # print(var + ": " + var_value_1)
+                # print(var + ": " + var_value_2)
                 if var_value_1 == var_value_2 and diff_var==0:
                     # print('no difference found ...')
                     add_to_list(ds, polly_files_list, selected_var_nc_ls)
                 elif var_value_1 != var_value_2 and diff_var==0:
                     print('difference found in var:')
                     print(var)
-                    #print(var + ": " + var_value_1)
-                    #print(var + ": " + var_value_2)
+                    # print(var + ": " + var_value_1)
+                    # print(var + ": " + var_value_2)
                     diff_var=1
                     add_to_list(ds, polly_files_list, selected_var_nc_ls) if force == True else None
                 elif var_value_1 == var_value_2 and diff_var != 0:
@@ -424,7 +425,7 @@ def checking_vars(timestamp, device, raw_folder, output_path:str):
         add_to_list(-1, polly_files_list, selected_var_nc_ls)
         print('\nno differences found in selected variables!\n')
     elif diff_var != 0:
-#        add_to_list(-1,polly_files_list,selected_var_nc_ls) if force == True else None
+        # add_to_list(-1, polly_files_list, selected_var_nc_ls) if force == True else None
         ## if force==true, merge, but if force==false: the whole day will not be in list anymore
         if force == True:
             add_to_list(-1, polly_files_list, selected_var_nc_ls)
@@ -480,15 +481,15 @@ def checking_attr(timestamp, device, raw_folder, output_path):
     print('checking differences in attributes ...')
     for ds in range(0, len(polly_file_ds_ls) - 1):
         ## get global attributes as a list of strings
-#        print(selected_var_nc_ls[ds] + '   vs.   ' + selected_var_nc_ls[ds+1])
-#        print('\nglobal attributes:')
+        # print(selected_var_nc_ls[ds] + '   vs.   ' + selected_var_nc_ls[ds+1])
+        # print('\nglobal attributes:')
         for nc_attr in polly_file_ds_ls[0].ncattrs():
             # att_value=repr(input_nc_file.getncattr(nc_attr))
             att_value_1 = polly_file_ds_ls[ds].getncattr(nc_attr)
             att_value_2 = polly_file_ds_ls[ds+1].getncattr(nc_attr)
-#            print(nc_attr)
-#            print("   " + att_value_1)
-#            print("   " + att_value_2)
+            # print(nc_attr)
+            # print("   " + att_value_1)
+            # print("   " + att_value_2)
             if att_value_1 == att_value_2 and diff_att==0:
                 add_to_list(ds, selected_var_nc_ls, selected_att_nc_ls)
             elif att_value_1 != att_value_2 and diff_att==0:
@@ -504,15 +505,15 @@ def checking_attr(timestamp, device, raw_folder, output_path):
                 print('difference found!')
                 add_to_list(ds, selected_var_nc_ls, selected_att_nc_ls) if force == True else None
 
-#        print("\nvariable attributes:")
+        # print("\nvariable attributes:")
         for var in polly_file_ds_ls[0].variables.keys():
-#            print(var)
+            # print(var)
             for var_att in polly_file_ds_ls[0].variables[var].ncattrs():
                 var_att_value_1 = polly_file_ds_ls[ds].variables[var].getncattr(var_att)
                 var_att_value_2 = polly_file_ds_ls[ds+1].variables[var].getncattr(var_att)
-#                print("   " + var_att)
-#                print("      " + var_att_value_1)
-#                print("      " + var_att_value_2)
+                # print("   " + var_att)
+                # print("      " + var_att_value_1)
+                # print("      " + var_att_value_2)
                 if var_att_value_1 == var_att_value_2 and diff_var_att == 0:
                     pass
                 elif var_att_value_1 != var_att_value_2 and diff_var_att == 0:
@@ -534,7 +535,7 @@ def checking_attr(timestamp, device, raw_folder, output_path):
         add_to_list(-1, selected_var_nc_ls, selected_att_nc_ls)
         print('\nno differences found in global attributes!\n')
     elif diff_att != 0:
-#        add_to_list(-1,selected_var_nc_ls,selected_att_nc_ls) if force == True else None
+        # add_to_list(-1, selected_var_nc_ls, selected_att_nc_ls) if force == True else None
 
         ## if force==true, merge, but if force==false: the whole day will not be in list anymore
         if force == True:
@@ -548,14 +549,14 @@ def checking_attr(timestamp, device, raw_folder, output_path):
 
     if diff_var_att == 0:
         print('\nno differences found in variable attributes!\n')
-#   elif diff_var_att != 0:
-#        ## if force==true, merge, but if force==false: the whole day will not be in list anymore
-#        if force == True:
-#            add_to_list(-1,selected_var_nc_ls,selected_att_nc_ls)
-#           print('\ndifferences found in variable attributes! But will be force-merged.\n')
-#        else:
-#           print('\ndifferences found in variable attributes! Selected Date will be skipped.\n')
-#           sys.exit()
+    # elif diff_var_att != 0:
+    #     ## if force==true, merge, but if force==false: the whole day will not be in list anymore
+    #     if force == True:
+    #         add_to_list(-1, selected_var_nc_ls, selected_att_nc_ls)
+    #         print('\ndifferences found in variable attributes! But will be force-merged.\n')
+    #     else:
+    #         print('\ndifferences found in variable attributes! Selected Date will be skipped.\n')
+    #         sys.exit()
 
 
     print(selected_att_nc_ls)
@@ -595,8 +596,8 @@ def checking_timestamp(timestamp, device, raw_folder, output_path):
         polly_file_ds = Dataset(files, "r")
         polly_file_ds_ls.append(polly_file_ds)
 
-    for elementNR,ds in enumerate(polly_file_ds_ls):
-    #    print(selected_timestamp_nc_ls[elementNR])
+    for elementNR, ds in enumerate(polly_file_ds_ls):
+        # print(selected_timestamp_nc_ls[elementNR])
         timestamp_ds = ds.variables['measurement_time'][:]
         if 19700101 in timestamp_ds.T[0]:
             print(f'The file: {selected_timestamp_nc_ls[elementNR]} contains incorrect timestamps!')
@@ -604,9 +605,9 @@ def checking_timestamp(timestamp, device, raw_folder, output_path):
             ## get correct timestamp_ds from filename
             timestamp_filename = selected_timestamp_nc_ls[elementNR]
             timestamp_filename = timestamp_filename.stem
-            timestamp_filename = re.split(r'_',str(timestamp_filename))[-3:]
+            timestamp_filename = re.split(r'_', str(timestamp_filename))[-3:]
             ## del. nc-file
-            #os.remove(selected_timestamp_nc_ls[elementNR]) ### remove unzipped nc-file with incorrect timestamps
+            # os.remove(selected_timestamp_nc_ls[elementNR]) ### remove unzipped nc-file with incorrect timestamps
             ## calc. the deltaT between measurementdatapoints
             laser_rep_rate = float(ds.variables['laser_rep_rate'][0])
             measurement_shots = ds.variables['measurement_shots'][:]
@@ -633,7 +634,7 @@ def checking_timestamp(timestamp, device, raw_folder, output_path):
                 ## check if seconds_ls does not contain seonds of day larger than 86400 ## TODO
                 ## if so, remove file from list and del. file ## TODO
                 t_check = any(value > 86400 for value in seconds_ls)
-                #t_check = False ## do not skip files which are longer than 24h, seconds_ls > 86400
+                # t_check = False ## do not skip files which are longer than 24h, seconds_ls > 86400
                 if t_check == True:
                     print('seconds of day exceeds 86400. file will be removed from merging list.')
                     ds.close()
@@ -703,7 +704,7 @@ def concat_files(timestamp, device, raw_folder, output_path:str):
 
     ## merge selected files
 
-#    concat='concat'
+    # concat='concat'
 
     sel_polly_files_list = checking_timestamp(timestamp, device, raw_folder, output_path)
 
@@ -720,12 +721,12 @@ def concat_files(timestamp, device, raw_folder, output_path:str):
         os.rename(sel_polly_files_list[0], Path(output_path, filestring))
         return ()
     else:
-#        sel_polly_files_list = [ str(el) for el in sel_polly_files_list]
+        # sel_polly_files_list = [ str(el) for el in sel_polly_files_list]
         ## parameters for controlling the merging process
         compat='override' ## Values of variable "laser_flashlamp" often changes, but those files will be merged anyway. This option picks the value from first dataset.
         coords='minimal'
 
-        ds = xarray.open_mfdataset(sel_polly_files_list,combine = 'nested', data_vars="minimal", concat_dim="time", compat=compat, coords=coords)
+        ds = xarray.open_mfdataset(sel_polly_files_list, combine = 'nested', data_vars="minimal", concat_dim="time", compat=compat, coords=coords)
         ## save to a single nc-file
         print(f"\nmerged nc-file '{filestring}' will be stored to '{output_path}'")
         print("\nwriting merged file ...")
@@ -741,8 +742,8 @@ def concat_files(timestamp, device, raw_folder, output_path:str):
                 enc[k] = {
                     "zlib": True,
                     "complevel": 1,
-#                    "fletcher32": True,
-#                    "chunksizes": tuple(map(lambda x: x//2, ds[k].shape))
+                    # "fletcher32": True,
+                    # "chunksizes": tuple(map(lambda x: x//2, ds[k].shape))
                 }
 
             ds.to_netcdf(out_file, format="NETCDF4", engine="netcdf4", encoding=enc)
@@ -866,11 +867,16 @@ def uniform_filter(x:np.ndarray, win:int, fill_val:float=np.nan) -> np.ndarray:
     **History**
     
     - 2026-02-02: First edition by Buholdt
+    
     """
     
     if isinstance(win, int):
         if len(x.shape) > 1:
             raise NotImplementedError('Support for smoothing of mulitdimensional arrays is not yet implemented')
+
+        if len(x) < win:
+            logging.warning("`win` is bigger than `x`. No smoothig applied.")
+            return x
         
         f = np.ones(win)/win
         x_smoothed = np.convolve(x, f, mode='valid')
@@ -931,12 +937,17 @@ def moving_average(x:np.ndarray, win:int) -> np.ndarray:
     - 2026-03-24: First edition by Buholdt
 
     """
+
     if isinstance(win, int):
         if len(x.shape) > 1:
             raise NotImplementedError('Support for smoothing of mulitdimensional arrays is not yet implemented')
         
+        if len(x) < win:
+            logging.warning("`win` is bigger than `x`. No smoothig applied.")
+            return x
+        
         if win % 2 == 0:
-            print("Warning: Odd smoothinglengs not allowd, will preform smoothing with length win - 1.")
+            logging.warning("Warning: Odd smoothinglengs not allowd, will preform smoothing with length win - 1.")
             win -= 1
         
         f = np.ones(win)/win
@@ -1003,8 +1014,12 @@ def savgol_filter(x:np.ndarray, window_length:int, polyorder:int=2, deriv:int=0,
     [3] Jianwen Luo, Kui Ying, and Jing Bai. 2005. Savitzky-Golay smoothing and
     differentiation filter for even number data. Signal Process.
     85, 7 (July 2005), 1429-1434.
-
     """
+
+    if len(x) < window_length:
+        logging.warning("`window_length` is bigger than `x`. No smoothig applied.")
+        return x
+
     f = savgol_coeffs(window_length, polyorder, deriv=deriv, delta=delta)
     x_smooth = np.convolve(x, f, mode='valid')
     fill = np.full(int((window_length - 1)/2), fill_val)
@@ -1015,6 +1030,169 @@ def savgol_filter(x:np.ndarray, window_length:int, polyorder:int=2, deriv:int=0,
     else:
         out = np.hstack((fill, x_smooth, fill))
     
+    return out
+
+
+def uniform_filter_2d(x:np.ndarray, Nr:int, Nc:int, fill_val=np.nan) -> np.ndarray:
+    """2 dimensional uniform smoothing filter.
+
+    The regions affected by edge/padding effects are replaced with ´fill_val´.
+
+    Parameters
+    ----------
+    x : ndarray (time, height, channel, )
+        2 dimensional time-height signal(s) to be smooth.
+    Nr : int
+        Smoothing window size along x-axis (rows).
+    Nc : int
+        Smoothing window size along y-axis (columns).
+    fill_val : float, optional
+        Value to be used for filling edges, in order to recreate the input
+        dimension. Default is np.nan.
+   
+    Returns
+    -------
+    out : ndarray (time, height, channel, )
+        Smoothed 2 dimensional time-height signal(s).
+
+    Notes
+    -----
+    - Invalid pixels are masked out and replaced with 0 during
+      the convolution process to avoid propagation during smoothing
+      process.
+    - scipy.ndimage.uniform_filter is used instead of alternative convolution
+      based filters due to its increased efficiency.
+
+    **History**
+   
+    - 2026-07-17: first edition by Buholdt
+
+    """
+
+    # Copy and check input dimensions
+    x0 = x.copy()
+    if len(x0.shape) == 2:
+        filterShape = (Nr, Nc)
+    elif len(x0.shape) == 3:
+        filterShape = (Nr, Nc, 1)
+    else:
+        raise ValueError(f"´x´ must either be a 2D or 3D array (multiple 2D arrays). Not {len(x0.shape)}D.")
+
+    # Smoothing process
+    invalid = np.isnan(x0)
+    x0[invalid] = 0
+    out = _uniform_filter(
+        x0,
+        size=filterShape,
+        mode="constant",
+        cval=0.0,
+    )
+    out[invalid] = np.nan
+
+    # Mask edge affected pixels
+    top = Nr // 2
+    bottom = (Nr - 1) // 2
+
+    if top:
+        out[:top] = fill_val
+    if bottom:
+        out[-bottom:] = fill_val
+    
+    left = Nc // 2
+    right = (Nc - 1) // 2
+
+    if left:
+        out[:, :left] = fill_val
+    if right:
+        out[:, -right:] = fill_val
+
+    return out
+
+
+def moving_average_2d(x:np.ndarray, Nr:int, Nc:int, sum:bool=False) -> np.ndarray:
+    """2 dimensional uniform smoothing filter ala. 2d version of smooth(y, span, method='moving')
+    in Matlab.
+
+    This function uses a centered moving filter with dynamic size reduction at edges.
+
+    Examples
+    --------
+    The output of the function for win = 5 in one dimension follows the following logic:
+    out[0] = x[0]/1
+    out[1] = (x[0] + x[1] + x[2])/3
+    out[2] = (x[0] + x[1] + x[2] + x[3] + x[4])/5
+    out[3] = (x[1] + x[2] + x[3] + x[4] + x[5])/5
+    ...
+    out[-4] = (x[-6] + x[-5] + x[-4] + x[-3] + x[-2])/5
+    out[-3] = (x[-5] + x[-4] + x[-3] + x[-2] + x[-1])/5
+    out[-2] = (x[-3] + x[-2] + x[-1])/3
+    out[-1] = x[-1]/1
+   
+    Parameters
+    ----------
+    x : ndarray (time, height, channel, )
+        2 dimensional time-height signal(s) to be smooth.
+    Nr : int
+        Smoothing window size along x-axis (rows).
+    Nc : int
+        Smoothing window size along y-axis (columns).
+    sum : bool, optional
+        If True, return moving sum results. Otherwise, return
+        moving average results. Default is False.
+   
+    Returns
+    -------
+    out : ndarray (time, height, channel, )
+        Smoothed 2 dimensional time-height signal(s).
+   
+    Notes
+    -----
+    - Invalid pixels are masked out and replaced with 0 during
+      the convolution process to avoid propagation during smoothing
+      process. However, unlike in ´uniform_filter_2d´ these pixels
+      are not counted in the averaging procedure if ´sum=False´.
+    - By using `sum=True` the function will return the moving sum result
+      instead of the moving average.
+    - scipy.ndimage.uniform_filter is used instead of alternative convolution
+      based filters due to its increased efficiency.
+
+    ** History **
+
+    - 2026-07-17: first edition by Buholdt
+
+    """
+
+    # Copy and check input dimensions
+    x0 = x.copy()
+    if len(x0.shape) == 2:
+        filterShape = (Nr, Nc)
+    elif len(x0.shape) == 3:
+        filterShape = (Nr, Nc, 1)
+    else:
+        raise ValueError(f"´x´ must either be a 2D or 3D array (multiple 2D arrays). Not {len(x0.shape)}D.")
+
+    # Smoothing process
+    invalid = np.isnan(x0)
+    x0[invalid] = 0
+    num = _uniform_filter(
+        x0,
+        size=filterShape,
+        mode="constant",
+        cval=0.0,
+    )
+    if sum:
+        num *= Nr * Nc
+        den = 1
+    else:
+        den = _uniform_filter(
+            (~invalid).astype(float),
+            size=filterShape,
+            mode="constant",
+            cval=0.0,
+        )
+    out = num/den
+    out[invalid] = np.nan
+
     return out
 
 

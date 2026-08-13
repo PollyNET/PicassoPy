@@ -102,8 +102,9 @@ class Meteo:
         Notes
         -----
 
-        **History**
+        ** History **
         - 2021-05-22: First edition by Zhenping.
+
         """
     
         assert meteorDataSource == 'nc_cloudnet', "Other meteo sources are not implemented yet"
@@ -113,7 +114,6 @@ class Meteo:
     
     def load(self, times:float, heights:np.ndarray, asl:float, flagPicassoComparison:bool=False):
         """Load the data and resample to 15 minute intervals.
-
 
         Parameters
         ----------
@@ -149,7 +149,6 @@ class Meteo:
         for t in time_slice:
             mean_profiles.append(self.ds.sel(time=slice(*t)).mean(dim='time'))
 
-        print(f"get_mean_profiles(time_slice: {type(time_slice)}) -> {type(mean_profiles)}")
         return mean_profiles
 
 
@@ -178,8 +177,9 @@ class MeteoNcCloudnet:
         Notes
         -----
 
-        **History**
+        ** History **
         - xxxx-xx-xx: First edition by ...
+
         """
 
         if not '/' == basepath[-1]:
@@ -203,14 +203,14 @@ class MeteoNcCloudnet:
         """
 
         candidates = glob.glob(self.basepath + "**", recursive=True)
-        #print('candidates ', candidates)
+        # print('candidates ', candidates)
 
         dt = datetime.datetime.fromtimestamp(time)
         regex = re.compile(self.filepattern.format(dt))
-        #print('regex ', regex)
+        # print('regex ', regex)
 
         filename = [s for s in candidates if regex.search(s) ]
-        #print('filename ', filename)
+        # print('filename ', filename)
 
         assert len(filename) == 1, f"{os.getcwd()}, {self.basepath} found {candidates} reduced to filenames {filename}"
 

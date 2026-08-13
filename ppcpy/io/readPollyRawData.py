@@ -4,77 +4,70 @@ import numpy as np
 #from pathlib import Path
 #import logging
 #import sys
+
 def readPollyRawData(filename: str) -> dict:
-    """read the Polly raw file
+    """Read Polly raw data.
     
     Parameters
     ----------
     filename : str
-    
+        Absolute path of the polly data.
     
     Returns
     -------
     data_dict : dict
-
+        rawSignal : ndarray (channel x height x time)
+            backscatter signal [Photon Count].
+        mShots : ndarray
+            number of the laser shots for each profile.
+        flagValidProfile : ndarray
+            flag to represent the validity of each signal profile.
+        mTime : ndarray
+            datetime array for the measurement time of each profile.
+        depCalAng : ndarray
+            angle of the polarizer in the receiving channel. (>0 means 
+            calibration process starts) [degree].
+        zenithAng : numeric???
+            zenith angle of the laser beam [degree].
+        repRate : float
+            laser pulse repetition rate [s^-1].
+        hRes : float
+            spatial resolution [m].
+        mSite : str
+            measurement site.
+        deadtime : ndarray (channel x polynomial_orders)
+            deadtime correction parameters.
+        lat : float
+            latitude of measurement site [degree].
+        lon : float
+            longitude of measurement site [degree].
+        alt : float
+            altitude of measurement site [degree].
+        filenameStartTime : datenum??????
+            start time extracted from filename.
     
+    Notes
+    -----
+    .. TODO::
+        - Go over the Returns section in the docsting. Are these variables actuly returned by the function?
+        - Deleat the matlab code underneath.S
+
+    ** HISTORY **
+
+    - 2024-03-21: First edition by Andi Klamt.
+    - xxxx-xx-xx: Translated to python.
+
+    .. Authors: - klamt@tropos.de
     """
 
-#% READPOLLYRAWDATA Read polly raw data.
-#%
-#% USAGE:
-#%    data = readPollyRawData(file)
-#%
-#% INPUTS:
-#%    file: char
-#%        absolute path of the polly data.
-#%
-#%
-#% OUTPUTS:
-#%    data: struct
-#%        rawSignal: matrix (channel x height x time)
-#%            backscatter signal. [Photon Count]
-#%        mShots: array
-#%            number of the laser shots for each profile.
-#%        flagValidProfile: array
-#%            flag to represent the validity of each signal profile.
-#%        mTime: array
-#%            datetime array for the measurement time of each profile.
-#%        depCalAng: array
-#%            angle of the polarizer in the receiving channel. (>0 means 
-#%            calibration process starts). [degree]
-#%        zenithAng: numeric
-#%            zenith angle of the laser beam. [degree]
-#%        repRate: float
-#%            laser pulse repetition rate. [s^-1]
-#%        hRes: float
-#%            spatial resolution [m]
-#%        mSite: char
-#%            measurement site.
-#%        deadtime: matrix (channel x polynomial_orders)
-#%            deadtime correction parameters.
-#%        lat: float
-#%            latitude of measurement site. [degree]
-#%        lon: float
-#%            longitude of measurement site. [degree]
-#%        alt: float
-#%            altitude of measurement site. [degree]
-#%        filenameStartTime: datenum
-#%            start time extracted from filename.
-#%
-#% HISTORY:
-#%    - 2024-03-21: First edition by Andi Klamt.
-#%
-#% .. Authors: - klamt@tropos.de
-
-    data_dict={}
+    data_dict = {}
     filename_path = Path(filename)
     if filename_path.is_file():
         logging.info(f'reading nc-file: {filename}')
     else:
-#        print(f'{filename} does not exist. Aborting')
         logging.critical(f'{filename} does not exist.')
         sys.exit(1)
-        return None
+        return
 
     ## open nc-file as dataset
     nc_file_ds = netCDF4.Dataset(filename, "r")
@@ -86,8 +79,8 @@ def readPollyRawData(filename: str) -> dict:
     data_dict['global_attributes'] = {}
     for nc_attr in nc_file_ds.ncattrs():
         att_value = nc_file_ds.getncattr(nc_attr)
-        #global_attr[nc_attr] = att_value
-        #data_dict[f'global_attr__{nc_attr}'] = att_value
+        # global_attr[nc_attr] = att_value
+        # data_dict[f'global_attr__{nc_attr}'] = att_value
         data_dict['global_attributes'][nc_attr] = att_value
 
     var_ls = []
@@ -95,8 +88,8 @@ def readPollyRawData(filename: str) -> dict:
         var_ls.append(var)
 
     ## fill data_dict with variable-values
-    #for var_name in var_ls:
-    #    data_dict[var_name] = nc_file_ds[var_name][:]
+    # for var_name in var_ls:
+    #     data_dict[var_name] = nc_file_ds[var_name][:]
 
     ## fill data_dict with variable-value and get variable attributes from nc-file
     for var_name in var_ls:
@@ -106,13 +99,13 @@ def readPollyRawData(filename: str) -> dict:
 
         for var_att in nc_file_ds.variables[var_name].ncattrs():
             var_att_value = nc_file_ds.variables[var_name].getncattr(var_att)
-            #data_dict[f'{var_name}___{var_att}'] = var_att_value
+            # data_dict[f'{var_name}___{var_att}'] = var_att_value
             data_dict[var_name]['var_att'][var_att] = var_att_value
         
-        #print(var_name, type(data_dict[var_name]['var_data']))
+        # print(var_name, type(data_dict[var_name]['var_data']))
         if isinstance(data_dict[var_name]['var_data'], np.ma.MaskedArray):
             data_dict[var_name]['var_data'] = data_dict[var_name]['var_data'].data
-        #print(var_name, type(data_dict[var_name]['var_data']))
+        # print(var_name, type(data_dict[var_name]['var_data']))
 
     assert data_dict['measurement_height_resolution']['var_att']['units'] == 'ns'
     # measurement height resolution should be given in ns
@@ -122,8 +115,10 @@ def readPollyRawData(filename: str) -> dict:
     nc_file_ds.close()
 
     return data_dict
-#
-#%% variables initialization
+
+
+# ------ Matlab eqvialent code:
+#% variables initialization
 #data = struct();
 #data.rawSignal = [];
 #data.mShots = [];
@@ -140,7 +135,7 @@ def readPollyRawData(filename: str) -> dict:
 #data.angle = [];
 #
 #
-#%% read data
+#% read data
 #try
 #    rawSignal = double(ncread(file, 'raw_signal'));
 #    if is_nc_variable(file, 'deadtime_polynomial')
