@@ -328,6 +328,7 @@ def raman_ext(
     - 2021-05-31: First edition by Zhenping
     - 2025-01-05: AI supported translation
     - 2026-02-04: Cleaned by Buholdt
+    - 2026-08-25: Added devision by height resolution in error calculations
 
     .. TODO::
         - moving_smooth_varied_win function is not yet implemented.
@@ -371,11 +372,11 @@ def raman_ext(
             ratio_MC = np.log(temp_MC)
 
             if method == 'movingslope' or method == 'moving':
-                deriv_ratio_MC = movingslope_variedWin(ratio_MC, window_size)
-                # TODO divide by
+                deriv_ratio_MC = movingslope_variedWin(ratio_MC, window_size) / \
+                     np.concatenate([[height[1] - height[0]], np.diff(height)])
             elif method == 'smoothing' or method == 'smooth':
-                deriv_ratio_MC = moving_smooth_varied_win(ratio_MC, window_size)
-                # TODO divide by
+                deriv_ratio_MC = moving_smooth_varied_win(ratio_MC, window_size) / \
+                     np.concatenate([[height[1] - height[0]], np.diff(height)])
             elif method == 'chi2':
                 deriv_ratio_MC = moving_linfit_varied_win(height, ratio_MC, window_size)
 
