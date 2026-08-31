@@ -33,6 +33,8 @@ import ppcpy.retrievals.quasi as quasi
 
 import ppcpy.io.sql_interaction as sql_db
 
+import ppcpy.qc.post_processing as ppp
+
 class PicassoProc:
     counter = 0
 
@@ -837,3 +839,13 @@ class PicassoProc:
         type(self).counter -= 1
         
 
+    def post_processing(self, nr=False):
+
+        self.retrievals_profile["klett_QC"] = ppp.run_postprocesing(self, nr, retrieval="klett")
+        self.retrievals_profile["raman_QC"] = ppp.run_postprocesing(self, nr, retrieval="raman")
+
+    def merging(self, nr=False):
+
+        self.retrievals_profile["klett_QC2"] = ppp.run_merging(self, nr, retrieval="klett_QC")
+        self.retrievals_profile["raman_QC2"] = ppp.run_merging(self, nr, retrieval="raman_QC")
+       

@@ -5,7 +5,7 @@
     "log_folder": "",
     "gdas1_folder": "",
     "MWRFolder": "",
-    "results_folder": "",
+    "results_folder": "C:/Users/gebauer/Documents/Henriette/Arbeit/Daten/Lidar/PicassoPy_local/",
     "pic_folder": "",
     "pollynet_config_link_file": "test_case_config/pollynet_processing_chain_config_links.xlsx",
 
