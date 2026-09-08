@@ -379,7 +379,7 @@ class PicassoProc:
 
         """
 
-        ChannelTags = pollyChannelTags.pollyChannelTags( 
+        channelTags = pollyChannelTags.pollyChannelTags( 
             self.polly_config_dict['channelTag'],   # TODO key: channelTags vs channelTag???
             flagFarRange=self.polly_config_dict['isFR'],
             flagNearRange=self.polly_config_dict['isNR'],
