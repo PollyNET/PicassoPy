@@ -384,6 +384,14 @@ class PicassoProc:
         self.flagCloudFree = cloudscreen.cloudscreen(self, collect_debug=collect_debug)
 
 
+    def genFlagValPrf(self):
+        """combine the cloudFree, depCal, shutterOn and fog masks to obtain valid profiles
+        
+        """
+        self.flagValPrf = self.flagCloudFree & (~self.retrievals_highres['depCalMask']) \
+            & (~self.retrievals_highres['shutterOnMask']) & (~self.retrievals_highres['fogMask'])
+
+
     def cloudFreeSeg(self):
         """Cloud free profile segmentation.
         
@@ -397,29 +405,38 @@ class PicassoProc:
             ]
         
         """
+        self.genFlagValPrf()
         self.clFreeGrps = profilesegment.segment(self)
 
-    def aggregate_profiles(self, var:str=None):
+    def aggregate_profiles(self, var:str=None, flagVal=None):
         """Aggregate highres profiles over cloud free segments.
 
         Parameters
         ----------
-        var : str
+        var : None | str
             Name of variables to aggregate.
             Default is `RCS`, `sigBGCor`, and `BG`.
+        flagVal : None | bool | np.ndarray
+            cut out single invalid profiles form `clFreeGrps`. If `True` the `data_cube.flagValPrf` is used. Individual array can also be supplied.
 
         Notes
         -----
         .. TODO:: Decide on a consistent way for doing the aggregation, do not mix mean and sum
         """
 
+        if isinstance(flagVal, (np.ndarray, list)):
+            flagVal = np.asarray(flagVal)
+            self.flagValPrf = flagVal
+        elif flagVal and not isinstance(flagVal, (np.ndarray, list)):
+            flagVal = self.flagValPrf
+
         if var == None:
             self.retrievals_profile['RCS'] = \
-                preprocprofiles.aggregate_clFreeGrps(self, 'RCS', func=np.nanmean)
+                preprocprofiles.aggregate_clFreeGrps(self, 'RCS', func=np.nanmean, flagVal=flagVal)
             self.retrievals_profile['sigBGCor'] = \
-                preprocprofiles.aggregate_clFreeGrps(self, 'sigBGCor')
+                preprocprofiles.aggregate_clFreeGrps(self, 'sigBGCor', flagVal=flagVal)
             self.retrievals_profile['BG'] = \
-                preprocprofiles.aggregate_clFreeGrps(self, 'BG')
+                preprocprofiles.aggregate_clFreeGrps(self, 'BG', flagVal=flagVal)
             
             # Remove empty dict keys (temporarly solution)
             for v in ['RCS', 'sigBGCor', 'BG']:
@@ -428,7 +445,7 @@ class PicassoProc:
 
         else:
             self.retrievals_profile[var] = \
-                preprocprofiles.aggregate_clFreeGrps(self, var)
+                preprocprofiles.aggregate_clFreeGrps(self, var, flagVal=flagVal)
             
             # Remove empty dict keys (temporarly solution)
             if self.retrievals_profile[var] is None:
