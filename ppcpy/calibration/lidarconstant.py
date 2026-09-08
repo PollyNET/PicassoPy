@@ -135,7 +135,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> di
     .. TODO:: Check if LC's are normalized with respect to the mean of the profiles.
 
     .. TODO:: Add option for Aeronet and rotational Raman retrieved LC.
-
+    
     **History**
 
     xxxx-xx-xx: First edition by ...
@@ -172,7 +172,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> di
 
             ## Elastic signal
             sig = profiles[channel]['signal']
-            signal = np.nanmean(np.squeeze(
+            signal = np.nanmean(np.squeeze( # TODO: try to use PCR --> normalized
                 data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree), :, data_cube.gf(wv, t, tel)]), axis=0)
             molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :].copy()
             molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :].copy()
@@ -236,7 +236,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> di
                 wv_r = elastic2raman[int(wv)]
 
                 ## Inelastic signal, backscatter and extinction:
-                signal_r = np.nanmean(np.squeeze(
+                signal_r = np.nanmean(np.squeeze( # TODO: try to use PCR --> normalized
                     data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree), :, data_cube.gf(wv_r, t, tel)]), axis=0)
                 molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i, :].copy()
                 molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i, :].copy()

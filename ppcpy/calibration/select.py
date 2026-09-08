@@ -8,8 +8,7 @@ import matplotlib
 def single_best(d:dict, name_val:str, name_min:str, name_method:str, relative:bool=False) -> dict:
     """Select the best calibration constant
     
-
-    generalization of lidarconstant.get_best_LC    
+    Generalization of lidarconstant.get_best_LC
     
     Parameters
     ----------
@@ -22,16 +21,10 @@ def single_best(d:dict, name_val:str, name_min:str, name_method:str, relative:bo
     relative : bool
         If true, choose calibration constant based on the relative error. 
     
-    
     Returns
     -------
     best : dict
         Lidar constants/Etas with lowest standard deviation per channel.
-    
-    Notes
-    -----
-    Since ``LC = LC_stable`` and ``LCStd = LC_stable * LC_Std`` so will any negative LC also have
-    a negative LCStd, and thus be chosen as the best LC.
 
     **History**
 
@@ -78,11 +71,18 @@ def plot_cals(d:dict, param:str, used:dict=None):
         Dict storing the used CCs. LCused or etaused.
         Will produce a horizontal dashed line in the plot if added.
         Default is None.
+    
+    Returns
+    -------
+    fig : figure
+        Matplotlib figure object.
+    ax : axis
+        Matplotlib axis object.
 
     Examples
     --------
-    >>> plot_cals(data_cube.pol_cali, 'eta', used=data_cube.etaused)
     
+    >>> plot_cals(data_cube.pol_cali, 'eta', used=data_cube.etaused)
     >>> plot_cals(data_cube.LC, 'LC', used=data_cube.LCused)
     
     """

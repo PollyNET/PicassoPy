@@ -1,7 +1,6 @@
 
 import logging
 from collections import defaultdict
-import pprint
 import numpy as np
 
 from ppcpy.misc.helper import uniform_filter
@@ -13,6 +12,7 @@ from ppcpy.misc.helper import default_to_regular
 def onemx_onepx(x:float|np.ndarray) -> float|np.ndarray:
     """Calculate the fraction of (1-x)/(1+x)"""
     return (1-x)/(1+x)
+
 
 def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     """Uniformly smooth the input signal
@@ -202,8 +202,8 @@ def calibrateGHK(data_cube, collect_debug:bool=False) -> dict:
 
     Parameters
     ----------
-    data_cube
-        the input data cube
+    data_cube : object
+        Main PicassoProc object
     
     Returns
     -------
@@ -245,7 +245,7 @@ def calibrateGHK(data_cube, collect_debug:bool=False) -> dict:
 
     pol_cali = {}
 
-    tel = 'FR' # currently only implemented in the far range receiver
+    tel = 'FR' # currently only implemented in the far-range receiver
     for wv in [355, 532, 1064]:
         logging.info(f"Channels: {wv} total {tel} | {wv} cross {tel}")
         if not np.any(data_cube.gf(wv, 'total', tel)) or not np.any(data_cube.gf(wv, 'cross', tel)):
@@ -571,29 +571,6 @@ def analyze_segments(dplus:np.ndarray, dminus:np.ndarray, segment_len:int,
 
     return mean_dpluses, std_dpluses, mean_dminuses, std_dminuses
 
-"""
-    [data.polCaliEta532, data.polCaliEtaStd532, data.polCaliTime, data.polCali532Attri] = 
-    pollyPolCaliGHK(data, PollyConfig.K(flag532t), flag532t, flag532c, wavelength, ...
-    'depolCaliMinBin', PollyConfig.depol_cal_minbin_532, ...
-    'depolCaliMaxBin', PollyConfig.depol_cal_maxbin_532, ...
-    'depolCaliMinSNR', PollyConfig.depol_cal_SNRmin_532, ...
-    'depolCaliMaxSig', PollyConfig.depol_cal_sigMax_532, ...
-    'relStdDPlus', PollyConfig.rel_std_dplus_532, ...
-    'relStdDMinus', PollyConfig.rel_std_dminus_532, ...
-    'depolCaliSegLen', PollyConfig.depol_cal_segmentLen_532, ...
-    'depolCaliSmWin', PollyConfig.depol_cal_smoothWin_532, ...
-    'dbFile', dbFile, ...
-    'pollyType', CampaignConfig.name, ...
-    'flagUsePrevDepolConst', PollyConfig.flagUsePreviousDepolCali, ...
-    'flagDepolCali', PollyConfig.flagDepolCali, ...
-    'default_polCaliEta', PollyDefaults.polCaliEta532, ...
-    'default_polCaliEtaStd', PollyDefaults.polCaliEtaStd532);
-    %print_msg('eta532.\n', 'flagTimestamp', true);
-    %data.polCaliEta532
-    %Taking the eta with lowest standard deviation
-    [~, index_min] = min(data.polCali532Attri.polCaliEtaStd);
-    data.polCaliEta532=data.polCali532Attri.polCaliEta(index_min);
-"""
 
 def calibrateMol(data_cube) -> dict:
     """Calibrate the polarization with the molecular signal.
@@ -605,57 +582,70 @@ def calibrateMol(data_cube) -> dict:
     
     Returns
     -------
-    dict
-        ...
-    
+    eta : ndarray
+        Polarization calibration eta.
+    etaStd : ndarray
+        Uncertainty of polarization calibration eta.
+    fac : array
+        Polarization calibration factor.
+    facStd : ndarray
+        Uncertainty of polarization calibration factor.
+    status : int
+        Retrieval status
+            0 : Bad
+            1 : Good
+    time_start : int
+        Start time of the cloud free segment for the retrieval in unixtime.
+    end_time : int
+        End time of the cloud free segment for the retrieval in unixtime.
+
     Notes
     -----
-    - Converted from the matlab code to the best knowledge, but not cross-validated yet
+    - Converted from the matlab code to the best knowledge, but not cross-validated yet.
 
-    .. TODO:: had to calculate TR_t, TR_c again when calling depol_cali_mol()
-    .. TODO:: Finish docstring.
+    .. TODO::
+        - had to calculate TR_t, TR_c again when calling depol_cali_mol().
+        - Finish docstring.
+
+    ** History **
+
+    - xx-xx-xxxx: First edition by ...
+    - xx-xx-xxxx: Translated to python
+
     """
 
-    #temp = {'eta': [], 'eta_std': [], 'fac': [], 'fac_std': [],
-    #        'time_start': [], 'time_end': [], 'status': 0}
-    pol_cali = defaultdict(lambda: defaultdict(list))
-
+    # temp = {'eta': [], 'eta_std': [], 'fac': [], 'fac_std': [],
+    #         'time_start': [], 'time_end': [], 'status': 0}
+    pol_cali = defaultdict(list)
     config_dict = data_cube.polly_config_dict
 
     for i, cldFree in enumerate(data_cube.clFreeGrps):
-        print(i, cldFree)
         cldFreeTime = np.array(data_cube.retrievals_highres['time'])[cldFree]
-        print(cldFreeTime)
 
-        #for wv in [355, 532, 1064]:
+        # for wv in [355, 532, 1064]:
         for wv, t, tel in [(532, 'total', 'FR'), (355, 'total', 'FR')]:
             if np.any(data_cube.gf(wv, t, tel)) and np.any(data_cube.gf(wv, 'cross', tel)):
                 logging.info(f'and even a {wv} channel')
     
-                sigBGCor_total = np.squeeze(data_cube.retrievals_highres['sigBGCor'][slice(*cldFree), :, data_cube.gf(wv, 'total', 'FR')])
-                bg_total = np.squeeze(data_cube.retrievals_highres['BG'][slice(*cldFree), data_cube.gf(wv, 'total', 'FR')])
-                sigBGCor_cross = np.squeeze(data_cube.retrievals_highres['sigBGCor'][slice(*cldFree), :, data_cube.gf(wv, 'cross', 'FR')])
-                bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][slice(*cldFree), data_cube.gf(wv, 'cross', 'FR')])
-
+                # Extracting necessary data
+                sigBGCor_total = np.squeeze(data_cube.retrievals_profile['sigBGCor'][i, :, data_cube.gf(wv, 'total', 'FR')]).copy()
+                bg_total = np.squeeze(data_cube.retrievals_profile['BG'][i, data_cube.gf(wv, 'total', 'FR')]).copy()
+                sigBGCor_cross = np.squeeze(data_cube.retrievals_profile['sigBGCor'][i, :, data_cube.gf(wv, 'cross', 'FR')]).copy()
+                bg_cross = np.squeeze(data_cube.retrievals_profile['BG'][i, data_cube.gf(wv, 'cross', 'FR')]).copy()
                 refHInd = data_cube.retrievals_profile['refH'][i][f'{wv}_{t}_{tel}']['refInd']
-                print(f'referenceH {wv} {t} {tel}', refHInd)
 
+                # Check for valid reference height
                 if np.any(np.isnan(refHInd)):
                     logging.info(f"skiping {wv} channel")
                     continue
-
+                
                 ret = depol_cali_mol(
-                    signal_t=sigBGCor_total[:, slice(*refHInd)], 
-                    background_t=bg_total, 
-                    signal_c=sigBGCor_cross[:, slice(*refHInd)],
-                    background_c=bg_cross,
-                    TR_t=onemx_onepx(np.squeeze(data_cube.polly_config_dict['H'][data_cube.gf(wv, t, tel)])),
-                    TR_t_std=0,
-                    TR_c=onemx_onepx(np.squeeze(data_cube.polly_config_dict['H'][data_cube.gf(wv, 'cross', tel)])),
-                    TR_c_std=0,
-                    minSNR=10,
-                    mdr=config_dict[f'molDepol{wv}'],
-                    mdrStd=config_dict[f'molDepolStd{wv}'],
+                    signal_t=sigBGCor_total[refHInd[0]:refHInd[1]+1], background_t=bg_total,
+                    signal_c=sigBGCor_cross[refHInd[0]:refHInd[1]+1], background_c=bg_cross,
+                    TR_t=onemx_onepx(np.squeeze(data_cube.polly_config_dict['H'][data_cube.gf(wv, t, tel)])), TR_t_std=0,
+                    TR_c=onemx_onepx(np.squeeze(data_cube.polly_config_dict['H'][data_cube.gf(wv, 'cross', tel)])), TR_c_std=0,
+                    minSNR=10, mdr=config_dict[f'molDepol{wv}'], mdrStd=config_dict[f'molDepolStd{wv}'],
+                    flagPicassoComparison=config_dict['flagPicassoComparison']
                 )
                 ret['time_start'] = int(cldFreeTime[0])
                 ret['time_end'] = int(cldFreeTime[1])
@@ -666,44 +656,49 @@ def calibrateMol(data_cube) -> dict:
     
 
 def depol_cali_mol(signal_t:np.ndarray, background_t:np.ndarray, signal_c:np.ndarray, background_c:np.ndarray,
-                   TR_t:float, TR_t_std:float, TR_c:float, TR_c_std:float, minSNR:float, mdr:float, mdrStd:float) -> dict:
+                   TR_t:float, TR_t_std:float, TR_c:float, TR_c_std:float, minSNR:float, mdr:float, mdrStd:float,
+                   flagPicassoComparison:bool=False) -> dict:
     """Molecular polarization calibration.
     
     Parameters
     ----------
-    signal_t: numeric
-        Total signal (photon count).
-    background_t: numeric
-        Background at total channel (photon count).
-    signal_c: numeric
-        Cross signal (photon count).
-    background_c: numeric
-        Background at cross channel (photon count).
-    TR_t: scalar
+    signal_t : ndarray
+        Total signal [photon count].
+    background_t : ndarray
+        Background at total channel [photon count].
+    signal_c : ndarray
+        Cross signal [photon count].
+    background_c : ndarray
+        Background at cross channel [photon count].
+    TR_t : float
         Transmission ratio at total channel.
-    TR_t_std: scalar
+    TR_t_std : float
         Uncertainty of the transmission ratio at total channel.
-    TR_c: scalar
+    TR_c : float
         Transmission ratio at cross channel.
-    TR_c_std: scalar
+    TR_c_std : float
         Uncertainty of the transmission ratio at cross channel.
-    minSNR: float
+    minSNR : float
         The SNR constraint for the signal strength at reference height.
-    mdr: float
+    mdr : float
         Default molecular depolarization ratio.
-    mdrStd: float
+    mdrStd : float
         Default standard deviation of molecular depolarization ratio.
     
     Returns
     -------
-    polCaliEta: array
+    eta : ndarray
         Polarization calibration eta.
-    polCaliEtaStd: array
+    etaStd : ndarray
         Uncertainty of polarization calibration eta.
-    polCaliFac: array
+    fac : array
         Polarization calibration factor.
-    polCaliFacStd: array
+    facStd : ndarray
         Uncertainty of polarization calibration factor.
+    status : int
+        Retrieval status
+            0 : Bad
+            1 : Good
     
     References
     ----------
@@ -712,6 +707,8 @@ def depol_cali_mol(signal_t:np.ndarray, background_t:np.ndarray, signal_c:np.nda
     
     Notes
     -----
+    .. TODO::
+        - The inputs TR_t_std & TR_c_std are currnetly not used in the function!
 
     **History**
 
@@ -719,17 +716,15 @@ def depol_cali_mol(signal_t:np.ndarray, background_t:np.ndarray, signal_c:np.nda
     - 2024-12-23: converted to python
     
     """
-    polCaliEta = []
-    polCaliEtaStd = []
-    polCaliFac = []
-    polCaliFacStd = []
+    
+    # Summing signal and background along height dim.
+    sig_t = np.nansum(signal_t, keepdims=True)
+    bg_t = background_t * signal_t.shape[0]
+    sig_c = np.nansum(signal_c, keepdims=True)
+    bg_c = background_c * signal_c.shape[0]
 
-    #print(signal_t, signal_t)
-    sig_t = np.nansum(signal_t[:, :], axis=0)
-    bg_t = np.nansum(background_t[:], axis=0) * signal_t.shape[1]
+    # Calculate SNR
     SNR_TSig = calc_snr(sig_t, bg_t)
-    sig_c = np.nansum(signal_c[:, :], axis=0)
-    bg_c = np.nansum(background_c[:], axis=0) * signal_c.shape[1]
     SNR_CSig = calc_snr(sig_c, bg_c)
 
     # Check validity of signals
@@ -737,16 +732,14 @@ def depol_cali_mol(signal_t:np.ndarray, background_t:np.ndarray, signal_c:np.nda
     flagValidCSig = (SNR_CSig >= minSNR)
 
     if not np.all(flagValidTSig) or not np.all(flagValidCSig):
-        print("Too noisy at the reference height to enable molecular polarization calibration.")
+        logging.warning("Too noisy at the reference height to enable molecular polarization calibration.")
         return {'status': 0}
 
-    sig_t = np.nansum(sig_t)
-    bg_t = np.nansum(bg_t)
-    sig_c = np.nansum(sig_c)
-    bg_c = np.nansum(bg_c)
-
-    std_sig_t = np.sqrt(sig_t + bg_t)
-    std_sig_c = np.sqrt(sig_c + bg_c)
+    std_sig_t = np.sqrt(sig_t + 2*bg_t)
+    std_sig_c = np.sqrt(sig_c + 2*bg_c)
+    if flagPicassoComparison:
+        std_sig_t = np.sqrt(sig_t + bg_t)
+        std_sig_c = np.sqrt(sig_c + bg_c)
 
     # Calculate derivatives for uncertainty propagation
     polCaliFacFunc = lambda x: (x / sig_c) * (1 + mdr * TR_t) / (1 + mdr * TR_c)
@@ -768,7 +761,7 @@ def depol_cali_mol(signal_t:np.ndarray, background_t:np.ndarray, signal_c:np.nda
     polCaliEta = polCaliFac * (1 + TR_c) / (1 + TR_t)
     polCaliEtaStd = polCaliFacStd * (1 + TR_c) / (1 + TR_t)
 
-    print(polCaliEta, polCaliEtaStd, polCaliFac, polCaliFacStd)
     results =  {'eta': float(polCaliEta), 'eta_std': float(polCaliEtaStd), 
                 'fac': float(polCaliFac), 'fac_std': float(polCaliFacStd), 'status': 1}
+    
     return results

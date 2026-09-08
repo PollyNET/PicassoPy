@@ -1,6 +1,7 @@
 import numpy as np
-from scipy.ndimage import label, uniform_filter1d
-from ppcpy.misc.helper import uniform_filter, savgol_filter
+from scipy.ndimage import label
+from ppcpy.misc.helper import savgol_filter, moving_average
+from ppcpy.retrievals.collection import calc_snr
 import matplotlib.pyplot as plt
 import logging
 
@@ -28,10 +29,11 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter
     - 2026-03-17: Changed back to scipy.ndimage.uniform_filter1d due to NaN-related issues in
       Zhao's cloud screening algorithm.
+    - 2026-07-24: Changed to ppcpy.misc.helper.moving_average.
+    
     """
 
-    # return uniform_filter(signal, window_len)
-    return uniform_filter1d(signal, window_len, mode='nearest') # <- Should switch to the incoming moving average filter here!
+    return moving_average(signal, window_len)
 
 
 def cloudscreen(data_cube, wv:int=532, collect_debug:bool=False) -> np.ndarray:
@@ -68,10 +70,10 @@ def cloudscreen(data_cube, wv:int=532, collect_debug:bool=False) -> np.ndarray:
     - xxxx-xx-xx: First edition by ...
     - 2026-03-18: Updated to include necessary configurations for cloudScreen_Zhao.
     - 2026-04-09: Added 'maxCloudSearchHeight' config parameters.
-    - 2026-04-20: Added option for no cloud screening ie. 'cloudScreenMode' = 0
+    - 2026-04-20: Added option for no cloud screening ie. 'cloudScreenMode' = 0.
+
     """
 
-    print('Starting cloud screen')
     config_dict = data_cube.polly_config_dict
     height = data_cube.retrievals_highres['range']
     bg = np.squeeze(data_cube.retrievals_highres['BG'][:, data_cube.gf(wv, 'total', 'FR')])
@@ -97,7 +99,8 @@ def cloudscreen(data_cube, wv:int=532, collect_debug:bool=False) -> np.ndarray:
             'bg': bg,
             'minSNR': 2, 
             'heightFullOverlap': hFullOL,
-            'showDetails': collect_debug
+            'showDetails': collect_debug,
+            'flagPicassoComparison': config_dict['flagPicassoComparison']
         }
     else:
         raise ValueError(f"cloudScreenMode {config_dict['cloudScreenMode']} not properly defined.")
@@ -162,6 +165,7 @@ def cloudScreen_MSG(height:np.ndarray, signal:np.ndarray, slope_thres:float, sea
     
     - 2021-05-18: First edition by Zhenping.
     - 2025-03-20: Translated into python.
+    
     """
 
     if len(search_region) != 2 or search_region[1] <= height[0]:
@@ -192,7 +196,7 @@ def cloudScreen_MSG(height:np.ndarray, signal:np.ndarray, slope_thres:float, sea
 
 def cloudScreen_Zhao(height:np.ndarray, signal:np.ndarray, bg:np.ndarray, search_region:list=[0, 10000],
                      minDepth:float=100, heightFullOverlap:float=600, smoothWin:int=7, minSNR:float=1,
-                     showDetails:bool=False) -> tuple:
+                     showDetails:bool=False, flagPicassoComparison:bool=False) -> tuple:
     """Cloud layer detection based on Zhao's algorithm.
 
     Parameters
@@ -231,6 +235,7 @@ def cloudScreen_Zhao(height:np.ndarray, signal:np.ndarray, bg:np.ndarray, search
     
     - 2021-05-18: First edition by Zhengping.
     - 2026-03-11: Translated into python.
+
     """
 
     if (signal.shape[1] != height.shape[0] or
@@ -260,7 +265,8 @@ def cloudScreen_Zhao(height:np.ndarray, signal:np.ndarray, bg:np.ndarray, search
             minHeight=heightFullOverlap / 1e3,
             smoothWin=smoothWin,
             minSNR=minSNR,
-            showDetails=showDetails
+            showDetails=showDetails,
+            flagPicassoComparison=flagPicassoComparison
         )
 
         for iLayer in range(len(layerInfo)):
@@ -282,7 +288,7 @@ def cloudScreen_Zhao(height:np.ndarray, signal:np.ndarray, bg:np.ndarray, search
 
 def VDE_cld(signal:np.ndarray, height:np.ndarray, BG:float, minLayerDepth:float=0.2,
             minHeight:float=0.4, smoothWin:int=3, savgolSmoothWin:int=9, minSNR:int=5,
-            showDetails:bool=False) -> tuple:
+            showDetails:bool=False, flagPicassoComparison:bool=False) -> tuple:
     """Cloud layer detection with VDE method. This method only required elstic signal.
     
     Parameters
@@ -342,6 +348,8 @@ def VDE_cld(signal:np.ndarray, height:np.ndarray, BG:float, minLayerDepth:float=
     - 2021-06-13: First edition by Zhenping.
     - 2026-03-11: Translated into pyhton.
     - 2026-04-09: Enhanced robustness against NaN values.
+    - 2026-07-28: Fixed SNR / noise calculations.
+
     """
 
     if np.floor(minLayerDepth / (height[1] - height[0])) < 3:
@@ -357,7 +365,9 @@ def VDE_cld(signal:np.ndarray, height:np.ndarray, BG:float, minLayerDepth:float=
     # ----------------------------------------------------
     # 1. Semi-Discretization Process (SDP)
     # ----------------------------------------------------
-    noise = np.sqrt(P + BG)*3
+    noise = np.sqrt(P + 2*BG)*3
+    if flagPicassoComparison:
+        noise = np.sqrt(P + BG)*3
     min_noise = np.ones_like(P)*np.sqrt(3)*3
     noise_tresh = np.nanmax(np.vstack([noise, min_noise]), axis=0)
     Ps = smooth_signal(P, smoothWin)
@@ -425,7 +435,9 @@ def VDE_cld(signal:np.ndarray, height:np.ndarray, BG:float, minLayerDepth:float=
 
         layerDepth = height[topIndex] - height[baseIndex]
         layerIndex = (L == iLayer)
-        layerSNR = np.nanmean(P[layerIndex]) / np.sqrt(np.nanmean(P[layerIndex] + BG))
+        layerSNR = calc_snr(np.nansum(P[layerIndex], keepdims=True), BG*np.sum(layerIndex))
+        if flagPicassoComparison:
+            layerSNR = np.nanmean(P[layerIndex]) / np.sqrt(np.nanmean(P[layerIndex] + BG))
 
         if showDetails:
             print(f"layer: {iLayer} at height [{height[baseIndex]:.3f}, {height[topIndex]:.3f}] km, Depth: {layerDepth:.3f} >= {minLayerDepth}, SNR: {layerSNR:.3f} >= {minSNR}")

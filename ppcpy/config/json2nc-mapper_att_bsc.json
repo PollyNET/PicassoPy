@@ -164,7 +164,7 @@
         "unit": "",
         "long_name": "quality mask for attenuated backscatter at 355 nm",
         "standard_name": "quality_mask_355",
-        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 355 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog)"
+        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 355 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog, 5: saturated)"
       }
     },
     "quality_mask_532nm": {
@@ -179,7 +179,7 @@
         "unit": "",
         "long_name": "quality mask for attenuated backscatter at 532 nm",
         "standard_name": "quality_mask_532",
-        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 532 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog)"
+        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 532 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog, 5: saturated)"
       }
     },
     "quality_mask_1064nm": {
@@ -194,7 +194,7 @@
         "unit": "",
         "long_name": "quality mask for attenuated backscatter at 1064 nm",
         "standard_name": "quality_mask_1064",
-        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 1064 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog)"
+        "comment": "This variable can be used to filter noisy pixels of attenuated backscatter at 1064 nm. (0: good data; 1: low SNR; 2: depolarization calibration periods; 3: shutter on; 4: fog, 5: saturated)"
       }
     },
     "SNR_355nm": {
@@ -209,7 +209,7 @@
         "unit": "",
         "long_name": "SNR at 355 nm",
         "standard_name": "signal-noise-ratio 355 nm",
-        "comment": ""
+        "comment": "Signal-noise-ratio at 355 nm used for quality mask."
       }
     },
     "SNR_532nm": {
@@ -224,7 +224,7 @@
         "unit": "",
         "long_name": "SNR at 532 nm",
         "standard_name": "signal-noise-ratio 532 nm",
-        "comment": ""
+        "comment": "Signal-noise-ratio at 532 nm used for quality mask."
       }
     },
     "SNR_1064nm": {
@@ -239,7 +239,7 @@
         "unit": "",
         "long_name": "SNR at 1064 nm",
         "standard_name": "signal-noise-ratio 1064 nm",
-        "comment": ""
+        "comment": "Signal-noise-ratio at 1064 nm used for the quality mask."
       }
     }
   }
