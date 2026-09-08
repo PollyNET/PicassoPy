@@ -63,7 +63,7 @@ my_parser.add_argument('--outdir', dest='outdir', metavar='outputdir',
                        help='the output folder to put the png files to.')
 my_parser.add_argument('--retrieval', dest='retrieval', metavar='retrieval parameter',
                        default=['all'],
-                       choices=['all','attbsc','voldepol','cloudinfo','target_class','wvmr_rh','quasi_results','profiles','overlap','LC','HKD','longterm_cali','profile_summary','poliphon','RCS'],
+                       choices=['all','attbsc','voldepol','cloudinfo','target_class','wvmr_rh','quasi_results','profiles','overlap','LC','HKD','longterm_cali','profile_summary','poliphon','RCS','SNR','BG','overlap_profiles'],
                        nargs='+',
                        type=str,
                        help='the retrievals to be plotted; default: "all".')
@@ -179,18 +179,52 @@ def main():
             nc_files = readout.get_nc_filename(date, device, inputfolder, param='RCS')
             for data_file in nc_files:
                 nc_dict = readout.read_nc_file(data_file,date,device,location)
-                param_ls = ['RCS_FR_355nm', 'RCS_FR_cross_355nm', 'RCS_NR_355nm', 'RCS_RR_355nm', 'RCS_FR_387nm', 'RCS_NR_387nm', 'RCS_FR_407nm', 'RCS_NR_407nm', 'RCS_FR_532nm', 'RCS_FR_cross_532nm','RCS_FR_parallel_532nm', 'RCS_NR_532nm', 'RCS_NR_cross_532nm', 'RCS_RR_532nm', 'RCS_FR_607nm', 'RCS_NR_607nm', 'RCS_FR_1064nm', 'RCS_FR_cross_1064nm', 'RCS_RR_1064nm']
+                param_ls = ['RCS_355_total_FR', 'RCS_355_cross_FR', 'RCS_387_total_FR', 'RCS_407_total_FR', 'RCS_532_total_FR', 'RCS_532_cross_FR', 'RCS_607_total_FR', 'RCS_1064_total_FR', 'RCS_355_total_NR', 'RCS_387_total_NR', 'RCS_532_total_NR', 'RCS_607_total_NR']
+#                param_ls = ['RCS_FR_355nm', 'RCS_FR_cross_355nm', 'RCS_NR_355nm', 'RCS_RR_355nm', 'RCS_FR_387nm', 'RCS_NR_387nm', 'RCS_FR_407nm', 'RCS_NR_407nm', 'RCS_FR_532nm', 'RCS_FR_cross_532nm','RCS_FR_parallel_532nm', 'RCS_NR_532nm', 'RCS_NR_cross_532nm', 'RCS_RR_532nm', 'RCS_FR_607nm', 'RCS_NR_607nm', 'RCS_FR_1064nm', 'RCS_FR_cross_1064nm', 'RCS_RR_1064nm']
                 for p in param_ls:
-                    p1 = re.split(r'RCS_',p)[1]
-                    param = re.split(r'_[1-9].*nm',p1)[0]
-                    wavelength = re.split(f'{param}_',p1)[-1]
-                    wavelength = re.split(r'nm',wavelength)[0]
+                    print(p)
 
-                    if np.all(nc_dict[p].mask): ## do not plot empty/non-existing channels
+                    if p not in nc_dict.keys(): ## do not plot empty/non-existing channels
                         continue
                     else:
                         print(f'plotting {p}')
-                        display_3d.pollyDisplayRCS(nc_dict, config_dict, polly_conf_dict, outputfolder, wavelength=wavelength,param=param,donefilelist_dict=donefilelist_dict)
+                        display_3d.pollyDisplay_preprocessed(nc_dict, config_dict, polly_conf_dict, outputfolder, variable=p,donefilelist_dict=donefilelist_dict)
+        except Exception as e:
+            logging.exception("An error occurred")
+
+    if ('all' in args.retrieval) or ('SNR' in args.retrieval):
+    ## plotting SNR plots
+        try:
+            nc_files = readout.get_nc_filename(date, device, inputfolder, param='SNR')
+            for data_file in nc_files:
+                nc_dict = readout.read_nc_file(data_file,date,device,location)
+                param_ls = ['SNR_355_total_FR', 'SNR_355_cross_FR', 'SNR_387_total_FR', 'SNR_407_total_FR', 'SNR_532_total_FR', 'SNR_532_cross_FR', 'SNR_607_total_FR', 'SNR_1064_total_FR', 'SNR_355_total_NR', 'SNR_387_total_NR', 'SNR_532_total_NR', 'SNR_607_total_NR']
+                for p in param_ls:
+                    print(p)
+
+                    if p not in nc_dict.keys(): ## do not plot empty/non-existing channels
+                        continue
+                    else:
+                        print(f'plotting {p}')
+                        display_3d.pollyDisplay_preprocessed(nc_dict, config_dict, polly_conf_dict, outputfolder, variable=p,donefilelist_dict=donefilelist_dict)
+        except Exception as e:
+            logging.exception("An error occurred")
+
+    if ('all' in args.retrieval) or ('BG' in args.retrieval):
+    ## plotting BG plots
+        try:
+            nc_files = readout.get_nc_filename(date, device, inputfolder, param='BG')
+            for data_file in nc_files:
+                nc_dict = readout.read_nc_file(data_file,date,device,location)
+                param_ls = ['BG_355_total_FR', 'BG_355_cross_FR', 'BG_387_total_FR', 'BG_407_total_FR', 'BG_532_total_FR', 'BG_532_cross_FR', 'BG_607_total_FR', 'BG_1064_total_FR', 'BG_355_total_NR', 'BG_387_total_NR', 'BG_532_total_NR', 'BG_607_total_NR']
+                for p in param_ls:
+                    print(p)
+
+                    if p not in nc_dict.keys(): ## do not plot empty/non-existing channels
+                        continue
+                    else:
+                        print(f'plotting {p}')
+                        display_3d.pollyDisplay_preprocessed_BG(nc_dict, config_dict, polly_conf_dict, outputfolder, variable=p,donefilelist_dict=donefilelist_dict)
         except Exception as e:
             logging.exception("An error occurred")
 
@@ -299,7 +333,7 @@ def main():
     if ('all' in args.retrieval) or ('quasi_results' in args.retrieval):
     ## plotting Quasi results V1
         try:
-            q_params_ls = ["angexp", "bsc_532", "bsc_1064", "par_depol_532"] 
+            q_params_ls = ["angexp", "bsc_355", "bsc_532", "bsc_1064", "ext_355", "ext_532", "ext_1064", "par_depol_532", "vol_depol_532"]
             nc_files = readout.get_nc_filename(date, device, inputfolder, param='quasi_results')
             for data_file in nc_files:
                 nc_dict = readout.read_nc_file(data_file,date,device,location)
@@ -412,14 +446,27 @@ def main():
     else:
         pass
     
-    if ('all' in args.retrieval) or ('overlap' in args.retrieval):
+    #if ('all' in args.retrieval) or ('overlap' in args.retrieval):
+    #    ## plotting overlap 
+    #    try:
+    #        nc_files = readout.get_nc_filename(date, device, inputfolder, param='overlap')
+    #        for data_file in nc_files:
+    #            nc_dict = readout.read_nc_file(data_file,date,device,location)
+    #            print('plotting overlap:')
+    #            display_3d.pollyDisplay_Overlap(nc_dict, config_dict, polly_conf_dict, outputfolder,donefilelist_dict=donefilelist_dict)
+    #    except Exception as e:
+    #        logging.exception("An error occurred")
+
+    if ('all' in args.retrieval) or ('overlap_profiles' in args.retrieval):
         ## plotting overlap 
         try:
-            nc_files = readout.get_nc_filename(date, device, inputfolder, param='overlap')
+            nc_files = readout.get_nc_filename(date, device, inputfolder, param='overlap_profiles')
+            print(nc_files)
             for data_file in nc_files:
+                print(data_file)
                 nc_dict = readout.read_nc_file(data_file,date,device,location)
-                print('plotting overlap:')
-                display_3d.pollyDisplay_Overlap(nc_dict, config_dict, polly_conf_dict, outputfolder,donefilelist_dict=donefilelist_dict)
+                print('plotting overlap profiles:')
+                display_profiles.pollyDisplay_Overlap_Profiles(nc_dict, config_dict, polly_conf_dict, outputfolder,donefilelist_dict=donefilelist_dict)
         except Exception as e:
             logging.exception("An error occurred")
 

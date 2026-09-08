@@ -75,7 +75,7 @@
         "calendar": "julian"
       }
     },
-    "BG_FR_total_355nm": {
+    "BG_355_total_FR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -86,13 +86,13 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "background FR_total_355nm",
-        "standard_name": "BG_FR_total_355nm",
+        "standard_name": "BG_355_total_FR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
       }
     },
-    "BG_FR_cross_355nm": {
+    "BG_355_cross_FR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -103,13 +103,13 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "background FR_cross_355nm",
-        "standard_name": "BG_FR_cross_355nm",
+        "standard_name": "BG_355_cross_FR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
       }
     },
-    "BG_FR_387nm": {
+    "BG_387_total_FR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -126,7 +126,7 @@
         "comment": ""
       }
     },
-    "BG_FR_407nm": {
+    "BG_407_total_FR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -143,7 +143,7 @@
         "comment": ""
       }
     },
-    "BG_FR_total_532nm": {
+    "BG_532_total_FR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -154,13 +154,13 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "background FR_total_532nm",
-        "standard_name": "BG_FR_total_532nm",
+        "standard_name": "BG_532_total_FR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
       }
     },
-    "BG_FR_cross_532nm": {
+    "BG_532_cross_FR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -171,7 +171,7 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "background FR_cross_532nm",
-        "standard_name": "BG_FR_cross_532nm",
+        "standard_name": "BG_532_cross_FR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
@@ -194,7 +194,7 @@
         "comment": ""
       }
     },
-    "BG_FR_607nm": {
+    "BG_607_total_FR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -211,7 +211,7 @@
         "comment": ""
       }
     },
-    "BG_FR_total_1064nm": {
+    "BG_1064_total_FR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -222,7 +222,7 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "background FR_total_1064nm",
-        "standard_name": "BG_FR_total_1064nm",
+        "standard_name": "BG_1064_total_FR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
@@ -245,7 +245,7 @@
         "comment": ""
       }
     },
-    "BG_NR_total_355nm": {
+    "BG_355_total_NR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -256,13 +256,13 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "background NR_total_355nm",
-        "standard_name": "BG_NR_total_355nm",
+        "standard_name": "BG_355_total_NR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
       }
     },
-    "BG_NR_387nm": {
+    "BG_387_total_NR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -279,7 +279,7 @@
         "comment": ""
       }
     },
-    "BG_NR_total_532nm": {
+    "BG_532_total_NR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -290,13 +290,13 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "background NR_total_532nm",
-        "standard_name": "BG_NR_total_532nm",
+        "standard_name": "BG_532_total_NR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
       }
     },
-    "BG_NR_cross_532nm": {
+    "BG_532_cross_NR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -307,13 +307,13 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "background NR_cross_532nm",
-        "standard_name": "BG_NR_cross_532nm",
+        "standard_name": "BG_532_cross_NR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""
       }
     },
-    "BG_NR_607nm": {
+    "BG_607_total_NR": {
       "dtype": "f8",
       "shape": [
         "time"

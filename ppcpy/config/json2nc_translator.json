@@ -897,5 +897,65 @@
                                                  "parameter":"tcMaskV2"
                             }
 		}
+  },
+  "overlap_profiles": {
+              "variables": {
+                            "frnr_overlap_355": {
+                                                 "method":"overlap",
+                                                 "parameter":"frnr",
+                                                 "channel":"355_total_FR"
+                            },
+                            "frnr_overlap_387": {
+                                                 "method":"overlap",
+                                                 "parameter":"frnr",
+                                                 "channel":"387_total_FR"
+                            },
+                            "frnr_overlap_532": {
+                                                 "method":"overlap",
+                                                 "parameter":"frnr",
+                                                 "channel":"532_total_FR"
+                            },
+                            "frnr_overlap_607": {
+                                                 "method":"overlap",
+                                                 "parameter":"frnr",
+                                                 "channel":"607_total_FR"
+                            },
+                            "frnr_overlap_1064": {
+                                                 "method":"overlap",
+                                                 "parameter":"frnr",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "raman_overlap_355_fr": {
+                                                 "method":"overlap",
+                                                 "parameter":"raman",
+                                                 "channel":"355_total_FR"
+                            },
+                            "raman_overlap_532_fr": {
+                                                 "method":"overlap",
+                                                 "parameter":"raman",
+                                                 "channel":"532_total_FR"
+                            },
+                            "raman_overlap_1064_fr": {
+                                                 "method":"overlap",
+                                                 "parameter":"raman",
+                                                 "channel":"1064_total_FR"
+                            },
+                            "raman_overlap_355_nr": {
+                                                 "method":"overlap",
+                                                 "parameter":"raman",
+                                                 "channel":"355_total_NR"
+                            },
+                            "raman_overlap_532_nr": {
+                                                 "method":"overlap",
+                                                 "parameter":"raman",
+                                                 "channel":"532_total_NR"
+                            },
+                            "raman_overlap_1064_nr": {
+                                                 "method":"overlap",
+                                                 "parameter":"raman",
+                                                 "channel":"1064_total_NR"
+                            }
+              }
   }
+
 }

@@ -662,6 +662,14 @@ class PicassoProc:
         self.flagCloudFree = cloudscreen.cloudscreen(self, collect_debug=collect_debug)
 
 
+    def genFlagValPrf(self):
+        """combine the cloudFree, depCal, shutterOn and fog masks to obtain valid profiles
+        
+        """
+        self.flagValPrf = self.flagCloudFree & (~self.retrievals_highres['depCalMask']) \
+            & (~self.retrievals_highres['shutterOnMask']) & (~self.retrievals_highres['fogMask'])
+
+
     def cloudFreeSeg(self):
         """Cloud free profile segmentation.
 
@@ -687,18 +695,22 @@ class PicassoProc:
         """
 
         logging.info("Segment cloud free groups ...")
+        self.genFlagValPrf()
         self.clFreeGrps = profilesegment.segment(self)
 
 
-    def aggregate_profiles(self, var:str|list=None, func=np.nansum):
+    def aggregate_profiles(self, var:str|list=None, func=np.nansum, flagVal:bool=None):
         """Aggregate highres profiles over cloud free segments.
 
         Parameters
         ----------
         var : str or array_like
-            Name of variable to aggregate. Default is None.
+            Name(s) of variable to aggregate. Default is None.
         func : function, optional
             Function to do the aggregation (mean, sum, median, etc.). Default is np.nansum.
+        flagVal : None | bool | np.ndarray
+            cut out single invalid profiles form `clFreeGrps`. If `True` the `data_cube.flagValPrf` is used. 
+            Individual array can also be supplied.
         
         Yields
         ------
@@ -721,11 +733,17 @@ class PicassoProc:
                       And corrected the aggregation for PCR-signals like `RCS`.
         
         """
-
+        
+        if isinstance(flagVal, (np.ndarray, list)):
+            flagVal = np.asarray(flagVal)
+            self.flagValPrf = flagVal
+        elif flagVal and not isinstance(flagVal, (np.ndarray, list)):
+            flagVal = self.flagValPrf
+        
         if var is None:
             # Take care of the default scenario
-            self.aggregate_profiles(['sigBGCor', 'BG', 'RCS', 'mShots'])
-            self.aggregate_profiles(['mask387Off', 'mask607Off', 'mask407Off'], np.nanmean)
+            self.aggregate_profiles(['sigBGCor', 'BG', 'RCS', 'mShots'], flagVal=flagVal)
+            self.aggregate_profiles(['mask387Off', 'mask607Off', 'mask407Off'], func=np.nanmean, flagVal=flagVal)
             return
 
         if isinstance(var, str):
@@ -737,23 +755,23 @@ class PicassoProc:
                 if variable == "RCS":
                     if self.polly_config_dict['flagPicassoComparison']:
                         self.retrievals_profile[variable] = \
-                            preprocprofiles.aggregate_clFreeGrps(self, variable, np.nanmean)
+                            preprocprofiles.aggregate_clFreeGrps(self, variable, func=np.nanmean, flagVal=flagVal)
                     else:
                         self.retrievals_profile[variable] = pollyPreprocess.calculate_rcs(
                             signal=pollyPreprocess.photonCount2PCR(
-                                signal=preprocprofiles.aggregate_clFreeGrps(self, 'sigBGCor', func),
-                                mShots=preprocprofiles.aggregate_clFreeGrps(self, 'mShots', func),
+                                signal=preprocprofiles.aggregate_clFreeGrps(self, 'sigBGCor', func=func, flagVal=flagVal),
+                                mShots=preprocprofiles.aggregate_clFreeGrps(self, 'mShots', func=func, flagVal=flagVal),
                                 hRes=self.rawdata_dict['measurement_height_resolution']['var_data']
                             ),
                             ranges=self.retrievals_highres['range']
                         )
                 else:
                     self.retrievals_profile[variable] = \
-                        preprocprofiles.aggregate_clFreeGrps(self, variable, func)
+                        preprocprofiles.aggregate_clFreeGrps(self, variable, func=func, flagVal=flagVal)
             else:
                 logging.critical(f"{variable} is NOT in data_cube.retrievals_highres")
                 raise ValueError(f"Could not locate variable '{variable}'.")
-
+                
 
     def loadMeteo(self):
         """Load meteorological data.

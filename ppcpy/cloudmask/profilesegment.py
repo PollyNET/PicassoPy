@@ -24,11 +24,9 @@ def segment(data_cube) -> np.ndarray:
     """
     
     config_dict = data_cube.polly_config_dict
-    flagValPrf = data_cube.flagCloudFree & (~data_cube.retrievals_highres['depCalMask']) \
-            & (~data_cube.retrievals_highres['shutterOnMask']) & (~data_cube.retrievals_highres['fogMask'])
 
     logging.info(f"intNProfiles: {config_dict['intNProfiles']}, minIntNProfiles: {config_dict['minIntNProfiles']}")
-    clFreeGrps = clFreeSeg(flagValPrf, config_dict['intNProfiles'], config_dict['minIntNProfiles'])
+    clFreeGrps = clFreeSeg(data_cube.flagValPrf, config_dict['intNProfiles'], config_dict['minIntNProfiles'])
 
     return clFreeGrps
 
