@@ -5,69 +5,91 @@ import numpy as np
 import ppcpy.retrievals.depolarization as depolarization 
 
 
-def transCorGHK_cube(data_cube, signal='BGCor'):
-    """ """
+def transCorGHK_cube(data_cube, signal:str='BGCor', collect_debug:bool=False) -> tuple:
+    """Perform GHK transmission correction.
+
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
+    signal : str
+        Signal type. Default is 'BGCor'.
+    collect_debug : bool
+        If True, collects debug information. Default is False.
+
+    Returns
+    -------
+    sigTCor : ndarray
+        Transmission corrected signal [Photon counts].
+    BGTCor : ndarray
+        Transmission corrected background.
+    """
 
     config_dict = data_cube.polly_config_dict
 
+    # Use the background corrected signal as a default
     BGTCor = data_cube.retrievals_highres['BG'].copy() 
-    # Store the background corrected signal
     sigTCor = data_cube.retrievals_highres[f'sig{signal}'].copy() 
 
-    tel = 'FR'
+    tel = 'FR' # only done for the far-range signals
     for wv in [355, 532, 1064]:
         flagt = data_cube.gf(wv, 'total', tel)
         flagc = data_cube.gf(wv, 'cross', tel)
         indxt = np.where(flagt)[0]
-        #print(flagt, indxt)
+
         if np.any(flagt) and np.any(flagc):
-            logging.info(f'and even a {wv} channel')
+            logging.info(f"Channel: {wv} total FR | {wv} cross FR")
 
-            sigBGCor_total = np.squeeze(data_cube.retrievals_highres[f'sig{signal}'][:,:,flagt])
-            bg_total = np.squeeze(data_cube.retrievals_highres['BG'][:,flagt])
-            sigBGCor_cross = np.squeeze(data_cube.retrievals_highres[f'sig{signal}'][:,:,flagc])
-            bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][:,flagc])
+            sigBGCor_total = np.squeeze(data_cube.retrievals_highres[f'sig{signal}'][:, :, flagt]).copy()
+            bg_total = np.squeeze(data_cube.retrievals_highres['BG'][:, flagt]).copy()
+            sigBGCor_cross = np.squeeze(data_cube.retrievals_highres[f'sig{signal}'][:, :, flagc]).copy()
+            # bg_cross = np.squeeze(data_cube.retrievals_highres['BG'][:, flagc]) # TODO: Not used!
 
-            print('G', config_dict['G'][flagt], config_dict['G'][flagc])
-            print('H', config_dict['H'][flagt], config_dict['H'][flagc])
-            print('polCaliEta', data_cube.etaused[f'{wv}_{tel}'])
+            if collect_debug:
+                print('G', config_dict['G'][flagt], config_dict['G'][flagc])
+                print('H', config_dict['H'][flagt], config_dict['H'][flagc])
+                print('polCaliEta', data_cube.etaused[f'{wv}_{tel}'])
 
             # similar to voldepol_2d
             vdr, vdrStd = depolarization.calc_profile_vdr(
-                sigBGCor_total, sigBGCor_cross, 
-                config_dict['G'][flagt], config_dict['G'][flagc],
-                config_dict['H'][flagt], config_dict['H'][flagc],
-                data_cube.etaused[f'{wv}_{tel}'], config_dict[f'voldepol_error_{wv}'],
+                sigt=sigBGCor_total, sigc=sigBGCor_cross, 
+                Gt=config_dict['G'][flagt], Gr=config_dict['G'][flagc],
+                Ht=config_dict['H'][flagt], Hr=config_dict['H'][flagc],
+                eta=data_cube.etaused[f'{wv}_{tel}'],
+                voldepol_error=config_dict[f'voldepol_error_{wv}'],
             )
 
             sigTCor_total, bgTCor_total = transCor_E16_channel(
-                sigBGCor_total, bg_total, vdr,
-                config_dict['H'][flagt], 
+                sigT=sigBGCor_total, bgT=bg_total, 
+                voldepol=vdr,
+                HT=config_dict['H'][flagt], 
             )
-            sigTCor[:,:,indxt] = np.expand_dims(sigTCor_total, -1)
-            BGTCor[:,indxt] = np.expand_dims(bgTCor_total, -1)
+
+            sigTCor[:, :, indxt] = np.expand_dims(sigTCor_total, -1)
+            BGTCor[:, indxt] = np.expand_dims(bgTCor_total, -1)
     
     return sigTCor, BGTCor
 
-def transCor_E16_channel(sigT, bgT, voldepol, HT):
-    """ transmission correction for the total channel using the Mattis 2009/Engelmann 2016 method
+
+def transCor_E16_channel(sigT:np.ndarray, bgT:np.ndarray, voldepol:np.ndarray, HT:float) -> tuple:
+    """Transmission correction for the total channel using the Mattis 2009/Engelmann 2016 method
     
     Parameters
     ----------
-    sigT : array
+    sigT : ndarray
         Signal in total channel (background-corrected)
-    bgT : array
+    bgT : ndarray
         Background in total channel
-    voldepol : array
+    voldepol : ndarray
         Volume depolarization ratio
     HT : float
         Transmission ratio of total channel in GHK notation
     
     Returns
     -------
-    sigTCor : array
+    sigTCor : ndarray
         Signal in total channel corrected for polarization induced transmission effects
-    bgTCor : array
+    bgTCor : ndarray
         Background of total signal 
     
 
@@ -92,60 +114,74 @@ def transCor_E16_channel(sigT, bgT, voldepol, HT):
     """
 
     R_t = (1 - HT) / (1 + HT)
-    print('calculated R_t', R_t)
+    # print('calculated R_t', R_t)
     sigTCor = sigT * (1 + R_t*voldepol) / (1+voldepol)
     bgTCor = bgT 
 
     return sigTCor, bgTCor
 
 
-def transCorGHK_channel(sigT, bgT, sigC, bgC, transGT=1, transGR=1, transHT=0, transHR=-1, polCaliEta=1, polCaliEtaStd=0):
+def transCorGHK_channel(sigT:np.ndarray, bgT:np.ndarray, sigC:np.ndarray, bgC:np.ndarray, transGT:float=1, transGR:float=1,
+                        transHT:float=0, transHR:float=-1, polCaliEta:float=1, polCaliEtaStd:float=0) -> tuple:
     """Corrects the effect of different polarization-dependent transmission inside the total and depol channel.
 
+    Follows the matlab code at:
     https://github.com/PollyNET/Pollynet_Processing_Chain/blob/master/lib/qc/transCorGHK.m
     
-    INPUTS:
-        sigT: array
-            Signal in total channel.
-        bgT: array
-            Background in total channel.
-        sigC: array
-            Signal in cross channel.
-        bgC: array
-            Background in cross channel.
-        transGT: float
-            G parameter in total channel.
-        transGR: float
-            G parameter in cross channel.
-        transHT: float
-            H parameter in total channel.
-        transHR: float
-            H parameter in cross channel.
-        polCaliEta: float
-            Depolarization calibration constant (eta).
-        polCaliEtaStd: float
-            Uncertainty of the depolarization calibration constant.
+    Parameters
+    ----------
+    sigT : ndarray
+        Signal in total channel.
+    bgT : ndarray
+        Background in total channel.
+    sigC : ndarray
+        Signal in cross channel.
+    bgC : ndarray
+        Background in cross channel.
+    transGT : float
+        G parameter in total channel.
+    transGR : float
+        G parameter in cross channel.
+    transHT : float
+        H parameter in total channel.
+    transHR : float
+        H parameter in cross channel.
+    polCaliEta : float
+        Depolarization calibration constant (eta).
+    polCaliEtaStd : float
+        Uncertainty of the depolarization calibration constant.
     
-    OUTPUTS:
-        sigTCor: array
-            Transmission corrected elastic signal.
-        bgTCor: array
-            Background of transmission corrected elastic signal.
+    Returns
+    -------
+    sigTCor : ndarray
+        Transmission corrected elastic signal.
+    bgTCor : ndarray
+        Background of transmission corrected elastic signal.
     
-    REFERENCES:
-        Mattis, I., Tesche, M., Grein, M., Freudenthaler, V., and Müller, D.: 
-        Systematic error of lidar profiles caused by a polarization-dependent receiver transmission: 
-        Quantification and error correction scheme, Appl. Opt., 48, 2742-2751, 2009.
-        Freudenthaler, V. About the effects of polarising optics on lidar signals and the Delta90 calibration. 
-        Atmos. Meas. Tech., 9, 4181–4255 (2016).
+    Notes
+    -----
+    .. TODO:: Input parameter ´polCaliEtaStd´ is not used.
     
-    HISTORY:
-        - 2021-05-27: First edition by Zhenping.
-        - 2024-08-14: Change to GHK parameterization by Moritz.
-        - 2024-12-28: AI translation
+    References
+    ----------
+    - Mattis, I., Tesche, M., Grein, M., Freudenthaler, V., and Müller, D.: 
+      Systematic error of lidar profiles caused by a polarization-dependent receiver transmission: 
+      Quantification and error correction scheme, Appl. Opt., 48, 2742-2751, 2009.
+    - Freudenthaler, V. About the effects of polarising optics on lidar signals and the Delta90 calibration. 
+      Atmos. Meas. Tech., 9, 4181–4255 (2016).
     
-    Authors: - zhenping@tropos.de, haarig@tropos.de
+    ** History **
+
+    - 2021-05-27: First edition by Zhenping.
+    - 2024-08-14: Change to GHK parameterization by Moritz.
+    - 2024-12-28: AI translation
+    
+    
+    Authors
+    -------
+    - zhenping@tropos.de, haarig@tropos.de
     """
+    
     if sigT.shape != sigC.shape:
         raise ValueError("Input signals have different sizes.")
     
