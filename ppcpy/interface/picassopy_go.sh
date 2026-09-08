@@ -10,6 +10,7 @@ FLAG_PROCESSING=0   # false
 TIMESTAMP=""
 DEVICE=""
 UNZIPPING="True"
+FLAG_PREPROC_ONLY=0 # false
 PICASSO_CFG=""
 
 # ---------- helper functions ----------
@@ -26,6 +27,7 @@ Options:
   --unzipping                  Set to True or False, default is True; choose False i.e. for level0b 24h-file
   --merge_to_single_24h_file   Flag to merge all level0 files of the day into one 24h file, default: false
   --processing                 Flag if processing or not (e.g. merge-only), default: false
+  --preproc_only               Flag to only run the preprocessing, including the storage of SNR, BG and RCS files, default: false
   -h, --help                   Show this help and exit
 EOF
     exit 1
@@ -68,6 +70,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --processing)
             FLAG_PROCESSING=1
+            shift
+            ;;
+        --preproc_only)
+            FLAG_PREPROC_ONLY=1
             shift
             ;;
         -h|--help)
@@ -267,7 +273,24 @@ for TIMESTAMP in ${DATE_LS[@]}; do
         # Call the actual processing script.
         # -----------------------------------------------------------------
         
-        if (( FLAG_PROCESSING )); then
+        if (( FLAG_PREPROC_ONLY )); then
+            log_info "PreProcessing only"
+            log_info "Processing file: $rawfile"
+            PICASSO_OP_SCRIPT="${ROOT_DIR}/ppcpy/interface/picassopy_operational.py"
+            "$PYTHON_PATH"/python3 "$PICASSO_OP_SCRIPT" \
+                --date "$TIMESTAMP" \
+                --device "$DEVICE"\
+                --base_dir "$BASE_DIR"\
+                --picasso_config_file "$PICASSO_CFG" \
+                --level0_file_to_process "$rawfile" \
+                --preproc_only \
+                || {
+                    log_error "Processing of $rawfile failed."
+                    error_list+=("Failed processing: $rawfile")
+                    #exit 1
+                    continue
+                }
+        elif (( FLAG_PROCESSING )); then
             log_info "Processing file: $rawfile"
             PICASSO_OP_SCRIPT="${ROOT_DIR}/ppcpy/interface/picassopy_operational.py"
             "$PYTHON_PATH"/python3 "$PICASSO_OP_SCRIPT" \

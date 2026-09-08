@@ -6,10 +6,9 @@ import matplotlib
 
 
 def single_best(d:dict, name_val:str, name_min:str, relative:bool=False) -> dict:
-    """Select the best calibration constant
+    """Select the best calibration constant.
     
-
-    generalization of lidarconstant.get_best_LC    
+    Generalization of lidarconstant.get_best_LC
     
     Parameters
     ----------
@@ -22,27 +21,26 @@ def single_best(d:dict, name_val:str, name_min:str, relative:bool=False) -> dict
     relative : bool
         If true, choose calibration constant based on the relative error. 
     
-    
     Returns
     -------
     best : dict
         Lidar constants/Etas with lowest standard deviation per channel.
-    
-    Notes
-    -----
-    Since ``LC = LC_stable`` and ``LCStd = LC_stable * LC_Std`` so will any negative LC also have
-    a negative LCStd, and thus be chosen as the best LC.
 
     **History**
 
     - 2026-02-16: Added additional checks to hinder negative LCs to be chosen.
     - 2026-03-27: generalized to also hold for depolarization calibration
+
     """
 
     best = {}
     for k, l in d.items():
-        val = np.array([e[name_val] for e in l if e[name_val] >= 0])
-        min = np.array([e[name_min] for e in l if e[name_val] >= 0])
+        val = np.array([e[name_val] for e in l if name_val in e and e[name_val] >= 0])
+        min = np.array([e[name_min] for e in l if {name_min, name_val}.issubset(e.keys()) and e[name_val] >= 0])
+
+        if len(val) == 0 or len(min) == 0:
+            best[k] = np.nan
+            continue
 
         if relative:
             best[k] = val[np.argmin(min / val)]
@@ -52,18 +50,24 @@ def single_best(d:dict, name_val:str, name_min:str, relative:bool=False) -> dict
     return best
 
     
-def plot_cals(d, param, used=None):
-    """plot the calibration constants
+def plot_cals(d:dict, param:str, used:dict=None) -> tuple:
+    """Plot the calibration constants.
 
     Parameters
     ----------
     d : dict
-        the dict as in data_cube
+        The dict as in data_cube.
     param : str
-        the parameter to extract
-    used : dict
-        the LCused or etaused (will produce a dashed line in the plot)
-
+        The parameter to extract.
+    used : dict, optional
+        The LCused or etaused (will produce a dashed line in the plot).
+    
+    Returns
+    -------
+    fig : figure
+        Matplotlib figure object.
+    ax : axis
+        Matplotlib axis object.
 
     Examples
     --------

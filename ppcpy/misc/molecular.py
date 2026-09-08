@@ -2,6 +2,7 @@
 from collections import defaultdict
 import numpy as np
 import xarray as xr
+import logging
 
 # Global variable
 ASSUME_AIR_IDEAL:bool = True
@@ -816,10 +817,10 @@ def calc_profiles(met_profiles:list, wavelengths:list=[355, 387, 407, 532, 607, 
         input wavelength.
     """
 
-    print('len mean_profiles', len(met_profiles))
+    logging.debug(f"len mean_profiles: {len(met_profiles)}")
     shp = (len(met_profiles), met_profiles[0].height.shape[0])
-    print('shape of the molecular scattering', shp)
-    print('for the wavelengths ', wavelengths)
+    logging.debug(f"shape of the molecular scattering {shp} for the wavelengths {wavelengths}.")
+
     m_p = defaultdict(lambda: np.zeros(shp))
 
     for i, p in enumerate(met_profiles):

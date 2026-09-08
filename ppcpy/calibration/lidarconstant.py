@@ -39,11 +39,14 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
 
     .. TODO:: Check if LC's are normalized with respect to the mean of the profiles.
     .. TODO:: Add option for Aeronet and rotational Raman retrieved LC.
+    .. TODO:: insted of performing an additional check for if the raman channels was off here. we could just pass on the information form the quality flag and use it when choosing the best LC. >-- What did I mean here???
+    .. TODO:: Add a check at the statr if to see if the channels where on more than x% of the time during each cloud free preiod. Give a warning if it was less than ...% and an error/skipp the period for the channel if it was less than ...%.
 
     **History**
 
     xxxx-xx-xx: First edition by ...
     2026-03-18: Changed beta_mol for inelastic wavelengths and added the 'flagUseRetrievedExt4LCCalc' variable.
+    
     """
 
     logging.info(f'LC retrieval: {retrieval} method')
@@ -75,7 +78,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
 
             # Elastic signal:
             sig = profiles[channel]['signal']
-            signal = np.nanmean(np.squeeze(
+            signal = np.nanmean(np.squeeze( # TODO: try to use PCR --> normalized
                 data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree), :, data_cube.gf(wv, t, tel)]), axis=0)
             molBsc = data_cube.mol_profiles[f'mBsc_{wv}'][i, :].copy()
             molExt = data_cube.mol_profiles[f'mExt_{wv}'][i, :].copy()
@@ -139,7 +142,7 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> li
                 wv_r = elastic2raman[int(wv)]
 
                 ## Inelastic signal, backscatter and extinction:
-                signal_r = np.nanmean(np.squeeze(
+                signal_r = np.nanmean(np.squeeze( # TODO: try to use PCR --> normalized
                     data_cube.retrievals_highres[f'sig{sig}'][slice(*cldFree), :, data_cube.gf(wv_r, t, tel)]), axis=0)
                 molBsc_r = data_cube.mol_profiles[f'mBsc_{wv_r}'][i, :].copy()
                 molExt_r = data_cube.mol_profiles[f'mExt_{wv_r}'][i, :].copy()
