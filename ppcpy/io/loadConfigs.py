@@ -269,8 +269,8 @@ def loadPollyConfig(polly_config_file:str, polly_default_config_file:str) -> dic
 
                 if 'first_range_gate_indx' in polly_default_config_file_dict.keys():
                     fix_indexing_keys = ['first_range_gate_indx']
-                elif 'LC' in polly_default_config_file_dict.keys():
-                    fix_indexing_keys = ['LC'] # TODO: Why are we subtracting one from LC???
+                else:
+                    fix_indexing_keys = []
                 return fix_indexing(polly_config_dict, keys=fix_indexing_keys + [
                     'bgCorRangeIndx', 'bgCorRangeIndxLow', 'bgCorRangeIndxHigh', 'LCMeanMinIndx', 
                     'LCMeanMaxIndx', 'depol_cal_minbin_355', 'depol_cal_minbin_532', 'depol_cal_minbin_1064'])
@@ -283,8 +283,8 @@ def loadPollyConfig(polly_config_file:str, polly_default_config_file:str) -> dic
             logging.warning(f'polly_default_config_file: {polly_default_config_file} will be used')
             if 'first_range_gate_indx' in polly_default_config_file_dict.keys():
                 fix_indexing_keys = ['first_range_gate_indx']
-            elif 'LC' in polly_default_config_file_dict.keys():
-                fix_indexing_keys = ['LC'] # TODO: Why are we subtracting one from LC???
+            else:
+                fix_indexing_keys = []
             return fix_indexing(polly_default_config_file_dict, keys=fix_indexing_keys +  [
                     'bgCorRangeIndx', 'bgCorRangeIndxLow', 'bgCorRangeIndxHigh', 'LCMeanMinIndx', 
                     'LCMeanMaxIndx', 'depol_cal_minbin_355', 'depol_cal_minbin_532', 'depol_cal_minbin_1064'])

@@ -57,8 +57,7 @@ def attbsc_2d(data_cube, nr:bool=True, collect_debug:bool=False):
         if channel not in data_cube.LCused.keys():
             logging.info(f'{channel} skipped at attbsc_2d')
             continue
-
-        attBsc = sig * ranges2d / data_cube.LCused[channel]
+        attBsc = sig * ranges2d / data_cube.LCused[channel]['LC']
         attBsc[data_cube.retrievals_highres['depCalMask'], :] = np.nan
 
         data_cube.retrievals_highres[f"attBsc_{channel}"] = attBsc
@@ -80,7 +79,7 @@ def attbsc_2d(data_cube, nr:bool=True, collect_debug:bool=False):
                 logging.info(f'{channel} skipped at attbsc_2d OL')
                 continue
             
-            attBsc = sig * ranges2d / data_cube.LCused[channel]
+            attBsc = sig * ranges2d / data_cube.LCused[channel]['LC']
             attBsc[data_cube.retrievals_highres['depCalMask'], :] = np.nan
 
             data_cube.retrievals_highres[f"attBsc_{wv}_{t}_OC"] = attBsc
@@ -127,7 +126,7 @@ def voldepol_2d(data_cube):
                 sigt=sigt, sigc=sigc,
                 Gt=config_dict['G'][flagt], Gr=config_dict['G'][flagc],
                 Ht=config_dict['H'][flagt], Hr=config_dict['H'][flagc],
-                eta=data_cube.etaused[f'{wv}_{tel}'],
+                eta=data_cube.etaused[f'{wv}_{tel}']['eta'],
                 voldepol_error=config_dict[f'voldepol_error_{wv}'],
                 window=1
             )

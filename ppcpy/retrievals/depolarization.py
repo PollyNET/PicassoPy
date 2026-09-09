@@ -85,7 +85,7 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name:str) -> dict:
                     sigt=sigt, sigc=sigc, 
                     Gt=config_dict['G'][flagt], Gr=config_dict['G'][flagc],
                     Ht=config_dict['H'][flagt], Hr=config_dict['H'][flagc],
-                    eta=data_cube.etaused[f'{wv}_{tel}'], 
+                    eta=data_cube.etaused[f'{wv}_{tel}']['eta'], 
                     voldepol_error=config_dict[f'voldepol_error_{wv}'],
                     window=config_dict[f'smoothWin_{retrieval}_{wv}']
                 )
@@ -113,7 +113,7 @@ def voldepol_cldFreeGrps(data_cube, ret_prof_name:str) -> dict:
                     sigt=sigt, sigc=sigc, 
                     Gt=config_dict['G'][flagt], Gr=config_dict['G'][flagc],
                     Ht=config_dict['H'][flagt], Hr=config_dict['H'][flagc],
-                    eta=data_cube.etaused[f'{wv}_{tel}'], 
+                    eta=data_cube.etaused[f'{wv}_{tel}']['eta'], 
                     voldepol_error=config_dict[f'voldepol_error_{wv}'],
                     window=1
                 )

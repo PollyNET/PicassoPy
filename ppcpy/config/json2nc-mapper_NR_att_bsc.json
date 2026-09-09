@@ -105,7 +105,7 @@
         "plot_range": "0., 1.5e-05",
         "plot_scale": "linear",
         "retrieving_info": {
-            "Lidar_calibration_constant_used": {"value": "__LCused[355_total_NR]", "unit": ""}
+            "Lidar_calibration_constant_used": {"value": "__LCused[355_total_NR][LC]", "unit": "", "method": "__LCused[355_total_NR][method]"}
             },
         "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
       }
@@ -126,7 +126,7 @@
         "plot_range": "0., 5.e-06",
         "plot_scale": "linear",
         "retrieving_info": {
-            "Lidar_calibration_constant_used": {"value": "__LCused[532_total_NR]", "unit": ""}
+            "Lidar_calibration_constant_used": {"value": "__LCused[532_total_NR][LC]", "unit": "", "method": "__LCused[532_total_NR][method]"}
             },
         "comment": "This parameter is calculated with taking into account of the effects of lidar constants. Therefore, it reflects the concentration of aerosol and molecule backscatter."
       }
