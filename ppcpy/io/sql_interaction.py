@@ -79,6 +79,29 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str]) -> dict:
                 'time_end': int(string_to_ts(row['cali_stop_time'])), 
             })
         ret['D90_db'] = default_to_regular(d)
+
+    if table_name == 'wv_calibration_constant':
+            d = defaultdict(list)
+            for index, row in df[df.cali_method == 'Profile_Method'].iterrows():
+                k = f"{row['wavelength']}_{mapping[row['telescope']]}"
+                d[k].append({
+                    'WVC': row['wv_const'], 'WVCStd': row['uncertainty_wv_const'],
+                    'time_start': int(string_to_ts(row['cali_start_time'])), 
+                    'time_end': int(string_to_ts(row['cali_stop_time'])), 
+                })
+            profile_db = default_to_regular(d)
+    
+            d = defaultdict(list)
+            for index, row in df[df.cali_method == 'Regression_Method'].iterrows():
+                k = f"{row['wavelength']}_{mapping[row['telescope']]}"
+                d[k].append({
+                    'WVC': row['wv_const'], 'WVCStd': row['uncertainty_wv_const'],
+                    'time_start': int(string_to_ts(row['cali_start_time'])), 
+                    'time_end': int(string_to_ts(row['cali_stop_time'])), 
+                })
+            regression_db = default_to_regular(d)
+
+            ret['model'] = {'profile': profile_db, 'regression': regression_db}
         
     return ret
 
@@ -104,6 +127,10 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
         method_db = 'Raman_Method'
     elif method == 'klett':
         method_db = 'Klett_Method'
+    elif method == 'profile':
+        method_db = 'Profile_Method'
+    elif method == 'regression':
+        method_db = 'Regression_Method'
 
     print(data_cube.LC.keys())
     if parameter == 'LC':
@@ -137,6 +164,23 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                 rows_to_insert.append((
                     str(start), str(stop), float(eta), float(eta_std), eta_is_used, 
                     wv, tel_db, str(data_cube.rawfile), data_cube.device))
+
+    elif parameter == 'WVC':
+        cali_instrument = 'model'
+        for e in data_cube.wv_cali[cali_instrument][method].keys():
+            wv, tel = e.split('_')
+            tel_db = mapping_inverse[tel]
+            for line in data_cube.wv_cali[cali_instrument][method][e]:
+                WVC = line['WVC']
+                WVCStd = line['WVCStd']
+                WVC_is_used = True if WVC == data_cube.WVCused[e] else False
+                start_unix = line['time_start']
+                stop_unix = line['time_end']
+                start = datetime.fromtimestamp(start_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+                stop = datetime.fromtimestamp(stop_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+                rows_to_insert.append((
+                    str(start), str(stop), float(WVC), float(WVCStd), WVC_is_used, 
+                    wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
     return rows_to_insert
 
 def setup_empty(db_path:str, table_name:str, column_names:list[str], data_types:list[str], unique:str=''):

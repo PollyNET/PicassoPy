@@ -470,11 +470,16 @@ class PicassoProc:
         self.mol_profiles = molecular.calc_profiles(mean_profiles, flagPicassoComparison=self.polly_config_dict['flagPicassoComparison'])
     
     def watervaporCali(self):
-        """Perform water vapor calibration on aggregated profiles"""
+        """Perform water vapor calibration on aggregated profiles
+        
+        .. TODO:: How to select best WVC over all calibration instruments and methods.
+        """
 
         logging.info('Start calibration')
+        self.wv_cali = watervapor.wvc_for_cldFreeGrps(self)
 
-        watervapor.wvc_for_cldFreeGrps(self)
+        logging.info("Choosing best WVC...")
+        self.WVCused = select.single_best(self.wv_cali['model']['regression'], 'WVC', 'WVCStd')
 
     def rayleighFit(self, collect_debug:bool=False):
         """Perform the rayleigh fit procedure.
@@ -710,6 +715,13 @@ class PicassoProc:
         highres.voldepol_2d(self)
 
 
+    def wvmr(self):
+        """highres wvmr in 2D."""
+
+        logging.info('wvmr 2d retrieval')
+        highres.wvmr_2d(self)
+
+
     def molecularHighres(self):
         """calculate the molecular signal for the 2d high resolution."""
 
@@ -750,14 +762,14 @@ class PicassoProc:
         quasi.target_cat(self, version='V2')
 
     def write_2_sql_db(self, parameter:str, db_path:str|None=None, method:str|None=None):
-        """Write LC or eta to sqlite db table.
+        """Write LC, eta or WVC to sqlite db table.
 
         Parameters
         ----------
         parameter : str
-            can be LC (Lidar-calibration-constant) or DC (Depol-calibration-constant)
+            can be LC (Lidar-calibration-constant), DC (Depol-calibration-constant) or WVC (WaterVapor-calibration-constant)
         method : str
-            'raman' or 'klett'
+            'raman', 'klett', 'profile' or 'regression'
         db_path : str
             location of the sqlite db-file
 
@@ -786,6 +798,13 @@ class PicassoProc:
                 'wavelength', 'telescope', 'nc_zip_file', 'polly_type']
             data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text']
             unique=', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope)'
+        elif parameter == 'WVC':
+            table_name = 'wv_calibration_constant'
+            column_names = [
+                'cali_start_time', 'cali_stop_time', 'wv_const', 'uncertainty_wv_const', 'used_for_processing', 
+                'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
+            data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text', 'text']
+            unique=', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope, cali_method)'
         assert len(column_names) == len(data_types), 'column names do not match data types'
 
         logging.info(f'writing to sqlite-db: {db_path}')
@@ -818,6 +837,9 @@ class PicassoProc:
 
         table_name = 'depol_calibration_constant'
         self.pol_cali.update(sql_db.get_from_sql_db(db_path, table_name, ts_interval))
+
+        table_name = 'wv_calibration_constant'
+        self.wv_cali.update(sql_db.get_from_sql_db(db_path, table_name, ts_interval))
         
 
 
