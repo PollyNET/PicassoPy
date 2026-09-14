@@ -26,8 +26,8 @@ def getVal(array:np.ndarray, indices:list) -> list:
     out : list
         Values of the array at given indices.
         If indx is NaN value is also NaN.
-
     """
+
     if indices[0] >= indices[1]:
         raise ValueError('Invalid index pair.')
     
@@ -63,8 +63,8 @@ def rayleighfit(data_cube, collect_debug:bool=False) -> list:
       with the best fit to the molecular signal.
     - Currently, only the FR reference heights are calculated, while the NR reference heights are 
       taken from the config files.
-
     """
+
     # ..TODO:: is data.distance0 and height the same? https://github.com/PollyNET/Pollynet_Processing_Chain/blob/e413f9254094ff2c0a18fcdac4e9bebb5385d526/lib/preprocess/pollyPreprocess.m#L299
     # --> data.distance0 equals range, not height. However, Picasso uses a constant 7.5 m height resolution while PicassoPy uses the height resolution form the raw data dict ~ 7.475 m
     height = data_cube.retrievals_highres['range']
@@ -76,12 +76,12 @@ def rayleighfit(data_cube, collect_debug:bool=False) -> list:
 
     if not data_cube.polly_config_dict['flagUseManualRefH']:
         for i, cldFree in enumerate(data_cube.clFreeGrps):
-            print(i, cldFree)
+            logging.info(f"Cloud free segment {i}, Time: {data_cube.retrievals_highres['time64'][cldFree[0]]} - {data_cube.retrievals_highres['time64'][cldFree[1]]}.")
             refH_cldFree = {}
 
             for wv, t, tel in [(532, 'total', 'FR'), (355, 'total', 'FR'), (1064, 'total', 'FR')]:
                 if np.any(data_cube.gf(wv, t, tel)):
-                    print(f'refH for {wv}')
+                    logging.info(f"Channel: {wv} {t} {tel}.")
 
                     # Extract signal
                     rcs = np.squeeze(data_cube.retrievals_profile['RCS'][i, :, data_cube.gf(wv, t, tel)])
@@ -113,7 +113,7 @@ def rayleighfit(data_cube, collect_debug:bool=False) -> list:
                         window_size=config_dict[f'decomSmoothWin{wv}'],
                         showDetails=collect_debug
                     )
-                    print('DPInd:', DPInd)
+                    logging.debug(f"DPInd: {DPInd}.")
 
                     # Rayleigh fitting
                     refInd = fit_profile(
@@ -129,7 +129,7 @@ def rayleighfit(data_cube, collect_debug:bool=False) -> list:
                         flagShowDetail=collect_debug,
                         flagPicassoComparison=config_dict['flagPicassoComparison']
                     )
-                    print('refInd:', refInd)
+                    logging.debug(f"refInd: {refInd}")
 
                     refHeight = getVal(data_cube.retrievals_highres['height'], refInd)
                     refRange = getVal(data_cube.retrievals_highres['range'], refInd)
@@ -215,6 +215,7 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     - 2026-04-17: Changed to ppcpy.misc.helper.moving_average to get values at edges.
     
     """
+
     # return uniform_filter1d(signal, window_len, mode='nearest')
     return moving_average(signal, window_len)
 
@@ -240,7 +241,7 @@ def DouglasPeucker(signal:np.ndarray, height:np.ndarray, epsilon:float, heightBa
     window_size : int
         Size of the average smooth window. Default is 1.
     showDetails : bool
-        If true, print debug information. Default is False.
+        If true, collect debug information. Default is False.
     
     Returns
     -------
@@ -262,7 +263,8 @@ def DouglasPeucker(signal:np.ndarray, height:np.ndarray, epsilon:float, heightBa
     - 2024-12-20: Direct translated from matlab with ai
     
     """
-    #print('height', height[:30], 'epsilon', epsilon, 'height', heightBase, heightTop, 'maxHThick', maxHThick, 'window_size', window_size)
+
+    logging.debug(f"height {height[:30]}, epsilon {epsilon}, height range [{heightBase} - {heightTop}], maxHThick {maxHThick}, window_size {window_size}")
 
     # Input check
     if len(signal) != len(height):
@@ -319,8 +321,8 @@ def DP_algorithm(pointList:list, epsilon:float, maxHThick:float, recursive_depth
     -------
     sigIndx : list
         Indices of simplified points.
-    
     """
+
     if len(pointList) == 1:
         if showDetails: print(f'Recursion: {recursive_depth}, len(pointList) == 1, returning [0]')
         return [0]
@@ -386,8 +388,8 @@ def my_dist(pointM:list, pointS:list, pointE:list, full:bool=True) -> float:
     -----
     - If pointS and pointE are constant only the numerator is neede to calculate the
       extreme points with respect to pointM.
-
     """
+
     num = abs(pointM[1] - pointS[1] + (pointS[1] - pointE[1]) / \
                (pointS[0] - pointE[0]) * (pointS[0] - pointM[0]))
     if full:
@@ -437,6 +439,7 @@ def chi2fit(x:np.ndarray, y:np.ndarray, measure_error:np.ndarray) -> tuple:
     --------
     ``a, b, sigmaA, sigmaB, chi2, Q = chi2fit(x, y, measure_error)``
     """
+
     if len(x) != len(y):
         raise ValueError("Array lengths of x and y must agree.")
 
@@ -521,8 +524,8 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
       residual calculations due to the subtraction and mean of very small numbers [-1e-24, 1e-24].
       these numerical discrepancies may cause a different reference height to be chosen compared to
       Picasso.
-
     """
+    
     # if len([height, sig_aer, pc, bg, sig_mol, dpIndx]) < 6:
     # #if len([height, sig_aer, pc, bg, sig_mol, dpIndx]) < 6:
     #     raise ValueError('Not enough inputs.')
@@ -532,7 +535,7 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
         raise ValueError('sig_aer and sig_mol must be 1-dimensional array')
 
     if dpIndx is None or len(dpIndx) == 0:
-        print('Warning: dpIndx is empty')
+        logging.warning('dpIndx is empty!')
         return np.nan, np.nan
 
     # parameter initialize
@@ -551,7 +554,7 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
         test1 = test2 = test3 = test4 = test5 = True
         iDpBIndx = dpIndx[iIndx]
         iDpTIndx = dpIndx[iIndx + 1] # + 1 # matlab slicing issue??
-        #print(iIndx, iDpBIndx, iDpTIndx)
+        # print(iIndx, iDpBIndx, iDpTIndx)
 
         # check layer thickness
         if not ((height[iDpTIndx] - height[iDpBIndx]) > layerThickConstrain):
@@ -566,11 +569,11 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
 
         sig_factor = np.nanmean(sig_mol[iDpBIndx:iDpTIndx+1]) / \
                     np.nanmean(sig_aer[iDpBIndx:iDpTIndx+1])
-        #print('sig factor ', sig_factor)
+        # print('sig factor ', sig_factor)
         sig_aer_norm = sig_aer * sig_factor
         std_aer_norm = sig_aer_norm / np.sqrt(pc + bg)
-        #print('sig_aer_norm ', sig_aer_norm.shape, sig_aer_norm[iDpBIndx:iDpTIndx+1])
-        #print('std_aer_norm ', std_aer_norm.shape, std_aer_norm[iDpBIndx:iDpTIndx+1])
+        # print('sig_aer_norm ', sig_aer_norm.shape, sig_aer_norm[iDpBIndx:iDpTIndx+1])
+        # print('std_aer_norm ', std_aer_norm.shape, std_aer_norm[iDpBIndx:iDpTIndx+1])
 
         # Quality test 2: near and far - range cross criteria
         winLen = int(layerThickConstrain / (height[1] - height[0]))
@@ -596,15 +599,15 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
             continue
 
         # Quality test 3: white-noise criterion
-        #print('white noise criterion ', iDpBIndx, iDpTIndx)
+        # print('white noise criterion ', iDpBIndx, iDpTIndx)
         residual = (sig_aer_norm[iDpBIndx:iDpTIndx+1] - 
                    sig_mol[iDpBIndx:iDpTIndx+1])
 
-        #print(sig_aer_norm[iDpBIndx], sig_mol[iDpBIndx], sig_aer_norm[iDpBIndx]-sig_mol[iDpBIndx])
-        #print(sig_aer_norm[iDpBIndx+1], sig_mol[iDpBIndx+1], sig_aer_norm[iDpBIndx+1]-sig_mol[iDpBIndx+1])
-        #print(sig_aer_norm[iDpBIndx+2], sig_mol[iDpBIndx+2], sig_aer_norm[iDpBIndx+2]-sig_mol[iDpBIndx+2])
-        #print(sig_aer_norm[iDpBIndx+3], sig_mol[iDpBIndx+3], sig_aer_norm[iDpBIndx+3]-sig_mol[iDpBIndx+3])
-        #print('residual ', residual.shape, residual)
+        # print(sig_aer_norm[iDpBIndx], sig_mol[iDpBIndx], sig_aer_norm[iDpBIndx]-sig_mol[iDpBIndx])
+        # print(sig_aer_norm[iDpBIndx+1], sig_mol[iDpBIndx+1], sig_aer_norm[iDpBIndx+1]-sig_mol[iDpBIndx+1])
+        # print(sig_aer_norm[iDpBIndx+2], sig_mol[iDpBIndx+2], sig_aer_norm[iDpBIndx+2]-sig_mol[iDpBIndx+2])
+        # print(sig_aer_norm[iDpBIndx+3], sig_mol[iDpBIndx+3], sig_aer_norm[iDpBIndx+3]-sig_mol[iDpBIndx+3])
+        # print('residual ', residual.shape, residual)
         x = height[iDpBIndx:iDpTIndx+1] / 1e3
 
         if len(residual) <= 10:
@@ -614,10 +617,10 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
             #continue
 
         # Note: chi2fit implementation needed here
-        #print('white noise chi2fit input', np.nanmean(x), np.nanmean(residual), np.nanmean(std_aer_norm[iDpBIndx:iDpTIndx+1]))
+        # print('white noise chi2fit input', np.nanmean(x), np.nanmean(residual), np.nanmean(std_aer_norm[iDpBIndx:iDpTIndx+1]))
         thisIntersect, thisSlope, _, _, _, _ = chi2fit(
             x, residual, std_aer_norm[iDpBIndx:iDpTIndx+1])
-        #print('white noise chi2fit ', thisIntersect, thisSlope)
+        # print('white noise chi2fit ', thisIntersect, thisSlope)
         
         residual_fit = thisIntersect + thisSlope * x
         et = residual - residual_fit
@@ -628,21 +631,21 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
                 print(f'Region {iIndx}: {height[iDpBIndx]} - '
                       f'{height[iDpTIndx]} fails in white-noise criterion.')
             test3 = False
-            #continue
+            # continue
 
         # Quality test 4: SNR check
         sigsum = np.nansum(pc[dpIndx[iIndx]:dpIndx[iIndx+1]+1])
         # adaption needed for the background not given as a profile
         bgsum = bg * (dpIndx[iIndx + 1] - dpIndx[iIndx])
         SNR = sigsum / np.sqrt(sigsum + 2*bgsum)
-        #print('SNR', sigsum, '/', bgsum, '=', SNR)
+        # print('SNR', sigsum, '/', bgsum, '=', SNR)
         
         if SNR < SNRConstrain:
             if flagShowDetail:
                 print(f'Region {iIndx}: {height[iDpBIndx]} - '
                       f'{height[iDpTIndx]} fails in SNR criterion.')
             test4 = False
-            #continue
+            # continue
 
         # Quality test 5: slope check
         x = height[iDpBIndx:iDpTIndx+1]
@@ -667,9 +670,9 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
             #continue
 
         _, aerSlope, _, deltaAerSlope, _, _ = chi2fit(x, y_aer, std_y_aer)
-        #print('aer chi2fit', aerSlope, deltaAerSlope)
+        # print('aer chi2fit', aerSlope, deltaAerSlope)
         _, molSlope, _, deltaMolSlope, _, _ = chi2fit(x, y_mol, np.zeros_like(x))
-        #print('mol chi2fit', molSlope, deltaMolSlope)
+        # print('mol chi2fit', molSlope, deltaMolSlope)
 
         slope_condition = (molSlope <= (aerSlope + (deltaAerSlope + deltaMolSlope) * 
                          slopeConstrain) and
@@ -686,7 +689,7 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
             #continue
 
         if not (test1 and test2 and test3 and test4 and test5):
-            print("one tests failed?")
+            logging.info("One tests failed")
             continue
 
         # save statistics
@@ -730,7 +733,7 @@ def fit_profile(height:np.ndarray, sig_aer:np.ndarray, pc:np.ndarray, bg:np.ndar
     else:
         # QuicFix for all NaN arrays:
         if np.isnan(X_val).all():
-            print("None valid clean region found.")
+            logging.warning("None valid clean region found.")
             return np.nan, np.nan
         indxBest_Int = np.nanargmin(X_val)
 

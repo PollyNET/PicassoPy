@@ -1,0 +1,275 @@
+
+{
+  "global_attributes": {
+    "Conventions": "CF-1.0",
+    "Licence": "Creative Commons Attribution Share Alike 4.0 International (CC BY-SA 4.0)",
+    "Data_Policy": "Each PollyNET site has Principal Investigator(s) (PI), responsible for deployment, maintenance and data collection. Information on which PI is responsible can be gathered via polly@tropos.de. The PI has priority use of the data collected at the site. The PI is entitled to be informed of any use of that data. Mandatory guidelines for data use and publication: Using PollyNET data or plots (also for presentations/workshops): Please consult with the PI or the PollyNET team (see contact_mail contact) before using data or plots! This will help to avoid misinterpretations of the lidar data and avoid the use of data from periods of malfunction of the instrument. Using PollyNET images/data on external websites: PIs and PollyNET must be asked for agreement and a link directed to polly.tropos.de must be included. Publishing PollyNET data and/or plots data: Offer authorship for the PI(s)! Acknowledge projects which have made the measurements possible according to PI(s) recommendation. PollyNET requests a notification of any published papers or reports or a brief description of other uses (e.g., posters, oral presentations, etc.) of data/plots used from PollyNET. This will help us determine the use of PollyNET data, which is helpful in optimizing product development and acquire new funding for future measurements. It also helps us to keep our product-related references up-to-date.",
+    "location": "",
+    "institute": "Ground-based Remote Sensing Group (TROPOS)",
+    "source": "__device",
+    "version": "picasso_version",
+    "reference": "https://polly.tropos.de/",
+    "contact": "",
+    "PicassoConfig_Info": "",
+    "PollyConfig_Info": "",
+    "CampaignConfig_Info": "",
+    "PollyData_Info": "",
+    "history": ""
+  },
+  "dimensions": {
+    "height": 0,
+    "reference_height": 2
+  },
+  "variables": {
+    "altitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "m",
+        "long_name": "Height of lidar above mean sea level",
+        "standard_name": "altitude"
+      }
+    },
+    "longitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees_east",
+        "long_name": "Longitude of the site",
+        "standard_name": "longitude",
+        "axis": "Y"
+      }
+    },
+    "latitude": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees_north",
+        "long_name": "Latitude of the site",
+        "standard_name": "latitude",
+        "axis": "Y"
+      }
+    },
+    "start_time": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "seconds since 1970-01-01 00:00:00 UTC",
+        "long_name": "Time UTC to finish the current measurement",
+        "standard_name": "time"
+      }
+    },
+    "end_time": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "seconds since 1970-01-01 00:00:00 UTC",
+        "long_name": "Time UTC to finish the current measurement",
+        "standard_name": "time"
+      }
+    },
+    "height": {
+      "dtype": "f4",
+      "shape": ["height"],
+      "data": null,
+      "attributes": {
+        "unit": "m",
+        "long_name": "Height above the ground",
+        "standard_name": "height",
+        "axis": "Z"
+      }
+    },
+    "tilt_angle": {
+      "dtype": "f4",
+      "shape": [],
+      "data": null,
+      "attributes": {
+        "unit": "degrees",
+        "long_name": "Tilt angle of lidar device",
+        "standard_name": "tilt_angle"
+      }
+    },
+    "frnr_overlap_355": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "overlap function for 355nm far-range channel",
+        "standard_name": "overlap355",
+        "plot_range": [0, 1.1],
+        "plot_scale": "linear",
+        "source": "__device",
+        "comment": "This variable is not quality-assured. Only use with instructions from the PollyNET develop team."
+      }
+    },
+    "frnr_overlap_387": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "overlap function for 387nm far-range channel",
+        "standard_name": "overlap387",
+        "plot_range": [0, 1.1],
+        "plot_scale": "linear",
+        "source": "__device",
+        "comment": "This variable is not quality-assured. Only use with instructions from the PollyNET develop team."
+      }
+    },
+    "frnr_overlap_532": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "overlap function for 532nm far-range channel",
+        "standard_name": "overlap532",
+        "plot_range": [0, 1.1],
+        "plot_scale": "linear",
+        "source": "__device",
+        "comment": "This variable is not quality-assured. Only use with instructions from the PollyNET develop team."
+      }
+    },
+    "frnr_overlap_607": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "overlap function for 607nm far-range channel",
+        "standard_name": "overlap607",
+        "plot_range": [0, 1.1],
+        "plot_scale": "linear",
+        "source": "__device",
+        "comment": "This variable is not quality-assured. Only use with instructions from the PollyNET develop team."
+      }
+    },
+    "frnr_overlap_1064": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "overlap function for 1064nm far-range channel",
+        "standard_name": "overlap1064",
+        "plot_range": [0, 1.1],
+        "plot_scale": "linear",
+        "source": "__device",
+        "comment": "This variable is not quality-assured. Only use with instructions from the PollyNET develop team."
+      }
+    },
+    "raman_overlap_355_fr": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "overlap function for 355nm far-range channel (Raman method)",
+        "standard_name": "overlap355raman_fr",
+        "plot_range": [0, 1.1],
+        "plot_scale": "linear",
+        "source": "__device",
+        "comment": "This variable is not quality-assured. Only use with instructions from the PollyNET develop team."
+      }
+    },
+    "raman_overlap_532_fr": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "overlap function for 532nm far-range channel (Raman method)",
+        "standard_name": "overlap532raman_fr",
+        "plot_range": [0, 1.1],
+        "plot_scale": "linear",
+        "source": "__device",
+        "comment": "This variable is not quality-assured. Only use with instructions from the PollyNET develop team."
+      }
+    },
+    "raman_overlap_1064_fr": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "overlap function for 1064nm far-range channel (Raman method)",
+        "standard_name": "overlap1064raman_fr",
+        "plot_range": [0, 1.1],
+        "plot_scale": "linear",
+        "source": "__device",
+        "comment": "This variable is not quality-assured. Only use with instructions from the PollyNET develop team."
+      }
+    },
+    "raman_overlap_355_nr": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "overlap function for 355nm far-range channel (Raman method)",
+        "standard_name": "overlap355raman_nr",
+        "plot_range": [0, 1.1],
+        "plot_scale": "linear",
+        "source": "__device",
+        "comment": "This variable is not quality-assured. Only use with instructions from the PollyNET develop team."
+      }
+    },
+    "raman_overlap_355_nr": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "overlap function for 355nm far-range channel (Raman method)",
+        "standard_name": "overlap355raman_nr",
+        "plot_range": [0, 1.1],
+        "plot_scale": "linear",
+        "source": "__device",
+        "comment": "This variable is not quality-assured. Only use with instructions from the PollyNET develop team."
+      }
+    },
+    "raman_overlap_355_nr": {
+      "dtype": "f8",
+      "shape": ["height"],
+      "data": null,
+      "_FillValue": -999,
+      "attributes": {
+        "unit": "",
+        "unit_html": "",
+        "long_name": "overlap function for 355nm far-range channel (Raman method)",
+        "standard_name": "overlap355raman_nr",
+        "plot_range": [0, 1.1],
+        "plot_scale": "linear",
+        "source": "__device",
+        "comment": "This variable is not quality-assured. Only use with instructions from the PollyNET develop team."
+      }
+    }
+
+  }
+}

@@ -20,6 +20,7 @@ def quasi_bsc(data_cube):
 
     - xxxx-xx-xx: First edition by ...
     - xxxx-xx-xx: AI based translation to python
+    
     """
 
     rgs = data_cube.retrievals_highres['range']
@@ -115,6 +116,7 @@ def quasi_retrieval(height:np.ndarray, att_beta:np.ndarray, molExt:np.ndarray,
     - 2018-12-25: First edition by Zhenping
     - 2019-03-31: Added the keyword 'nIters' to control iteration times.
     - 2025-03-21: AI based translation to python and debugging
+
     """
 
     # Compute differential heights

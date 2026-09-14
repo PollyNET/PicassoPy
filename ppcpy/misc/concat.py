@@ -15,23 +15,43 @@ import numpy as np
 from scipy.sparse import diags
 import tracemalloc # memory usage tracking
 
+
 def os_name():
-    """"""
+    """ """
     return platform.system()
 
 
 def date_splitting(timestamp):
+    """ """
     YYYY = timestamp[0:4]
     MM = timestamp[4:6]
     DD = timestamp[6:8]
-    return YYYY,MM,DD
+    return YYYY, MM, DD
 
-def get_input_path(timestamp, device, base_dir):
+
+def get_input_path(timestamp, device:str, base_dir:Path):
+    """Checking for the correct subpath.
+    
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : str
+        Name of polly device.
+    base_dir : Path
+        Path to base directory.
+
+    Returns
+    -------
+    ...
+            
+    Notes
+    -----
+    .. TODO::
+        - Using glob or similiar to be more flexible in terms of level0b or martha...
     """
-        Checking for the correct subpath
-        TODO: using glob or similiar to be more flexible in terms of level0b or martha...
-    """
-    YYYY,MM,DD = date_splitting(timestamp)
+
+    YYYY, MM, DD = date_splitting(timestamp)
     search_root_normal = Path(base_dir) / device
     search_root_special = Path(base_dir)
     search_pattern = f"**/*{YYYY}_{MM}_{DD}*.nc*"
@@ -40,20 +60,36 @@ def get_input_path(timestamp, device, base_dir):
         return file_path.parent.resolve()
     for file_path in search_root_special.rglob(search_pattern):
         return file_path.parent.resolve()
+    return
 
-    return None
 
+def get_pollyxt_zipfiles(timestamp, device:str, raw_folder:Path):
+    """This function locates multiple pollyxt level0 nc-zip files 
+    from one day measurements, and returns a list of zip-files.
 
-def get_pollyxt_zipfiles(timestamp, device, raw_folder):
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : str
+        Name of Polly device.
+    raw_floder : Path
+        Path to raw data folder.
+    
+    Returns
+    -------
+    ...
+
+    Notes
+    -----
+    .. TODO:: Finish docstring!
     """
-        This function locates multiple pollyxt level0 nc-zip files from one day measurements,
-        and returns a list of zip-files
-    """
+
     input_path = get_input_path(timestamp, device, raw_folder)
     if input_path:
         path_exist = Path(input_path)
     else:
-        return None
+        return
 
     if path_exist.exists() == True:
 
@@ -71,21 +107,40 @@ def get_pollyxt_zipfiles(timestamp, device, raw_folder):
         #for file in polly_zip_files_list0:
         #    polly_zip_files_list.append(str(file))
 
-def get_pollyxt_nc_files(timestamp, device, raw_folder):
+
+def get_pollyxt_nc_files(timestamp, device:str, raw_folder:Path):
+    """This function locates pollyxt level0 nc-files (i.e. already 24h-merged level0b files)
+    from one day measurements, and returns a list of nc-files.
+
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : str
+        Name of polly device.
+    raw_folder : str
+        Path to raw data folder.
+    
+    Returns
+    -------
+    polly_files_list : ...
+        ...
+    
+    Notes
+    -----
+    .. TODO:: Finish docstring!
     """
-        This function locates pollyxt level0 nc-files (i.e. already 24h-merged level0b files) from one day measurements,
-        and returns a list of nc-files
-    """
+
     input_path = get_input_path(timestamp, device, raw_folder)
     if input_path:
         path_exist = Path(input_path)
     else:
-        return None
+        return
 
     if path_exist.exists() == True:
 
         ## set the searchpattern for the zipped-nc-files:
-        YYYY,MM,DD = date_splitting(timestamp)
+        YYYY, MM, DD = date_splitting(timestamp)
 
         nc_searchpattern = str(YYYY)+'_'+str(MM)+'_'+str(DD)+'*_*[0-9].nc'
 
@@ -93,16 +148,34 @@ def get_pollyxt_nc_files(timestamp, device, raw_folder):
         polly_files_list = [x for x in polly_files if x.is_file()]
         return polly_files_list
     else:
-        return None
+        return
 
 
-def unzipping_pollyxt_files(polly_zip_files_list,timestamp,output_path):
+def unzipping_pollyxt_files(polly_zip_files_list:list, timestamp, output_path:Path):
+    """This function checks the size of the zip-files.
+    If smaller than threshold (e.g. 500000 Byte), the file will be skipped.
+    The files passing the filesize check will be unzipped
+    returns a list of unzipped files.
+
+    Parameters
+    ----------
+    polly_zip_files_list : list??
+        ...
+    timestamp : ...
+        ...
+    output_path : Path
+        Path to output folder.
+    
+    Returns
+    -------
+    polly_files_list : list??
+        ...
+    
+    Notes
+    -----
+    .. TODO:: Finish docstring.
     """
-        This function checks the size of the zip-files.
-        If smaller than threshold (e.g. 500000 Byte), the file will be skipped.
-        The files passing the filesize check will be unzipped
-        returns a list of unzipped files
-    """
+
     # Ensure the destination directory exists
     Path(output_path).mkdir(parents=True, exist_ok=True)
 
@@ -123,14 +196,14 @@ def unzipping_pollyxt_files(polly_zip_files_list,timestamp,output_path):
             continue ## go to next file
 
     ## unzipping
-    YYYY,MM,DD = date_splitting(timestamp)
+    YYYY, MM, DD = date_splitting(timestamp)
     date_pattern = str(YYYY) + '_' + str(MM) + '_' + str(DD)
     if len(to_unzip_list) > 0:
         ## if working remotly on windows, copy zipped files first, than unzip
         if os_name().lower() == 'windows':
             logging.info("Copy zipped files to local drive...")
             for zip_file in to_unzip_list:
-                logging-info(zip_file)
+                logging.info(zip_file)
                 shutil.copy2(Path(zip_file), Path(output_path) / Path(zip_file).name)
             logging.info(f"Unzipping to: {output_path}")
             for zip_file in Path(output_path).iterdir():
@@ -154,15 +227,34 @@ def unzipping_pollyxt_files(polly_zip_files_list,timestamp,output_path):
             return polly_files_list
     else:
         logging.warning('no files to unzip')
-        return None
+        return
 
 
-def get_pollyxt_files(timestamp, device, raw_folder, output_path, **kwargs):
+def get_pollyxt_files(timestamp, device:str, raw_folder:Path, output_path:Path, **kwargs):
+    """This function locates multiple pollyxt level0 nc-zip files from one day measurements,
+    unzipps the files to output_path and returns a list of files to be merged.
+
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : str
+        Name of PollyXT device.
+    raw_floder : Path
+        Path to raw data folder.
+    output_path : Path
+        Path to output folder.
+    
+    Returns
+    -------
+    polly_files_list : list??
+        ...
+    
+    Notes
+    -----
+    .. TODO:: Finish docstring!
     """
-        This function locates multiple pollyxt level0 nc-zip files from one day measurements,
-        unzipps the files to output_path
-        and returns a list of files to be merged
-    """
+
     unzip = kwargs.get('unzipping', True)
 
     if str(unzip).lower() == 'true':
@@ -175,7 +267,7 @@ def get_pollyxt_files(timestamp, device, raw_folder, output_path, **kwargs):
             sys.exit()
 
         ## unzip files
-        polly_files_list = unzipping_pollyxt_files(polly_zip_files_list,timestamp,output_path)
+        polly_files_list = unzipping_pollyxt_files(polly_zip_files_list, timestamp, output_path)
         if polly_files_list:
             pass
         else:
@@ -190,19 +282,39 @@ def get_pollyxt_files(timestamp, device, raw_folder, output_path, **kwargs):
             logging.error('No files found. Aborting')
             sys.exit()
 
-
     ## sort lists
     polly_files_list.sort()
 
     return polly_files_list
 
 
-def get_pollyxt_logbook_files(timestamp, device, raw_folder, output_path):
+def get_pollyxt_logbook_files(timestamp, device:str, raw_folder:Path, output_path:Path) -> tuple:
+    """This function locates multiple pollyxt logbook-zip files from one day measurements,
+    unzipps the files to output_path and  merge them to one file.
+
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : str
+        Name of PollyXT device.
+    raw_floder : Path
+        Path to raw data folder.
+    output_path : Path
+        Path to output folder.
+    
+    Returns
+    -------
+    tuple
+        Empty tuple.
+    
+    Notes
+    -----
+    .. TODO::
+        - Finish docstring!
+        - Why are we returning an empty tuple?
     """
-        This function locates multiple pollyxt logbook-zip files from one day measurements,
-        unzipps the files to output_path
-        and  merge them to one file
-    """
+
     input_path = get_input_path(timestamp, device, raw_folder)
     path_exist = Path(input_path)
 
@@ -215,9 +327,8 @@ def get_pollyxt_logbook_files(timestamp, device, raw_folder, output_path):
 
         zip_searchpattern = str(YYYY)+'_'+str(MM)+'_'+str(DD)+'*_*laserlogbook*.zip'
 
-        polly_laserlog_files       = Path(r'{}'.format(input_path)).glob('{}'.format(zip_searchpattern))
+        polly_laserlog_files = Path(r'{}'.format(input_path)).glob('{}'.format(zip_searchpattern))
         polly_laserlog_zip_files_list0 = [x for x in polly_laserlog_files if x.is_file()]
-
 
         ## convert type path to type string
         polly_laserlog_zip_files_list = []
@@ -238,7 +349,6 @@ def get_pollyxt_logbook_files(timestamp, device, raw_folder, output_path):
             path = Path(unzipped_logtxt)
 
             to_unzip_list.append(zip_file)
-
 
         ## unzipping
         if len(to_unzip_list) > 0:
@@ -265,9 +375,9 @@ def get_pollyxt_logbook_files(timestamp, device, raw_folder, output_path):
 
         laserlog_filename = polly_laserlog_files_list[0]
         laserlog_filename = Path(laserlog_filename).name
-        laserlog_filename_left = re.split(r'_[0-9][0-9]_[0-9][0-9]_[0-9][0-9]\.nc',laserlog_filename)[0]
+        laserlog_filename_left = re.split(r'_[0-9][0-9]_[0-9][0-9]_[0-9][0-9]\.nc', laserlog_filename)[0]
         laserlog_filename = f'{laserlog_filename_left}_00_00_01.nc.laserlogbook.txt'
-        destination_file = Path(output_path,laserlog_filename)
+        destination_file = Path(output_path, laserlog_filename)
 
         # Open the source file in binary mode and read its content
         with open(result_file, 'rb') as source:
@@ -283,7 +393,7 @@ def get_pollyxt_logbook_files(timestamp, device, raw_folder, output_path):
 
 
 def add_to_list(element, from_list, to_list):
-    """"""
+    """ """
     if from_list[element] in to_list:
         pass
     else:
@@ -291,17 +401,41 @@ def add_to_list(element, from_list, to_list):
 
 
 
-def checking_vars(timestamp, device, raw_folder, output_path, **kwargs):
-    """"""
+def checking_vars(timestamp, device:str, raw_folder:Path, output_path:Path, **kwargs):
+    """...
+
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : str
+        Name of PollyXT device.
+    raw_floder : Path
+        Path to raw data folder.
+    output_path : Path
+        Path to output folder.
+    
+    Returns
+    -------
+    selected_var_nc_ls : ...
+        ...
+    
+    Notes
+    -----
+    .. TODO:: 
+        - Finish docstring!
+        - Variable `force` is not defined.
+    """
+
     ## select only those nc-files where the values of some specific variables haven't changed
     vars_of_interest = [
                         'measurement_height_resolution',
                         'laser_rep_rate',
                         'laser_power',
-#                        'laser_flashlamp',
+                        #'laser_flashlamp',
                         'location_height',
                         'neutral_density_filter',
-#                        'location_coordinates',
+                        #'location_coordinates',
                         'pm_voltage',
                         'pinhole',
                         'polstate',
@@ -327,22 +461,22 @@ def checking_vars(timestamp, device, raw_folder, output_path, **kwargs):
     print('\n')
     logging.info('checking differences in selected variables ...')
     for ds in range(0,len(polly_file_ds_ls)-1):
-#        print('\n')
-#        print(polly_files_list[ds] + '   vs.   ' + polly_files_list[ds+1])
+        # print('\n')
+        # print(polly_files_list[ds] + '   vs.   ' + polly_files_list[ds+1])
         for var in vars_of_interest:
             if var in polly_file_ds_ls[ds].variables.keys(): ## check if var is available within the polly-datastructure (depending on polly-system)
                 var_value_1=str(polly_file_ds_ls[ds].variables[var][:])
                 var_value_2=str(polly_file_ds_ls[ds+1].variables[var][:])
-    #            print(var + ": " + var_value_1)
-    #            print(var + ": " + var_value_2)
+                # print(var + ": " + var_value_1) 
+                # print(var + ": " + var_value_2)
                 if var_value_1 == var_value_2 and diff_var==0:
                     # print('no difference found ...')
                     add_to_list(ds, polly_files_list, selected_var_nc_ls)
                 elif var_value_1 != var_value_2 and diff_var==0:
                     logging.info('difference found in var:')
                     logging.info(var)
-                    #print(var + ": " + var_value_1)
-                    #print(var + ": " + var_value_2)
+                    # print(var + ": " + var_value_1)
+                    # print(var + ": " + var_value_2)
                     diff_var=1
                     add_to_list(ds, polly_files_list, selected_var_nc_ls) if force == True else None
                 elif var_value_1 == var_value_2 and diff_var != 0:
@@ -357,7 +491,7 @@ def checking_vars(timestamp, device, raw_folder, output_path, **kwargs):
         add_to_list(-1, polly_files_list, selected_var_nc_ls)
         logging.info('no differences found in selected variables!')
     elif diff_var != 0:
-#        add_to_list(-1,polly_files_list,selected_var_nc_ls) if force == True else None
+        # add_to_list(-1, polly_files_list, selected_var_nc_ls) if force == True else None
         ## if force==true, merge, but if force==false: the whole day will not be in list anymore
         if force == True:
             add_to_list(-1, polly_files_list, selected_var_nc_ls)
@@ -371,26 +505,31 @@ def checking_vars(timestamp, device, raw_folder, output_path, **kwargs):
     return selected_var_nc_ls
 
 
-def checking_attr(timestamp, device, raw_folder, output_path, **kwargs):
+def checking_attr(timestamp, device:str, raw_folder:Path, output_path:Path, **kwargs):
     """...
     
     Parameters
     ----------
     timestamp : ...
         ...
-    device : ...
-        ...
-    raw_folder : ...
-        ...
-    output_path : ...
-        ...
+    device : str
+        Name of PollyXT device.
+    raw_folder : Path
+        Path to raw data folder.
+    output_path : Path
+        Path to output folder.
     
     Returns
     -------
     ...
     
-    TODO: Variables 'force' and 'polly_files_list' are not defined anywhere
+    Notes
+    -----
+    .. TODO::
+        - Finish docstring!
+        - Variables 'force' and 'polly_files_list' are not defined anywhere.
     """
+
     ## select only those nc-files where the global attributes and the var-attributes haven't changed
     selected_var_nc_ls = checking_vars(timestamp, device, raw_folder, output_path, **kwargs)
     if len(selected_var_nc_ls) == 1:
@@ -409,15 +548,15 @@ def checking_attr(timestamp, device, raw_folder, output_path, **kwargs):
     logging.info('checking differences in attributes ...')
     for ds in range(0, len(polly_file_ds_ls) - 1):
         ## get global attributes as a list of strings
-#        print(selected_var_nc_ls[ds] + '   vs.   ' + selected_var_nc_ls[ds+1])
-#        print('\nglobal attributes:')
+        # print(selected_var_nc_ls[ds] + '   vs.   ' + selected_var_nc_ls[ds+1])
+        # print('\nglobal attributes:')
         for nc_attr in polly_file_ds_ls[0].ncattrs():
             # att_value=repr(input_nc_file.getncattr(nc_attr))
             att_value_1 = polly_file_ds_ls[ds].getncattr(nc_attr)
             att_value_2 = polly_file_ds_ls[ds+1].getncattr(nc_attr)
-#            print(nc_attr)
-#            print("   " + att_value_1)
-#            print("   " + att_value_2)
+            # print(nc_attr)
+            # print("   " + att_value_1)
+            # print("   " + att_value_2)
             if att_value_1 == att_value_2 and diff_att==0:
                 add_to_list(ds, selected_var_nc_ls, selected_att_nc_ls)
             elif att_value_1 != att_value_2 and diff_att==0:
@@ -433,15 +572,15 @@ def checking_attr(timestamp, device, raw_folder, output_path, **kwargs):
                 logging.info('difference found!')
                 add_to_list(ds, selected_var_nc_ls, selected_att_nc_ls) if force == True else None
 
-#        print("\nvariable attributes:")
+        # print("\nvariable attributes:")
         for var in polly_file_ds_ls[0].variables.keys():
-#            print(var)
+            # print(var)
             for var_att in polly_file_ds_ls[0].variables[var].ncattrs():
                 var_att_value_1 = polly_file_ds_ls[ds].variables[var].getncattr(var_att)
                 var_att_value_2 = polly_file_ds_ls[ds+1].variables[var].getncattr(var_att)
-#                print("   " + var_att)
-#                print("      " + var_att_value_1)
-#                print("      " + var_att_value_2)
+                # print("   " + var_att)
+                # print("      " + var_att_value_1)
+                # print("      " + var_att_value_2)
                 if var_att_value_1 == var_att_value_2 and diff_var_att == 0:
                     pass
                 elif var_att_value_1 != var_att_value_2 and diff_var_att == 0:
@@ -458,12 +597,11 @@ def checking_attr(timestamp, device, raw_folder, output_path, **kwargs):
     for ds in range(0, len(polly_file_ds_ls) - 1):
         polly_file_ds_ls[ds].close()
 
-
     if diff_att == 0:
         add_to_list(-1, selected_var_nc_ls, selected_att_nc_ls)
         logging.info('no differences found in global attributes!')
     elif diff_att != 0:
-#        add_to_list(-1,selected_var_nc_ls,selected_att_nc_ls) if force == True else None
+        # add_to_list(-1, selected_var_nc_ls, selected_att_nc_ls) if force == True else None
 
         ## if force==true, merge, but if force==false: the whole day will not be in list anymore
         if force == True:
@@ -477,22 +615,41 @@ def checking_attr(timestamp, device, raw_folder, output_path, **kwargs):
 
     if diff_var_att == 0:
         logging.info('no differences found in variable attributes!')
-#   elif diff_var_att != 0:
-#        ## if force==true, merge, but if force==false: the whole day will not be in list anymore
-#        if force == True:
-#            add_to_list(-1,selected_var_nc_ls,selected_att_nc_ls)
-#           print('\ndifferences found in variable attributes! But will be force-merged.\n')
-#        else:
-#           print('\ndifferences found in variable attributes! Selected Date will be skipped.\n')
-#           sys.exit()
-
+    # elif diff_var_att != 0:
+    #     ## if force==true, merge, but if force==false: the whole day will not be in list anymore
+    #     if force == True:
+    #         add_to_list(-1, selected_var_nc_ls, selected_att_nc_ls)
+    #         print('\ndifferences found in variable attributes! But will be force-merged.\n')
+    #     else:
+    #         print('\ndifferences found in variable attributes! Selected Date will be skipped.\n')
+    #         sys.exit()
 
     logging.info(selected_att_nc_ls)
     return selected_att_nc_ls
 
 
-def checking_timestamp(timestamp, device, raw_folder, output_path, **kwargs):
-    """"""
+def checking_timestamp(timestamp, device:str, raw_folder:Path, output_path:Path, **kwargs):
+    """...
+
+    Parameters
+    ----------
+    timestamp : ...
+        ...
+    device : str
+        Name of PollyXT device.
+    raw_folder : Path
+        Path to raw data folder.
+    output_path : Path
+        Path to output folder.
+    
+    Returns
+    -------
+    ...
+
+    Notes
+    -----
+    .. TODO:: Finish docstring!
+    """
     selected_timestamp_nc_ls = checking_attr(timestamp, device, raw_folder, output_path, **kwargs)
     if len(selected_timestamp_nc_ls) == 1:
         return selected_timestamp_nc_ls
@@ -503,8 +660,8 @@ def checking_timestamp(timestamp, device, raw_folder, output_path, **kwargs):
         polly_file_ds = Dataset(files, "r")
         polly_file_ds_ls.append(polly_file_ds)
 
-    for elementNR,ds in enumerate(polly_file_ds_ls):
-    #    print(selected_timestamp_nc_ls[elementNR])
+    for elementNR, ds in enumerate(polly_file_ds_ls):
+        # print(selected_timestamp_nc_ls[elementNR])
         timestamp_ds = ds.variables['measurement_time'][:]
         if 19700101 in timestamp_ds.T[0]:
             logging.info(f'The file: {selected_timestamp_nc_ls[elementNR]} contains incorrect timestamps!')
@@ -512,9 +669,9 @@ def checking_timestamp(timestamp, device, raw_folder, output_path, **kwargs):
             ## get correct timestamp_ds from filename
             timestamp_filename = selected_timestamp_nc_ls[elementNR]
             timestamp_filename = timestamp_filename.stem
-            timestamp_filename = re.split(r'_',str(timestamp_filename))[-3:]
+            timestamp_filename = re.split(r'_', str(timestamp_filename))[-3:]
             ## del. nc-file
-            #os.remove(selected_timestamp_nc_ls[elementNR]) ### remove unzipped nc-file with incorrect timestamps
+            # os.remove(selected_timestamp_nc_ls[elementNR]) ### remove unzipped nc-file with incorrect timestamps
             ## calc. the deltaT between measurementdatapoints
             laser_rep_rate = float(ds.variables['laser_rep_rate'][0])
             measurement_shots = ds.variables['measurement_shots'][:]
@@ -566,7 +723,6 @@ def checking_timestamp(timestamp, device, raw_folder, output_path, **kwargs):
                         else:
                             new_var[:] = var[:]
 
-
                     ds.close()
                     new_dataset.close()
                     os.remove(selected_timestamp_nc_ls[elementNR]) ### remove unzipped nc-file with incorrect timestamps
@@ -580,7 +736,6 @@ def checking_timestamp(timestamp, device, raw_folder, output_path, **kwargs):
         if ds.isopen():
             ds.close()
 
-
     logging.info('the following ' + str(len(selected_cor_timestamp_nc_ls)) + ' files can be merged:')
     logging.info(selected_cor_timestamp_nc_ls)
     return selected_cor_timestamp_nc_ls
@@ -591,11 +746,27 @@ def get_memory_usage():
     current, peak = tracemalloc.get_traced_memory()
     return current / 1024 / 1024, peak / 1024 / 1024  # MB
 
+
 def write_netcdf_robust(ds: xr.Dataset, out_file: Path,
                        comp_level: int = 1,
                        max_retries: int = 3) -> bool:
-    """
-    Robust NetCDF writing with retries and error handling
+    """Robust NetCDF writing with retries and error handling.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        ...
+    out_file : Path
+        ...
+    comp_level : int, optional
+        ... Default is 1.
+    max_retries : int, optional
+        ... Default is 3.
+    
+    Returns
+    -------
+    bool
+        True if ..., otherwise False.
     """
     
     # Start tracing memory
@@ -701,17 +872,27 @@ def write_netcdf_robust_old(ds: xr.Dataset, out_file: Path,
                        comp_level: int = 1,
                        max_retries: int = 3,
                        timeout_seconds: int = 600) -> bool:
-    """
-    Robust NetCDF writing with retries and error handling
+    """Robust NetCDF writing with retries and error handling.
     
-    Args:
-        ds: xr Dataset to write
-        out_file: Output file path
-        max_retries: Maximum number of retry attempts
-        timeout_seconds: Timeout in seconds
+    Parameters
+    ----------
+    ds : xr.Dataset 
+        Dataset to write.
+    out_file : Path
+        Output file path.
+    max_retries : int
+        Maximum number of retry attempts.
+    timeout_seconds : int
+        Timeout in seconds.
     
-    Returns:
-        bool: True if successful, False otherwise
+    Returns
+    -------
+    bool
+        True if successful, False otherwise.
+    
+    Notes
+    -----
+    - What is the difference between this function and the one above...
     """
     
     for attempt in range(max_retries):
@@ -784,11 +965,33 @@ def write_netcdf_robust_old(ds: xr.Dataset, out_file: Path,
     
     return False
 
-def concat_files(timestamp, device, raw_folder, output_path, **kwargs):
-    """"""
-    ## merge selected files
 
-    sel_polly_files_list = checking_timestamp(timestamp,device,raw_folder,output_path, **kwargs)
+def concat_files(timestamp, device:str, raw_folder:Path, output_path:Path, **kwargs) -> Path:
+    """...
+
+    Parametrs
+    ---------
+    timestamp : ...
+        ...
+    device : str
+        Name of Polly device.
+    raw_folder : Path
+        Path to the raw folder.
+    output_path : Path
+        Path to the output folder.
+    
+    Returns
+    -------
+    destination_file : Path
+        ...
+    
+    Notes
+    -----
+    .. TODO:: Finish docstring!
+    """
+    
+    ## merge selected files
+    sel_polly_files_list = checking_timestamp(timestamp, device, raw_folder, output_path, **kwargs)
 
     if len(sel_polly_files_list) == 0:
         logging.info('no files found for this day. no merging.')
@@ -800,19 +1003,19 @@ def concat_files(timestamp, device, raw_folder, output_path, **kwargs):
 
     if len(sel_polly_files_list) == 1:
         logging.info("Only one file found. Nothing to merge!")
-        os.rename(sel_polly_files_list[0],Path(output_path,filestring))
+        os.rename(sel_polly_files_list[0], Path(output_path, filestring))
         return ()
     else:
         ## parameters for controlling the merging process
         compat='override' ## Values of variable "laser_flashlamp" often changes, but those files will be merged anyway. This option picks the value from first dataset.
         coords='minimal'
 
-        ds = xr.open_mfdataset(sel_polly_files_list,combine = 'nested', data_vars="minimal", concat_dim="time", compat=compat, coords=coords)
+        ds = xr.open_mfdataset(sel_polly_files_list, combine = 'nested', data_vars="minimal", concat_dim="time", compat=compat, coords=coords)
         ## save to a single nc-file
         logging.info(f"merged nc-file '{filestring}' will be stored to '{output_path}'")
         logging.info("writing merged file ...")
 
-        merge_proc = write_netcdf_robust(ds=ds,out_file=Path(output_path,filestring_dummy))
+        merge_proc = write_netcdf_robust(ds=ds, out_file=Path(output_path, filestring_dummy))
 
         ds.close()
  
@@ -820,16 +1023,15 @@ def concat_files(timestamp, device, raw_folder, output_path, **kwargs):
             pass
         else:
             logging.error('merging failed. Aborting')
-            return None
+            return
 
     logging.info("deleting individual .nc files ...")
     for el in sel_polly_files_list:
         logging.info(el)
         os.remove(el)
-    destination_file = Path(output_path,filestring)
+    destination_file = Path(output_path, filestring)
     if os.path.exists(destination_file):
         os.remove(destination_file)  # Remove the existing destination file
-    os.rename(Path(output_path,filestring_dummy),destination_file)
+    os.rename(Path(output_path, filestring_dummy), destination_file)
     logging.info('done!')
     return destination_file
-

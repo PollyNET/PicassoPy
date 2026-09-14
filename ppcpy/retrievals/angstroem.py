@@ -27,6 +27,7 @@ def smooth_signal(signal:np.ndarray, window_len:int) -> np.ndarray:
     - 2026-02-04: Changed from scipy.ndimage.uniform_filter1d to ppcpy.misc.helper.uniform_filter.
     
     """
+
     return uniform_filter(signal, window_len)
 
 
@@ -61,8 +62,9 @@ def ae_cldFreeGrps(data_cube, ret_prof_name:str, collect_debug:bool=False) -> di
                   the higher of the two wavelengths, and discriminates between FR and NR.
 
     """
-    config_dict = data_cube.polly_config_dict
-    opt_profiles = data_cube.retrievals_profile[ret_prof_name]
+
+    config_dict = data_cube.polly_config_dict.copy()
+    opt_profiles = data_cube.retrievals_profile[ret_prof_name].copy()
 
     for i, cldFree in enumerate(data_cube.clFreeGrps):
         cldFree = cldFree[0], cldFree[1] + 1
@@ -77,10 +79,10 @@ def ae_cldFreeGrps(data_cube, ret_prof_name:str, collect_debug:bool=False) -> di
                 flag = (f'aer{prod}' in opt_profiles[i][ch1]) and (f'aer{prod}' in opt_profiles[i][ch2])
             else:
                 flag = False
-            #print(prod, wv1, wv2, tel, opt_profiles[i].keys(), ' -> ', flag)
+            # print(prod, wv1, wv2, tel, opt_profiles[i].keys(), ' -> ', flag)
 
             if flag:
-                print('channels available', ch1, ch2, prod)
+                logging.info(f"Channels: {ch1}, {ch2}. Product: {prod}.")
                 retrieval = opt_profiles[i][ch1]['retrieval']
 
                 ae, aeStd = calc_ae(
@@ -89,7 +91,8 @@ def ae_cldFreeGrps(data_cube, ret_prof_name:str, collect_debug:bool=False) -> di
                     param2=opt_profiles[i][ch2][f'aer{prod}'],
                     param2_std=opt_profiles[i][ch2][f'aer{prod}Std'],
                     wavelength1=wv1, wavelength2=wv2,
-                    smooth_window=config_dict[f"smoothWin_{retrieval}{'_'+tel if tel=='NR' else ''}_{wv2}"]
+                    # smooth_window=config_dict[f"smoothWin_{retrieval}{'_'+tel if tel=='NR' else ''}_{wv2}"]
+                    smooth_window=1 # Hard Coded!
                 )
 
                 opt_profiles[i][ch1][f'AE_{prod}_{wv1}_{wv2}'] = ae
@@ -101,7 +104,6 @@ def ae_cldFreeGrps(data_cube, ret_prof_name:str, collect_debug:bool=False) -> di
 def calc_ae(param1:np.ndarray, param1_std:np.ndarray, param2:np.ndarray, param2_std:np.ndarray,
             wavelength1:float, wavelength2:float, smooth_window:int=17) -> tuple:
     """Calculates the Ångström exponent and its uncertainty.
-
 
     Parameters
     ----------
@@ -127,28 +129,36 @@ def calc_ae(param1:np.ndarray, param1_std:np.ndarray, param2:np.ndarray, param2_
     angexpStd : array
         Uncertainty of Ångström exponent.
 
-
     Notes
     -----
-    Should the ratio be smoothed or not?? If we do not smooth the ratio then why are we
+    .. TODO:: Should the ratio be smoothed or not?? If we do not smooth the ratio then why are we
     considering the smoothing window in the error calculations??
     
     **History**
 
     - 2021-05-31: first edition by Zhenping
 
+    
     Examples
     --------
-    angexp, angexpStd = pollyAE(param1, param1_std, param2, param2_std, wavelength1, wavelength2)
+    angexp, angexpStd = calc_ae(param1, param1_std, param2, param2_std, wavelength1, wavelength2)
     
     """
+
+    param1 = param1.copy()
+    param2 = param2.copy()
+
     # Replace non-positive and 0 values with NaN
     param1 = np.where(param1 > 0, param1, np.nan)
     param2 = np.where(param2 > 0, param2, np.nan)
 
     # Compute smoothed ratio
-    #ratio = smooth_signal(param1, smooth_window) / smooth_signal(param2, smooth_window)
-    ratio = param1 / param2
+    if smooth_window > 1:
+        ratio = smooth_signal(param1, smooth_window) / smooth_signal(param2, smooth_window)
+    elif smooth_window == 1:
+        ratio = param1 / param2
+    else:
+        raise ValueError("Unsupported smoothing window size")
 
     # Compute Ångström exponent
     angexp = np.log(ratio) / np.log(wavelength2 / wavelength1)

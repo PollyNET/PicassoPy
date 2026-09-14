@@ -133,7 +133,8 @@ def pollyDisplayAttnBsc(nc_dict, config_dict, polly_conf_dict, saveFolder, wavel
     ## read from nc file
     ATT_BETA = nc_dict[f'attenuated_backscatter_{wavelength}nm']['data']
     if param == 'FR' or param == 'NR':
-        SNR = nc_dict[f'SNR_{wavelength}nm']['data']
+        if f'SNR_{wavelength}nm' in nc_dict.keys():
+            SNR = nc_dict[f'SNR_{wavelength}nm']['data']
         quality_mask = nc_dict[f'quality_mask_{wavelength}nm']['data']
     elif param == 'OC':
         quality_mask = np.where(ATT_BETA > 0, 0, 0)
@@ -356,6 +357,10 @@ def pollyDisplayAttnBsc(nc_dict, config_dict, polly_conf_dict, saveFolder, wavel
 
     ## plotting SNR
     if param == 'FR' or param == 'NR':
+        if f'SNR_{wavelength}nm' in nc_dict.keys():
+            pass
+        else:
+            return None
         ## fill time gaps in snr matrix
         SNR, quality_mask_SNR = readout.fill_time_gaps_of_matrix(time, SNR, quality_mask)
 
@@ -1927,10 +1932,20 @@ def pollyDisplayQR(nc_dict,config_dict, polly_conf_dict, saveFolder, q_param, q_
         zLim = polly_conf_dict['zLim_quasi_beta_1064']
     elif q_param == "angexp":
         zLim = polly_conf_dict['zLim_quasi_ANG']
+    elif q_param == "bsc_355":
+        zLim = polly_conf_dict['zLim_quasi_beta_355']        
     elif q_param == "bsc_532":
         zLim = polly_conf_dict['zLim_quasi_beta_532']        
     elif q_param == "par_depol_532":
         zLim = polly_conf_dict['zLim_quasi_Par_DR_532']
+    elif q_param == "vol_depol_532":
+        zLim = polly_conf_dict['zLim_quasi_Vol_DR_532']
+    elif q_param == "ext_355":
+        zLim = polly_conf_dict['zLim_quasi_ext']        
+    elif q_param == "ext_532":
+        zLim = polly_conf_dict['zLim_quasi_ext']        
+    if q_param == "ext_1064":
+        zLim = polly_conf_dict['zLim_quasi_ext']
 
     partnerLabel = polly_conf_dict['partnerLabel']
     colormap_basic = polly_conf_dict['colormap_basic']
@@ -1940,17 +1955,31 @@ def pollyDisplayQR(nc_dict,config_dict, polly_conf_dict, saveFolder, q_param, q_
 
     if q_param == "angexp":
         matrix = nc_dict['quasi_ang_532_1064']['data']
-        quality_mask = np.where(matrix > 0, 0, 0)
+        #quality_mask = np.where(matrix > 0, 0, 0)
+    elif q_param == "bsc_355":
+        matrix = nc_dict['quasi_bsc_355']['data']
+        #quality_mask = nc_dict['quality_mask_355']['data']
     elif q_param == "bsc_532":
         matrix = nc_dict['quasi_bsc_532']['data']
-        quality_mask = nc_dict['quality_mask_532']['data']
+        #quality_mask = nc_dict['quality_mask_532']['data']
     elif q_param == "bsc_1064":
         matrix = nc_dict['quasi_bsc_1064']['data']
-        quality_mask = nc_dict['quality_mask_1064']['data']
+        #quality_mask = nc_dict['quality_mask_1064']['data']
+    elif q_param == "ext_355":
+        matrix = nc_dict['quasi_ext_355']['data']
+        #quality_mask = nc_dict['quality_mask_355']['data']
+    elif q_param == "ext_532":
+        matrix = nc_dict['quasi_ext_532']['data']
+        #quality_mask = nc_dict['quality_mask_532']['data']
+    elif q_param == "ext_1064":
+        matrix = nc_dict['quasi_ext_1064']['data']
+        #quality_mask = nc_dict['quality_mask_1064']['data']
+    elif q_param == "vol_depol_532":
+        matrix = nc_dict['quasi_voldepol_532']['data']
     elif q_param == "par_depol_532":
         matrix = nc_dict['quasi_pardepol_532']['data']
         #quality_mask = nc_dict['quality_mask_voldepol']
-        quality_mask = nc_dict['quality_mask_voldepol_532']['data']
+        #quality_mask = nc_dict['quality_mask_voldepol_532']['data']
     
     height = nc_dict['height']['data']
     time = nc_dict['time']['data']
@@ -1971,6 +2000,14 @@ def pollyDisplayQR(nc_dict,config_dict, polly_conf_dict, saveFolder, q_param, q_
         if q_version == "V2":
             plotfile = f'{dataFilename}_Quasi_ANGEXP_532_1064_V2.{imgFormat}'
         quasi_title = f'Quasi BSC Angstroem Exponent 532-1064 ({q_version}) of {pollyVersion} at {location}'
+    if q_param == "bsc_355":
+        prodtype = "Quasi_Bsc_355"
+        wavelength = 355
+        if q_version == "V1":
+            plotfile = f'{dataFilename}_Quasi_Bsc_355.{imgFormat}'
+        if q_version == "V2":
+            plotfile = f'{dataFilename}_Quasi_Bsc_355_V2.{imgFormat}'
+        quasi_title = f'Quasi backscatter coefficient ({q_version}) at 355 nm from {pollyVersion} at {location}'
     if q_param == "bsc_532":
         prodtype = "Quasi_Bsc_532"
         wavelength = 532
@@ -1987,6 +2024,30 @@ def pollyDisplayQR(nc_dict,config_dict, polly_conf_dict, saveFolder, q_param, q_
         if q_version == "V2":
             plotfile = f'{dataFilename}_Quasi_Bsc_1064_V2.{imgFormat}'
         quasi_title = f'Quasi backscatter coefficient ({q_version}) at 1064 nm from {pollyVersion} at {location}'
+    if q_param == "ext_355":
+        prodtype = "Quasi_Ext_355"
+        wavelength = 355
+        if q_version == "V1":
+            plotfile = f'{dataFilename}_Quasi_Ext_355.{imgFormat}'
+        if q_version == "V2":
+            plotfile = f'{dataFilename}_Quasi_Ext_355_V2.{imgFormat}'
+        quasi_title = f'Quasi extinction ({q_version}) at 355 nm from {pollyVersion} at {location}'
+    if q_param == "ext_532":
+        prodtype = "Quasi_Ext_532"
+        wavelength = 532
+        if q_version == "V1":
+            plotfile = f'{dataFilename}_Quasi_Ext_532.{imgFormat}'
+        if q_version == "V2":
+            plotfile = f'{dataFilename}_Quasi_Ext_532_V2.{imgFormat}'
+        quasi_title = f'Quasi extinction ({q_version}) at 532 nm from {pollyVersion} at {location}'
+    if q_param == "ext_1064":
+        prodtype = "Quasi_Ext_1064"
+        wavelength = 1064
+        if q_version == "V1":
+            plotfile = f'{dataFilename}_Quasi_Ext_1064.{imgFormat}'
+        if q_version == "V2":
+            plotfile = f'{dataFilename}_Quasi_Ext_1064_V2.{imgFormat}'
+        quasi_title = f'Quasi extinction ({q_version}) at 1064 nm from {pollyVersion} at {location}'
     if q_param == "par_depol_532":
         prodtype = "Quasi_PDR_532"
         wavelength = 532
@@ -1995,10 +2056,19 @@ def pollyDisplayQR(nc_dict,config_dict, polly_conf_dict, saveFolder, q_param, q_
         if q_version == "V2":
             plotfile = f'{dataFilename}_Quasi_PDR_532_V2.{imgFormat}'
         quasi_title = f'Quasi particle depolarization ratio ({q_version}) at 532 nm from {pollyVersion} at {location}'
+    if q_param == "vol_depol_532":
+        prodtype = "Quasi_VDR_532"
+        wavelength = 532
+        if q_version == "V1":
+            plotfile = f'{dataFilename}_Quasi_VDR_532.{imgFormat}'
+        if q_version == "V2":
+            plotfile = f'{dataFilename}_Quasi_VDR_532_V2.{imgFormat}'
+        quasi_title = f'Quasi volume depolarization ratio ({q_version}) at 532 nm from {pollyVersion} at {location}'
 
     saveFilename = os.path.join(saveFolder,plotfile)
 
     ## fill time gaps in att_bsc matrix
+    quality_mask = np.full_like(matrix, fill_value=np.nan, dtype=float) ## dummy-quality_mask
     matrix, quality_mask = readout.fill_time_gaps_of_matrix(time, matrix, quality_mask)
 
     ## get date and convert to datetime object
@@ -2019,7 +2089,7 @@ def pollyDisplayQR(nc_dict,config_dict, polly_conf_dict, saveFolder, q_param, q_
     extent = [ x_lims[0], x_lims[-1], max_height[0], max_height[-1] ]
 
     ## mask matrix
-    matrix = np.ma.masked_where(quality_mask < 0, matrix)
+    #matrix = np.ma.masked_where(quality_mask < 0, matrix)
     
     ## slice matrix to max_height
     matrix = matrix[:,0:len(max_height)]
@@ -2330,7 +2400,7 @@ def pollyDisplay_Overlap(nc_dict,config_dict,polly_conf_dict,outdir,donefilelist
                                     )
 
 
-def pollyDisplayRCS(nc_dict, config_dict, polly_conf_dict, saveFolder, wavelength, param,donefilelist_dict):
+def pollyDisplay_preprocessed(nc_dict, config_dict, polly_conf_dict, saveFolder, variable,donefilelist_dict):
     """
     Description
     -----------
@@ -2338,15 +2408,13 @@ def pollyDisplayRCS(nc_dict, config_dict, polly_conf_dict, saveFolder, wavelengt
 
     Parameters
     ----------
+    variable: variables for SNR or RCS or BG, e.g. RCS_532_total_NR
     nc_dict: dict
-        dict wich stores the RCS data.
-    wavelength: int
-        the selected wavelength channel: e.g.: 355/532/1064 nm
+        dict which stores the preprocessed data (SNR,RCS or BG).
 
     Usage
     -----
-    pollyDisplayRCS(nc_dict, config_dict, polly_conf_dict, saveFolder, wavelength, param)
-    param can be one of the following: ['FR','NR']
+    pollyDisplay_preprocessed(nc_dict, config_dict, polly_conf_dict, saveFolder, variable,donefilelist_dict)
 
     History
     -------
@@ -2358,21 +2426,23 @@ def pollyDisplayRCS(nc_dict, config_dict, polly_conf_dict, saveFolder, wavelengt
     fontname = config_dict['fontname']
 
 
-
+    var, wavelength, polarization, telescope = readout.gf(variable)
+    #print(var, wavelength, polarization, telescope)
     ## read from global config file
-    if "FR" in param or "RR" in param:
-        param_l = "FR"
-    elif "NR" in param:
-        param_l = "NR"
-    yLim = polly_conf_dict[f'yLim_{param_l}_RCS']
-    zLim = polly_conf_dict[f'zLim_{param_l}_RCS_{wavelength}']
+#    yLim = polly_conf_dict[f'yLim_{telescope}_{var}']
+    yLim = polly_conf_dict[f'yLim_{telescope}_RCS']
+    #zLim = polly_conf_dict[f'zLim_{telescope}_{var}_{wavelength}']
+    try:
+        zLim = polly_conf_dict[f'zLim_{telescope}_{var}_{wavelength}']
+    except:
+        zLim = [None,None]
     partnerLabel = polly_conf_dict['partnerLabel']
     colormap_basic = polly_conf_dict['colormap_basic']
     imgFormat = polly_conf_dict['imgFormat']
 
     ## read from nc file
-    RCS_matrix = nc_dict[f'RCS_{param}_{wavelength}nm']
-    quality_mask = np.where(RCS_matrix > 0, 0, -999.0)
+    data_matrix = nc_dict[variable]['data']
+    quality_mask = np.where(data_matrix > 0, 0, -999.0)
 
     height = nc_dict['height']['data']
     time = nc_dict['time']['data']
@@ -2380,24 +2450,21 @@ def pollyDisplayRCS(nc_dict, config_dict, polly_conf_dict, saveFolder, wavelengt
     pollyVersion = nc_dict['PollyVersion']
     location = nc_dict['location']
     version = nc_dict['PicassoVersion']
-    dataFilename = re.split(r'_RCS',nc_dict['PollyDataFile'])[0]
+    dataFilename = re.split(f'_{var}',nc_dict['PollyDataFile'])[0]
 
     # set the default font
     matplotlib.rcParams['font.sans-serif'] = fontname
     matplotlib.rcParams['font.family'] = "sans-serif"
 
-    plotfile = f'{dataFilename}_RCS_{param}_{wavelength}.{imgFormat}'
-    prod_type = f'RCS_{param}_{wavelength}'
-
+    plotfile = f'{dataFilename}_{variable}.{imgFormat}'
     saveFilename = os.path.join(saveFolder,plotfile)
 
     ## fill time gaps in att_bsc matrix
-#    RCS_matrix, quality_mask_ATT = readout.fill_time_gaps_of_matrix(time, RCS_matrix, quality_mask)
-    RCS_matrix = readout.fill_time_gaps_of_single_matrix(time, RCS_matrix)
+    data_matrix = readout.fill_time_gaps_of_single_matrix(time, data_matrix)
     
 
     ## get date and convert to datetime object
-    date_00 = datetime.strptime(nc_dict['m_date'], '%Y-%m-%d')
+    date_00 = datetime.strptime(nc_dict['m_date'], '%Y%m%d')
     date_00 = date_00.timestamp()
     
     ## set x-lim to 24h or only to last available timestamp
@@ -2414,17 +2481,17 @@ def pollyDisplayRCS(nc_dict, config_dict, polly_conf_dict, saveFolder, wavelengt
     extent = [ x_lims[0], x_lims[-1], max_height[0], max_height[-1] ]
 
 #    ## mask matrix
-    RCS_matrix = np.ma.masked_where(RCS_matrix <= 0, RCS_matrix)
+    data_matrix = np.ma.masked_where(data_matrix <= 0, data_matrix)
     
     ## slice matrix to max_height
-    RCS_matrix = RCS_matrix[:,0:len(max_height)]
+    data_matrix = data_matrix[:,0:len(max_height)]
 
     ## trimm matrix to last available timestamp if neccessary
-    RCS_matrix = readout.trimm_matrix_to_last_timestamp(flagPlotLastProfilesOnly=config_dict['flagPlotLastProfilesOnly'],matrix=RCS_matrix,mdate=date_00,profile_length=int(np.nanmean(np.diff(time))),last_timestamp=nc_dict['time']['data'][-1])
+    data_matrix = readout.trimm_matrix_to_last_timestamp(flagPlotLastProfilesOnly=config_dict['flagPlotLastProfilesOnly'],matrix=data_matrix,mdate=date_00,profile_length=int(np.nanmean(np.diff(time))),last_timestamp=nc_dict['time']['data'][-1])
 
     ## transpose and flip for correct plotting
-    RCS_matrix= np.ma.transpose(RCS_matrix)  ## matrix has to be transposed for usage with pcolormesh!
-    RCS_matrix= np.flip(RCS_matrix,0)
+    data_matrix= np.ma.transpose(data_matrix)  ## matrix has to be transposed for usage with pcolormesh!
+    data_matrix= np.flip(data_matrix,0)
 
     # define the colormap
     cmap = load_colormap(name=colormap_basic)
@@ -2440,7 +2507,7 @@ def pollyDisplayRCS(nc_dict, config_dict, polly_conf_dict, saveFolder, wavelengt
     fig = plt.figure(figsize=[12, 6])
     ax = fig.add_axes([0.11, 0.15, 0.79, 0.75])
     pcmesh = ax.imshow(
-            RCS_matrix / 1e6,
+            data_matrix / 1e6,
             cmap=cmap,
             vmin=zLim[0],
             vmax=zLim[1],
@@ -2470,18 +2537,21 @@ def pollyDisplayRCS(nc_dict, config_dict, polly_conf_dict, saveFolder, wavelengt
         right=True, top=True)
 
     ax.set_title(
-        'Range Corrected Signal at {wave} nm'.format(wave = wavelength) +
+        '{var} at {wave} nm'.format(var=var,wave = wavelength) +
         ' {param} of {instrument} at {location}'.format(
-            param=param,
+            param=telescope,
             instrument=pollyVersion,
             location=location),
         fontsize=15)
-
+    if zLim[0] is None or zLim[1] is None:
+        tick_values = None
+    else:
+        tick_values = np.linspace(zLim[0], zLim[1], 5)
     cb_ax = fig.add_axes([0.92, 0.25, 0.02, 0.55])
     cbar = fig.colorbar(
         pcmesh,
         cax=cb_ax,
-        ticks=np.linspace(zLim[0], zLim[1], 5),
+        ticks=tick_values,
         orientation='vertical')
     cbar.ax.tick_params(direction='in', labelsize=15, pad=5)
 #    cbar.ax.set_title('      $Mm^{-1}*sr^{-1}$\n', fontsize=10)
@@ -2527,7 +2597,7 @@ def pollyDisplayRCS(nc_dict, config_dict, polly_conf_dict, saveFolder, wavelengt
     remove_widht_height_entry_from_svg_file(saveFilename,imgFormat)
 
     
-
+    prod_type = variable
     ## write2donefilelist
     readout.write2donefilelist_dict(donefilelist_dict = donefilelist_dict,
                                     lidar = pollyVersion,
@@ -2538,7 +2608,203 @@ def pollyDisplayRCS(nc_dict, config_dict, polly_conf_dict, saveFolder, wavelengt
                                     wavelength = wavelength,
                                     filename = saveFilename,
                                     level = 0,
-                                    info = f"Range corrected Signal plots for {param} at {wavelength}",
+                                    info = f"{var} plots for {telescope} at {wavelength}",
+                                    nc_zip_file = nc_dict['PollyDataFile'],
+                                    nc_zip_file_size = 9000000,
+                                    active = 1,
+                                    GDAS = 0,
+                                    GDAS_timestamp = f"{datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d')} 12:00:00",
+                                    lidar_ratio = 50,
+                                    software_version = version,
+                                    product_type = prod_type,
+                                    product_starttime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d %H:%M:%S'),
+                                    product_stoptime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][-1])).strftime('%Y%m%d %H:%M:%S')
+                                    )
+    
+
+def pollyDisplay_preprocessed_BG(nc_dict, config_dict, polly_conf_dict, saveFolder, variable,donefilelist_dict):
+    """
+    Description
+    -----------
+    Display the RangeCorrected (FR/NR) of wavelength [nm] channel from level1 polly nc-file.
+
+    Parameters
+    ----------
+    variable: variables for SNR or RCS or BG, e.g. RCS_532_total_NR
+    nc_dict: dict
+        dict which stores the preprocessed data (SNR,RCS or BG).
+
+    Usage
+    -----
+    pollyDisplay_preprocessed(nc_dict, config_dict, polly_conf_dict, saveFolder, variable,donefilelist_dict)
+
+    History
+    -------
+    2022-09-01. First edition by Andi
+    """
+    ## read from config file
+    figDPI = config_dict['figDPI']
+    flagWatermarkOn = config_dict['flagWatermarkOn']
+    fontname = config_dict['fontname']
+
+
+    var, wavelength, polarization, telescope = readout.gf(variable)
+    ## read from global config file
+    partnerLabel = polly_conf_dict['partnerLabel']
+    colormap_basic = polly_conf_dict['colormap_basic']
+    imgFormat = polly_conf_dict['imgFormat']
+
+    ## read from nc file
+    data_matrix = nc_dict[variable]['data']
+    #quality_mask = np.where(data_matrix > 0, 0, -999.0)
+
+    time = nc_dict['time']['data']
+
+    timediffs = np.diff(time)
+    diffs_rounded = np.round(timediffs, decimals=3)
+    vals, counts = np.unique(diffs_rounded, return_counts=True)
+    common_delta = vals[np.argmax(counts)]
+    seconds_in_day = 86400
+
+    # 00:00:00 UTC dieses Tages
+    start_of_day = (time[0] // seconds_in_day) * seconds_in_day
+    
+    # Bis exakt zum Ende des Tages (00:00:00 UTC des Folgetages)
+    end_of_day = start_of_day + seconds_in_day
+    
+    # --- SCHRITT 3: Den kompletten Tag lückenlos generieren ---
+    # np.arange stoppt EXKLUSIVE dem Endwert. 
+    # Bei 30s Delta ist der letzte Punkt somit 23:59:30 UTC.
+    perfect_day_timestamps = np.arange(start_of_day, end_of_day, common_delta)
+    
+
+    pollyVersion = nc_dict['PollyVersion']
+    location = nc_dict['location']
+    version = nc_dict['PicassoVersion']
+    dataFilename = re.split(f'_{var}',nc_dict['PollyDataFile'])[0]
+
+    # set the default font
+    matplotlib.rcParams['font.sans-serif'] = fontname
+    matplotlib.rcParams['font.family'] = "sans-serif"
+
+    plotfile = f'{dataFilename}_{variable}.{imgFormat}'
+    saveFilename = os.path.join(saveFolder,plotfile)
+
+    ## fill time gaps in att_bsc matrix
+    data_matrix_h = np.expand_dims(data_matrix, axis=1) ## add dummy-height-dim
+    data_matrix_h = readout.fill_time_gaps_of_single_matrix(time, data_matrix_h)
+    
+
+    ## get date and convert to datetime object
+    date_00 = datetime.strptime(nc_dict['m_date'], '%Y%m%d')
+    date_00 = date_00.timestamp()
+    
+    ## set x-lim to 24h or only to last available timestamp
+    x_lims = readout.set_x_lims(flagPlotLastProfilesOnly=config_dict['flagPlotLastProfilesOnly'],mdate=date_00,last_timestamp=nc_dict['time']['data'][-1])
+
+    ## convert these datetime.datetime objects to the correct format for matplotlib to work with.
+    x_lims = date2num(x_lims)
+
+    ## trimm matrix to last available timestamp if neccessary
+    data_matrix_h = readout.trimm_matrix_to_last_timestamp(flagPlotLastProfilesOnly=config_dict['flagPlotLastProfilesOnly'],matrix=data_matrix_h,mdate=date_00,profile_length=int(np.nanmean(np.diff(time))),last_timestamp=nc_dict['time']['data'][-1])
+
+    data_matrix = np.squeeze(data_matrix_h, axis=1)
+    if len(perfect_day_timestamps) < len(data_matrix):
+        data_matrix = data_matrix[0:len(perfect_day_timestamps)]
+    elif len(perfect_day_timestamps) > len(data_matrix):
+        perfect_day_timestamps = perfect_day_timestamps[0:len(data_matrix)]
+
+    data_matrix = np.where(data_matrix > 0, data_matrix, 0)
+
+
+    print(f"plotting {plotfile} ... ")
+    # display attenuate backscatter
+    fig = plt.figure(figsize=[12, 6])
+    ax = fig.add_axes([0.11, 0.15, 0.79, 0.75])
+    ax.plot(perfect_day_timestamps.astype('datetime64[s]'),data_matrix)
+    # convert the datetime data from a float (which is the output of date2num into a nice datetime string.
+    ax.xaxis_date()
+
+    ax.set_xlabel('Time [UTC]', fontsize=15)
+    ax.set_ylabel('Background [a.u.]', fontsize=15)
+
+    ax.xaxis.set_minor_locator(HourLocator(interval=1))    # every hour
+    if config_dict['flagPlotLastProfilesOnly'] == True:
+        ax.xaxis.set_major_locator(HourLocator(interval=2))
+    else:
+        ax.xaxis.set_major_locator(HourLocator(byhour = [4,8,12,16,20,24]))
+
+    ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
+#    
+    ax.tick_params(
+        axis='both', which='major', labelsize=15, right=True,
+        top=True, width=2, length=5)
+    ax.tick_params(
+        axis='both', which='minor', width=1.5, length=3.5,
+        right=True, top=True)
+
+    ax.set_title(
+        'Background Signal at {wave} nm'.format(wave = wavelength) +
+        ' {param} of {instrument} at {location}'.format(
+            param=telescope,
+            instrument=pollyVersion,
+            location=location),
+        fontsize=15)
+
+
+    # add watermark
+    if flagWatermarkOn:
+        #rootDir = os.getcwd()
+        rootDir = os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        im_license = matplotlib.image.imread(
+            os.path.join(rootDir, 'ppcpy', 'img', 'by-sa.png'))
+
+        newax_license = fig.add_axes([0.58, 0.006, 0.14, 0.07], zorder=10)
+        newax_license.imshow(im_license, alpha=0.8, aspect='equal')
+        newax_license.axis('off')
+
+        fig.text(0.72, 0.003, 'Preliminary\nResults.',
+                 fontweight='bold', fontsize=12, color='red',
+                 ha='left', va='bottom', alpha=0.8, zorder=10)
+
+        fig.text(
+            0.84, 0.003,
+            u"\u00A9 {1} {0}.\nCC BY SA 4.0 License.".format(
+                datetime.now().strftime('%Y'), partnerLabel),
+            fontweight='bold', fontsize=7, color='black', ha='left',
+            va='bottom', alpha=1, zorder=10)
+
+    fig.text(
+        0.05, 0.02,
+        '{0}'.format(nc_dict['m_date']), fontsize=12)
+
+    fig.text(
+        0.2, 0.02,
+        'Version: {version}'.format(
+            version=version),
+        fontsize=12)
+
+    print(saveFilename)
+    print(figDPI)
+    fig.savefig(saveFilename,dpi=figDPI)
+
+    plt.close()
+    remove_widht_height_entry_from_svg_file(saveFilename,imgFormat)
+
+    
+    prod_type = variable
+    ## write2donefilelist
+    readout.write2donefilelist_dict(donefilelist_dict = donefilelist_dict,
+                                    lidar = pollyVersion,
+                                    location = nc_dict['location'],
+                                    starttime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d %H:%M:%S'),
+                                    stoptime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][-1])).strftime('%Y%m%d %H:%M:%S'),
+                                    last_update = datetime.now(timezone.utc).strftime("%Y%m%d %H:%M:%S"),
+                                    wavelength = wavelength,
+                                    filename = saveFilename,
+                                    level = 0,
+                                    info = f"Background Signal plots for {telescope} at {wavelength}",
                                     nc_zip_file = nc_dict['PollyDataFile'],
                                     nc_zip_file_size = 9000000,
                                     active = 1,

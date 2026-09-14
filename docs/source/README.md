@@ -22,6 +22,8 @@ python3 tests\picassopy_testing.py --picasso_config_file "pollynet_processing_ch
 ```
 
 ### Contribute
+Your contribution is welcomed! Just have a look into the issue, some of them are quite easy to fix or file one yourself detailing a bug you found.
+Additions to the documentation or tests is also always encouraged. Also, if you want to contribute more sophisticated algorithms feel free to file a pull request.
 
 ### History
 

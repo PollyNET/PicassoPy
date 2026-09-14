@@ -3,35 +3,47 @@ import logging
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 import pandas as pd
+import numpy as np
 
 import ppcpy.misc.helper as helper
 from ppcpy.misc.helper import default_to_regular
 
+
 mapping:dict = {'far_range': 'FR', 'near_range': 'NR', 'dfov': 'DFOV'}
 mapping_inverse:dict = {y: x for x, y in mapping.items()}
 
+
 def string_to_ts(s):
-    """string of format %Y-%m-%d %H:%M:%S to timestamp (timezone-aware)"""
+    """String of format %Y-%m-%d %H:%M:%S to timestamp (timezone-aware)"""
     return datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc).timestamp()
 
+
 def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str]) -> dict:
-    """read lidar calibration constant or depol calibration from database
+    """Read lidar calibration constant or depol calibration from database.
 
     Parameters
     ----------
     db_path : str
-        name of the specific sqlite db file.
+        Name of the specific sqlite db file.
     table_name : str
-        default 'lidar_calibration_constant'
+        Default 'lidar_calibration_constant'.
     ts_interval : str
-        the date or timestamp to look for
-
+        The date or timestamp to look for.
     
     Returns
     -------
     dict
         in calibration storage format
+    
+    **History**
+    
+    - 2026-03-28: First edition by Radenz.
+    - 2026-05-08: Added check for table existence. Added retrieval methods.
+
     """
+
+    ret = {}
+    
     delta = timedelta(hours=24)
     start = (
         datetime.fromtimestamp(ts_interval[0], timezone.utc) - delta
@@ -40,12 +52,19 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str]) -> dict:
         datetime.fromtimestamp(ts_interval[0], timezone.utc) + delta
         ).strftime("%Y-%m-%d %H:%M")
     with sqlite3.connect(db_path) as conn:
+        exists = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?;",
+            (table_name,)
+        ).fetchone()
+
+        if exists is None:
+            logging.warning(f"Database {db_path} not found.")
+            return ret
+        
         df = pd.read_sql_query(
             f'SELECT * FROM {table_name} WHERE cali_start_time BETWEEN ? AND ?;', 
             conn, params=(start, end))
     conn.close()
-
-    ret = {}
 
     if table_name == 'lidar_calibration_constant':
         d = defaultdict(list)
@@ -54,9 +73,11 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str]) -> dict:
             d[k].append({
                 'LC': row['liconst'], 'LCStd': row['uncertainty_liconst'],
                 'time_start': int(string_to_ts(row['cali_start_time'])), 
-                'time_end': int(string_to_ts(row['cali_stop_time'])), 
+                'time_end': int(string_to_ts(row['cali_stop_time'])),
+                'method': 'raman_db',
             })
         ret['raman_db'] = default_to_regular(d)
+        logging.info(f"Loaded {len(ret['raman_db'])} lines from table 'lidar_calibration_constant' with 'Raman_Method'.")
 
         d = defaultdict(list)
         for index, row in df[df.cali_method == 'Klett_Method'].iterrows():
@@ -64,10 +85,11 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str]) -> dict:
             d[k].append({
                 'LC': row['liconst'], 'LCStd': row['uncertainty_liconst'],
                 'time_start': int(string_to_ts(row['cali_start_time'])), 
-                'time_end': int(string_to_ts(row['cali_stop_time'])), 
+                'time_end': int(string_to_ts(row['cali_stop_time'])),
+                'method': 'klett_db',
             })
-
         ret['klett_db'] = default_to_regular(d)
+        logging.info(f"Loaded {len(ret['klett_db'])} lines from table 'lidar_calibration_constant' with 'Klett_Method'.")
 
     if table_name == 'depol_calibration_constant':
         d = defaultdict(list)
@@ -76,9 +98,12 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str]) -> dict:
             d[k].append({
                 'eta': row['depol_const'], 'eta_std': row['uncertainty_depol_const'],
                 'time_start': int(string_to_ts(row['cali_start_time'])), 
-                'time_end': int(string_to_ts(row['cali_stop_time'])), 
+                'time_end': int(string_to_ts(row['cali_stop_time'])),
+                'method': 'D90_db',
+                # 'status': 1,
             })
         ret['D90_db'] = default_to_regular(d)
+        logging.info(f"Loaded {len(ret['D90_db'])} lines from table 'depol_calibration_constant'.")
 
     if table_name == 'wv_calibration_constant':
             d = defaultdict(list)
@@ -102,24 +127,35 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str]) -> dict:
             regression_db = default_to_regular(d)
 
             ret['model'] = {'profile': profile_db, 'regression': regression_db}
-        
+            logging.info(f"Loaded {len(ret['model'])} lines from table 'wv_calibration_constant'.")
+
     return ret
 
+
 def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tuple]:
-    """
-    Collect all necessary variable and save it to a list of tuples for inserting into a SQLite table.
+    """Collect all necessary variable and save it to a list of 
+    tuples for inserting into a SQLite table.
 
     Parameters
     ----------
     data_cube : object
+        Main PicassoProc object
     parameter :str
-        LC or DC
+        Name of parameter to stoere eg. 'LC' or 'DC'.
     method : str
-        klett or raman
+        Name of retrieval method used to retrieve the parameter
+        eg. 'klett' or 'raman'.
         
     Returns
     -------
     rows_to_insert : list of tuples
+        Rows to insert in the database.
+
+    ** History **
+
+    - xxxx-xx-xx: First edition by
+    - xxxx-xx-xx: Translated to python.
+    
     """
 
     rows_to_insert = []
@@ -132,15 +168,14 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
     elif method == 'regression':
         method_db = 'Regression_Method'
 
-    print(data_cube.LC.keys())
     if parameter == 'LC':
-        for e in data_cube.LC[method].keys():
+        for e in data_cube.LC.get(method, {}).keys():
             wv, pol, tel =  helper.get_wv_pol_telescope_from_dictkeyname(e)
             tel_db = mapping_inverse[tel]
             for line in data_cube.LC[method][e]:
                 LC = line['LC']
                 LC_std = line['LCStd']
-                LC_is_used = True if LC == data_cube.LCused[e] else False
+                LC_is_used = True if LC == data_cube.LCused[e]['LC'] else False
                 start_unix = line['time_start']
                 stop_unix = line['time_end']
                 start = datetime.fromtimestamp(start_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
@@ -150,13 +185,13 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                     wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
 
     elif parameter == 'DC':
-        for e in data_cube.pol_cali['D90'].keys():
+        for e in data_cube.pol_cali.get('D90', {}).keys():
             wv, tel = e.split('_')
             tel_db = mapping_inverse[tel]
             for line in data_cube.pol_cali['D90'][e]:
                 eta = line['eta']
                 eta_std = line['eta_std']
-                eta_is_used = True if eta == data_cube.etaused[e] else False
+                eta_is_used = True if eta == data_cube.etaused[e]['eta'] else False
                 start_unix = line['time_start']
                 stop_unix = line['time_end']
                 start = datetime.fromtimestamp(start_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
@@ -183,7 +218,9 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                     wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
     return rows_to_insert
 
-def setup_empty(db_path:str, table_name:str, column_names:list[str], data_types:list[str], unique:str=''):
+
+def setup_empty(db_path:str, table_name:str, column_names:list[str],
+                data_types:list[str], unique:str=''):
     """Create/Initialise an empty database.
 
     Parameters
@@ -209,7 +246,8 @@ def setup_empty(db_path:str, table_name:str, column_names:list[str], data_types:
     conn.close()
 
 
-def write_rows_to_sql_db(db_path:str, table_name:str, column_names:list[str], rows_to_insert:list[str]):
+def write_rows_to_sql_db(db_path:str, table_name:str, column_names:list[str],
+                         rows_to_insert:list[str]):
     """Insert multiple rows into a SQLite table.
 
     Parameters
@@ -226,15 +264,15 @@ def write_rows_to_sql_db(db_path:str, table_name:str, column_names:list[str], ro
         
     Notes
     -----
-    The IGNORE syntax somehow did not work.
-    With the UNIQUE colums defined and INSERT OR REPLACE at least the new values are updated.
-    Though they are given a new ID.
+    - The IGNORE syntax somehow did not work.
+      With the UNIQUE colums defined and INSERT OR REPLACE at least the new values are updated.
+      Though they are given a new ID.
     
     """
 
     placeholders = ', '.join(['?'] * len(column_names))
     columns = ', '.join(column_names)
-    #sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders}) ON CONFLICT(cali_start_time, cali_stop_time, wavelength, polly_type, telescope) DO UPDATE SET data = excluded.data"
+    # sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders}) ON CONFLICT(cali_start_time, cali_stop_time, wavelength, polly_type, telescope) DO UPDATE SET data = excluded.data"
     sql = f"INSERT OR REPLACE INTO {table_name} ({columns}) VALUES ({placeholders})"
 
     try:
@@ -251,5 +289,3 @@ def write_rows_to_sql_db(db_path:str, table_name:str, column_names:list[str], ro
             logging.info(f"{inserted} rows inserted into '{table_name}'.")
     except sqlite3.Error as e:
         logging.warning(f"SQLite error: {e}")
-
-

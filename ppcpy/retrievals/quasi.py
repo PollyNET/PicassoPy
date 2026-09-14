@@ -27,6 +27,7 @@ def quasi_pdr(data_cube, wvs:list=[532], version:str='V1'):
     - xxxx-xx-xx: First edition by ...
     - xxxx-xx-xx: AI based translation to python
     - 2026-05-27: Added flag to use only valid data
+
     """
 
     rgs = data_cube.retrievals_highres['range']
@@ -64,7 +65,7 @@ def quasi_pdr(data_cube, wvs:list=[532], version:str='V1'):
             sigt=sigt, sigc=sigc,
             Gt=config_dict['G'][flagt], Gr=config_dict['G'][flagc],
             Ht=config_dict['H'][flagt], Hr=config_dict['H'][flagc],
-            eta=data_cube.etaused[f"{wv}_{tel}"],
+            eta=data_cube.etaused[f"{wv}_{tel}"]['eta'],
             voldepol_error=config_dict[f'voldepol_error_{wv}'],
             window=1
         )
@@ -108,6 +109,7 @@ def quasi_angstrom(data_cube, version:str='V1'):
     - xxxx-xx-xx: First edition by ...
     - xxxx-xx-xx: AI based translation to python
     - 2026-05-21: Fixed calculation
+
     """
 
     t = 'total'
@@ -140,6 +142,7 @@ def target_cat(data_cube, version:str='V1'):
     - xxxx-xx-xx: First edition by ...
     - xxxx-xx-xx: AI based translation to python
     - 2026-05-21: Added dependency on Quality mask
+
     """
 
     config_dict = data_cube.polly_config_dict
@@ -295,6 +298,7 @@ def target_classify(height:np.ndarray, attBeta532:np.ndarray, quasiBsc1064:np.nd
     - 2021-06-05: First edition by Zhenping
     - 2025-03-25: AI based translation to python
     - 2026-05-21: Fixed dimension issue
+
     """
 
     # Default parameter values
@@ -413,10 +417,11 @@ def detect_liquid_bits(height:np.ndarray, bsc1064:np.ndarray, cloudThresBsc1064:
     - 2021-06-05: First edition by Zhenping
     - 2025-03-25: AI based translation to python
     - 2026-05-21: Fixed dimension issue
+
     """
 
     logging.warning("Still in testing phase, may show strange classifications.")
-    # bsc1064 = np.nan_to_num(bsc1064)  # Replace NaN 0 and inf with large positive or negative numbers
+    # bsc1064 = np.nan_to_num(bsc1064)  # Replace NaN with 0 and inf with large positive or negative numbers
     bsc1064[~np.isfinite(bsc1064)] = 0 # Replace NaN and inf with 0
     flagLiquid = np.zeros_like(bsc1064, dtype=bool)
     

@@ -135,30 +135,34 @@ main() {
 	    echo $DEVICE
 	    for DATE in ${DATE_LS[@]}; do
 	        echo $DATE
-            ## check number of available level1-files
-            ## 24h-file vs. multiple individual processed files
-            #PATTERN="*[0-9][0-9]_att_bsc*.nc"
-            PATTERN="*${DEVICE}_att_bsc.nc"
-            echo $PATTERN
-            YYYY=${DATE:0:4}
-            MM=${DATE:4:2}
-            DD=${DATE:6:2}
-            POLLY_LEVEL1_FOLDER="$POLLY_LEVEL1_BASEFOLDER/$DEVICE/$YYYY/$MM/$DD"
-            echo "$POLLY_LEVEL1_FOLDER"
-            file_count=$(find "$POLLY_LEVEL1_FOLDER" -type f -name "$PATTERN" | wc -l)
-            if [ "$file_count" -eq 0 ]; then
-                echo "No matching file exists in $POLLY_LEVEL1_FOLDER."
-                echo "Continuing..."
-            elif [ "$file_count" -eq 1 ]; then
-                echo "One matching file exists in $POLLY_LEVEL1_FOLDER."
-                for RETRIEVAL in ${RETRIEVAL_LS[@]}; do
-                    echo $RETRIEVAL
-                    "$PY_FOLDER"python "$PICASSO_DIR"/ppcpy/visualization/pypolly_display_all.py --date $DATE --device $DEVICE --picasso_config $PICASSO_CONFIG_FILE  --retrieval $RETRIEVAL --donefilelist $flagDONEFILELIST
-                done
-            elif [ "$file_count" -gt 1 ]; then
-                echo "More than one matching file exists in $POLLY_LEVEL1_FOLDER."
-                #"$PY_FOLDER"python "$PICASSO_DIR"/ppcpy/visualization/pypolly_display_all.py --date $DATE --device $DEVICE --picasso_config $PICASSO_CONFIG_FILE  --retrieval $RETRIEVAL --donefilelist $flagDONEFILELIST
-            fi
+            for RETRIEVAL in ${RETRIEVAL_LS[@]}; do
+                echo $RETRIEVAL
+                "$PY_FOLDER"python "$PICASSO_DIR"/ppcpy/visualization/pypolly_display_all.py --date $DATE --device $DEVICE --picasso_config $PICASSO_CONFIG_FILE  --retrieval $RETRIEVAL --donefilelist $flagDONEFILELIST
+            done
+            ### check number of available level1-files
+            ### 24h-file vs. multiple individual processed files
+            ##PATTERN="*[0-9][0-9]_att_bsc*.nc"
+            #PATTERN="*${DEVICE}*_RCS.nc"
+            #echo $PATTERN
+            #YYYY=${DATE:0:4}
+            #MM=${DATE:4:2}
+            #DD=${DATE:6:2}
+            #POLLY_LEVEL1_FOLDER="$POLLY_LEVEL1_BASEFOLDER/$DEVICE/$YYYY/$MM/$DD"
+            #echo "$POLLY_LEVEL1_FOLDER"
+            #file_count=$(find "$POLLY_LEVEL1_FOLDER" -type f -name "$PATTERN" | wc -l)
+            #if [ "$file_count" -eq 0 ]; then
+            #    echo "No matching file exists in $POLLY_LEVEL1_FOLDER."
+            #    echo "Continuing..."
+            #elif [ "$file_count" -eq 1 ]; then
+            #    echo "One matching file exists in $POLLY_LEVEL1_FOLDER."
+            #    for RETRIEVAL in ${RETRIEVAL_LS[@]}; do
+            #        echo $RETRIEVAL
+            #        "$PY_FOLDER"python "$PICASSO_DIR"/ppcpy/visualization/pypolly_display_all.py --date $DATE --device $DEVICE --picasso_config $PICASSO_CONFIG_FILE  --retrieval $RETRIEVAL --donefilelist $flagDONEFILELIST
+            #    done
+            #elif [ "$file_count" -gt 1 ]; then
+            #    echo "More than one matching file exists in $POLLY_LEVEL1_FOLDER."
+            #    #"$PY_FOLDER"python "$PICASSO_DIR"/ppcpy/visualization/pypolly_display_all.py --date $DATE --device $DEVICE --picasso_config $PICASSO_CONFIG_FILE  --retrieval $RETRIEVAL --donefilelist $flagDONEFILELIST
+            #fi
 
 #            if [[ "$flagWriteIntoTodoList" == "true" ]];then
 #            	check_todo_list_consistency
