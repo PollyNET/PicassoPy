@@ -22,10 +22,10 @@ def attbsc_2d(data_cube, nr:bool=True, collect_debug:bool=False):
     collect_debug : bool, optional
         If True, collects debug information. Default is False.
 
-    Yeilds
-    ------
-    data_cube.retrievals_highres[f"attBsc_{channel}"] : np.ndarray
-        Attenuated backscatter per channel.
+    Attributes
+    ----------
+    data_cube.retrievals_highres[f"attBsc_{channel}"] : ndarray
+        Time-height attenuated backscatter per channel.
     
     Notes
     -----
@@ -94,12 +94,12 @@ def voldepol_2d(data_cube):
     Parameters
     ----------
     data_cube : object
-        Main PicassoProc object
+        Main PicassoProc object.
     
-    Yeilds
-    ------
-    data_cube.retrievals_highres[f"voldepol_{wv}_total_{tel}"] : np.ndarray
-        Time-hight volume depolarization ratio at wavelengths:
+    Attributes
+    ----------
+    data_cube.retrievals_highres[f"voldepol_{wv}_total_{tel}"] : ndarray
+        Time-hight volume depolarization ratio at wavelengths
         353 nm, 532 nm, 1064 nm, and 532 nm DFOV.
     """
 
@@ -107,6 +107,7 @@ def voldepol_2d(data_cube):
 
     channels = [
             (532, 'FR'), (355, 'FR'), (1064, 'FR')]
+    
     if '532_DFOV' in data_cube.etaused:
         channels += [(532, 'DFOV')]
         logging.info("voldepol also for DFOV")
@@ -136,21 +137,34 @@ def voldepol_2d(data_cube):
             vdr[data_cube.retrievals_highres['depCalMask'], :] = np.nan
             data_cube.retrievals_highres[f"voldepol_{wv}_total_{tel}"] = vdr
 
+
 def wvmr_2d(data_cube):
-    """Water Vapor Mixing Ratio
+    """Water Vapor Mixing Ratio.
     
     Parameters
     ----------
     data_cube : object
         Main PicassoProc object.
+    
+    Attributes
+    ----------
+    data_cube.retrievals_highres[f"wvmr_407_FR"] : ndarray
+        Time-height water vapor mixing ratio at 407 nm FR.
 
+    Notes
+    -----
     .. TODO:: Save highres wvmr data to .nc file
+
+    **History**
+
+    - 2026-09-11: First edition by Jakob
+
     """
-    wv_cali = data_cube.wv_cali
+
     height = data_cube.retrievals_highres['range']
     config_dict = data_cube.polly_config_dict
 
-    wv, tel = 407, 'FR'
+    tel = 'FR' # Only applied for far-range channels.
 
     # interpolation
     molExt_387 = interp1d(
@@ -170,8 +184,8 @@ def wvmr_2d(data_cube):
     trans_407 = np.exp(-2 * molOD_407)
 
     # apply smoothing (same as for quasi)
-    flag387 = data_cube.gf('387', 'total', 'FR')
-    flag407 = data_cube.gf('407', 'total', 'FR')
+    flag387 = data_cube.gf('387', 'total', tel)
+    flag407 = data_cube.gf('407', 'total', tel)
     sig387 = np.squeeze(
         data_cube.retrievals_highres['sigBGCor'][:, :, flag387])
     sig407 = np.squeeze(
@@ -185,18 +199,12 @@ def wvmr_2d(data_cube):
     wvmr_raw = (sig407 / sig387) * (trans_387 / trans_407)
 
     # apply wv_const
-    wvmr = wvmr_raw * data_cube.WVCused[f'{wv}_{tel}']
+    wvmr = wvmr_raw * data_cube.WVCused[f"407_{tel}"]['WVC']
 
     # quality mask
-    snr_387 = np.squeeze(data_cube.retrievals_highres['SNR'][:, :, flag387])
-    snr_407 = np.squeeze(data_cube.retrievals_highres['SNR'][:, :, flag407])
-    snr_min_387 = np.array(config_dict['mask_SNRmin'])[flag387]
-    snr_min_407 = np.array(config_dict['mask_SNRmin'])[flag407]
+    if config_dict['flagOnlyUseValidQuasiData']:
+        quality_mask_387 = np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, flag387])
+        quality_mask_407 = np.squeeze(data_cube.retrievals_highres['quality_mask'][:, :, flag407])
+        wvmr[(quality_mask_387 != 0) | (quality_mask_407 != 0)] = np.nan
 
-    quality_mask_wvmr = np.zeros(wvmr.shape, dtype=int)
-    quality_mask_wvmr[(snr_387 < snr_min_387) | (snr_407 < snr_min_407)] = 1
-    quality_mask_wvmr[data_cube.retrievals_highres['depCalMask'], :] = 2
-
-    wvmr[quality_mask_wvmr > 0] = np.nan
-
-    data_cube.retrievals_highres[f'wvmr_{wv}_{tel}'] = wvmr
+    data_cube.retrievals_highres[f"wvmr_407_{tel}"] = wvmr

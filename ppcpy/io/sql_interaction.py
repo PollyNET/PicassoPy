@@ -18,7 +18,7 @@ def string_to_ts(s):
     return datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc).timestamp()
 
 
-def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str]) -> dict:
+def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta:float=24) -> dict:
     """Read lidar calibration constant or depol calibration from database.
 
     Parameters
@@ -44,7 +44,7 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str]) -> dict:
 
     ret = {}
     
-    delta = timedelta(hours=24)
+    delta = timedelta(hours=ts_delta)
     start = (
         datetime.fromtimestamp(ts_interval[0], timezone.utc) - delta
         ).strftime("%Y-%m-%d %H:%M")
@@ -66,7 +66,9 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str]) -> dict:
             conn, params=(start, end))
     conn.close()
 
+    ## Lidar calibration constants
     if table_name == 'lidar_calibration_constant':
+        nLines = 0
         d = defaultdict(list)
         for index, row in df[df.cali_method == 'Raman_Method'].iterrows():
             k = f"{row['wavelength']}_total_{mapping[row['telescope']]}"
@@ -76,9 +78,11 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str]) -> dict:
                 'time_end': int(string_to_ts(row['cali_stop_time'])),
                 'method': 'raman_db',
             })
+            nLines += 1
         ret['raman_db'] = default_to_regular(d)
-        logging.info(f"Loaded {len(ret['raman_db'])} lines from table 'lidar_calibration_constant' with 'Raman_Method'.")
+        logging.info(f"Loaded {nLines} lines from table 'lidar_calibration_constant' with 'Raman_Method'.")
 
+        nLines = 0
         d = defaultdict(list)
         for index, row in df[df.cali_method == 'Klett_Method'].iterrows():
             k = f"{row['wavelength']}_total_{mapping[row['telescope']]}"
@@ -88,10 +92,13 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str]) -> dict:
                 'time_end': int(string_to_ts(row['cali_stop_time'])),
                 'method': 'klett_db',
             })
+            nLines += 1
         ret['klett_db'] = default_to_regular(d)
-        logging.info(f"Loaded {len(ret['klett_db'])} lines from table 'lidar_calibration_constant' with 'Klett_Method'.")
+        logging.info(f"Loaded {nLines} lines from table 'lidar_calibration_constant' with 'Klett_Method'.")
 
+    ## Depolarization calibration constants
     if table_name == 'depol_calibration_constant':
+        nLines = 0
         d = defaultdict(list)
         for index, row in df.iterrows():
             k = f"{row['wavelength']}_{mapping[row['telescope']]}"
@@ -102,32 +109,39 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str]) -> dict:
                 'method': 'D90_db',
                 # 'status': 1,
             })
+            nLines += 1
         ret['D90_db'] = default_to_regular(d)
-        logging.info(f"Loaded {len(ret['D90_db'])} lines from table 'depol_calibration_constant'.")
+        logging.info(f"Loaded {nLines} lines from table 'depol_calibration_constant'.")
 
+    ## Water Vapor calibration constants
     if table_name == 'wv_calibration_constant':
-            d = defaultdict(list)
-            for index, row in df[df.cali_method == 'Profile_Method'].iterrows():
-                k = f"{row['wavelength']}_{mapping[row['telescope']]}"
-                d[k].append({
-                    'WVC': row['wv_const'], 'WVCStd': row['uncertainty_wv_const'],
-                    'time_start': int(string_to_ts(row['cali_start_time'])), 
-                    'time_end': int(string_to_ts(row['cali_stop_time'])), 
-                })
-            profile_db = default_to_regular(d)
-    
-            d = defaultdict(list)
-            for index, row in df[df.cali_method == 'Regression_Method'].iterrows():
-                k = f"{row['wavelength']}_{mapping[row['telescope']]}"
-                d[k].append({
-                    'WVC': row['wv_const'], 'WVCStd': row['uncertainty_wv_const'],
-                    'time_start': int(string_to_ts(row['cali_start_time'])), 
-                    'time_end': int(string_to_ts(row['cali_stop_time'])), 
-                })
-            regression_db = default_to_regular(d)
+        nLines = 0
+        d = defaultdict(list)
+        for index, row in df[df.cali_method == 'Model_Profile_Method'].iterrows():
+            k = f"{row['wavelength']}_{mapping[row['telescope']]}"
+            d[k].append({
+                'WVC': row['wv_const'], 'WVCStd': row['uncertainty_wv_const'],
+                'time_start': int(string_to_ts(row['cali_start_time'])), 
+                'time_end': int(string_to_ts(row['cali_stop_time'])),
+                'method': 'model_profile_db',
+            })
+            nLines += 1
+        ret['model_profile_db'] = default_to_regular(d)
+        logging.info(f"Loaded {nLines} lines from table 'wv_calibration_constant' with 'Model_Profile_Method'.")
 
-            ret['model'] = {'profile': profile_db, 'regression': regression_db}
-            logging.info(f"Loaded {len(ret['model'])} lines from table 'wv_calibration_constant'.")
+        nLines = 0
+        d = defaultdict(list)
+        for index, row in df[df.cali_method == 'Model_Regression_Method'].iterrows():
+            k = f"{row['wavelength']}_{mapping[row['telescope']]}"
+            d[k].append({
+                'WVC': row['wv_const'], 'WVCStd': row['uncertainty_wv_const'],
+                'time_start': int(string_to_ts(row['cali_start_time'])), 
+                'time_end': int(string_to_ts(row['cali_stop_time'])),
+                'method': 'model_regression_db', 
+            })
+            nLines += 1
+        ret['model_regression_db'] = default_to_regular(d)
+        logging.info(f"Loaded {nLines} lines from table 'wv_calibration_constant' with 'Model_Regression_Method'.")
 
     return ret
 
@@ -163,11 +177,12 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
         method_db = 'Raman_Method'
     elif method == 'klett':
         method_db = 'Klett_Method'
-    elif method == 'profile':
-        method_db = 'Profile_Method'
-    elif method == 'regression':
-        method_db = 'Regression_Method'
+    elif method == 'model_profile':
+        method_db = 'Model_Profile_Method'
+    elif method == 'model_regression':
+        method_db = 'Model_Regression_Method'
 
+    ## Lidar calibration constants
     if parameter == 'LC':
         for e in data_cube.LC.get(method, {}).keys():
             wv, pol, tel =  helper.get_wv_pol_telescope_from_dictkeyname(e)
@@ -184,6 +199,7 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                     str(start), str(stop), float(LC), float(LC_std), LC_is_used, 
                     wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
 
+    ## Depolarization calibration constants
     elif parameter == 'DC':
         for e in data_cube.pol_cali.get('D90', {}).keys():
             wv, tel = e.split('_')
@@ -200,15 +216,15 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                     str(start), str(stop), float(eta), float(eta_std), eta_is_used, 
                     wv, tel_db, str(data_cube.rawfile), data_cube.device))
 
+    ## Water vapor calibration constants
     elif parameter == 'WVC':
-        cali_instrument = 'model'
-        for e in data_cube.wv_cali[cali_instrument][method].keys():
+        for e in data_cube.wv_cali.get(method, {}).keys():
             wv, tel = e.split('_')
             tel_db = mapping_inverse[tel]
-            for line in data_cube.wv_cali[cali_instrument][method][e]:
+            for line in data_cube.wv_cali[method][e]:
                 WVC = line['WVC']
                 WVCStd = line['WVCStd']
-                WVC_is_used = True if WVC == data_cube.WVCused[e] else False
+                WVC_is_used = True if WVC == data_cube.WVCused[e]['WVC'] else False
                 start_unix = line['time_start']
                 stop_unix = line['time_end']
                 start = datetime.fromtimestamp(start_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
@@ -216,6 +232,7 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                 rows_to_insert.append((
                     str(start), str(stop), float(WVC), float(WVCStd), WVC_is_used, 
                     wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
+    
     return rows_to_insert
 
 

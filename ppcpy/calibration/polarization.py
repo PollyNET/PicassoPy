@@ -115,8 +115,8 @@ def loadGHK(data_cube):
     data_cube : object
         Main PicassoProc object.
     
-    Yields
-    ------
+    Attributes
+    ----------
     data_cube.polly_config_dict : dict
         Updated to parameters:
             TR  -->  Removed
@@ -238,9 +238,6 @@ def calibrateGHK(data_cube, collect_debug:bool=False) -> dict:
     Function is called here https://github.com/PollyNET/Pollynet_Processing_Chain/blob/5f5e4d0fd3dcebe7f87220cf802fcd6f414fe235/lib/interface/picassoProcV3.m#L548
     The two most relevant functions here are https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/pollyPolCaliGHK.m
     which also calls https://github.com/PollyNET/Pollynet_Processing_Chain/blob/dev/lib/calibration/depolCaliGHK.m
-    
-    **History**
-
     """
 
     pol_cali = {}

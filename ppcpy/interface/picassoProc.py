@@ -54,8 +54,8 @@ class PicassoProc:
         picasso_config_dict : dict
             The general picasso config loadConfigs.loadPicassoConfig(args.picasso_config_file,picasso_default_config_file).
 
-        Yields
-        ------
+        Attributes
+        ----------
         self.rawfile : str
             Path to level0-file.
         self.rawdata_dict : dict
@@ -84,6 +84,8 @@ class PicassoProc:
             Dictionary to store polarization calibration constants.
         self.LC : dict
             Dictionary to store lidar calibration constants.
+        self.wv_cali : dict
+            Dictionary to store water vapor calibration constants.
 
         Notes
         -----
@@ -105,6 +107,7 @@ class PicassoProc:
         self.retrievals_profile['avail_optical_profiles'] = []
         self.pol_cali = {}
         self.LC = {}
+        self.wv_cali = {}
 
 
     def mdate_filename(self) -> str:
@@ -212,8 +215,8 @@ class PicassoProc:
             that might be covered via the mcps conversion
             --> How exactly???
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.rawdata_dict : dict
             With filtered or corrected enteries for timestamps where `data_cube.check_for_correct_mshots()=True`.
         
@@ -289,8 +292,8 @@ class PicassoProc:
     def reset_date_infile(self):
         """Correct the date in the file.
 
-        Yields
-        ------
+        Attributes
+        ----------
         self.rawdata_dict['measurement_time']['var_data'] : ndarray
             Updated ....
         
@@ -332,8 +335,8 @@ class PicassoProc:
         data_cube.flag_355_total_FR
         ```
 
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrievals_highres['channel'] : list
             Updated channel tags.
         self.polly_config_dict['channelTags'] : list
@@ -482,8 +485,8 @@ class PicassoProc:
         collect_debug : bool, optional
             If true, collects debug information. Default is False.
         
-        Yelds
-        -----
+        Attributes
+        ----------
         self.retrievals_highres : dict
             With preprocessed lidar data.
 
@@ -602,8 +605,8 @@ class PicassoProc:
     def SaturationDetect(self):
         """Saturation Detection.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.flagSaturation : ndarray
             1 dimensional temporal boolean array per channel.
             True if the channel is saturated, else False.
@@ -614,7 +617,6 @@ class PicassoProc:
             data_cube = self,
             sigSaturateThresh = self.polly_config_dict['saturate_thresh']
         )
-
 
 
     def polarizationCaliD90(self, db_path:str=None, collect_debug:bool=False, **defaults):
@@ -718,7 +720,12 @@ class PicassoProc:
             # Load DCs from database
             table_name = 'depol_calibration_constant'
             ts_interval = self.retrievals_highres['time'][0], self.retrievals_highres['time'][-1]
-            db_table = sql_db.get_from_sql_db(db_path, table_name, ts_interval)
+            db_table = sql_db.get_from_sql_db(
+                db_path=db_path,
+                table_name=table_name,
+                ts_interval=ts_interval,
+                ts_delta=self.polly_config_dict['TimeInterval4LoadingDBCC']
+            )
             if 'D90_db' in db_table:
                 self.pol_cali['D90_db'] = db_table['D90_db']
 
@@ -748,8 +755,8 @@ class PicassoProc:
         collect_debug : bool, optional
             If true, collects debug information. Default is False.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.flagCloudFree : ndarray
             1 dimensional temporal boolean array. 0 = cloudy, 1 = cloud free. 
         
@@ -774,8 +781,8 @@ class PicassoProc:
     def cloudFreeSeg(self):
         """Cloud free profile segmentation.
 
-        Yields
-        ------
+        Attributes
+        ----------
         self.clFreeGrps : nested list
             List with start, stop index of each cloud free segement.
         
@@ -813,8 +820,8 @@ class PicassoProc:
             cut out single invalid profiles form `clFreeGrps`. If `True` the `data_cube.flagValPrf` is used. 
             Individual array can also be supplied.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrievals_profiles[`var`] : ndarray
             Aggregated profile.
         
@@ -890,8 +897,8 @@ class PicassoProc:
 
         and saved in the dataFrame `self.met`.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.met : object
             Object to handle meterological data.
 
@@ -930,8 +937,8 @@ class PicassoProc:
         with the strategy of first averaging the met data and then
         calculating the rayleigh scattering.
 
-        Yields
-        ------
+        Attributes
+        ----------
         self.mol_profiles : dict
             Dictionary containing calculated molecular profiles for each channel.
             
@@ -981,18 +988,133 @@ class PicassoProc:
         logging.info(f"time slices of cloud free {time_slices}")
         mean_profiles = self.met.get_mean_profiles(time_slices)
         self.mol_profiles = molecular.calc_profiles(mean_profiles, flagPicassoComparison=self.polly_config_dict['flagPicassoComparison'])
-    
-    def watervaporCali(self):
-        """Perform water vapor calibration on aggregated profiles
+
+
+    def watervaporCali(self, db_path:str=None, collect_debug:bool=False, **defaults):
+        """Perform water vapor calibration on aggregated profiles.
+
+        Parameters
+        ----------
+        db_path : str, optional
+            Path to calibration constant database. If ``db_path`` is ``None``
+            and config variable ``flagUsePreviousWVconst`` is enabled,
+            a standard path is constructed from the config variable
+            ``calibrationDB``. Default is ``None``.
+        collect_debug : bool, optional
+            If True, collects debug information. Default is False.
+        wvconst : float
+            Default water vapor calibration constant.
+        wvconstStd : float
+            Default water vapor calibration constant error.
         
+        Attributes
+        ----------
+        self.wv_cali['model_profile' & 'model_profile_db'] : dict
+            All retrieved and read water vapor calibration constants
+            and retrieval information from model data with profile method.
+        self.wv_cali['model_regression' & 'model_regression_db'] : dict
+            All retrieved and read water vapor calibration constants
+            and retrieval information from model data with regression method.
+        self.wv_cali['default'] : dict
+            Default depol calibration constants and retrieval information.
+        self.WVCused : dict
+            The optimal depol calibration constants.
+        
+        Notes
+        -----
+        The function uses the following configuration flags:
+
+        - ``flagWVCalibration``: Enables or disables calculation of water vapor
+                                 calibration constants through Delta-90° method.
+
+        - ``flagUsePreviousWVconst``: Enables or disables loading previously determined
+                                      water vapor calibration constants from the calibration
+                                      database.
+
+        All calibration constants are stored in ``self.wv_cali``.
+        The selected optimal constants are stored in ``self.WVCused``.
+
+        Default values are by standard taken from their config variable but can be
+        overwritten if passed as an input to this function.
+
+        At the moment, only calibration results form the model regression method is 
+        considerd when selecting the optimal constant. There currently exist no option
+        to select the best WVC over all calibration instruments and methods.
+
         .. TODO:: How to select best WVC over all calibration instruments and methods.
+       
+        **History**
+
+        - xxxx-xx-xx: First edition by ...
+        - 2026-09-11: Implemented in python by Jakob.
+    
         """
 
-        logging.info('Start calibration')
-        self.wv_cali = watervapor.wvc_for_cldFreeGrps(self)
+        if self.polly_config_dict['flagWVCalibration']:
+            logging.info('Performing Water Vapor calibration ...')
 
-        logging.info("Choosing best WVC...")
-        self.WVCused = select.single_best(self.wv_cali['model']['regression'], 'WVC', 'WVCStd')
+            # Estimate WV calibration constants
+            self.wv_cali['model_profile'], self.wv_cali['model_regression'] = watervapor.wvc_for_cldFreeGrps(
+                self,
+                instrument='model',
+                collect_debug=collect_debug
+            )
+            all_modelProfile_WVCs = self.wv_cali['model_profile'].copy()
+            all_modelRegression_WVCs = self.wv_cali['model_regression'].copy()
+
+            # Check retrieval
+            isUsable = sum([True for val in list(self.wv_cali['model_profile'].values()) \
+                            + list(self.wv_cali['model_regression'].values()) for element in val if element])
+            if not isUsable:
+                logging.warning("No viable water vapor calibration constants was retrieved from the measurement.")
+
+        else:
+            logging.warning("Water Vapor calibration is turned off.")
+            all_modelProfile_WVCs, all_modelRegression_WVCs = {}, {}
+
+        if self.polly_config_dict['flagUsePreviousWVconst']:
+            if db_path is None:
+                base_dir = Path(self.picasso_config_dict['results_folder'])
+                db_path = base_dir.joinpath(self.device, self.polly_config_dict['calibrationDB'])
+            logging.info(f"Loading Water Vapor calibration constants from database: {db_path}")
+           
+            # Load WVCs from database
+            table_name = 'wv_calibration_constant'
+            ts_interval = self.retrievals_highres['time'][0], self.retrievals_highres['time'][-1]
+            db_table = sql_db.get_from_sql_db(
+                db_path=db_path,
+                table_name=table_name,
+                ts_interval=ts_interval,
+                ts_delta=self.polly_config_dict['TimeInterval4LoadingDBCC']
+            )
+            if 'model_profile_db' in db_table:
+                self.wv_cali['model_profile_db'] = db_table['model_profile_db']
+
+                # Combine retrieved and database model profile WVCs
+                for ch in self.wv_cali['model_profile_db']:
+                    all_modelProfile_WVCs[ch] = all_modelProfile_WVCs.get(ch, []) \
+                        + self.wv_cali['model_profile_db'][ch]
+
+            if 'model_regression_db' in db_table:
+                self.wv_cali['model_regression_db'] = db_table['model_regression_db']
+
+                # Combine retrieved and database model regression WVCs
+                for ch in self.wv_cali['model_regression_db']:
+                    all_modelRegression_WVCs[ch] = all_modelRegression_WVCs.get(ch, []) \
+                        + self.wv_cali['model_regression_db'][ch]
+            
+        # Load default WVCs
+        self.wv_cali['default'] = watervapor.loadDefaults(self, **defaults)
+
+        # Select optimal WVCs
+        self.WVCused = select.single_best(self.wv_cali['default'], 'WVC', 'WVCStd', 'method', relative=True) |\
+                       select.single_best(all_modelRegression_WVCs, 'WVC', 'WVCStd', 'method', relative=True)
+
+        # Check if default WVCs were used
+        defaultWVCsUsed = [ch for ch in self.WVCused if self.WVCused[ch]['method'] == 'default']
+        if defaultWVCsUsed:
+            logging.warning(f"Deafault Water vapor calibration constant used for channels: {defaultWVCsUsed}")
+
 
     def rayleighFit(self, collect_debug:bool=False):
         """Perform the rayleigh fit procedure.
@@ -1002,8 +1124,8 @@ class PicassoProc:
         collect_debug : bool, optional
             If true, collects debug information. Default is False.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrievals_profiles['refH'][idx][ch] : dict
             Reference height information for cloud free segment `idx` and channel `ch`.
         
@@ -1035,8 +1157,8 @@ class PicassoProc:
     def polarizationCaliMol(self):
         """Calibration with molecular signal in reference height.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.pol_cali['mol'][ch][idx] : dict
             Molecular depol calibration constants and retrieval information for 
             channel `ch` and cloud free index `idx`.
@@ -1076,8 +1198,8 @@ class PicassoProc:
     def transCor(self):
         """Perform GHK-transmission correction on the signal.
 
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrievals_highres : dict
             With corrected signal.
 
@@ -1121,8 +1243,8 @@ class PicassoProc:
         nr : bool, optional
             If true, apply the retrieval on the near range profiles as well as the far range profiles. Default is False.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrievals_profile['klett' or 'klett_OC'][idx][ch] : dict
             Klett retrieved optical profiles and retrieval information
             for cloud free segment `idx` and channel `ch`.
@@ -1185,8 +1307,8 @@ class PicassoProc:
         collect_debug : bool, optional
             If true, collects debug information. Default is False.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrievals_profile['raman' or 'raman_OC'][idx][ch] : dict
             Raman retrieved optical profiles and retrieval information
             for cloud free segment `idx` and channel `ch`.
@@ -1253,8 +1375,8 @@ class PicassoProc:
         collect_debug : str, optional
             If true, collects debug information. Default is False.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrievals_profile['overlap']['frnr'][idx][ch] : list of dicts
             Far-range-Near-range retrieved overlap function and retrieval
             information for cloud free segment `idx` and channel `ch`.
@@ -1302,8 +1424,8 @@ class PicassoProc:
     def overlapFixLowestBins(self):
         """The lowest bins are affected by stange near range effects.
 
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrievals_profile['overlap']['frnr'][idx][ch]['olFunc'] : ndarray
             FRNR retrieved overlap func with subdued near-range effect.
         self.retrievals_profile['overlap']['raman'][idx][ch]['olFunc'] : ndarray
@@ -1321,8 +1443,8 @@ class PicassoProc:
     def overlapCor(self):
         """Overlap correction.
 
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrieval_highres : dict
             With overlap corrected signal and retrieval information.
 
@@ -1363,8 +1485,8 @@ class PicassoProc:
     def calcDepol(self):
         """Calculate the volume depol and the particle depol.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrievals_profiles[sig][idx][ch] : dict
             Volume and particle depolarization profiles and retrieval info
             for signal type `sig` for cloud free segment `idx` and channel `ch`.
@@ -1402,8 +1524,8 @@ class PicassoProc:
     def estQualityMask(self):
         """Estimate the quality mask.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrievals_highres['quality_mask'] : ndarray
             High resolution (time, height) quality masks per channel.
                 0 : good data
@@ -1435,8 +1557,8 @@ class PicassoProc:
     def Angstroem(self):
         """Calculate the angstrom exponent.
 
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrievals_profiles[sig][idx][ch] : dict
             Volume and particle depolarization profiles and retrieval info
             for signal type `sig` for cloud free segment `idx` and channel `ch`.
@@ -1561,7 +1683,12 @@ class PicassoProc:
             # Load LCs from database
             table_name = 'lidar_calibration_constant'
             ts_interval = self.retrievals_highres['time'][0], self.retrievals_highres['time'][-1]
-            db_table = sql_db.get_from_sql_db(db_path, table_name, ts_interval)
+            db_table = sql_db.get_from_sql_db(
+                db_path=db_path,
+                table_name=table_name,
+                ts_interval=ts_interval,
+                ts_delta=self.polly_config_dict['TimeInterval4LoadingDBCC']
+            )
             if 'klett_db' in db_table:
                 self.LC['klett_db'] = db_table['klett_db']
 
@@ -1593,17 +1720,17 @@ class PicassoProc:
 
 
     def attBsc_volDepol(self):
-        """Highres attBsc and voldepol in 2d.
+        """High resolution attenuated backscatter and volume depolarization.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrievals_highres : dict
             With attenuated backscatter.
 
             Keys
             ----
             attBsc_{wv}\_{t}\_{tel} : ndarray
-                High resolution (time, height) attenuated backscatter at chennel {wv}\_{t}\_{tel}.
+                High resolution (time, height) attenuated backscatter at channel {wv}\_{t}\_{tel}.
             attBsc_{wv}\_{t}\_OC : ndarray
                 High resolution (time, height) overlap corrected attenuated backscatter at channel {wv}\_{t}\_FR.
         """
@@ -1616,18 +1743,11 @@ class PicassoProc:
         highres.voldepol_2d(self)
 
 
-    def wvmr(self):
-        """highres wvmr in 2D."""
-
-        logging.info('wvmr 2d retrieval')
-        highres.wvmr_2d(self)
-
-
     def molecularHighres(self):
         """Calculate the molecular signal for the 2d high resolution.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.mol_2d : xr.Dataset
             xarray dataset with dimensions time and height and variables molecular
             backscatter (mBsc) and molecular extinction (mExt) per wavelength.
@@ -1644,11 +1764,29 @@ class PicassoProc:
         )
 
 
-    def quasiV1(self):
-        """QuasiV1 retrivals and target categorisation.
+    def wvmr(self):
+        """High resolution water vapor mixing ratio.
         
-        Yields
-        ------
+        Attributes
+        ----------
+        self.retrieval_highres : dict
+            With water vapor mixing rato.
+
+            Keys
+            ----
+            wvmr_{wv}_{tel} : ndarray
+                High resolution (time, height) water vapor mixing ratio fro channel {wv}\_{tel}.
+        """
+
+        logging.info("2D water vapor mixing ratio retrieval ...")
+        highres.wvmr_2d(self)
+
+
+    def quasiV1(self):
+        """QuasiV1 retrievals and target categorisation.
+        
+        Attributes
+        ----------
         self.retrieval_highres : dict
             With high resolution Quasi version 1 products as well as Target categorization.
 
@@ -1698,10 +1836,10 @@ class PicassoProc:
 
 
     def quasiV2(self):
-        """QuasiV2 retrivals and target categorisation.
+        """QuasiV2 retrievals and target categorisation.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.retrieval_highres : dict
             With high resolution Quasi version 2 products as well as Target categorization.
 
@@ -1769,7 +1907,8 @@ class PicassoProc:
         """
 
         if db_path == None:
-            db_path = self.polly_config_dict['calibrationDB']
+            base_dir = Path(self.picasso_config_dict['results_folder'])
+            db_path = base_dir.joinpath(self.device, self.polly_config_dict['calibrationDB'])
             logging.info(f"read db_path from polly_config_dict {db_path}")
         
         if parameter == 'LC':
@@ -1812,8 +1951,8 @@ class PicassoProc:
         db_path : str or NoneType
             path to database file... Default is None.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.LC : dict
             Original `LC` with all additinal lidar calibration constant availabel
             in the datafram `db_path` in the time period of the measurement +-24h.
@@ -1844,8 +1983,8 @@ class PicassoProc:
     def adding_retrieving_infos_2_polly_config_dict(self):
         """Some infos from the polly_config_dict should have there own keys, e.g. reference_search_range.
         
-        Yields
-        ------
+        Attributes
+        ----------
         self.polly_config_dict : dict
             With additional info.
 
