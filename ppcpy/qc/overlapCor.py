@@ -85,7 +85,7 @@ def spread(data_cube):
 
         if len(olFuncs) > 1:
             ## Use different overlap function for different times, centered around theire cloud free period.
-            logging.info(f'Using time-varying ovrlap function for channel for channel: {channel.replace('_', ' ')}.')
+            logging.info(f"Using time-varying ovrlap function for channel for channel: {channel.replace('_', ' ')}.")
             olFunc_2d = np.zeros((2*len(olFuncs), height.shape[0]))
 
             ## Set the estimated overlap profiles to the beginning and end of the profile
@@ -103,7 +103,7 @@ def spread(data_cube):
 
         else:
             ## Use same olFunc function for all timestamps.
-            logging.info(f'Using time-constant overlap function for channel: {channel.replace('_', ' ')}.')
+            logging.info(f"Using time-constant overlap function for channel: {channel.replace('_', ' ')}.")
             ol = olFuncs[0]['olFunc']
             olFunc_2d = np.repeat(ol[np.newaxis, :], time.shape[0], axis=0)
 
