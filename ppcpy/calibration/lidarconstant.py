@@ -86,7 +86,7 @@ def loadDefaults(data_cube, **defaults) -> dict:
 
 
 def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> dict:
-    """Estimate the lidar calibration constant from the optical profiles.
+    """Estimate lidar calibration constant from the optical profiles.
 
     Parameters
     ----------
@@ -94,8 +94,8 @@ def lc_for_cldFreeGrps(data_cube, retrieval:str, collect_debug:bool=False) -> di
         Main PicassoProc object.
     retrieval : str
         Retrieval type. 'klett' or 'raman'.
-    collect_debug : bool
-        If true, collects debug information.
+    collect_debug : bool, optional
+        If true, collects debug information. Default is False
     
     Returns
     -------

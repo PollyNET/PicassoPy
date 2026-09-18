@@ -956,6 +956,19 @@
                                                  "channel":"1064_total_NR"
                             }
               }
+  },
+  "WVMR_RH": {
+              "variables": {
+		            "time": {
+				    "parameter":"time"
+			    },
+		            "height": {
+				    "parameter":"height"
+			    },
+                            "WVMR": {
+                                                 "parameter":"wvmr_407_FR"
+                            }
+		}
   }
 
 }
