@@ -98,7 +98,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
 
                 # Check availability of Raman channel during retireval priod
                 if data_cube.retrievals_profile[f'mask{wv_r}Off'][i] > 0:
-                    logging.warning(f'Channel {wv_r} {t_r} {tel_r} was not opertional {data_cube.retrievals_profile[f'mask{wv_r}Off'][i]*100:.2f}% of the profile retrieval period.')
+                    logging.warning(f"Channel {wv_r} {t_r} {tel_r} was not opertional {data_cube.retrievals_profile[f'mask{wv_r}Off'][i]*100:.2f}% of the profile retrieval period.")
                      # .. TODO:: add this information to a quality flag for the profile based on how long wv_r was unoperational.
                     if data_cube.retrievals_profile[f'mask{wv_r}Off'][i] > 0.5: # <-- .. TODO:: decide on a treshold for skipping the channel processing.
                         logging.warning('Skipping Raman retrival for this channel.')
