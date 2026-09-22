@@ -306,8 +306,8 @@ def main():
                 nc_dict = readout.read_nc_file(data_file,date,device,location)
                 print('plotting WVMR:')
                 display_3d.pollyDisplayWVMR(nc_dict, config_dict, polly_conf_dict, outputfolder,donefilelist_dict=donefilelist_dict)
-                print('plotting RH:')
-                display_3d.pollyDisplayRH(nc_dict, config_dict, polly_conf_dict, outputfolder,donefilelist_dict=donefilelist_dict)
+                #print('plotting RH:')
+                #display_3d.pollyDisplayRH(nc_dict, config_dict, polly_conf_dict, outputfolder,donefilelist_dict=donefilelist_dict)
         except Exception as e:
             logging.exception("An error occurred")
 
