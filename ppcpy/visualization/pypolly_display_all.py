@@ -63,7 +63,7 @@ my_parser.add_argument('--outdir', dest='outdir', metavar='outputdir',
                        help='the output folder to put the png files to.')
 my_parser.add_argument('--retrieval', dest='retrieval', metavar='retrieval parameter',
                        default=['all'],
-                       choices=['all','attbsc','voldepol','cloudinfo','target_class','wvmr_rh','quasi_results','profiles','overlap','LC','HKD','longterm_cali','profile_summary','poliphon','RCS','SNR','BG','overlap_profiles'],
+                       choices=['all','attbsc','voldepol','target_class','wvmr_rh','quasi_results','profiles','overlap','LC','HKD','longterm_cali','profile_summary','poliphon','RCS','SNR','BG','overlap_profiles'],
                        nargs='+',
                        type=str,
                        help='the retrievals to be plotted; default: "all".')
@@ -306,8 +306,8 @@ def main():
                 nc_dict = readout.read_nc_file(data_file,date,device,location)
                 print('plotting WVMR:')
                 display_3d.pollyDisplayWVMR(nc_dict, config_dict, polly_conf_dict, outputfolder,donefilelist_dict=donefilelist_dict)
-                print('plotting RH:')
-                display_3d.pollyDisplayRH(nc_dict, config_dict, polly_conf_dict, outputfolder,donefilelist_dict=donefilelist_dict)
+                #print('plotting RH:')
+                #display_3d.pollyDisplayRH(nc_dict, config_dict, polly_conf_dict, outputfolder,donefilelist_dict=donefilelist_dict)
         except Exception as e:
             logging.exception("An error occurred")
 

@@ -1201,17 +1201,17 @@ def pollyDisplay_profile_summary(nc_dict_profile,nc_dict_profile_NR,config_dict,
     ## eta
     try:
         retrieving_info = json.loads(nc_dict_profile['parDepol_klett_355']['attributes']['retrieving_info'])
-        eta355 = retrieving_info['eta']['value']
+        eta355 = float(retrieving_info['eta']['value'])
     except:
         eta355 = np.nan
     try:
         retrieving_info = json.loads(nc_dict_profile['parDepol_klett_532']['attributes']['retrieving_info'])
-        eta532 = retrieving_info['eta']['value']
+        eta532 = float(retrieving_info['eta']['value'])
     except:
         eta532 = np.nan
     try:
         retrieving_info = json.loads(nc_dict_profile['parDepol_klett_1064']['attributes']['retrieving_info'])
-        eta1064 = retrieving_info['eta']['value']
+        eta1064 = float(retrieving_info['eta']['value'])
     except:
         eta1064 = np.nan
     ax[4].text(
