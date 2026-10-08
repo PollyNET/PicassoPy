@@ -1,0 +1,65 @@
+{
+    "title": "PicassoPy",
+    "description": "<p><span lang=\"EN-US\">This repository contains the python version of the PollyNET Processing Chain (</span><a href=\"https://doi.org/10.5281/zenodo.13379737\"><span lang=\"EN-US\">Klamt et al, 2024</span></a><span lang=\"EN-US\">) responsible for the automatic processing and visualization of lidar data from&nbsp;</span><a href=\"https://polly.tropos.de/\"><span lang=\"EN-US\">PollyNET</span></a><span lang=\"EN-US\">&nbsp;(</span><a href=\"https://doi.org/10.5194/acp-16-5111-2016\"><span lang=\"EN-US\">Baars et al, 2016</span></a><span lang=\"EN-US\">). PollyNET is an independent, voluntary, and scientific network initiated by the Leibniz Institute for Tropospheric Research (TROPOS). The network consists of novel multiwavelength Raman polarization lidars of type PollyXT (</span><a href=\"https://doi.org/10.5194/amt-9-1767-2016\"><span lang=\"EN-US\">Engelmann et al, 2016</span></a><span lang=\"EN-US\">,&nbsp;</span><a href=\"https://www.igf.fuw.edu.pl/m/conferences/34/a7/34a7d6cf-733c-4ab7-a532-fb3d9991561a/BookELC2025.pdf\"><span lang=\"EN-US\">2025</span></a><span lang=\"EN-US\">) deployed by TROPOS and several partners at locations around the world, like Dushanbe Tajikistan, Mindelo Cabo Verde, and Limassol Cyprus among others. They can measure vertical profiles of tiny, airborne particles (aerosol and clouds) and water vapor with high temporal and vertical resolution in the atmosphere. All systems are designed for continuous, unattended operation. For the most advanced version, the system has more than 12 channels, including 8 far-range channels and 4 near-range channels. It can deliver vertical profiles of the particle backscatter coefficient, the particle extinction coefficient, the particle lidar ratio, the particle linear depolarization ratio and respective Ångström exponents but also water vapor mixing ratio profile at night-time.</span></p> <p><span lang=\"EN-US\">The program in this repository is the standard to retrieve products from PollyNET measurements. It automatically calibrates the lidar data, e.g., with respect to depolarization and water vapor channels, and applies several corrections (e.g., dead time, background, etc.). It retrieves vertical profiles of optical properties aggregated over cloud-free periods. Next to these standard products, several quicklooks (time-height cross sections) including quasi-products and a target categorization (</span><a href=\"https://doi.org/10.5194/amt-10-3175-2017\"><span lang=\"EN-US\">Baars et al, 2017</span></a><span lang=\"EN-US\">) are provided.</span></p>",
+    "notes": "We acknowledge EARLINET for scientific exchange and fruitful discussions.",
+    "access_right": "open",
+    "creators": [
+        {
+            "name": "Buholdt, H\u00e5uvard Strid",
+            "affiliation": "Leibniz Institute for Tropospheric Research",
+            "orcid": "0009-0006-4805-2231"
+        },
+        {
+            "name": "Klamt, Andi",
+            "affiliation": "Leibniz Institute for Tropospheric Research",
+            "orcid": "0009-0006-0981-5865"
+        },
+        {
+            "name": "Radenz, Martin",
+            "affiliation": "Leibniz Institute for Tropospheric Research",
+            "orcid": "0000-0002-7771-033X"
+        },
+        {
+            "name": "Baars, Holger",
+            "affiliation": "Leibniz Institute for Tropospheric Research",
+            "orcid": "0000-0002-2316-8960"
+        }
+    ],
+    "contributors": [
+        {
+            "name": "Haarig, Moritz",
+            "affiliation": "Leibniz Institute for Tropospheric Research",
+            "orcid": "0000-0002-5533-2112"
+        }
+    ],
+    "version": "0.9.0",
+    "license": "GPL-3.0",
+    "upload_type": "software",
+    "language": "eng",
+    "keywords": [
+        "Lidar",
+        "PollyNet",
+        "PollyXT"
+    ],
+    "references": [
+        "Andi Klamt et al., PollyNET/Pollynet_Processing_Chain: Version 4.0, 27 August 2024, https://doi.org/10.5281/zenodo.13379737.",
+        "Ronny Engelmann et al., ‘The Automated Multiwavelength Raman Polarization and Water-Vapor Lidar PollyXT: The neXT Generation’, Atmospheric Measurement Techniques 9, no. 4 (2016): 1767–84, https://doi.org/10.5194/amt-9-1767-2016.",
+        "Holger Baars et al., ‘An Overview of the First Decade of PollyNET: An Emerging Network of Automated Raman-Polarization Lidars for Continuous Aerosol Profiling’, Atmospheric Chemistry and Physics 16, no. 8 (2016): 5111–37, https://doi.org/10.5194/acp-16-5111-2016.",
+        "Holger Baars et al., ‘Target Categorization of Aerosol and Clouds by Continuous Multiwavelength-Polarization Lidar Measurements’, Atmospheric Measurement Techniques 10, no. 9 (2017): 3175–201, https://doi.org/10.5194/amt-10-3175-2017.",
+        "Guangyao Dai et al., ‘Calibration of Raman Lidar Water Vapor Profiles by Means of AERONET Photometer Observations and GDAS Meteorological Data’, Atmospheric Measurement Techniques 11, no. 5 (2018): 2735–48, https://doi.org/10.5194/amt-11-2735-2018."
+    ],
+    "grants": [
+        {"id": "From the European Union’s Horizon 2020 research and innovation programme under Grant Agreement No 857510 (EXCELSIOR project), No 101008004 (ATMO-ACCESS Integrating Activity)."},
+        {"id": "From the German Federal Ministry of Education and Research (BMBF) under the FONA Strategy “Research for Sustainability” (grant no. 01LK2001A, ACTRIS-D; grant no. 01LK1603A, PoLiCyTa project; ."},
+        {"id": "From the German Federal Ministry for Economic Affairs and Energy (BMWi) (grant no. 50EE2403A, GIVE)"},
+        {"id": "From the German Research Foundation (DFG) under the priority program 1158 “Antarctic Research with Comparative Investigations in Arctic Ice Areas” (Funding 463307613, COALA project)"}
+    ],
+    "related_identifiers": [
+        {
+            "identifier": "https://github.com/PollyNET/PicassoPy/tree/0.9.0",
+            "relation": "isSupplementTo",
+            "resource_type": "software",
+            "scheme": "url"
+        }
+    ]
+}
