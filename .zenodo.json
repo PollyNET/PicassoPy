@@ -28,16 +28,17 @@
         {
             "name": "Haarig, Moritz",
             "affiliation": "Leibniz Institute for Tropospheric Research",
+            "type": "Researcher",
             "orcid": "0000-0002-5533-2112"
         }
     ],
-    "version": "0.9.1",
+    "version": "0.9.2",
     "license": "GPL-3.0",
     "upload_type": "software",
     "language": "eng",
     "keywords": [
         "Lidar",
-        "PollyNet",
+        "PollyNET",
         "PollyXT"
     ],
     "references": [
@@ -49,7 +50,7 @@
     ],
     "related_identifiers": [
         {
-            "identifier": "https://github.com/PollyNET/PicassoPy/tree/0.9.1",
+            "identifier": "https://github.com/PollyNET/PicassoPy/tree/0.9.2",
             "relation": "isSupplementTo",
             "resource_type": "software",
             "scheme": "url"
