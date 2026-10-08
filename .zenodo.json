@@ -31,7 +31,7 @@
             "orcid": "0000-0002-5533-2112"
         }
     ],
-    "version": "0.9.0",
+    "version": "0.9.1",
     "license": "GPL-3.0",
     "upload_type": "software",
     "language": "eng",
@@ -49,7 +49,7 @@
     ],
     "related_identifiers": [
         {
-            "identifier": "https://github.com/PollyNET/PicassoPy/tree/0.9.0",
+            "identifier": "https://github.com/PollyNET/PicassoPy/tree/0.9.1",
             "relation": "isSupplementTo",
             "resource_type": "software",
             "scheme": "url"
