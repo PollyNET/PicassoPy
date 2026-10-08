@@ -37,7 +37,7 @@ Additions to the documentation or tests is also always encouraged. Also, if you 
 
 ## History
 
-This program is based on the foundation the [PollyNET Processing Chaine](https://github.com/PollyNET/Pollynet_Processing_Chain).
+This program is based on the foundation of the [PollyNET Processing Chaine](https://github.com/PollyNET/Pollynet_Processing_Chain).
 
 ## License
 
