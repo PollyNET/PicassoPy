@@ -835,7 +835,7 @@ def pollyPolCaliTime(depCalAng:np.ndarray, mTime:list, init_depAng:float, maskDe
         elif maskDepCalAng[iProf] == 'n':
             flagNDepCal[iProf] = True
     
-    flagDepCal = (np.abs(depCalAng - init_depAng) > 0.0)
+    flagDepCal = (np.abs(depCalAng - init_depAng) > 0.02)
     ## the profile will be treated as depol cali profile if it has different
     ## depol_cal_ang than the init_depAng
 

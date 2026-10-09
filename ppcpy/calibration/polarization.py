@@ -2,10 +2,13 @@
 import logging
 from collections import defaultdict
 import numpy as np
+from scipy.optimize import least_squares
 
 from ppcpy.misc.helper import uniform_filter
 from ppcpy.retrievals.collection import calc_snr
 from ppcpy.misc.helper import default_to_regular
+
+from ppcpy.retrievals.depolarization import calc_profile_vdr
 
 
 # Helper functions
@@ -706,6 +709,7 @@ def depol_cali_mol(signal_t:np.ndarray, background_t:np.ndarray, signal_c:np.nda
     -----
     .. TODO::
         - The inputs TR_t_std & TR_c_std are currnetly not used in the function!
+        - Not yet adapted to the new DC storage
 
     **History**
 
@@ -762,3 +766,394 @@ def depol_cali_mol(signal_t:np.ndarray, background_t:np.ndarray, signal_c:np.nda
                 'fac': float(polCaliFac), 'fac_std': float(polCaliFacStd), 'status': 1}
     
     return results
+
+
+def calc_transfer_eta(sigt, sigc, vdr_ref, Gt, Gr, Ht, Hr):
+    """helper function to calculate a eta profile based on vdr_ref
+    
+    used to get an initial guess for the least squares optimization.
+
+    Early versions still had a stupid sign error.
+
+    Parameters
+    ----------
+    sigt, sigc : array_like
+        Total and cross-polarized signals.
+    vdr_ref : array_like
+        Reference volume depolarization ratio.
+    Gt, Gr, Ht, Hr : float or array_like
+        G,H parameters for the outer field of view.
+
+    Returns
+    -------
+    eta : array_like
+        Calculated eta profile as use for first guess.
+    
+    """
+    
+    SR = sigc/sigt
+    eta = (
+        SR * ((Gt + Ht) + vdr_ref*(Gt-Ht)) / (vdr_ref*(Gr-Hr) + (Gr + Hr)))
+    return eta
+
+
+def safe_log10(x, floor=1e-8):
+    """log10(x) for x > floor, with a linear continuation below floor.
+
+    Unlike clipping, the continuation retains a gradient when x <= floor.
+    """
+    x = np.asarray(x, dtype=float)
+
+    return np.where(
+        x > floor,
+        np.log10(np.maximum(x, floor)),
+        np.log10(floor) + (x - floor) / (floor * np.log(10.0)),
+    )
+
+
+from scipy.ndimage import gaussian_filter1d
+def make_fit_for_Hr_eta(
+    calc_vdr,
+    vdr_ref,
+    sigt_outer,
+    sigc_outer,
+    Ht_outer,
+    Gr_outer,
+    Gt_outer,
+    height_mask,
+    voldepol_error,
+    smoothing_sigma=5,
+    min_points=30,
+):
+    """Create a residual function for jointly fitting Hr and eta.
+
+    Parameters are [Hr, eta].
+
+    For every selected height bin, the residual is
+
+        log10(vdr_outer) - log10(vdr_inner)
+
+    so a residual of zero means vdr_outer == vdr_inner.
+
+    Parameters
+    ----------
+    calc_vdr : callable
+        Function used to calculate the vdr profile.
+    vdr_ref : array_like
+        Reference vdr profile.
+    sigt_outer, sigc_outer : array_like
+        Outer total and cross-polarized signals.
+    Ht_outer, Gr_outer, Gt_outer : float
+        G, H coefficients for the outer profile.
+    height_mask : array_like of bool
+        Mask selecting height bins used in the fit.
+    voldepol_error : float or array_like
+        Volume-depolarization uncertainty passed to ``calc_vdr``.
+    smoothing_sigma : float, optional
+        Standard deviation of the smoothing kernel.
+    min_points : int, optional
+        Minimum number of valid points required for fitting.
+
+    Returns
+    -------
+    residual : callable
+        Function returning log-VDR residuals for parameters ``[Hr, eta]``.
+    evaluate : callable
+        Function returning calculated profiles, fit indices, and residuals.
+    """
+
+    # The inner VDR does not depend on Hr or eta.
+    vdr_inner_smooth = smooth_signal(
+        vdr_ref,
+        #sigma=smoothing_sigma,
+        window_len=smoothing_sigma,
+    )
+
+    # Keep the fitting indices fixed throughout the optimization.
+    fit_mask = (
+        height_mask
+        & np.isfinite(vdr_inner_smooth)
+        & (vdr_inner_smooth > 0.0)
+    )
+    fit_indices = np.flatnonzero(fit_mask)
+
+    if fit_indices.size < min_points:
+        raise ValueError(
+            f"Only {fit_indices.size} valid inner-profile points"
+        )
+
+    def evaluate(parameters):
+        """Calculate outer VDR and pointwise log residuals."""
+        Hr, eta = np.asarray(parameters, dtype=float)
+
+        vdr_outer, _ = calc_vdr(
+            sigt=sigt_outer,
+            sigc=sigc_outer,
+            Gt=Gt_outer,
+            Gr=Gr_outer,
+            Ht=Ht_outer,
+            Hr=Hr,
+            eta=eta,
+            voldepol_error=voldepol_error,
+            window=1,
+        )
+
+        vdr_outer_smooth = smooth_signal(
+            np.asarray(vdr_outer, dtype=float),
+            #sigma=smoothing_sigma,
+            window_len=smoothing_sigma,
+        )
+
+        
+        inner_selected = vdr_inner_smooth[fit_mask]
+        outer_selected = vdr_outer_smooth[fit_mask]
+
+        if not np.all(np.isfinite(outer_selected)):
+            raise ValueError(
+                f"Non-finite outer VDR for Hr={Hr}, eta={eta}"
+            )
+
+        log_vdr_inner = np.log10(inner_selected)
+        log_vdr_outer = safe_log10(outer_selected, floor=1e-8)
+
+        log_residuals = log_vdr_outer - log_vdr_inner
+
+        return {
+            "vdr_outer": vdr_outer,
+            "vdr_outer_smooth": vdr_outer_smooth,
+            "fit_indices": fit_indices,
+            "log_residuals": log_residuals,
+        }
+
+    def residual(parameters):
+        Hr, eta = np.asarray(parameters, dtype=float)
+        evaluation = evaluate(parameters)
+        log_residuals = evaluation["log_residuals"]
+
+        return log_residuals
+
+    return residual, evaluate
+    
+    
+def calibrateOuterFOV(data_cube, collect_debug:bool=False, collect_vars_plot:bool=True) -> dict:
+    """calibrate the outer field of view
+    
+    Parameters
+    ----------
+    data_cube : object
+        Main PicassoProc object.
+    collect_debug : bool
+        flag to collect additional debug infromation
+    
+    Returns
+    -------
+    pol_cali : dict
+        polarization calibration results from transfer method for 532-DFOV.
+        
+        Contains a list of sub-dicts. One per successful cloud-free period, with entries:
+
+        ``eta`` : float
+            Depol calibration constant.
+
+        ``eta_std`` : float
+            Uncertainty of Depol calibration constant.
+
+        ``time_start``, ``time_end`` : int
+            Start and stop times for successful calibration.
+
+        ``method`` : str
+            Name of retrieval method.
+        
+        The number of element in each list depends on the number of successful retrievals.
+
+    Notes
+    -----
+
+    .. TODO::
+        - the thresholds for height is hardcoded -> based on full overlap and snr threshold?
+        - some print statements are still ther for debugging reasons
+        - currently the optimized HR is only available via collect debug
+
+    ** History **
+
+    - 2026-10-07: first iteration by martin-rdz
+    """
+    
+    config_dict = data_cube.polly_config_dict.copy()
+    height = np.array(data_cube.retrievals_highres['height'])/1000
+
+    results = []
+    for i, cldFree in enumerate(data_cube.clFreeGrps):
+        cldFreeTime64 = np.array(data_cube.retrievals_highres['time64'])[cldFree]
+        cldFreeTime = np.array(data_cube.retrievals_highres['time'])[cldFree]
+        dt = cldFreeTime64[0].astype('datetime64[us]').astype('O')
+
+        wv = 532
+        flagt_inner = data_cube.gf(wv, 'total', 'FR')
+        flagc_inner = data_cube.gf(wv, 'cross', 'FR')
+        sigt_inner = np.squeeze(data_cube.retrievals_profile['sigBGCor'][i, :, flagt_inner]).copy()
+        sigc_inner = np.squeeze(data_cube.retrievals_profile['sigBGCor'][i, :, flagc_inner]).copy()
+
+        flagt_outer = data_cube.gf(wv, 'total', 'NR')
+        flagc_outer = data_cube.gf(wv, 'cross', 'DFOV')
+        sigt_outer = np.squeeze(data_cube.retrievals_profile['sigBGCor'][i, :, flagt_outer]).copy()
+        sigc_outer = np.squeeze(data_cube.retrievals_profile['sigBGCor'][i, :, flagc_outer]).copy()
+        
+        vdr_inner, _ = calc_profile_vdr(
+            sigt=sigt_inner, sigc=sigc_inner, 
+            Gt=config_dict['G'][flagt_inner], Gr=config_dict['G'][flagc_inner],
+            Ht=config_dict['H'][flagt_inner], Hr=config_dict['H'][flagc_inner],
+            eta=data_cube.etaused[f'{wv}_FR']['eta'], 
+            voldepol_error=config_dict[f'voldepol_error_{wv}'],
+            window=1
+        )
+        eta_outer = calc_transfer_eta(
+            sigt_outer, sigc_outer, vdr_inner, 
+            config_dict['G'][flagt_outer], config_dict['G'][flagc_outer],
+            config_dict['H'][flagt_outer], config_dict['H'][flagc_outer],
+        )
+
+        height_mask = (height > 0.8) & (height < 6)
+        # the eta estimate seems more roubust for high voldepol in the inner fov
+        # the lower vdr_inner, the stronger the effect of a wrong Hr
+        print("!!! ", np.percentile(vdr_inner[height_mask], [10, 20]))
+        vdr_inner_min = np.percentile(vdr_inner[height_mask], [10])*2
+        
+        vdr_mask = vdr_inner[height_mask] > vdr_inner_min
+        eta_lt0_mask = eta_outer[height_mask] > 0
+        print("height_mask", np.sum(height_mask), len(height_mask))
+        print("vdr_mask", np.sum(vdr_mask), len(vdr_mask))
+        
+        # check if enough high vdr_inner values are there, if so Hr and eta are optimized else only eta
+        if np.sum((vdr_mask) & (eta_lt0_mask)) > 50:
+            eta_outer_guess = np.mean(eta_outer[height_mask][(vdr_mask) & (eta_lt0_mask)])
+            print('eta_outer first guess', eta_outer_guess)
+            hr_bounds = (-0.9998, -0.96) # translates to a T_R 10000, 48
+            error_eta = 0.2
+            Hr_fixed = False
+        else:
+            eta_outer_guess = 25
+            hr_bounds = (config_dict['H'][flagc_outer][0]*1.0001, config_dict['H'][flagc_outer][0]*0.9999)
+            error_eta = 0.5
+            Hr_fixed = True
+
+        # Example only: allow eta to vary by ±50% around its initial estimate.
+        eta_bounds = (
+            0.4 * eta_outer_guess,
+            3 * eta_outer_guess,
+        )
+
+        fit_residual, evaluate_fit = make_fit_for_Hr_eta(
+            calc_vdr=calc_profile_vdr,
+            vdr_ref=vdr_inner,
+            sigt_outer=sigt_outer,
+            sigc_outer=sigc_outer,
+            Ht_outer=config_dict["H"][flagt_outer],
+            Gr_outer=config_dict["G"][flagc_outer],
+            Gt_outer=config_dict["G"][flagt_outer],
+            height_mask=height_mask,
+            voldepol_error=np.array([0.004, 0.0, 0.0]),
+            smoothing_sigma=5,
+            min_points=30,
+        )
+
+        result = least_squares(
+            fit_residual,
+            x0=np.array([config_dict['H'][flagc_outer][0], eta_outer_guess]),
+            bounds=(
+                [hr_bounds[0], eta_bounds[0]],
+                [hr_bounds[1], eta_bounds[1]],
+            ),
+            method="trf", 
+            loss="soft_l1",
+            f_scale=0.02,
+            x_scale=np.array([0.01, 0.5,]),
+            max_nfev=100,
+        )
+
+        hr_opt, eta_opt = result.x
+        evaluation_opt = evaluate_fit(result.x)
+        log_residuals = evaluation_opt["log_residuals"]
+        rmse_log = np.sqrt(np.mean(log_residuals**2))
+        median_ratio = 10.0 ** np.median(log_residuals)
+        bias_factor = 10**np.abs(np.mean(log_residuals))
+
+        print("\nOptimization result")
+        print(f"success              = {result.success}")
+        print(f"message              = {result.message}")
+        print(f"Hr                   = {hr_opt:.10f}")
+        print(f"(1-Hr)/(1+Hr)        = {(1-hr_opt)/(1+hr_opt):.5f}")
+        print(f"eta                  = {eta_opt:.10f}")
+        print(f"log10 RMSE           = {rmse_log:.6f} linear {10**rmse_log:.6}")
+        print(f"median outer/inner   = {median_ratio:.5f}")
+        print(f"cost                 = {result.cost:.6g}")
+        print(f"function evaluations = {result.nfev}")
+        print('active mask?', result.active_mask)
+        print('bias factor', bias_factor)
+
+        good_fit = (
+            result.success
+            and result.status > 0
+            #and np.all(result.active_mask == 0)
+            and result.active_mask[1] == 0 # eta should not touch the bounds
+            and log_residuals.size >= 30
+            and bias_factor < 1.03
+            and 10**rmse_log < 1.10
+        )
+        print('   >>> good fit?', good_fit)
+
+        opt = result.x
+        #fit_opt = fit_for_Hr(hr_opt)
+    
+        print("\nOptimization result")
+        print(f"success   = {result.success}")
+        print(f"message   = {result.message}")
+        print("HR_opt", hr_opt, (1-hr_opt)/(1+hr_opt))
+        print(opt)
+
+        results.append({
+            'eta': eta_opt, 'eta_std': eta_opt*error_eta,
+            'time_start': cldFreeTime[0],  
+            'time_end': cldFreeTime[1],
+            'method': 'transfer'
+        })
+
+        if collect_debug:
+
+            results[-1]['Hr'] = hr_opt
+            results[-1]['Hr_fixed'] = Hr_fixed
+            results[-1]['rmse'] = 10**rmse_log
+            results[-1]['median_ratio'] = median_ratio
+            results[-1]['vdr_ref_10'] = np.percentile(vdr_inner[height_mask], [10])
+            results[-1]['vdr_ref_90'] = np.percentile(vdr_inner[height_mask], [90])
+
+            
+        if collect_vars_plot:
+            vdr_outer, _ = calc_profile_vdr(
+                sigt=sigt_outer, sigc=sigc_outer, 
+                Gt=config_dict['G'][flagt_outer], Gr=config_dict['G'][flagc_outer],
+                Ht=config_dict['H'][flagt_outer], Hr=config_dict['H'][flagc_outer],
+                eta=eta_outer_guess, 
+                voldepol_error=np.array([0.004, 0.   , 0.   ]), # just need a dummy value for now
+                window=1
+            )
+            vdr_outer_dash, _ = calc_profile_vdr(
+                sigt=sigt_outer, sigc=sigc_outer, 
+                Gt=config_dict['G'][flagt_outer], Gr=config_dict['G'][flagc_outer],
+                Ht=config_dict['H'][flagt_outer], Hr=hr_opt,
+                eta=eta_opt, 
+                voldepol_error=np.array([0.004, 0.   , 0.   ]), # just need a dummy value for now
+                window=1
+            )
+            results[-1]['cldFreeTime64'] = cldFreeTime64
+            results[-1]['vdr_inner_min'] = vdr_inner_min
+            results[-1]['height_mask'] = height_mask
+            results[-1]['eta_outer_guess'] = eta_outer_guess
+            results[-1]['vdr_inner'] = vdr_inner
+            results[-1]['eta_outer'] = eta_outer
+            results[-1]['vdr_outer'] = vdr_outer
+            results[-1]['vdr_outer_dash'] = vdr_outer_dash
+
+            pass
+
+    return {"532_DFOV": results}
