@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import logging
 from datetime import datetime, timezone, timedelta
@@ -51,6 +52,10 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
     end = (
         datetime.fromtimestamp(ts_interval[0], timezone.utc) + delta
         ).strftime("%Y-%m-%d %H:%M")
+    
+    if not os.path.exists(db_path):
+        logging.warning(f"Path to Database does not exist {db_path}, likely directory is missing.")
+        return ret
     with sqlite3.connect(db_path) as conn:
         exists = conn.execute(
             "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?;",
@@ -68,9 +73,9 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
 
     ## Lidar calibration constants
     if table_name == 'lidar_calibration_constant':
-        nLines = 0
         d = defaultdict(list)
-        for index, row in df[df.cali_method == 'Raman_Method'].iterrows():
+        df_method = df[df.cali_method == 'Raman_Method']
+        for index, row in df_method.iterrows():
             k = f"{row['wavelength']}_total_{mapping[row['telescope']]}"
             d[k].append({
                 'LC': row['liconst'], 'LCStd': row['uncertainty_liconst'],
@@ -78,13 +83,12 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
                 'time_end': int(string_to_ts(row['cali_stop_time'])),
                 'method': 'raman_db',
             })
-            nLines += 1
         ret['raman_db'] = default_to_regular(d)
-        logging.info(f"Loaded {nLines} lines from table 'lidar_calibration_constant' with 'Raman_Method'.")
+        logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with 'Raman_Method'.")
 
-        nLines = 0
         d = defaultdict(list)
-        for index, row in df[df.cali_method == 'Klett_Method'].iterrows():
+        df_method = df[df.cali_method == 'Klett_Method']
+        for index, row in df_method.iterrows():
             k = f"{row['wavelength']}_total_{mapping[row['telescope']]}"
             d[k].append({
                 'LC': row['liconst'], 'LCStd': row['uncertainty_liconst'],
@@ -92,15 +96,14 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
                 'time_end': int(string_to_ts(row['cali_stop_time'])),
                 'method': 'klett_db',
             })
-            nLines += 1
         ret['klett_db'] = default_to_regular(d)
-        logging.info(f"Loaded {nLines} lines from table 'lidar_calibration_constant' with 'Klett_Method'.")
+        logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with 'Klett_Method'.")
 
     ## Depolarization calibration constants
     if table_name == 'depol_calibration_constant':
-        nLines = 0
         d = defaultdict(list)
-        for index, row in df.iterrows():
+        df_method = df[df.cali_method == 'D90']
+        for index, row in df_method.iterrows():
             k = f"{row['wavelength']}_{mapping[row['telescope']]}"
             d[k].append({
                 'eta': row['depol_const'], 'eta_std': row['uncertainty_depol_const'],
@@ -109,15 +112,28 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
                 'method': 'D90_db',
                 # 'status': 1,
             })
-            nLines += 1
         ret['D90_db'] = default_to_regular(d)
-        logging.info(f"Loaded {nLines} lines from table 'depol_calibration_constant'.")
+        logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with 'D90'.")
+
+        d = defaultdict(list)
+        df_method = df[df.cali_method == 'transfer']
+        for index, row in df_method.iterrows():
+            k = f"{row['wavelength']}_{mapping[row['telescope']]}"
+            d[k].append({
+                'eta': row['depol_const'], 'eta_std': row['uncertainty_depol_const'],
+                'time_start': int(string_to_ts(row['cali_start_time'])), 
+                'time_end': int(string_to_ts(row['cali_stop_time'])),
+                'method': 'transfer_db',
+                # 'status': 1,
+            })
+        ret['transfer_db'] = default_to_regular(d)
+        logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with 'transfer'.")
 
     ## Water Vapor calibration constants
     if table_name == 'wv_calibration_constant':
-        nLines = 0
         d = defaultdict(list)
-        for index, row in df[df.cali_method == 'Model_Profile_Method'].iterrows():
+        df_method = df[df.cali_method == 'Model_Profile_Method']
+        for index, row in df_method.iterrows():
             k = f"{row['wavelength']}_{mapping[row['telescope']]}"
             d[k].append({
                 'WVC': row['wv_const'], 'WVCStd': row['uncertainty_wv_const'],
@@ -125,13 +141,12 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
                 'time_end': int(string_to_ts(row['cali_stop_time'])),
                 'method': 'model_profile_db',
             })
-            nLines += 1
         ret['model_profile_db'] = default_to_regular(d)
-        logging.info(f"Loaded {nLines} lines from table 'wv_calibration_constant' with 'Model_Profile_Method'.")
+        logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with 'Model_Profile_Method'.")
 
-        nLines = 0
         d = defaultdict(list)
-        for index, row in df[df.cali_method == 'Model_Regression_Method'].iterrows():
+        df_method = df[df.cali_method == 'Model_Regression_Method']
+        for index, row in df_method.iterrows():
             k = f"{row['wavelength']}_{mapping[row['telescope']]}"
             d[k].append({
                 'WVC': row['wv_const'], 'WVCStd': row['uncertainty_wv_const'],
@@ -139,9 +154,8 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
                 'time_end': int(string_to_ts(row['cali_stop_time'])),
                 'method': 'model_regression_db', 
             })
-            nLines += 1
         ret['model_regression_db'] = default_to_regular(d)
-        logging.info(f"Loaded {nLines} lines from table 'wv_calibration_constant' with 'Model_Regression_Method'.")
+        logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with 'Model_Regression_Method'.")
 
     return ret
 

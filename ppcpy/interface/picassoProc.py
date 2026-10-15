@@ -1922,7 +1922,7 @@ class PicassoProc:
             table_name = 'depol_calibration_constant'
             column_names = [
                 'cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'used_for_processing', 
-                'wavelength', 'telescope', 'cali_method' 'nc_zip_file', 'polly_type']
+                'wavelength', 'telescope', 'cali_method', 'nc_zip_file', 'polly_type']
             data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text', 'text']
             unique=', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope, cali_method)'
         elif parameter == 'WVC':
