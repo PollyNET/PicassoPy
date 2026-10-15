@@ -177,6 +177,10 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
         method_db = 'Raman_Method'
     elif method == 'klett':
         method_db = 'Klett_Method'
+    elif method == 'D90':
+        method_db = 'D90'
+    elif method == 'transfer':
+        method_db = 'transfer'
     elif method == 'model_profile':
         method_db = 'Model_Profile_Method'
     elif method == 'model_regression':
@@ -201,10 +205,10 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
 
     ## Depolarization calibration constants
     elif parameter == 'DC':
-        for e in data_cube.pol_cali.get('D90', {}).keys():
+        for e in data_cube.pol_cali.get(method, {}).keys():
             wv, tel = e.split('_')
             tel_db = mapping_inverse[tel]
-            for line in data_cube.pol_cali['D90'][e]:
+            for line in data_cube.pol_cali[method][e]:
                 eta = line['eta']
                 eta_std = line['eta_std']
                 eta_is_used = True if eta == data_cube.etaused[e]['eta'] else False
@@ -214,7 +218,7 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                 stop = datetime.fromtimestamp(stop_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
                 rows_to_insert.append((
                     str(start), str(stop), float(eta), float(eta_std), eta_is_used, 
-                    wv, tel_db, str(data_cube.rawfile), data_cube.device))
+                    wv, tel_db, method_db, str(data_cube.rawfile), data_cube.device))
 
     ## Water vapor calibration constants
     elif parameter == 'WVC':
