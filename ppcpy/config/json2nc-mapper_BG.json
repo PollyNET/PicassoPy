@@ -228,7 +228,7 @@
         "comment": ""
       }
     },
-    "BG_1064s": {
+    "BG_1064_cross_FR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -239,7 +239,7 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "background 1064s",
-        "standard_name": "BG_1064s",
+        "standard_name": "BG_1064_cross_FR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""

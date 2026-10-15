@@ -229,7 +229,7 @@ def pollyDisplayAttnBsc(nc_dict, config_dict, polly_conf_dict, saveFolder, wavel
     ATT_BETA[ATT_BETA < 0] = np.nan
     #ATT_BETA = np.ma.masked_invalid(ATT_BETA)       # NaNs → Mask
     ## set color of nan-values
-    cmap.set_bad(color='white')
+    cmap.set_bad(color='black')
 
 
     print(f"plotting {plotfile} ... ")
@@ -355,150 +355,150 @@ def pollyDisplayAttnBsc(nc_dict, config_dict, polly_conf_dict, saveFolder, wavel
                                     )
     
 
-    ## plotting SNR
-    if param == 'FR' or param == 'NR':
-        if f'SNR_{wavelength}nm' in nc_dict.keys():
-            pass
-        else:
-            return None
-        ## fill time gaps in snr matrix
-        SNR, quality_mask_SNR = readout.fill_time_gaps_of_matrix(time, SNR, quality_mask)
-
-        ## mask matrix
-        SNR = np.ma.masked_where(quality_mask_SNR < 0, SNR)
-
-
-        ## slice matrix to max_height
-        SNR = SNR[:,0:len(max_height)]
-
-        ## trimm matrix to last available timestamp if neccessary
-        SNR = readout.trimm_matrix_to_last_timestamp(flagPlotLastProfilesOnly=config_dict['flagPlotLastProfilesOnly'],matrix=SNR,mdate=date_00,profile_length=int(np.nanmean(np.diff(time))),last_timestamp=nc_dict['time']['data'][-1])
-	
-        zLim = [np.nanmin(SNR), np.nanmax(SNR)]
-    
-        ## transpose and flip for correct plotting
-        SNR = np.ma.transpose(SNR)  ## matrix has to be transposed for usage with pcolormesh!
-        SNR = np.flip(SNR,0)
-        SNR = downsample_nearest(SNR, factor=4)
-        #SNR[SNR == 0] = np.nan
-        #SNR[SNR < zLim[0]] = np.nan
-        SNR[SNR < 0] = np.nan
-        print(f"plotting {plotfile_SNR} ... ")
-        # display attenuate backscatter
-        fig = plt.figure(figsize=[12, 6])
-        ax = fig.add_axes([0.11, 0.15, 0.79, 0.75])
-        pcmesh = ax.imshow(
-                SNR,
-                cmap=cmap,
-                vmin=zLim[0],
-                vmax=zLim[1],
-                interpolation='none',
-                aspect='auto',
-                extent=extent,
-                )
-        # convert the datetime data from a float (which is the output of date2num into a nice datetime string.
-        ax.xaxis_date()
-    
-        ax.set_xlabel('Time [UTC]', fontsize=15)
-        ax.set_ylabel('Height [km]', fontsize=15)
-    
-        ax.xaxis.set_minor_locator(HourLocator(interval=1))    # every hour
-        if config_dict['flagPlotLastProfilesOnly'] == True:
-            ax.xaxis.set_major_locator(HourLocator(interval=2))
-        else:
-            ax.xaxis.set_major_locator(HourLocator(byhour = [4,8,12,16,20,24]))
-
-        ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
-
-
-    #    
-        ax.tick_params(
-            axis='both', which='major', labelsize=15, right=True,
-            top=True, width=2, length=5)
-        ax.tick_params(
-            axis='both', which='minor', width=1.5, length=3.5,
-            right=True, top=True)
-    
-        ax.set_title(
-            'SNR at {wave} nm'.format(wave = wavelength) +
-            ' {param} of {instrument} at {location}'.format(
-                param=param,
-                instrument=pollyVersion,
-                location=location),
-            fontsize=15)
-    
-        cb_ax = fig.add_axes([0.92, 0.25, 0.02, 0.55])
-        cbar = fig.colorbar(
-            pcmesh,
-            cax=cb_ax,
-            ticks=np.linspace(zLim[0], zLim[1], 5),
-            orientation='vertical')
-        cbar.ax.tick_params(direction='in', labelsize=15, pad=5)
-        cbar.ax.set_title('      SNR\n', fontsize=10)
-    
-        # add watermark
-        if flagWatermarkOn:
-        #    rootDir = os.getcwd()
-            rootDir = os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            im_license = matplotlib.image.imread(
-                os.path.join(rootDir, 'ppcpy', 'img', 'by-sa.png'))
-    
-            newax_license = fig.add_axes([0.58, 0.006, 0.14, 0.07], zorder=10)
-            newax_license.imshow(im_license, alpha=0.8, aspect='equal')
-            newax_license.axis('off')
-    
-            fig.text(0.72, 0.003, 'Preliminary\nResults.',
-                     fontweight='bold', fontsize=12, color='red',
-                     ha='left', va='bottom', alpha=0.8, zorder=10)
-    
-            fig.text(
-                0.84, 0.003,
-                u"\u00A9 {1} {0}.\nCC BY SA 4.0 License.".format(
-                    datetime.now().strftime('%Y'), partnerLabel),
-                fontweight='bold', fontsize=7, color='black', ha='left',
-                va='bottom', alpha=1, zorder=10)
-
-        fig.text(
-           0.05, 0.02,
-           '{0}\nLC: {1:.2e}'.format(
-   #            datenum_to_datetime(time[0]).strftime("%Y-%m-%d"),
-               nc_dict['m_date'],
-               LCUsed), fontsize=12)
-        fig.text(
-            0.2, 0.02,
-            'Version: {version}\nCalibration: {method}'.format(
-                version=version,
-                method=flagLC),
-            fontsize=12)
-    
-        fig.savefig(saveFilename_SNR,dpi=figDPI)
-    
-        plt.close()
-        remove_widht_height_entry_from_svg_file(saveFilename_SNR,imgFormat)
-
-        ## write2donefilelist
-        readout.write2donefilelist_dict(donefilelist_dict = donefilelist_dict,
-                                        lidar = pollyVersion,
-                                        location = nc_dict['location'],
-                                        starttime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d %H:%M:%S'),
-                                        stoptime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][-1])).strftime('%Y%m%d %H:%M:%S'),
-                                        last_update = datetime.now(timezone.utc).strftime("%Y%m%d %H:%M:%S"),
-                                        wavelength = wavelength,
-                                        filename = saveFilename_SNR,
-                                        level = 0,
-                                        info = f"ATT_BETA plots for {param}",
-                                        nc_zip_file = nc_dict['PollyDataFile'],
-                                        nc_zip_file_size = 9000000,
-                                        active = 1,
-                                        GDAS = 0,
-                                        GDAS_timestamp = f"{datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d')} 12:00:00",
-                                        lidar_ratio = 50,
-                                        software_version = version,
-                                        product_type = f'SNR_{param}_{wavelength}',
-                                        product_starttime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d %H:%M:%S'),
-                                        product_stoptime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][-1])).strftime('%Y%m%d %H:%M:%S')
-                                        )
+#    ## plotting SNR
+#    if param == 'FR' or param == 'NR':
+#        if f'SNR_{wavelength}nm' in nc_dict.keys():
+#            pass
+#        else:
+#            return None
+#        ## fill time gaps in snr matrix
+#        SNR, quality_mask_SNR = readout.fill_time_gaps_of_matrix(time, SNR, quality_mask)
+#
+#        ## mask matrix
+#        SNR = np.ma.masked_where(quality_mask_SNR < 0, SNR)
+#
+#
+#        ## slice matrix to max_height
+#        SNR = SNR[:,0:len(max_height)]
+#
+#        ## trimm matrix to last available timestamp if neccessary
+#        SNR = readout.trimm_matrix_to_last_timestamp(flagPlotLastProfilesOnly=config_dict['flagPlotLastProfilesOnly'],matrix=SNR,mdate=date_00,profile_length=int(np.nanmean(np.diff(time))),last_timestamp=nc_dict['time']['data'][-1])
+#	
+#        zLim = [np.nanmin(SNR), np.nanmax(SNR)]
+#    
+#        ## transpose and flip for correct plotting
+#        SNR = np.ma.transpose(SNR)  ## matrix has to be transposed for usage with pcolormesh!
+#        SNR = np.flip(SNR,0)
+#        SNR = downsample_nearest(SNR, factor=4)
+#        #SNR[SNR == 0] = np.nan
+#        #SNR[SNR < zLim[0]] = np.nan
+#        SNR[SNR < 0] = np.nan
+#        print(f"plotting {plotfile_SNR} ... ")
+#        # display attenuate backscatter
+#        fig = plt.figure(figsize=[12, 6])
+#        ax = fig.add_axes([0.11, 0.15, 0.79, 0.75])
+#        pcmesh = ax.imshow(
+#                SNR,
+#                cmap=cmap,
+#                vmin=zLim[0],
+#                vmax=zLim[1],
+#                interpolation='none',
+#                aspect='auto',
+#                extent=extent,
+#                )
+#        # convert the datetime data from a float (which is the output of date2num into a nice datetime string.
+#        ax.xaxis_date()
+#    
+#        ax.set_xlabel('Time [UTC]', fontsize=15)
+#        ax.set_ylabel('Height [km]', fontsize=15)
+#    
+#        ax.xaxis.set_minor_locator(HourLocator(interval=1))    # every hour
+#        if config_dict['flagPlotLastProfilesOnly'] == True:
+#            ax.xaxis.set_major_locator(HourLocator(interval=2))
+#        else:
+#            ax.xaxis.set_major_locator(HourLocator(byhour = [4,8,12,16,20,24]))
+#
+#        ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
+#
+#
+#    #    
+#        ax.tick_params(
+#            axis='both', which='major', labelsize=15, right=True,
+#            top=True, width=2, length=5)
+#        ax.tick_params(
+#            axis='both', which='minor', width=1.5, length=3.5,
+#            right=True, top=True)
+#    
+#        ax.set_title(
+#            'SNR at {wave} nm'.format(wave = wavelength) +
+#            ' {param} of {instrument} at {location}'.format(
+#                param=param,
+#                instrument=pollyVersion,
+#                location=location),
+#            fontsize=15)
+#    
+#        cb_ax = fig.add_axes([0.92, 0.25, 0.02, 0.55])
+#        cbar = fig.colorbar(
+#            pcmesh,
+#            cax=cb_ax,
+#            ticks=np.linspace(zLim[0], zLim[1], 5),
+#            orientation='vertical')
+#        cbar.ax.tick_params(direction='in', labelsize=15, pad=5)
+#        cbar.ax.set_title('      SNR\n', fontsize=10)
+#    
+#        # add watermark
+#        if flagWatermarkOn:
+#        #    rootDir = os.getcwd()
+#            rootDir = os.path.dirname(
+#            os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+#            im_license = matplotlib.image.imread(
+#                os.path.join(rootDir, 'ppcpy', 'img', 'by-sa.png'))
+#    
+#            newax_license = fig.add_axes([0.58, 0.006, 0.14, 0.07], zorder=10)
+#            newax_license.imshow(im_license, alpha=0.8, aspect='equal')
+#            newax_license.axis('off')
+#    
+#            fig.text(0.72, 0.003, 'Preliminary\nResults.',
+#                     fontweight='bold', fontsize=12, color='red',
+#                     ha='left', va='bottom', alpha=0.8, zorder=10)
+#    
+#            fig.text(
+#                0.84, 0.003,
+#                u"\u00A9 {1} {0}.\nCC BY SA 4.0 License.".format(
+#                    datetime.now().strftime('%Y'), partnerLabel),
+#                fontweight='bold', fontsize=7, color='black', ha='left',
+#                va='bottom', alpha=1, zorder=10)
+#
+#        fig.text(
+#           0.05, 0.02,
+#           '{0}\nLC: {1:.2e}'.format(
+#   #            datenum_to_datetime(time[0]).strftime("%Y-%m-%d"),
+#               nc_dict['m_date'],
+#               LCUsed), fontsize=12)
+#        fig.text(
+#            0.2, 0.02,
+#            'Version: {version}\nCalibration: {method}'.format(
+#                version=version,
+#                method=flagLC),
+#            fontsize=12)
+#    
+#        fig.savefig(saveFilename_SNR,dpi=figDPI)
+#    
+#        plt.close()
+#        remove_widht_height_entry_from_svg_file(saveFilename_SNR,imgFormat)
+#
+#        ## write2donefilelist
+#        readout.write2donefilelist_dict(donefilelist_dict = donefilelist_dict,
+#                                        lidar = pollyVersion,
+#                                        location = nc_dict['location'],
+#                                        starttime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d %H:%M:%S'),
+#                                        stoptime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][-1])).strftime('%Y%m%d %H:%M:%S'),
+#                                        last_update = datetime.now(timezone.utc).strftime("%Y%m%d %H:%M:%S"),
+#                                        wavelength = wavelength,
+#                                        filename = saveFilename_SNR,
+#                                        level = 0,
+#                                        info = f"ATT_BETA plots for {param}",
+#                                        nc_zip_file = nc_dict['PollyDataFile'],
+#                                        nc_zip_file_size = 9000000,
+#                                        active = 1,
+#                                        GDAS = 0,
+#                                        GDAS_timestamp = f"{datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d')} 12:00:00",
+#                                        lidar_ratio = 50,
+#                                        software_version = version,
+#                                        product_type = f'SNR_{param}_{wavelength}',
+#                                        product_starttime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d %H:%M:%S'),
+#                                        product_stoptime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][-1])).strftime('%Y%m%d %H:%M:%S')
+#                                        )
 
 
 
@@ -614,7 +614,7 @@ def pollyDisplayATT_BSC_cloudinfo(nc_dict, nc_dict_cloudinfo, config_dict, polly
     # define the colormap
     cmap = load_colormap(name=colormap_basic)
     ## set color of nan-values
-    cmap.set_bad(color='white')
+    cmap.set_bad(color='black')
 
     print(f"plotting {plotfile} ... ")
     # display attenuate backscatter
@@ -797,6 +797,10 @@ def pollyDisplayVDR(nc_dict,config_dict,polly_conf_dict,saveFolder, wavelength,d
     imgFormat = "svg"
 
 
+    if f'volume_depolarization_ratio_{wavelength}nm' in nc_dict.keys():
+        pass
+    else:
+        return
     VDR = nc_dict[f'volume_depolarization_ratio_{wavelength}nm']['data']
     quality_mask = np.where(VDR > 0, 0, 0)
     #eta = re.split(r'eta:',nc_dict[f'volume_depolarization_ratio_{wavelength}nm___comment'])[1]
@@ -863,7 +867,7 @@ def pollyDisplayVDR(nc_dict,config_dict,polly_conf_dict,saveFolder, wavelength,d
     #cmap =copy.copy(plt.cm.get_cmap(colormap_basic))
     VDR = downsample_nearest(VDR, factor=4)
     ## set color of nan-values
-    cmap.set_bad(color='white')
+    cmap.set_bad(color='black')
 
     print(f"plotting {plotfile} ... ")
     # display attenuate backscatter
@@ -1089,7 +1093,7 @@ def pollyDisplayWVMR(nc_dict,config_dict,polly_conf_dict,saveFolder,donefilelist
     ## set color of nan-values
     WVMR = downsample_nearest(WVMR, factor=4)
     ## set color of nan-values
-    cmap.set_bad(color='white')
+    cmap.set_bad(color='black')
 
     print(f"plotting {plotfile} ... ")
     # display attenuate backscatter
@@ -1552,7 +1556,7 @@ def pollyDisplayRH(nc_dict,config_dict,polly_conf_dict,saveFolder,donefilelist_d
     #import copy
     #cmap =copy.copy(plt.cm.get_cmap(colormap_basic))
     ## set color of nan-values
-    cmap.set_bad(color='white')
+    cmap.set_bad(color='black')
 
     print(f"plotting {plotfile} ... ")
     # display attenuate backscatter
@@ -2120,7 +2124,7 @@ def pollyDisplayQR(nc_dict,config_dict, polly_conf_dict, saveFolder, q_param, q_
     #cmap =copy.copy(plt.cm.get_cmap(colormap_basic))
     matrix= downsample_nearest(matrix, factor=4)
     ## set color of nan-values
-    cmap.set_bad(color='white')
+    cmap.set_bad(color='black')
 
     print(f"plotting {plotfile} ... ")
     # display attenuate backscatter
