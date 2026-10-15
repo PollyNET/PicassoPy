@@ -982,7 +982,9 @@ def calibrateOuterFOV(data_cube, collect_debug:bool=False, collect_vars_plot:boo
     config_dict = data_cube.polly_config_dict.copy()
     height = np.array(data_cube.retrievals_highres['height'])/1000
 
+    print('starting with clFreeGrps', data_cube.clFreeGrps)
     results = []
+    debug = []
     for i, cldFree in enumerate(data_cube.clFreeGrps):
         cldFreeTime64 = np.array(data_cube.retrievals_highres['time64'])[cldFree]
         cldFreeTime = np.array(data_cube.retrievals_highres['time'])[cldFree]
@@ -1014,10 +1016,14 @@ def calibrateOuterFOV(data_cube, collect_debug:bool=False, collect_vars_plot:boo
         )
 
         height_mask = (height > 0.8) & (height < 6)
+        #print('vdr_inner', vdr_inner[height_mask])
+        if np.all(~np.isfinite(vdr_inner[height_mask])):
+            print('only nan for vdr_inner')
+            continue
         # the eta estimate seems more roubust for high voldepol in the inner fov
         # the lower vdr_inner, the stronger the effect of a wrong Hr
-        print("!!! ", np.percentile(vdr_inner[height_mask], [10, 20]))
-        vdr_inner_min = np.percentile(vdr_inner[height_mask], [10])*2
+        print("percentile 10, 20 ", np.nanpercentile(vdr_inner[height_mask], [10, 20]))
+        vdr_inner_min = np.nanpercentile(vdr_inner[height_mask], [10])*2
         
         vdr_mask = vdr_inner[height_mask] > vdr_inner_min
         eta_lt0_mask = eta_outer[height_mask] > 0
@@ -1120,15 +1126,21 @@ def calibrateOuterFOV(data_cube, collect_debug:bool=False, collect_vars_plot:boo
 
         if collect_debug:
 
-            results[-1]['Hr'] = hr_opt
-            results[-1]['Hr_fixed'] = Hr_fixed
-            results[-1]['rmse'] = 10**rmse_log
-            results[-1]['median_ratio'] = median_ratio
-            results[-1]['vdr_ref_10'] = np.percentile(vdr_inner[height_mask], [10])
-            results[-1]['vdr_ref_90'] = np.percentile(vdr_inner[height_mask], [90])
+            debug.append({
+                'eta': eta_opt, 'eta_std': eta_opt*error_eta,
+                'time_start': cldFreeTime[0],  
+                'time_end': cldFreeTime[1],
+            })
+            
+            debug[-1]['Hr'] = hr_opt
+            debug[-1]['Hr_fixed'] = Hr_fixed
+            debug[-1]['rmse'] = 10**rmse_log
+            debug[-1]['median_ratio'] = median_ratio
+            debug[-1]['vdr_ref_10'] = np.percentile(vdr_inner[height_mask], [10])
+            debug[-1]['vdr_ref_90'] = np.percentile(vdr_inner[height_mask], [90])
 
             
-        if collect_vars_plot:
+        if collect_debug and collect_vars_plot:
             vdr_outer, _ = calc_profile_vdr(
                 sigt=sigt_outer, sigc=sigc_outer, 
                 Gt=config_dict['G'][flagt_outer], Gr=config_dict['G'][flagc_outer],
@@ -1145,15 +1157,13 @@ def calibrateOuterFOV(data_cube, collect_debug:bool=False, collect_vars_plot:boo
                 voldepol_error=np.array([0.004, 0.   , 0.   ]), # just need a dummy value for now
                 window=1
             )
-            results[-1]['cldFreeTime64'] = cldFreeTime64
-            results[-1]['vdr_inner_min'] = vdr_inner_min
-            results[-1]['height_mask'] = height_mask
-            results[-1]['eta_outer_guess'] = eta_outer_guess
-            results[-1]['vdr_inner'] = vdr_inner
-            results[-1]['eta_outer'] = eta_outer
-            results[-1]['vdr_outer'] = vdr_outer
-            results[-1]['vdr_outer_dash'] = vdr_outer_dash
+            debug[-1]['cldFreeTime64'] = cldFreeTime64
+            debug[-1]['vdr_inner_min'] = vdr_inner_min
+            debug[-1]['height_mask'] = height_mask
+            debug[-1]['eta_outer_guess'] = eta_outer_guess
+            debug[-1]['vdr_inner'] = vdr_inner
+            debug[-1]['eta_outer'] = eta_outer
+            debug[-1]['vdr_outer'] = vdr_outer
+            debug[-1]['vdr_outer_dash'] = vdr_outer_dash
 
-            pass
-
-    return {"532_DFOV": results}
+    return {"532_DFOV": results}, debug

@@ -879,7 +879,39 @@ class PicassoProc:
             else:
                 logging.critical(f"{variable} is NOT in data_cube.retrievals_highres")
                 raise ValueError(f"Could not locate variable '{variable}'.")
+
                 
+    def polarizationCaliOuterFOV(self, collect_debug=False, collect_vars_plot=False):
+        """transfer the inner FOV depol calibration to the outer FOV
+        
+        
+        Parameters
+        ---------- 
+        collect_debug : bool, optional
+            If True, collects debug information. Default is False.
+        collect_vars_plot : bool, optional
+            If True, collect the variables for the diagnostics plot. Default is False.
+        
+        Attributes
+        ----------
+        self.pol_cali['transfer' & 'transfer_db'] : dict
+            All retrieved and read transfer depol calibration constants
+        self.etaused : dict
+            Added the respective depolariztion constant.
+        
+        """
+
+        
+    
+        
+        out, debug = polarization.calibrateOuterFOV(
+            self, collect_debug=collect_debug, collect_vars_plot=collect_vars_plot
+        )
+        self.pol_cali['transfer'] = out
+                
+        # add the optimum to etaused
+        
+        # optionally store the values
 
     def loadMeteo(self):
         """Load meteorological data.
