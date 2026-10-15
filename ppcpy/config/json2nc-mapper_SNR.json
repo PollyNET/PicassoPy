@@ -251,7 +251,7 @@
         "comment": ""
       }
     },
-    "SNR_1064s": {
+    "SNR_1064_cross_FR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -262,8 +262,8 @@
       "attributes": {
         "unit": "a.u.",
         "unit_html": "a.u.",
-        "long_name": "signal to noise ratio 1064s",
-        "standard_name": "SNR_1064s",
+        "long_name": "signal to noise ratio 1064_cross_FR",
+        "standard_name": "SNR_1064_cross_FR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""

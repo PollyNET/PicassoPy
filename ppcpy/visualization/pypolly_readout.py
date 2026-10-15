@@ -377,7 +377,11 @@ def read_nc_file(nc_filename,timestamp,device,location):
 #    nc_dict['m_date'] = datetime.fromtimestamp(nc_file_ds['time'][0]).strftime("%Y-%m-%d")
 
     nc_file_ds.close()
-    #print(nc_dict.keys())
+
+    #print(nc_filename)
+    #print(nc_dict['parDepol_klett_355'])
+    #print(nc_dict['parDepol_klett_1064'])
+    
     return nc_dict
 
 

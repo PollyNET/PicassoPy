@@ -251,7 +251,7 @@
         "comment": ""
       }
     },
-    "RCS_1064s": {
+    "RCS_1064_cross_FR": {
       "dtype": "f8",
       "shape": [
         "time",
@@ -263,7 +263,7 @@
         "unit": "a.u.",
         "unit_html": "a.u.",
         "long_name": "range corrected signal 1064s",
-        "standard_name": "RCS_1064s",
+        "standard_name": "RCS_1064_cross_FR",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""

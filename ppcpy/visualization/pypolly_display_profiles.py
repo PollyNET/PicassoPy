@@ -960,7 +960,7 @@ def pollyDisplay_profile_summary(nc_dict_profile,nc_dict_profile_NR,config_dict,
 
     y_max_NR = 5000
     cols = 6
-    if len(nc_dict_profile_NR) > 0:
+    if len(nc_dict_profile_NR) > 0:  ## if NR-files available
         height_NR = nc_dict_profile_NR['height']['data']
         h_index = np.where(height_NR > 5000)[0][0]
         height_NR_shortened = height_NR[0:h_index]
@@ -984,7 +984,7 @@ def pollyDisplay_profile_summary(nc_dict_profile,nc_dict_profile_NR,config_dict,
                           "angstroem": {"FR": ['AE_beta_355_532_Raman','AE_beta_532_1064_Raman','AE_parExt_355_532_Raman'],
                                         "NR": []
                                        },
-                          "depolarization": {"FR": ['parDepol_raman_355','parDepol_raman_532','parDepol_raman_1064'],
+                          "depolarization": {"FR": ['parDepol_raman_355','parDepol_raman_532','parDepol_raman_1064','volDepol_raman_355','volDepol_raman_532','volDepol_raman_1064'],
                                              "NR": []
                                             },
                           "wvmr": {"FR": ['WVMR'],
@@ -1008,14 +1008,14 @@ def pollyDisplay_profile_summary(nc_dict_profile,nc_dict_profile_NR,config_dict,
                           "angstroem": {"FR": [],
                                         "NR": []
                                        },
-                          "depolarization": {"FR": ['parDepol_klett_355','parDepol_klett_532','parDepol_klett_1064'],
+                          "depolarization": {"FR": ['parDepol_klett_355','parDepol_klett_532','parDepol_klett_1064','volDepol_klett_355','volDepol_klett_532','volDepol_klett_1064'],
                                              "NR": []
                                             },
                           "wvmr": {"FR": ['WVMR'],
                                    "NR": []
                                   }
             }
-    else:
+    else:  ## if no NR-files available
 
         if method == 'raman':
             param_dict = {
@@ -1035,7 +1035,7 @@ def pollyDisplay_profile_summary(nc_dict_profile,nc_dict_profile_NR,config_dict,
                                               ['aerLR_raman_355','aerLR_raman_532','aerLR_raman_1064','aerLR_RR_355','aerLR_RR_532','aerLR_RR_1064'],
                                         "NR": []
                                        },
-                          "depolarization": {"FR": ['parDepol_raman_355','parDepol_raman_532','parDepol_raman_1064'],
+                          "depolarization": {"FR": ['parDepol_raman_355','parDepol_raman_532','parDepol_raman_1064','volDepol_raman_355','volDepol_raman_532','volDepol_raman_1064'],
                                              "NR": []
                                             },
                           "wvmr": {"FR": ['WVMR','RH'],
@@ -1058,7 +1058,7 @@ def pollyDisplay_profile_summary(nc_dict_profile,nc_dict_profile_NR,config_dict,
                           "angstroem": {"FR": [],
                                         "NR": []
                                        },
-                          "depolarization": {"FR": ['parDepol_klett_355','parDepol_klett_532','parDepol_klett_1064'],
+                          "depolarization": {"FR": ['parDepol_klett_355','parDepol_klett_532','parDepol_klett_1064','volDepol_klett_355','volDepol_klett_532','volDepol_klett_1064'],
                                              "NR": []
                                             },
                           "wvmr": {"FR": ['WVMR','RH'],
@@ -1086,11 +1086,15 @@ def pollyDisplay_profile_summary(nc_dict_profile,nc_dict_profile_NR,config_dict,
             label=f'{p}_FR'
             if parameter == 'angstroem':
                     color_ls = ['orange','magenta','black']
+            elif parameter == 'depolarization':
+                    color_ls = ['blue','green','red','blue','green','red']
             else:
                     color_ls = ['blue','green','red','purple','olive','lightsalmon']
 
             if 'RR' in p:
                 line_style = 'dashed'
+            elif 'Depol' in p:
+                line_style_ls = ['-','-','-','dashed','dashed','dashed']
             else:
                 line_style = '-'
             #line_style = '-'
@@ -1125,6 +1129,12 @@ def pollyDisplay_profile_summary(nc_dict_profile,nc_dict_profile_NR,config_dict,
                     alpha=1,\
                     label='RH')
                 ax2.legend(fontsize=14, loc='upper right', bbox_to_anchor=(0.9, 0.95))
+            elif parameter == 'depolarization':
+                p_FR = ax[col].plot(nc_dict_profile[p]['data']*scaling_factor, height_FR/1000,\
+                    linestyle=line_style_ls[n],\
+                    color=color_ls[n],\
+                    zorder=2,\
+                    label=label)
             else:
                 if parameter == 'extinction' and method == 'klett':
                     label = f'{p} x LR'

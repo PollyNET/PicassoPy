@@ -148,8 +148,10 @@ def wvc_for_cldFreeGrps(data_cube, instrument:str, collect_debug:bool=False) -> 
     
         ## SNR mask
         snr_min = config_dict['minSNRWVCali']
-        snr_387 = data_cube.retrievals_highres['SNR_FR_387nm'][slice(*cldFree), :]
-        snr_407 = data_cube.retrievals_highres['SNR_FR_407nm'][slice(*cldFree), :]
+        #snr_387 = data_cube.retrievals_highres['SNR_FR_387nm'][slice(*cldFree), :]
+        #snr_407 = data_cube.retrievals_highres['SNR_FR_407nm'][slice(*cldFree), :]
+        snr_387 = data_cube.retrievals_highres['SNR_387_total_FR'][slice(*cldFree), :]
+        snr_407 = data_cube.retrievals_highres['SNR_407_total_FR'][slice(*cldFree), :]
         mask_wvmr = (snr_387 < snr_min) | (snr_407 < snr_min)
 
         ## background-corrected signal at 387 and 407, mask, then averaged over group

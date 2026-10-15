@@ -276,7 +276,7 @@ write2nc.write2nc_file(data_cube=data_cube,prod_ls=["quasi_results","quasi_resul
 ## watervapor mixing ratio
 data_cube.watervaporCali()
 data_cube.wvmr()
-write2nc_file(data_cube=data_cube,prod_ls=["WVMR_RH"])
+write2nc.write2nc_file(data_cube=data_cube,prod_ls=["WVMR_RH"])
 
 
 logging.info('processing finished!')
