@@ -1159,6 +1159,7 @@ def calibrateOuterFOV(data_cube, collect_debug:bool=False, collect_vars_plot:boo
             debug[-1]['vdr_inner_min'] = vdr_inner_min
             debug[-1]['height_mask'] = height_mask
             debug[-1]['eta_outer_guess'] = eta_outer_guess
+            debug[-1]['Hr_outer_init'] = config_dict['H'][flagc_outer][0]
             debug[-1]['vdr_inner'] = vdr_inner
             debug[-1]['eta_outer'] = eta_outer
             debug[-1]['vdr_outer'] = vdr_outer
