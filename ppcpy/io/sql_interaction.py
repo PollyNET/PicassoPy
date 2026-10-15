@@ -324,3 +324,26 @@ def write_rows_to_sql_db(db_path:str, table_name:str, column_names:list[str],
             logging.info(f"{inserted} rows inserted into '{table_name}'.")
     except sqlite3.Error as e:
         logging.warning(f"SQLite error: {e}")
+
+
+
+
+def simple_write_db(db_path, tablename, d):
+    """tiny utility function that writes debug values to a separate db"""
+    
+    import pandas as pd
+    import sqlite3
+
+
+    df = pd.DataFrame(d['532_DFOV'])
+    df['time_int'] = df['time_start'].astype(str) + " " + df['time_end'].astype(str)
+    df = df.set_index('time_int')
+
+
+    df.to_sql(
+        tablename,
+        sqlite3.connect(db_path),
+        if_exists="append",
+        index=True,
+        index_label="time_int"
+    )

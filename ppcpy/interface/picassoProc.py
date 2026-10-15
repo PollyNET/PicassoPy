@@ -108,6 +108,7 @@ class PicassoProc:
         self.pol_cali = {}
         self.LC = {}
         self.wv_cali = {}
+        self.etaused = {}
 
 
     def mdate_filename(self) -> str:
@@ -738,8 +739,11 @@ class PicassoProc:
         self.pol_cali['default'] = polarization.loadDefaults(self, **defaults)
 
         # Select optimal DCs
-        self.etaused = select.single_best(self.pol_cali['default'], 'eta', 'eta_std', 'method', relative=True) |\
-                       select.single_best(all_D90_pol_calis, 'eta', 'eta_std', 'method', relative=True)
+        # etaused has to be updated not overwritten
+        self.etaused.update(
+            select.single_best(self.pol_cali['default'], 'eta', 'eta_std', 'method', relative=True) |\
+            select.single_best(all_D90_pol_calis, 'eta', 'eta_std', 'method', relative=True)
+        )
 
         # Check if default DCs were used
         defaultDCsUsed = [ch for ch in self.etaused if self.etaused[ch]['method'] == 'default']
@@ -881,12 +885,20 @@ class PicassoProc:
                 raise ValueError(f"Could not locate variable '{variable}'.")
 
                 
-    def polarizationCaliOuterFOV(self, collect_debug=False, collect_vars_plot=False):
+    def polarizationCaliOuterFOV(
+        self, db_path:str=None, 
+        collect_debug:bool=False, collect_vars_plot=False,
+        store_debug:bool=False):
         """transfer the inner FOV depol calibration to the outer FOV
         
         
         Parameters
         ---------- 
+        db_path : str, optional
+            Path to calibration constant database. If ``db_path`` is ``None``
+            and config variable ``flagUsePreviousDepolCali`` is enabled,
+            a standard path is constructed from the config variable
+            ``calibrationDB``. Default is ``None``.
         collect_debug : bool, optional
             If True, collects debug information. Default is False.
         collect_vars_plot : bool, optional
@@ -901,17 +913,58 @@ class PicassoProc:
         
         """
 
-        
-    
+        if store_debug:
+            collect_debug = True
         
         out, debug = polarization.calibrateOuterFOV(
             self, collect_debug=collect_debug, collect_vars_plot=collect_vars_plot
         )
         self.pol_cali['transfer'] = out
-                
-        # add the optimum to etaused
+        all_transfer_pol_cali = self.pol_cali['transfer'].copy()
+
+        if self.polly_config_dict['flagUsePreviousDepolCali']:
+            if db_path is None:
+                base_dir = Path(self.picasso_config_dict['results_folder'])
+                db_path = base_dir.joinpath(self.device, self.polly_config_dict['calibrationDB'])
+            logging.info(f"Loading Depol calibration constants from database: {db_path}")
+            table_name = 'depol_calibration_constant'
+            ts_interval = self.retrievals_highres['time'][0], self.retrievals_highres['time'][-1]
+            db_table = sql_db.get_from_sql_db(
+                db_path=db_path,
+                table_name=table_name,
+                ts_interval=ts_interval,
+                ts_delta=self.polly_config_dict['TimeInterval4LoadingDBCC']
+            )
+            if 'transfer_db' in db_table:
+                self.pol_cali['transfer_db'] = db_table['transfer_db']
+
+                # Combine retrieved and database D90 DCs
+                for ch in self.pol_cali['transfer_db'].keys():
+                    all_transfer_pol_cali[ch] = all_transfer_pol_cali.get(ch, []) \
+                        + self.pol_cali['transfer_db'][ch]
         
-        # optionally store the values
+        # etaused has to be updated not overwritten
+        self.etaused.update(
+            select.single_best(all_transfer_pol_cali, 'eta', 'eta_std', 'method', relative=False))
+        
+        if store_debug:
+            keep = ['eta', 'eta_std', 'time_start', 'time_end', 'method', 'Hr', 'Hr_fixed', 'rmse', 'median_ratio']
+
+            debug_reduced = {
+                '532_DFOV': [{k: o[k] for k in keep if k in o} for o in debug]
+            }
+
+            sql_db.simple_write_db(
+                f"{self.device}/{self.device}_DFOV_more_vars.db",
+                "eta_retrieval",
+                debug_reduced
+            )
+
+
+        if collect_debug:
+            return debug
+        else:
+            return None
 
     def loadMeteo(self):
         """Load meteorological data.

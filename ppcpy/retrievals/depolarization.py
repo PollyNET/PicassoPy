@@ -190,7 +190,7 @@ def calc_profile_vdr(sigt:np.ndarray, sigc:np.ndarray, Gt:float, Gr:float, Ht:fl
 
     """
 
-    logging.info(f"G {Gt} {Gr} H {Ht} {Hr} Eta {eta} error {voldepol_error} Window {window} ")
+    logging.debug(f"G {Gt} {Gr} H {Ht} {Hr} Eta {eta} error {voldepol_error} Window {window} ")
     # Smooth signals before or after ratio calculation
     sig_ratio = sigc / sigt
     if window > 1: # smoothing with a window size of 1 equals no smoothing

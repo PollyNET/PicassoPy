@@ -1032,7 +1032,7 @@ def calibrateOuterFOV(data_cube, collect_debug:bool=False, collect_vars_plot:boo
         
         # check if enough high vdr_inner values are there, if so Hr and eta are optimized else only eta
         if np.sum((vdr_mask) & (eta_lt0_mask)) > 50:
-            eta_outer_guess = np.mean(eta_outer[height_mask][(vdr_mask) & (eta_lt0_mask)])
+            eta_outer_guess = np.nanmedian(eta_outer[height_mask][(vdr_mask) & (eta_lt0_mask)])
             print('eta_outer first guess', eta_outer_guess)
             hr_bounds = (-0.9998, -0.96) # translates to a T_R 10000, 48
             error_eta = 0.2
@@ -1087,8 +1087,7 @@ def calibrateOuterFOV(data_cube, collect_debug:bool=False, collect_vars_plot:boo
         print("\nOptimization result")
         print(f"success              = {result.success}")
         print(f"message              = {result.message}")
-        print(f"Hr                   = {hr_opt:.10f}")
-        print(f"(1-Hr)/(1+Hr)        = {(1-hr_opt)/(1+hr_opt):.5f}")
+        print(f"Hr                   = {hr_opt:.10f}   in T_R {(1-hr_opt)/(1+hr_opt):.5f}")
         print(f"eta                  = {eta_opt:.10f}")
         print(f"log10 RMSE           = {rmse_log:.6f} linear {10**rmse_log:.6}")
         print(f"median outer/inner   = {median_ratio:.5f}")
@@ -1115,7 +1114,6 @@ def calibrateOuterFOV(data_cube, collect_debug:bool=False, collect_vars_plot:boo
         print(f"success   = {result.success}")
         print(f"message   = {result.message}")
         print("HR_opt", hr_opt, (1-hr_opt)/(1+hr_opt))
-        print(opt)
 
         results.append({
             'eta': eta_opt, 'eta_std': eta_opt*error_eta,
