@@ -268,6 +268,8 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, flagPicassoComp
     # radiosondeType = param.get('radiosondeType', False) # <-- Not used
     bgCorrectionIndexLow = param.get('bgCorrectionIndexLow', False)
     bgCorrectionIndexHigh = param.get('bgCorrectionIndexHigh', False)
+    bgCorrectionIndexLow_upper = param.get('bgCorrectionIndexLow_upper', False)
+    bgCorrectionIndexHigh_upper = param.get('bgCorrectionIndexHigh_upper', False)
     asl = param.get('asl', 10)
     initialPolAngle = param.get('initialPolAngle', False)
     maskPolCalAngle = param.get('maskPolCalAngle', False)
@@ -344,7 +346,7 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, flagPicassoComp
     # Background Correction
     # ------------------------------------------------------------------------
     logging.info('... calculate background corrected signal')
-    sigBGCor, bg =  pollyRemoveBG(
+    sigBGCor, bg, bg_upper =  pollyRemoveBG(
         rawSignal=data_dict['preproSignal'],
         bgCorrectionIndexLow=bgCorrectionIndexLow,
         bgCorrectionIndexHigh=bgCorrectionIndexHigh,
@@ -354,6 +356,7 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, flagPicassoComp
     # Store the background and background corrected signal
     data_dict['BG'] = bg[:, 1, :] ## reshaping the3-dim. BG-matrix to 2-dim matrix
     data_dict['sigBGCor'] = sigBGCor
+    data_dict['BG_upper'] = bg_upper[:, 1, :]
 
 
     # ------------------------------------------------------------------------
@@ -722,13 +725,16 @@ def pollyRemoveBG(rawSignal:np.ndarray, bgCorrectionIndexLow:list, bgCorrectionI
 
     # Calculate the mean across the channel specific column range for each row and page
     mean_matrix = np.empty((rawSignal.shape[0], 1, rawSignal.shape[2]), dtype=rawSignal.dtype)
+    mean_matrix_upper = np.empty((rawSignal.shape[0], 1, rawSignal.shape[2]), dtype=rawSignal.dtype)
     for iCh in range(rawSignal.shape[2]):
         mean_matrix[:, :, iCh] = np.mean(rawSignal[:, bgCorrectionIndexLow[iCh]:bgCorrectionIndexHigh[iCh] + 1, iCh], axis=1, keepdims=True)
+        mean_matrix_upper[:, :, iCh] = np.mean(rawSignal[:, bgCorrectionIndexLow_upper[iCh]:bgCorrectionIndexHigh_upper[iCh] + 1, iCh], axis=1, keepdims=True)
 
     # Replicate the mean matrix along the second dimension
     bg = np.tile(mean_matrix, (1, maxHeightBin, 1))
     signal_out = slicerange(rawSignal, maxHeightBin, firstBinIndex) - bg
-    return signal_out, bg
+    bg_upper = np.tile(mean_matrix_upper, (1, maxHeightBin, 1))
+    return signal_out, bg, bg_upper
 
 
 def slicerange(array:np.ndarray, maxHeightBin:int, firstBinIndex:list) -> np.ndarray:
