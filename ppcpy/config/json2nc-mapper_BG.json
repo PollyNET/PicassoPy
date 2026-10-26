@@ -414,6 +414,23 @@
         "plot_scale": "linear",
         "comment": ""
       }
+    },
+    "BG_upper_532_total_FR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background FR_total_532nm for upper bins",
+        "standard_name": "BG_upper_532_total_FR",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
     }
   }
 }

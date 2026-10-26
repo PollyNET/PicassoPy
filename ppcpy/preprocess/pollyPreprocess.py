@@ -350,6 +350,8 @@ def pollyPreprocess(rawdata_dict:dict, collect_debug:bool=False, flagPicassoComp
         rawSignal=data_dict['preproSignal'],
         bgCorrectionIndexLow=bgCorrectionIndexLow,
         bgCorrectionIndexHigh=bgCorrectionIndexHigh,
+        bgCorrectionIndexLow_upper=bgCorrectionIndexLow_upper,
+        bgCorrectionIndexHigh_upper=bgCorrectionIndexHigh_upper,
         maxHeightBin=maxHeightBin,
         firstBinIndex=firstBinIndex
     )
@@ -683,6 +685,7 @@ def pollyDTCor(PCR:np.ndarray, **varargin:dict) -> np.ndarray:
 
 
 def pollyRemoveBG(rawSignal:np.ndarray, bgCorrectionIndexLow:list, bgCorrectionIndexHigh:list,
+                  bgCorrectionIndexLow_upper:list, bgCorrectionIndexHigh_upper:list,
                   maxHeightBin:int=3000, firstBinIndex:list|None=None) -> tuple[np.ndarray, np.ndarray]:
     """Background correction. Remove mean background noise from signal.
 
