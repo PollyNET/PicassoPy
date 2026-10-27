@@ -102,67 +102,87 @@ def pollyChannelTags(chTagsIn:list, **channel_attributes) -> list:
         for iCh in range(nChs):
             chCode = sum(2**i * b for i, b in enumerate(encodings[:, iCh]))
             if chCode in [69, 77, 16389, 16393, 16397]:
-                ch_label = 'far-range total 353 nm'
+                #ch_label = 'far-range total 353 nm'
+                ch_label = '353_total_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 73:
-                ch_label = 'far-range total 355 nm'
+                #ch_label = 'far-range total 355 nm'
+                ch_label = '355_total_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 74:
-                ch_label = 'near-range 355 nm'
+                #ch_label = 'near-range 355 nm'
+                ch_label = '355_total_NR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 81:
-                ch_label = 'far-range cross 355 nm'
+                #ch_label = 'far-range cross 355 nm'
+                ch_label = '355_cross_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 129:
-                ch_label = 'far-range 387 nm'
+                #ch_label = 'far-range 387 nm'
+                ch_label = '387_total_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 130:
-                ch_label = 'near-range 387 nm'
+                #ch_label = 'near-range 387 nm'
+                ch_label = '387_total_NR'
                 chTagsOut_ls.append(ch_label)
-            elif chCode == 257:
-                ch_label = 'far-range 407 nm'
+            #elif chCode == 257:
+            elif chCode == 265:
+                ch_label = '407_total_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode in [517, 525, 32773, 32777, 32781]:
-                ch_label = 'far-range total 530 nm'
+                #ch_label = 'far-range total 530 nm'
+                ch_label = '530_total_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 521:
-                ch_label = 'far-range total 532 nm'
+                #ch_label = 'far-range total 532 nm'
+                ch_label = '532_total_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 522:
-                ch_label = 'near-range total 532 nm'
+                #ch_label = 'near-range total 532 nm'
+                ch_label = '532_total_NR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 529:
-                ch_label = 'far-range cross 532 nm'
+                #ch_label = 'far-range cross 532 nm'
+                ch_label = '532_cros_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 4624:
-                ch_label = 'near-range cross 532 nm'
+                #ch_label = 'near-range cross 532 nm'
+                ch_label = '532_cross_NR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 545:
-                ch_label = 'far-range parallel 532 nm'
+                #ch_label = 'far-range parallel 532 nm'
+                ch_label = '532_parallel_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 1025:
-                ch_label = 'far-range 607 nm'
+                #ch_label = 'far-range 607 nm'
+                ch_label = '607_total_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 1026:
-                ch_label = 'near-range 607 nm'
+                #ch_label = 'near-range 607 nm'
+                ch_label = '607_total_NR'
                 chTagsOut_ls.append(ch_label)
             elif chCode in [2053, 2061, 65541, 65545, 65549]:
-                ch_label = 'far-range total 1058 nm'
+                #ch_label = 'far-range total 1058 nm'
+                ch_label = '1058_total_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 2057:
-                ch_label = 'far-range total 1064 nm'
+                #ch_label = 'far-range total 1064 nm'
+                ch_label = '1064_total_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 2058:
-                ch_label = 'near-range cross 1064 nm'
+                #ch_label = 'near-range cross 1064 nm'
+                ch_label = '1064_cross_NR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 2065:
-                ch_label = 'far-range cross 1064 nm'
+                #ch_label = 'far-range cross 1064 nm'
+                ch_label = '1064_cross_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 2081:
-                ch_label = 'far-range parallel 1064 nm'
+                #ch_label = 'far-range parallel 1064 nm'
+                ch_label = '1064_parallel_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode == 8193:
-                ch_label = 'far-range 460 nm'
+                ch_label = '460_total_FR'
                 chTagsOut_ls.append(ch_label)
             else:
                 ch_label = 'unknown'
@@ -345,7 +365,8 @@ def pollyChannelFlags(channel_dict_length:int, **channel_attributes) -> list:
         elif chCode == 130:
             ## near-range 387 nm
             flag_387_total_NR[iCh] = True
-        elif chCode == 257:
+        #elif chCode == 257:
+        elif chCode == 265:
             ## far-range 407 nm
             flag_407_total_FR[iCh] = True
         elif chCode in [517, 525, 32773, 32777, 32781]:
