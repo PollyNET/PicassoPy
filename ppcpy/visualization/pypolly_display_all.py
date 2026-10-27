@@ -179,7 +179,7 @@ def main():
             nc_files = readout.get_nc_filename(date, device, inputfolder, param='RCS')
             for data_file in nc_files:
                 nc_dict = readout.read_nc_file(data_file,date,device,location)
-                param_ls = ['RCS_355_total_FR', 'RCS_355_cross_FR', 'RCS_387_total_FR', 'RCS_407_total_FR', 'RCS_532_total_FR', 'RCS_532_cross_FR', 'RCS_607_total_FR', 'RCS_1064_total_FR', 'RCS_355_total_NR', 'RCS_387_total_NR', 'RCS_532_total_NR', 'RCS_607_total_NR']
+                param_ls = ['RCS_355_total_FR', 'RCS_355_cross_FR', 'RCS_387_total_FR', 'RCS_407_total_FR', 'RCS_532_total_FR', 'RCS_532_cross_FR', 'RCS_607_total_FR', 'RCS_1064_total_FR', 'RCS_355_total_NR', 'RCS_387_total_NR', 'RCS_532_total_NR', 'RCS_607_total_NR','RCS_1064_cross_FR']
 #                param_ls = ['RCS_FR_355nm', 'RCS_FR_cross_355nm', 'RCS_NR_355nm', 'RCS_RR_355nm', 'RCS_FR_387nm', 'RCS_NR_387nm', 'RCS_FR_407nm', 'RCS_NR_407nm', 'RCS_FR_532nm', 'RCS_FR_cross_532nm','RCS_FR_parallel_532nm', 'RCS_NR_532nm', 'RCS_NR_cross_532nm', 'RCS_RR_532nm', 'RCS_FR_607nm', 'RCS_NR_607nm', 'RCS_FR_1064nm', 'RCS_FR_cross_1064nm', 'RCS_RR_1064nm']
                 for p in param_ls:
                     print(p)
@@ -198,7 +198,7 @@ def main():
             nc_files = readout.get_nc_filename(date, device, inputfolder, param='SNR')
             for data_file in nc_files:
                 nc_dict = readout.read_nc_file(data_file,date,device,location)
-                param_ls = ['SNR_355_total_FR', 'SNR_355_cross_FR', 'SNR_387_total_FR', 'SNR_407_total_FR', 'SNR_532_total_FR', 'SNR_532_cross_FR', 'SNR_607_total_FR', 'SNR_1064_total_FR', 'SNR_355_total_NR', 'SNR_387_total_NR', 'SNR_532_total_NR', 'SNR_607_total_NR']
+                param_ls = ['SNR_355_total_FR', 'SNR_355_cross_FR', 'SNR_387_total_FR', 'SNR_407_total_FR', 'SNR_532_total_FR', 'SNR_532_cross_FR', 'SNR_607_total_FR', 'SNR_1064_total_FR', 'SNR_355_total_NR', 'SNR_387_total_NR', 'SNR_532_total_NR', 'SNR_607_total_NR','SNR_1064_cross_FR']
                 for p in param_ls:
                     print(p)
 
@@ -216,7 +216,8 @@ def main():
             nc_files = readout.get_nc_filename(date, device, inputfolder, param='BG')
             for data_file in nc_files:
                 nc_dict = readout.read_nc_file(data_file,date,device,location)
-                param_ls = ['BG_355_total_FR', 'BG_355_cross_FR', 'BG_387_total_FR', 'BG_407_total_FR', 'BG_532_total_FR', 'BG_532_cross_FR', 'BG_607_total_FR', 'BG_1064_total_FR', 'BG_355_total_NR', 'BG_387_total_NR', 'BG_532_total_NR', 'BG_607_total_NR']
+                print(nc_dict.keys())
+                param_ls = ['BG_355_total_FR', 'BG_355_cross_FR', 'BG_387_total_FR', 'BG_407_total_FR', 'BG_532_total_FR', 'BG_532_cross_FR', 'BG_607_total_FR', 'BG_1064_total_FR', 'BG_355_total_NR', 'BG_387_total_NR', 'BG_532_total_NR', 'BG_607_total_NR','BG_1064_cross_FR']
                 for p in param_ls:
                     print(p)
 
@@ -295,6 +296,8 @@ def main():
                 display_3d.pollyDisplayVDR(nc_dict, config_dict, polly_conf_dict, outputfolder, wavelength=355,donefilelist_dict=donefilelist_dict)
                 print('plotting VDR_532nm:')
                 display_3d.pollyDisplayVDR(nc_dict, config_dict, polly_conf_dict, outputfolder, wavelength=532,donefilelist_dict=donefilelist_dict)
+                print('plotting VDR_1064nm:')
+                display_3d.pollyDisplayVDR(nc_dict, config_dict, polly_conf_dict, outputfolder, wavelength=1064,donefilelist_dict=donefilelist_dict)
         except Exception as e:
             logging.exception("An error occurred")
     
