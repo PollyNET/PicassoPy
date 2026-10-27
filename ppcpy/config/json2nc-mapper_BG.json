@@ -228,7 +228,7 @@
         "comment": ""
       }
     },
-    "BG_1064s": {
+    "BG_1064_cross_FR": {
       "dtype": "f8",
       "shape": [
         "time"
@@ -415,6 +415,74 @@
         "comment": ""
       }
     },
+    "BG_upper_355_total_FR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background FR_total_355nm",
+        "standard_name": "BG_upper_355_total_FR",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_355_cross_FR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background FR_cross_355nm",
+        "standard_name": "BG_upper_355_cross_FR",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_387_total_FR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background FR_387nm",
+        "standard_name": "BG_upper_FR_387nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_407_total_FR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background FR_407nm",
+        "standard_name": "BG_upper_FR_407nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
     "BG_upper_532_total_FR": {
       "dtype": "f8",
       "shape": [
@@ -425,8 +493,263 @@
       "attributes": {
         "unit": "a.u.",
         "unit_html": "a.u.",
-        "long_name": "background FR_total_532nm for upper bins",
+        "long_name": "background FR_total_532nm",
         "standard_name": "BG_upper_532_total_FR",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_532_cross_FR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background FR_cross_532nm",
+        "standard_name": "BG_upper_532_cross_FR",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_FR_parallel_532nm": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background FR_parallel_532nm",
+        "standard_name": "BG_upper_FR_parallel_532nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_607_total_FR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background FR_607nm",
+        "standard_name": "BG_upper_FR_607nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_1064_total_FR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background FR_total_1064nm",
+        "standard_name": "BG_upper_1064_total_FR",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_1064_cross_FR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background 1064s",
+        "standard_name": "BG_upper_1064s",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_355_total_NR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background NR_total_355nm",
+        "standard_name": "BG_upper_355_total_NR",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_387_total_NR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background NR_387nm",
+        "standard_name": "BG_upper_NR_387nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_532_total_NR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background NR_total_532nm",
+        "standard_name": "BG_upper_532_total_NR",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_532_cross_NR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background NR_cross_532nm",
+        "standard_name": "BG_upper_532_cross_NR",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_607_total_NR": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background NR_607nm",
+        "standard_name": "BG_upper_NR_607nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_NR_1064nm": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background NR_1064nm",
+        "standard_name": "BG_upper_NR_1064nm",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_DFOV": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background DFOV",
+        "standard_name": "BG_upper_DFOV",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_RR_355": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background RR_355",
+        "standard_name": "BG_upper_RR_355",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_RR_532": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background RR_532",
+        "standard_name": "BG_upper_RR_532",
+        "plot_range": "0., 50.",
+        "plot_scale": "linear",
+        "comment": ""
+      }
+    },
+    "BG_upper_RR_1064": {
+      "dtype": "f8",
+      "shape": [
+        "time"
+      ],
+      "data": null,
+      "_FillValue": -999999999,
+      "attributes": {
+        "unit": "a.u.",
+        "unit_html": "a.u.",
+        "long_name": "background RR_1064",
+        "standard_name": "BG_upper_RR_1064",
         "plot_range": "0., 50.",
         "plot_scale": "linear",
         "comment": ""

@@ -178,10 +178,8 @@ def write_channelwise_2_nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[
 
         ## adding dynamical variables
         for v in list(json_nc_mapping_dict['variables'].keys()): ## use list here to suppress RuntimeError: dictionary changed size during iteration
-            print(v)
         # for v in json_nc_mapping_dict['variables'].keys():
             if v in data_cube.retrievals_highres.keys():
-                print(f"{v} is in retrievals_highres-keys")
                 json_nc_mapping_dict['variables'][v]['data'] = data_cube.retrievals_highres[v]
                 ## update variable attribute
                 if "eta" in json_nc_mapping_dict['variables'][v]['attributes'].keys():
