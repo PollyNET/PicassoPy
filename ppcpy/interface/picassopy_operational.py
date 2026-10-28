@@ -159,7 +159,7 @@ data_cube.preprocessing()
 for prod in ["BG","BG_upper","SNR","RCS"]:
     helper.channel_2_variable_mapping(data_retrievals=data_cube.retrievals_highres, var=prod, channeltags_dict=data_cube.channel_dict)
 
-write2nc.write_channelwise_2_nc_file(data_cube=data_cube,prod_ls=["BG"])
+write2nc.write_channelwise_2_nc_file(data_cube=data_cube,prod_ls=["BG","SNR","RCS"])
 if args.preproc_only:
     exit()
 
