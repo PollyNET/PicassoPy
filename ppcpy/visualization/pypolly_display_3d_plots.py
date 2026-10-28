@@ -2728,14 +2728,37 @@ def pollyDisplay_preprocessed_BG(nc_dict, config_dict, polly_conf_dict, saveFold
 
     data_matrix = np.where(data_matrix > 0, data_matrix, 0)
 
+    ## upper-bg-range
+    wv_pol_tel = variable.split("BG_")[-1]
+    bg_upper_var = f'BG_upper_{wv_pol_tel}'
+
+    data_matrix_upper = nc_dict[bg_upper_var]['data']
+    
+    ## fill time gaps in att_bsc matrix
+    data_matrix_h_upper = np.expand_dims(data_matrix_upper, axis=1) ## add dummy-height-dim
+    data_matrix_h_upper = readout.fill_time_gaps_of_single_matrix(time, data_matrix_h_upper)
+    
+    ## trimm matrix to last available timestamp if neccessary
+    data_matrix_h_upper = readout.trimm_matrix_to_last_timestamp(flagPlotLastProfilesOnly=config_dict['flagPlotLastProfilesOnly'],matrix=data_matrix_h_upper,mdate=date_00,profile_length=int(np.nanmean(np.diff(time))),last_timestamp=nc_dict['time']['data'][-1])
+
+    data_matrix_upper = np.squeeze(data_matrix_h_upper, axis=1)
+    if len(perfect_day_timestamps) < len(data_matrix_upper):
+        data_matrix_upper = data_matrix_upper[0:len(perfect_day_timestamps)]
+    elif len(perfect_day_timestamps) > len(data_matrix_upper):
+        perfect_day_timestamps = perfect_day_timestamps[0:len(data_matrix_upper)]
+
+    data_matrix_upper = np.where(data_matrix_upper > 0, data_matrix_upper, 0)
+
 
     print(f"plotting {plotfile} ... ")
     # display attenuate backscatter
     fig = plt.figure(figsize=[12, 6])
     ax = fig.add_axes([0.11, 0.15, 0.79, 0.75])
-    ax.plot(perfect_day_timestamps.astype('datetime64[s]'),data_matrix)
+    ax.plot(perfect_day_timestamps.astype('datetime64[s]'),data_matrix,color='green',label='BG_lower')
+    ax.plot(perfect_day_timestamps.astype('datetime64[s]'),data_matrix_upper,color='red',label='BG_upper')
     # convert the datetime data from a float (which is the output of date2num into a nice datetime string.
     ax.xaxis_date()
+    ax.legend(loc=1)
 
     ax.set_xlabel('Time [UTC]', fontsize=15)
     ax.set_ylabel('Background [a.u.]', fontsize=15)
@@ -2797,8 +2820,6 @@ def pollyDisplay_preprocessed_BG(nc_dict, config_dict, polly_conf_dict, saveFold
             version=version),
         fontsize=12)
 
-    print(saveFilename)
-    print(figDPI)
     fig.savefig(saveFilename,dpi=figDPI)
 
     plt.close()
@@ -2829,137 +2850,135 @@ def pollyDisplay_preprocessed_BG(nc_dict, config_dict, polly_conf_dict, saveFold
                                     product_stoptime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][-1])).strftime('%Y%m%d %H:%M:%S')
                                     )
 
-    ## include background-monitoring for upper height-regions
-    if any(key.startswith('BG_upper') for key in nc_dict.keys()):
-        pass
-    else:
-        return
-
-
-    ## read from nc file
-    wv_pol_tel = variable.split("BG_")[-1]
-    bg_upper_var = f'BG_upper_{wv_pol_tel}'
-
-    plotfile = f'{dataFilename}_{bg_upper_var}.{imgFormat}'
-    saveFilename = os.path.join(saveFolder,plotfile)
-
-    data_matrix_upper = nc_dict[bg_upper_var]['data']
-    
-    ## fill time gaps in att_bsc matrix
-    data_matrix_h_upper = np.expand_dims(data_matrix_upper, axis=1) ## add dummy-height-dim
-    data_matrix_h_upper = readout.fill_time_gaps_of_single_matrix(time, data_matrix_h_upper)
-    
-    ## trimm matrix to last available timestamp if neccessary
-    data_matrix_h_upper = readout.trimm_matrix_to_last_timestamp(flagPlotLastProfilesOnly=config_dict['flagPlotLastProfilesOnly'],matrix=data_matrix_h_upper,mdate=date_00,profile_length=int(np.nanmean(np.diff(time))),last_timestamp=nc_dict['time']['data'][-1])
-
-    data_matrix_upper = np.squeeze(data_matrix_h_upper, axis=1)
-    if len(perfect_day_timestamps) < len(data_matrix_upper):
-        data_matrix_upper = data_matrix_upper[0:len(perfect_day_timestamps)]
-    elif len(perfect_day_timestamps) > len(data_matrix_upper):
-        perfect_day_timestamps = perfect_day_timestamps[0:len(data_matrix_upper)]
-
-    data_matrix_upper = np.where(data_matrix_upper > 0, data_matrix_upper, 0)
-
-    print(f"plotting {plotfile} ... ")
-    # display attenuate backscatter
-    fig = plt.figure(figsize=[12, 6])
-    ax = fig.add_axes([0.11, 0.15, 0.79, 0.75])
-    ax.plot(perfect_day_timestamps.astype('datetime64[s]'),data_matrix_upper)
-    # convert the datetime data from a float (which is the output of date2num into a nice datetime string.
-    ax.xaxis_date()
-
-    ax.set_xlabel('Time [UTC]', fontsize=15)
-    ax.set_ylabel('Background [a.u.]', fontsize=15)
-
-    ax.xaxis.set_minor_locator(HourLocator(interval=1))    # every hour
-    if config_dict['flagPlotLastProfilesOnly'] == True:
-        ax.xaxis.set_major_locator(HourLocator(interval=2))
-    else:
-        ax.xaxis.set_major_locator(HourLocator(byhour = [4,8,12,16,20,24]))
-
-    ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
+#    ## include background-monitoring for upper height-regions
+#    if any(key.startswith('BG_upper') for key in nc_dict.keys()):
+#        pass
+#    else:
+#        return
+#
+#
+#    ## read from nc file
+#    wv_pol_tel = variable.split("BG_")[-1]
+#    bg_upper_var = f'BG_upper_{wv_pol_tel}'
+#
+#    plotfile = f'{dataFilename}_{bg_upper_var}.{imgFormat}'
+#    saveFilename = os.path.join(saveFolder,plotfile)
+#
+#    data_matrix_upper = nc_dict[bg_upper_var]['data']
 #    
-    ax.tick_params(
-        axis='both', which='major', labelsize=15, right=True,
-        top=True, width=2, length=5)
-    ax.tick_params(
-        axis='both', which='minor', width=1.5, length=3.5,
-        right=True, top=True)
-
-    ax.set_title(
-        'Upper Background Signal at {wave} nm'.format(wave = wavelength) +
-        ' {param} of {instrument} at {location}'.format(
-            param=telescope,
-            instrument=pollyVersion,
-            location=location),
-        fontsize=15)
-
-
-    # add watermark
-    if flagWatermarkOn:
-        #rootDir = os.getcwd()
-        rootDir = os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        im_license = matplotlib.image.imread(
-            os.path.join(rootDir, 'ppcpy', 'img', 'by-sa.png'))
-
-        newax_license = fig.add_axes([0.58, 0.006, 0.14, 0.07], zorder=10)
-        newax_license.imshow(im_license, alpha=0.8, aspect='equal')
-        newax_license.axis('off')
-
-        fig.text(0.72, 0.003, 'Preliminary\nResults.',
-                 fontweight='bold', fontsize=12, color='red',
-                 ha='left', va='bottom', alpha=0.8, zorder=10)
-
-        fig.text(
-            0.84, 0.003,
-            u"\u00A9 {1} {0}.\nCC BY SA 4.0 License.".format(
-                datetime.now().strftime('%Y'), partnerLabel),
-            fontweight='bold', fontsize=7, color='black', ha='left',
-            va='bottom', alpha=1, zorder=10)
-
-    fig.text(
-        0.05, 0.02,
-        '{0}'.format(nc_dict['m_date']), fontsize=12)
-
-    fig.text(
-        0.2, 0.02,
-        'Version: {version}'.format(
-            version=version),
-        fontsize=12)
-
-    print(saveFilename)
-    print(figDPI)
-    fig.savefig(saveFilename,dpi=figDPI)
-
-    plt.close()
-    remove_widht_height_entry_from_svg_file(saveFilename,imgFormat)
-
-    
-    prod_type = bg_upper_var
-    ## write2donefilelist
-    readout.write2donefilelist_dict(donefilelist_dict = donefilelist_dict,
-                                    lidar = pollyVersion,
-                                    location = nc_dict['location'],
-                                    starttime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d %H:%M:%S'),
-                                    stoptime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][-1])).strftime('%Y%m%d %H:%M:%S'),
-                                    last_update = datetime.now(timezone.utc).strftime("%Y%m%d %H:%M:%S"),
-                                    wavelength = wavelength,
-                                    filename = saveFilename,
-                                    level = 0,
-                                    info = f"Background Signal plots for {telescope} at {wavelength}",
-                                    nc_zip_file = nc_dict['PollyDataFile'],
-                                    nc_zip_file_size = 9000000,
-                                    active = 1,
-                                    GDAS = 0,
-                                    GDAS_timestamp = f"{datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d')} 12:00:00",
-                                    lidar_ratio = 50,
-                                    software_version = version,
-                                    product_type = prod_type,
-                                    product_starttime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d %H:%M:%S'),
-                                    product_stoptime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][-1])).strftime('%Y%m%d %H:%M:%S')
-                                    )
-
+#    ## fill time gaps in att_bsc matrix
+#    data_matrix_h_upper = np.expand_dims(data_matrix_upper, axis=1) ## add dummy-height-dim
+#    data_matrix_h_upper = readout.fill_time_gaps_of_single_matrix(time, data_matrix_h_upper)
+#    
+#    ## trimm matrix to last available timestamp if neccessary
+#    data_matrix_h_upper = readout.trimm_matrix_to_last_timestamp(flagPlotLastProfilesOnly=config_dict['flagPlotLastProfilesOnly'],matrix=data_matrix_h_upper,mdate=date_00,profile_length=int(np.nanmean(np.diff(time))),last_timestamp=nc_dict['time']['data'][-1])
+#
+#    data_matrix_upper = np.squeeze(data_matrix_h_upper, axis=1)
+#    if len(perfect_day_timestamps) < len(data_matrix_upper):
+#        data_matrix_upper = data_matrix_upper[0:len(perfect_day_timestamps)]
+#    elif len(perfect_day_timestamps) > len(data_matrix_upper):
+#        perfect_day_timestamps = perfect_day_timestamps[0:len(data_matrix_upper)]
+#
+#    data_matrix_upper = np.where(data_matrix_upper > 0, data_matrix_upper, 0)
+#
+#    print(f"plotting {plotfile} ... ")
+#    # display attenuate backscatter
+#    fig = plt.figure(figsize=[12, 6])
+#    ax = fig.add_axes([0.11, 0.15, 0.79, 0.75])
+#    ax.plot(perfect_day_timestamps.astype('datetime64[s]'),data_matrix_upper)
+#    # convert the datetime data from a float (which is the output of date2num into a nice datetime string.
+#    ax.xaxis_date()
+#
+#    ax.set_xlabel('Time [UTC]', fontsize=15)
+#    ax.set_ylabel('Background [a.u.]', fontsize=15)
+#
+#    ax.xaxis.set_minor_locator(HourLocator(interval=1))    # every hour
+#    if config_dict['flagPlotLastProfilesOnly'] == True:
+#        ax.xaxis.set_major_locator(HourLocator(interval=2))
+#    else:
+#        ax.xaxis.set_major_locator(HourLocator(byhour = [4,8,12,16,20,24]))
+#
+#    ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
+##    
+#    ax.tick_params(
+#        axis='both', which='major', labelsize=15, right=True,
+#        top=True, width=2, length=5)
+#    ax.tick_params(
+#        axis='both', which='minor', width=1.5, length=3.5,
+#        right=True, top=True)
+#
+#    ax.set_title(
+#        'Upper Background Signal at {wave} nm'.format(wave = wavelength) +
+#        ' {param} of {instrument} at {location}'.format(
+#            param=telescope,
+#            instrument=pollyVersion,
+#            location=location),
+#        fontsize=15)
+#
+#
+#    # add watermark
+#    if flagWatermarkOn:
+#        #rootDir = os.getcwd()
+#        rootDir = os.path.dirname(
+#            os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+#        im_license = matplotlib.image.imread(
+#            os.path.join(rootDir, 'ppcpy', 'img', 'by-sa.png'))
+#
+#        newax_license = fig.add_axes([0.58, 0.006, 0.14, 0.07], zorder=10)
+#        newax_license.imshow(im_license, alpha=0.8, aspect='equal')
+#        newax_license.axis('off')
+#
+#        fig.text(0.72, 0.003, 'Preliminary\nResults.',
+#                 fontweight='bold', fontsize=12, color='red',
+#                 ha='left', va='bottom', alpha=0.8, zorder=10)
+#
+#        fig.text(
+#            0.84, 0.003,
+#            u"\u00A9 {1} {0}.\nCC BY SA 4.0 License.".format(
+#                datetime.now().strftime('%Y'), partnerLabel),
+#            fontweight='bold', fontsize=7, color='black', ha='left',
+#            va='bottom', alpha=1, zorder=10)
+#
+#    fig.text(
+#        0.05, 0.02,
+#        '{0}'.format(nc_dict['m_date']), fontsize=12)
+#
+#    fig.text(
+#        0.2, 0.02,
+#        'Version: {version}'.format(
+#            version=version),
+#        fontsize=12)
+#
+#    fig.savefig(saveFilename,dpi=figDPI)
+#
+#    plt.close()
+#    remove_widht_height_entry_from_svg_file(saveFilename,imgFormat)
+#
+#    
+#    prod_type = bg_upper_var
+#    ## write2donefilelist
+#    readout.write2donefilelist_dict(donefilelist_dict = donefilelist_dict,
+#                                    lidar = pollyVersion,
+#                                    location = nc_dict['location'],
+#                                    starttime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d %H:%M:%S'),
+#                                    stoptime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][-1])).strftime('%Y%m%d %H:%M:%S'),
+#                                    last_update = datetime.now(timezone.utc).strftime("%Y%m%d %H:%M:%S"),
+#                                    wavelength = wavelength,
+#                                    filename = saveFilename,
+#                                    level = 0,
+#                                    info = f"Background Signal plots for {telescope} at {wavelength}",
+#                                    nc_zip_file = nc_dict['PollyDataFile'],
+#                                    nc_zip_file_size = 9000000,
+#                                    active = 1,
+#                                    GDAS = 0,
+#                                    GDAS_timestamp = f"{datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d')} 12:00:00",
+#                                    lidar_ratio = 50,
+#                                    software_version = version,
+#                                    product_type = prod_type,
+#                                    product_starttime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][0])).strftime('%Y%m%d %H:%M:%S'),
+#                                    product_stoptime = datetime.utcfromtimestamp(int(nc_dict['time']['data'][-1])).strftime('%Y%m%d %H:%M:%S')
+#                                    )
+#
     ## calc/plot relation Bg/BG_upper
     bg_rel_var = f'BG_rel_{wv_pol_tel}'
     plotfile = f'{dataFilename}_{bg_rel_var}.{imgFormat}'
@@ -2970,10 +2989,6 @@ def pollyDisplay_preprocessed_BG(nc_dict, config_dict, polly_conf_dict, saveFold
     #data_matrix_rel[valid_mask] = ( (data_matrix[valid_mask] - data_matrix_upper[valid_mask]) / data_matrix[valid_mask] )
     data_matrix_rel = abs(data_matrix - data_matrix_upper)
 
-    n=100
-    print(data_matrix[n])
-    print(data_matrix_upper[n])
-    print(data_matrix_rel[n])
     #data_matrix_rel = (data_matrix_upper - data_matrix)/(data_matrix_upper/2 + data_matrix/2)
     #data_matrix_rel = abs(data_matrix_upper - data_matrix)
 
@@ -3048,8 +3063,6 @@ def pollyDisplay_preprocessed_BG(nc_dict, config_dict, polly_conf_dict, saveFold
             version=version),
         fontsize=12)
 
-    print(saveFilename)
-    print(figDPI)
     fig.savefig(saveFilename,dpi=figDPI)
 
     plt.close()
