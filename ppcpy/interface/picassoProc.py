@@ -1898,7 +1898,7 @@ class PicassoProc:
         parameter : str
             can be LC (Lidar-calibration-constant), DC (Depol-calibration-constant) or WVC (WaterVapor-calibration-constant)
         method : str
-            'raman', 'klett', 'profile' or 'regression'
+            'raman', 'klett', 'D90', 'transfer', 'profile' or 'regression'
         db_path : str
             location of the sqlite db-file
 
@@ -1924,9 +1924,9 @@ class PicassoProc:
             table_name = 'depol_calibration_constant'
             column_names = [
                 'cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'used_for_processing', 
-                'wavelength', 'telescope', 'nc_zip_file', 'polly_type']
-            data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text']
-            unique=', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope)'
+                'wavelength', 'telescope', 'cali_method', 'nc_zip_file', 'polly_type']
+            data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text', 'text']
+            unique=', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope, cali_method)'
         elif parameter == 'WVC':
             table_name = 'wv_calibration_constant'
             column_names = [
