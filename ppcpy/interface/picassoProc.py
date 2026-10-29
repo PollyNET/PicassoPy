@@ -580,6 +580,8 @@ class PicassoProc:
             radiosondeType=self.polly_config_dict['radiosondeType'],
             bgCorrectionIndexLow=self.polly_config_dict['bgCorRangeIndxLow'],
             bgCorrectionIndexHigh=self.polly_config_dict['bgCorRangeIndxHigh'],
+            bgCorrectionIndexLow_upper=self.polly_config_dict['bgCorRangeIndxLow_upper'],
+            bgCorrectionIndexHigh_upper=self.polly_config_dict['bgCorRangeIndxHigh_upper'],
             asl=self.polly_config_dict['asl'],
             initialPolAngle=self.polly_config_dict['init_depAng'],
             maskPolCalAngle=self.polly_config_dict['maskDepCalAng'],

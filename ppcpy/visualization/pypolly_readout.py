@@ -281,14 +281,18 @@ def read_config(configfile):
     f.close()
     return config_json#configfile_dict
 
-def read_excel_config_file(excel_file, timestamp, device):
+def read_excel_config_file(link_file, timestamp, device):
     pd.set_option('display.width', 1500)
     pd.set_option('display.max_columns', None)
+    link_file_path = Path(link_file)
     #excel_file_ds = pd.read_excel(f'{excel_file}', engine='openpyxl',usecols = 'A:Z')
-    excel_file_ds = pd.read_excel(f'{excel_file}', engine='openpyxl')
-    print(excel_file)
+    #excel_file_ds = pd.read_excel(f'{excel_file}', engine='openpyxl')
+    if link_file_path.suffix.lower() == ".xlsx":
+        file_ds = pd.read_excel(link_file, engine='openpyxl')
+    elif link_file_path.suffix.lower() == ".csv":
+        file_ds = pd.read_csv(link_file, sep=';')
     ## search for timerange for given timestamp
-    filtered_device = excel_file_ds.loc[(excel_file_ds['Instrument'] == device)]
+    filtered_device = file_ds.loc[(file_ds['Instrument'] == device)]
     filtered_device = filtered_device.copy() ## make a copy of the df to avoid the SettingWithCopyWarning
     filtered_device['starttime'] = pd.to_datetime(filtered_device['Starttime of config'])
     filtered_device['stoptime'] = pd.to_datetime(filtered_device['Stoptime of config'])

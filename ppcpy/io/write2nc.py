@@ -156,11 +156,16 @@ def write_channelwise_2_nc_file(data_cube, root_dir:str=root_dir, prod_ls:list=[
         # json_nc_mapping_dict = {}
         # if prod in polly_config_dict["prodSaveList"]:
         json_nc_mapping_dict = json2nc_mapping.read_json_to_dict(Path(root_dir, 'ppcpy', 'config', f'json2nc-mapper_{prod}.json'))
+        #print("before... helper.channel_2_variable_mapping")
+        #print(data_cube.retrievals_highres.keys())
 
-        if prod == "SNR" or prod == "BG" or prod == "RCS":
-            """ map channels to variables """
-            helper.channel_2_variable_mapping(data_retrievals=data_cube.retrievals_highres, var=prod, channeltags_dict=data_cube.channel_dict)
+        #if prod == "SNR" or prod == "BG" or prod == "RCS":
+        #    """ map channels to variables """
+        #    helper.channel_2_variable_mapping(data_retrievals=data_cube.retrievals_highres, var=prod, channeltags_dict=data_cube.channel_dict)
 
+        #print("after... helper.channel_2_variable_mapping")
+        #print(data_cube.retrievals_highres.keys())
+        
         """ set dimension sizes """
         for d in json_nc_mapping_dict['dimensions']:
             json_nc_mapping_dict['dimensions'][d] = len(data_cube.retrievals_highres[d])

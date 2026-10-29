@@ -151,7 +151,15 @@ if isinstance(polly_config_dict["first_range_gate_height"],str) or isinstance(po
 data_cube.preprocessing()
 
 ## write channelwise infos to nc-files (e.g.: SNR, Background, RangeCorrectedSignal)
-write2nc.write_channelwise_2_nc_file(data_cube=data_cube,prod_ls=["SNR","BG","RCS"])
+#write2nc.write_channelwise_2_nc_file(data_cube=data_cube,prod_ls=["SNR","BG","RCS"])
+#print(data_cube.retrievals_highres.keys())
+
+# if prod == "SNR" or prod == "BG" or prod == "RCS":
+### """ add some vars channelwise to =data_cube.retrievals_highres """
+for prod in ["BG","BG_upper","SNR","RCS"]:
+    helper.channel_2_variable_mapping(data_retrievals=data_cube.retrievals_highres, var=prod, channeltags_dict=data_cube.channel_dict)
+
+write2nc.write_channelwise_2_nc_file(data_cube=data_cube,prod_ls=["BG","SNR","RCS"])
 if args.preproc_only:
     exit()
 

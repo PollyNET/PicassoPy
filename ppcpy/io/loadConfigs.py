@@ -91,13 +91,16 @@ def readPollyNetConfigLinkTable(polly_config_table_file:str, timestamp:str, devi
 
     if polly_config_table_file_path.is_file():
         logging.info(f'pollynet_config_link_file: {polly_config_table_file}')
-        excel_file_ds = pd.read_excel(f'{polly_config_table_file}', engine='openpyxl')
+        if polly_config_table_file_path.suffix.lower() == ".xlsx":
+            file_ds = pd.read_excel(polly_config_table_file, engine='openpyxl')
+        elif polly_config_table_file_path.suffix.lower() == ".csv":
+            file_ds = pd.read_csv(polly_config_table_file, sep=';')
         ## search for timerange for given timestamp
         timestamp = str(timestamp)
-        after_start_date = excel_file_ds['Starttime of config'] <= timestamp
-        before_end_date = excel_file_ds['Stoptime of config'] >= timestamp
+        after_start_date = file_ds['Starttime of config'] <= timestamp
+        before_end_date = file_ds['Stoptime of config'] >= timestamp
         between_two_dates = after_start_date & before_end_date
-        filtered_result = excel_file_ds.loc[between_two_dates]
+        filtered_result = file_ds.loc[between_two_dates]
         # print(filtered_result)
         ## get config-file for timeperiod and instrument
         config_array = filtered_result.loc[(filtered_result['Instrument'] == device)]
