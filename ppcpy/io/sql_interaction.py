@@ -10,8 +10,42 @@ import ppcpy.misc.helper as helper
 from ppcpy.misc.helper import default_to_regular
 
 
-mapping:dict = {'far_range': 'FR', 'near_range': 'NR', 'dfov': 'DFOV'}
-mapping_inverse:dict = {y: x for x, y in mapping.items()}
+MAPPING:dict = {'far_range': 'FR', 'near_range': 'NR', 'dfov': 'DFOV'}
+MAPPING_INVERSE:dict = {y: x for x, y in MAPPING.items()}
+
+DB_SCHEME = {
+    'LC': {
+        'table_name': 'lidar_calibration_constant',
+        'column_names': [
+            'cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'used_for_processing', 
+            'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope'],
+        'data_types': [
+            'text', 'text', 'real', 'real', 'integer',
+            'text', 'text', 'text', 'text', 'text'],
+        'unique': ', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope, cali_method)',
+    },
+    'DC': {
+        'table_name': 'depol_calibration_constant',
+        'column_names': [
+            'cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'used_for_processing', 
+            'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope'],
+            #'wavelength', 'telescope', 'cali_method', 'nc_zip_file', 'polly_type'], # old sorting still for test
+        'data_types': [
+            'text', 'text', 'real', 'real', 'integer', 
+            'text', 'text', 'text', 'text', 'text'],
+        'unique': ', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope, cali_method)',
+    },
+    'WVC': {
+        'table_name': 'wv_calibration_constant',
+        'column_names': [
+            'cali_start_time', 'cali_stop_time', 'wv_const', 'uncertainty_wv_const', 'used_for_processing', 
+            'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope'],
+        'data_types': [
+            'text', 'text', 'real', 'real', 'integer', 
+            'text', 'text', 'text', 'text', 'text'],
+        'unique': ', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope, cali_method)',
+    },
+}
 
 
 def string_to_ts(s):
@@ -76,7 +110,7 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
         d = defaultdict(list)
         df_method = df[df.cali_method == 'Raman_Method']
         for index, row in df_method.iterrows():
-            k = f"{row['wavelength']}_total_{mapping[row['telescope']]}"
+            k = f"{row['wavelength']}_total_{MAPPING[row['telescope']]}"
             d[k].append({
                 'LC': row['liconst'], 'LCStd': row['uncertainty_liconst'],
                 'time_start': int(string_to_ts(row['cali_start_time'])), 
@@ -89,7 +123,7 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
         d = defaultdict(list)
         df_method = df[df.cali_method == 'Klett_Method']
         for index, row in df_method.iterrows():
-            k = f"{row['wavelength']}_total_{mapping[row['telescope']]}"
+            k = f"{row['wavelength']}_total_{MAPPING[row['telescope']]}"
             d[k].append({
                 'LC': row['liconst'], 'LCStd': row['uncertainty_liconst'],
                 'time_start': int(string_to_ts(row['cali_start_time'])), 
@@ -104,7 +138,7 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
         d = defaultdict(list)
         df_method = df[df.cali_method == 'D90']
         for index, row in df_method.iterrows():
-            k = f"{row['wavelength']}_{mapping[row['telescope']]}"
+            k = f"{row['wavelength']}_{MAPPING[row['telescope']]}"
             d[k].append({
                 'eta': row['depol_const'], 'eta_std': row['uncertainty_depol_const'],
                 'time_start': int(string_to_ts(row['cali_start_time'])), 
@@ -118,7 +152,7 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
         d = defaultdict(list)
         df_method = df[df.cali_method == 'transfer']
         for index, row in df_method.iterrows():
-            k = f"{row['wavelength']}_{mapping[row['telescope']]}"
+            k = f"{row['wavelength']}_{MAPPING[row['telescope']]}"
             d[k].append({
                 'eta': row['depol_const'], 'eta_std': row['uncertainty_depol_const'],
                 'time_start': int(string_to_ts(row['cali_start_time'])), 
@@ -134,7 +168,7 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
         d = defaultdict(list)
         df_method = df[df.cali_method == 'Model_Profile_Method']
         for index, row in df_method.iterrows():
-            k = f"{row['wavelength']}_{mapping[row['telescope']]}"
+            k = f"{row['wavelength']}_{MAPPING[row['telescope']]}"
             d[k].append({
                 'WVC': row['wv_const'], 'WVCStd': row['uncertainty_wv_const'],
                 'time_start': int(string_to_ts(row['cali_start_time'])), 
@@ -147,7 +181,7 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
         d = defaultdict(list)
         df_method = df[df.cali_method == 'Model_Regression_Method']
         for index, row in df_method.iterrows():
-            k = f"{row['wavelength']}_{mapping[row['telescope']]}"
+            k = f"{row['wavelength']}_{MAPPING[row['telescope']]}"
             d[k].append({
                 'WVC': row['wv_const'], 'WVCStd': row['uncertainty_wv_const'],
                 'time_start': int(string_to_ts(row['cali_start_time'])), 
@@ -204,7 +238,7 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
     if parameter == 'LC':
         for e in data_cube.LC.get(method, {}).keys():
             wv, pol, tel =  helper.get_wv_pol_telescope_from_dictkeyname(e)
-            tel_db = mapping_inverse[tel]
+            tel_db = MAPPING_INVERSE[tel]
             for line in data_cube.LC[method][e]:
                 LC = line['LC']
                 LC_std = line['LCStd']
@@ -221,7 +255,7 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
     elif parameter == 'DC':
         for e in data_cube.pol_cali.get(method, {}).keys():
             wv, tel = e.split('_')
-            tel_db = mapping_inverse[tel]
+            tel_db = MAPPING_INVERSE[tel]
             for line in data_cube.pol_cali[method][e]:
                 eta = line['eta']
                 eta_std = line['eta_std']
@@ -232,13 +266,14 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                 stop = datetime.fromtimestamp(stop_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
                 rows_to_insert.append((
                     str(start), str(stop), float(eta), float(eta_std), eta_is_used, 
-                    wv, tel_db, method_db, str(data_cube.rawfile), data_cube.device))
+                    #wv, tel_db, method_db, str(data_cube.rawfile), data_cube.device)) # old format
+                    wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
 
     ## Water vapor calibration constants
     elif parameter == 'WVC':
         for e in data_cube.wv_cali.get(method, {}).keys():
             wv, tel = e.split('_')
-            tel_db = mapping_inverse[tel]
+            tel_db = MAPPING_INVERSE[tel]
             for line in data_cube.wv_cali[method][e]:
                 WVC = line['WVC']
                 WVCStd = line['WVCStd']
@@ -269,6 +304,19 @@ def setup_empty(db_path:str, table_name:str, column_names:list[str],
     data_types : list of str
         List of SQLite data types for each respective columns (e.g. ['text', 'real'])
     """
+    #table_name = 'dummy'
+    if not os.path.exists(db_path):
+        logging.warning(f"Path to Database does not exist {db_path}, will be generated")
+    else:
+        # check if table exists
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.execute(
+                "SELECT 1 FROM pragma_table_list WHERE name = ?", (table_name,),
+            ).fetchone()
+            print(cursor)
+            table_exists = cursor is not None
+        conn.close()
+        print('table exists? ', table_exists)
 
     column_names = ['id'] + column_names
     data_types = ['INTEGER PRIMARY KEY'] + data_types
@@ -305,6 +353,25 @@ def write_rows_to_sql_db(db_path:str, table_name:str, column_names:list[str],
     
     """
 
+    import traceback
+
+    try:
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            rows = conn.execute(f'PRAGMA table_info({table_name})').fetchall()
+            print('rows', rows)
+
+        conn.close()
+    except:
+        print(traceback.format_exc())
+    actual = [row[1] for row in rows]
+    
+    print(f"Expected: {['id'] + column_names}")
+    print(f"Actual:   {actual}")
+    assert set(actual) == set(['id'] + column_names), f"missing column names {set(actual) ^ set(['id'] + column_names)}"
+    if not actual == ['id'] + column_names:
+        logging.info(f"Order of table differs. Not nice, but columns should be accessed explicitely")
+
     placeholders = ', '.join(['?'] * len(column_names))
     columns = ', '.join(column_names)
     # sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders}) ON CONFLICT(cali_start_time, cali_stop_time, wavelength, polly_type, telescope) DO UPDATE SET data = excluded.data"
@@ -312,15 +379,22 @@ def write_rows_to_sql_db(db_path:str, table_name:str, column_names:list[str],
 
     try:
         with sqlite3.connect(db_path) as conn:
+
+            print("\nBefore:")
+            print(pd.read_sql_query(f"SELECT * FROM {table_name}", conn).to_string(index=False))
+            
             cursor = conn.cursor()
             before_changes = conn.total_changes
             cursor.executemany(sql, rows_to_insert)
             conn.commit()
-            inserted = conn.total_changes - before_changes
+            affected = conn.total_changes - before_changes
+
+            print("\nAfter:")
+            print(pd.read_sql_query(f"SELECT * FROM {table_name}", conn).to_string(index=False))
         conn.close()
-        if inserted == 0:
-            logging.info(f"no new rows inserted into '{table_name}'.")
+        if affected == 0:
+            logging.info(f"no rows changed in '{table_name}'.")
         else:
-            logging.info(f"{inserted} rows inserted into '{table_name}'.")
+            logging.info(f"{affected} rows inserted/updated in '{table_name}'.")
     except sqlite3.Error as e:
         logging.warning(f"SQLite error: {e}")
