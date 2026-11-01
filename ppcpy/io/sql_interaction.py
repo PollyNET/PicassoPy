@@ -30,10 +30,13 @@ DB_SCHEME = {
             'cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'used_for_processing', 
             'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope'],
             #'wavelength', 'telescope', 'cali_method', 'nc_zip_file', 'polly_type'], # old sorting still for test
+            #'wavelength', 'telescope', 'nc_zip_file', 'polly_type'], # and without the cali method
         'data_types': [
             'text', 'text', 'real', 'real', 'integer', 
             'text', 'text', 'text', 'text', 'text'],
+            #'text', 'text', 'text', 'text'],
         'unique': ', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope, cali_method)',
+        #'unique': ', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope)',
     },
     'WVC': {
         'table_name': 'wv_calibration_constant',
@@ -136,7 +139,10 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
     ## Depolarization calibration constants
     if table_name == 'depol_calibration_constant':
         d = defaultdict(list)
-        df_method = df[df.cali_method == 'D90']
+        if 'cali_method' in df.columns:
+            df_method = df[df['cali_method'] == 'D90']
+        else:
+            df_method = df
         for index, row in df_method.iterrows():
             k = f"{row['wavelength']}_{MAPPING[row['telescope']]}"
             d[k].append({
@@ -150,7 +156,10 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
         logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with 'D90'.")
 
         d = defaultdict(list)
-        df_method = df[df.cali_method == 'transfer']
+        if 'cali_method' in df.columns:
+            df_method = df[df.cali_method == 'transfer']
+        else:
+            df_method = df
         for index, row in df_method.iterrows():
             k = f"{row['wavelength']}_{MAPPING[row['telescope']]}"
             d[k].append({
@@ -267,6 +276,7 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                 rows_to_insert.append((
                     str(start), str(stop), float(eta), float(eta_std), eta_is_used, 
                     #wv, tel_db, method_db, str(data_cube.rawfile), data_cube.device)) # old format
+                    #wv, tel_db, str(data_cube.rawfile), data_cube.device)) # old format without method
                     wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
 
     ## Water vapor calibration constants
@@ -304,7 +314,6 @@ def setup_empty(db_path:str, table_name:str, column_names:list[str],
     data_types : list of str
         List of SQLite data types for each respective columns (e.g. ['text', 'real'])
     """
-    #table_name = 'dummy'
     if not os.path.exists(db_path):
         logging.warning(f"Path to Database does not exist {db_path}, will be generated")
     else:
@@ -313,21 +322,48 @@ def setup_empty(db_path:str, table_name:str, column_names:list[str],
             cursor = conn.execute(
                 "SELECT 1 FROM pragma_table_list WHERE name = ?", (table_name,),
             ).fetchone()
-            print(cursor)
             table_exists = cursor is not None
         conn.close()
-        print('table exists? ', table_exists)
 
-    column_names = ['id'] + column_names
-    data_types = ['INTEGER PRIMARY KEY'] + data_types
-    columns = ', '.join([f"{c} {d}" for c, d in zip(column_names, data_types)])
-    sql = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns}{unique}) "
-    with sqlite3.connect(db_path) as conn:
-        cursor = conn.cursor()
-        cursor.execute(sql)
-        conn.commit()
-    conn.close()
+    if not table_exists:
+        column_names = ['id'] + column_names
+        data_types = ['INTEGER PRIMARY KEY'] + data_types
+        columns = ', '.join([f"{c} {d}" for c, d in zip(column_names, data_types)])
+        sql = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns}{unique}) "
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            conn.commit()
+        conn.close()
+        logging.info(f"added table {table_name}")
+    
+    else:
+        # check he columns
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            rows = conn.execute(f'PRAGMA table_info({table_name})').fetchall()
+        conn.close()
+        actual = [row[1] for row in rows]
+        missing_columns = set(actual) ^ set(['id'] + column_names)
 
+        if missing_columns:
+            logging.warning(f"missing columns {missing_columns} in {table_name} .... fixing database scheme HIC SUNT DRACONES")
+            assert len(missing_columns) == 1, "Currently only implemented for a single missing column"
+            col = list(missing_columns)[0]
+            assert col == 'cali_method', "at the moment the default value is hard-coded (i.e. the used calibration method is an educated guess)"
+            index = column_names.index(col)
+            dtype = data_types[index]
+            logging.warning(f'EXECUTING: ALTER TABLE "{table_name}" ADD COLUMN "{col}" {dtype}')
+
+            with sqlite3.connect(db_path) as conn:
+                conn.execute(
+                    f'ALTER TABLE "{table_name}" ADD COLUMN "{col}" {dtype} NOT NULL DEFAULT \'D90\''
+                )
+                conn.execute(f"CREATE UNIQUE INDEX IF NOT EXISTS uq_{table_name} ON {table_name} {unique.removeprefix(', UNIQUE')}")
+            # enforcing the unique constraint later on is internally a bit different, shown by "c" in the origin key instead of "c"
+            # the alternative would be to recreate the table and move all the contents
+            # not the safest waters to sail in ;)
+            
 
 def write_rows_to_sql_db(db_path:str, table_name:str, column_names:list[str],
                          rows_to_insert:list[str]):
@@ -359,15 +395,13 @@ def write_rows_to_sql_db(db_path:str, table_name:str, column_names:list[str],
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             rows = conn.execute(f'PRAGMA table_info({table_name})').fetchall()
-            print('rows', rows)
-
         conn.close()
     except:
         print(traceback.format_exc())
     actual = [row[1] for row in rows]
     
-    print(f"Expected: {['id'] + column_names}")
-    print(f"Actual:   {actual}")
+    logging.debug(f"Expected: {['id'] + column_names}")
+    logging.debug(f"Actual:   {actual}")
     assert set(actual) == set(['id'] + column_names), f"missing column names {set(actual) ^ set(['id'] + column_names)}"
     if not actual == ['id'] + column_names:
         logging.info(f"Order of table differs. Not nice, but columns should be accessed explicitely")
@@ -379,21 +413,18 @@ def write_rows_to_sql_db(db_path:str, table_name:str, column_names:list[str],
 
     try:
         with sqlite3.connect(db_path) as conn:
-
-            print("\nBefore:")
-            print(pd.read_sql_query(f"SELECT * FROM {table_name}", conn).to_string(index=False))
-            
+            #print("\nBefore:")
+            #print(pd.read_sql_query(f"SELECT * FROM {table_name}", conn).to_string(index=False))
             cursor = conn.cursor()
             before_changes = conn.total_changes
             cursor.executemany(sql, rows_to_insert)
             conn.commit()
             affected = conn.total_changes - before_changes
-
-            print("\nAfter:")
-            print(pd.read_sql_query(f"SELECT * FROM {table_name}", conn).to_string(index=False))
+            #print("\nAfter:")
+            #print(pd.read_sql_query(f"SELECT * FROM {table_name}", conn).to_string(index=False))
         conn.close()
         if affected == 0:
-            logging.info(f"no rows changed in '{table_name}'.")
+            logging.info(f"no rows added/changed in '{table_name}'.")
         else:
             logging.info(f"{affected} rows inserted/updated in '{table_name}'.")
     except sqlite3.Error as e:
