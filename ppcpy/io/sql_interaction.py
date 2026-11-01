@@ -29,14 +29,10 @@ DB_SCHEME = {
         'column_names': [
             'cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'used_for_processing', 
             'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope'],
-            #'wavelength', 'telescope', 'cali_method', 'nc_zip_file', 'polly_type'], # old sorting still for test
-            #'wavelength', 'telescope', 'nc_zip_file', 'polly_type'], # and without the cali method
         'data_types': [
             'text', 'text', 'real', 'real', 'integer', 
             'text', 'text', 'text', 'text', 'text'],
-            #'text', 'text', 'text', 'text'],
         'unique': ', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope, cali_method)',
-        #'unique': ', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope)',
     },
     'WVC': {
         'table_name': 'wv_calibration_constant',
@@ -50,10 +46,26 @@ DB_SCHEME = {
     },
 }
 
+METHOD_DB_NAMES = {
+    "raman": "Raman_Method",
+    "klett": "Klett_Method",
+    "D90": "D90",
+    "transfer": "transfer",
+    "model_profile": "Model_Profile_Method",
+    "model_regression": "Model_Regression_Method",
+}
+METHOD_DB_NAMES_INVERSE:dict = {y: x for x, y in METHOD_DB_NAMES.items()}
 
 def string_to_ts(s):
     """String of format %Y-%m-%d %H:%M:%S to timestamp (timezone-aware)"""
     return datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc).timestamp()
+
+def _format_ts(unix_timestamp):
+    """Convert a Unix timestamp to a UTC database timestamp."""
+    return datetime.fromtimestamp(
+        unix_timestamp,
+        timezone.utc,
+    ).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta:float=24) -> dict:
@@ -77,7 +89,7 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
     
     - 2026-03-28: First edition by Radenz.
     - 2026-05-08: Added check for table existence. Added retrieval methods.
-
+    - 2026-11-01: Gently tried to make it more pythonic
     """
 
     ret = {}
@@ -87,7 +99,7 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
         datetime.fromtimestamp(ts_interval[0], timezone.utc) - delta
         ).strftime("%Y-%m-%d %H:%M")
     end = (
-        datetime.fromtimestamp(ts_interval[0], timezone.utc) + delta
+        datetime.fromtimestamp(ts_interval[-1], timezone.utc) + delta
         ).strftime("%Y-%m-%d %H:%M")
     
     if not os.path.exists(db_path):
@@ -110,95 +122,66 @@ def get_from_sql_db(db_path:str, table_name:str, ts_interval:list[str], ts_delta
 
     ## Lidar calibration constants
     if table_name == 'lidar_calibration_constant':
-        d = defaultdict(list)
-        df_method = df[df.cali_method == 'Raman_Method']
-        for index, row in df_method.iterrows():
-            k = f"{row['wavelength']}_total_{MAPPING[row['telescope']]}"
-            d[k].append({
-                'LC': row['liconst'], 'LCStd': row['uncertainty_liconst'],
-                'time_start': int(string_to_ts(row['cali_start_time'])), 
-                'time_end': int(string_to_ts(row['cali_stop_time'])),
-                'method': 'raman_db',
-            })
-        ret['raman_db'] = default_to_regular(d)
-        logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with 'Raman_Method'.")
+        for method_db in ["Raman_Method", "Klett_Method"]:
+            method = METHOD_DB_NAMES_INVERSE[method_db]
+            method_key = f"{method}_db"
 
-        d = defaultdict(list)
-        df_method = df[df.cali_method == 'Klett_Method']
-        for index, row in df_method.iterrows():
-            k = f"{row['wavelength']}_total_{MAPPING[row['telescope']]}"
-            d[k].append({
-                'LC': row['liconst'], 'LCStd': row['uncertainty_liconst'],
-                'time_start': int(string_to_ts(row['cali_start_time'])), 
-                'time_end': int(string_to_ts(row['cali_stop_time'])),
-                'method': 'klett_db',
-            })
-        ret['klett_db'] = default_to_regular(d)
-        logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with 'Klett_Method'.")
+            d = defaultdict(list)
+            df_method = df[df["cali_method"].eq(method_db)]
+            for _, row in df_method.iterrows():
+                key = f"{row['wavelength']}_total_{MAPPING[row['telescope']]}"
+
+                d[key].append({
+                    "LC": row["liconst"],
+                    "LCStd": row["uncertainty_liconst"],
+                    "time_start": int(string_to_ts(row["cali_start_time"])),
+                    "time_end": int(string_to_ts(row["cali_stop_time"])),
+                    "method": method_key,
+                })
+            ret[method_key] = default_to_regular(d)
+            logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with '{method_db}'.")
 
     ## Depolarization calibration constants
     if table_name == 'depol_calibration_constant':
-        d = defaultdict(list)
-        if 'cali_method' in df.columns:
-            df_method = df[df['cali_method'] == 'D90']
-        else:
-            df_method = df
-        for index, row in df_method.iterrows():
-            k = f"{row['wavelength']}_{MAPPING[row['telescope']]}"
-            d[k].append({
-                'eta': row['depol_const'], 'eta_std': row['uncertainty_depol_const'],
-                'time_start': int(string_to_ts(row['cali_start_time'])), 
-                'time_end': int(string_to_ts(row['cali_stop_time'])),
-                'method': 'D90_db',
-                # 'status': 1,
-            })
-        ret['D90_db'] = default_to_regular(d)
-        logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with 'D90'.")
+        methods = ("D90", "transfer") if "cali_method" in df.columns else ("D90",)
+        for method_db in methods:
+            method = METHOD_DB_NAMES_INVERSE[method_db]
+            method_key = f"{method}_db"
 
-        d = defaultdict(list)
-        if 'cali_method' in df.columns:
-            df_method = df[df.cali_method == 'transfer']
-        else:
-            df_method = df
-        for index, row in df_method.iterrows():
-            k = f"{row['wavelength']}_{MAPPING[row['telescope']]}"
-            d[k].append({
-                'eta': row['depol_const'], 'eta_std': row['uncertainty_depol_const'],
-                'time_start': int(string_to_ts(row['cali_start_time'])), 
-                'time_end': int(string_to_ts(row['cali_stop_time'])),
-                'method': 'transfer_db',
-                # 'status': 1,
-            })
-        ret['transfer_db'] = default_to_regular(d)
-        logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with 'transfer'.")
+            d = defaultdict(list)
+            # to capture if reading in an old db that lacks the column cali_method
+            df_method = df[df["cali_method"].eq(method_db)] if "cali_method" in df.columns else df
+            for _, row in df_method.iterrows():
+                key = f"{row['wavelength']}_{MAPPING[row['telescope']]}"
+                d[key].append({
+                    "eta": row["depol_const"],
+                    "eta_std": row["uncertainty_depol_const"],
+                    "time_start": int(string_to_ts(row["cali_start_time"])),
+                    "time_end": int(string_to_ts(row["cali_stop_time"])),
+                    "method": method_key,
+                })
+            ret[method_key] = default_to_regular(d)
+            logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with '{method_db}'.")
 
     ## Water Vapor calibration constants
     if table_name == 'wv_calibration_constant':
-        d = defaultdict(list)
-        df_method = df[df.cali_method == 'Model_Profile_Method']
-        for index, row in df_method.iterrows():
-            k = f"{row['wavelength']}_{MAPPING[row['telescope']]}"
-            d[k].append({
-                'WVC': row['wv_const'], 'WVCStd': row['uncertainty_wv_const'],
-                'time_start': int(string_to_ts(row['cali_start_time'])), 
-                'time_end': int(string_to_ts(row['cali_stop_time'])),
-                'method': 'model_profile_db',
-            })
-        ret['model_profile_db'] = default_to_regular(d)
-        logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with 'Model_Profile_Method'.")
-
-        d = defaultdict(list)
-        df_method = df[df.cali_method == 'Model_Regression_Method']
-        for index, row in df_method.iterrows():
-            k = f"{row['wavelength']}_{MAPPING[row['telescope']]}"
-            d[k].append({
-                'WVC': row['wv_const'], 'WVCStd': row['uncertainty_wv_const'],
-                'time_start': int(string_to_ts(row['cali_start_time'])), 
-                'time_end': int(string_to_ts(row['cali_stop_time'])),
-                'method': 'model_regression_db', 
-            })
-        ret['model_regression_db'] = default_to_regular(d)
-        logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with 'Model_Regression_Method'.")
+        for method_db in ("Model_Profile_Method", "Model_Regression_Method"):
+            method = METHOD_DB_NAMES_INVERSE[method_db]
+            method_key = f"{method}_db"
+        
+            df_method = df[df["cali_method"].eq(method_db)]
+            d = defaultdict(list)
+            for _, row in df_method.iterrows():
+                key = f"{row['wavelength']}_{MAPPING[row['telescope']]}"
+                d[key].append({
+                    "WVC": row["wv_const"],
+                    "WVCStd": row["uncertainty_wv_const"],
+                    "time_start": int(string_to_ts(row["cali_start_time"])),
+                    "time_end": int(string_to_ts(row["cali_stop_time"])),
+                    "method": method_key,
+                })
+            ret[method_key] = default_to_regular(d)
+            logging.info(f"Loaded {df_method.shape[0]} lines from table {table_name} with '{method_db}'.")
 
     return ret
 
@@ -214,7 +197,7 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
     parameter :str
         Name of parameter to stoere eg. 'LC' or 'DC'.
     method : str
-        Name of retrieval method used to retrieve the parameter
+        Name of retrieval method used to retrieve the parameter (see `METHOD_DB_NAMES`)
         eg. 'klett' or 'raman'.
         
     Returns
@@ -226,22 +209,12 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
 
     - xxxx-xx-xx: First edition by
     - xxxx-xx-xx: Translated to python.
+    - 2026-11-01: Gently tried to make it more pythonic
     
     """
 
     rows_to_insert = []
-    if method == 'raman':
-        method_db = 'Raman_Method'
-    elif method == 'klett':
-        method_db = 'Klett_Method'
-    elif method == 'D90':
-        method_db = 'D90'
-    elif method == 'transfer':
-        method_db = 'transfer'
-    elif method == 'model_profile':
-        method_db = 'Model_Profile_Method'
-    elif method == 'model_regression':
-        method_db = 'Model_Regression_Method'
+    method_db = METHOD_DB_NAMES[method]
 
     ## Lidar calibration constants
     if parameter == 'LC':
@@ -252,12 +225,8 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                 LC = line['LC']
                 LC_std = line['LCStd']
                 LC_is_used = True if LC == data_cube.LCused[e]['LC'] else False
-                start_unix = line['time_start']
-                stop_unix = line['time_end']
-                start = datetime.fromtimestamp(start_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-                stop = datetime.fromtimestamp(stop_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
                 rows_to_insert.append((
-                    str(start), str(stop), float(LC), float(LC_std), LC_is_used, 
+                    _format_ts(line['time_start']), _format_ts(line['time_end']), float(LC), float(LC_std), LC_is_used, 
                     wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
 
     ## Depolarization calibration constants
@@ -269,14 +238,8 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                 eta = line['eta']
                 eta_std = line['eta_std']
                 eta_is_used = True if eta == data_cube.etaused[e]['eta'] else False
-                start_unix = line['time_start']
-                stop_unix = line['time_end']
-                start = datetime.fromtimestamp(start_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-                stop = datetime.fromtimestamp(stop_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
                 rows_to_insert.append((
-                    str(start), str(stop), float(eta), float(eta_std), eta_is_used, 
-                    #wv, tel_db, method_db, str(data_cube.rawfile), data_cube.device)) # old format
-                    #wv, tel_db, str(data_cube.rawfile), data_cube.device)) # old format without method
+                    _format_ts(line['time_start']), _format_ts(line['time_end']), float(eta), float(eta_std), eta_is_used, 
                     wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
 
     ## Water vapor calibration constants
@@ -288,12 +251,8 @@ def prepare_for_sql_db_writing(data_cube, parameter:str, method:str) -> list[tup
                 WVC = line['WVC']
                 WVCStd = line['WVCStd']
                 WVC_is_used = True if WVC == data_cube.WVCused[e]['WVC'] else False
-                start_unix = line['time_start']
-                stop_unix = line['time_end']
-                start = datetime.fromtimestamp(start_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-                stop = datetime.fromtimestamp(stop_unix, timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
                 rows_to_insert.append((
-                    str(start), str(stop), float(WVC), float(WVCStd), WVC_is_used, 
+                    _format_ts(line['time_start']), _format_ts(line['time_end']), float(WVC), float(WVCStd), WVC_is_used, 
                     wv, str(data_cube.rawfile), data_cube.device, method_db, tel_db))
     
     return rows_to_insert
@@ -316,6 +275,7 @@ def setup_empty(db_path:str, table_name:str, column_names:list[str],
     """
     if not os.path.exists(db_path):
         logging.warning(f"Path to Database does not exist {db_path}, will be generated")
+        table_exists = False
     else:
         # check if table exists
         with sqlite3.connect(db_path) as conn:
@@ -389,26 +349,18 @@ def write_rows_to_sql_db(db_path:str, table_name:str, column_names:list[str],
     
     """
 
-    import traceback
-
-    try:
-        with sqlite3.connect(db_path) as conn:
-            cursor = conn.cursor()
-            rows = conn.execute(f'PRAGMA table_info({table_name})').fetchall()
-        conn.close()
-    except:
-        print(traceback.format_exc())
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        rows = conn.execute(f'PRAGMA table_info({table_name})').fetchall()
     actual = [row[1] for row in rows]
     
-    logging.debug(f"Expected: {['id'] + column_names}")
-    logging.debug(f"Actual:   {actual}")
+    logging.debug(f"Expected: {['id'] + column_names}\nActual:   {actual}")
     assert set(actual) == set(['id'] + column_names), f"missing column names {set(actual) ^ set(['id'] + column_names)}"
     if not actual == ['id'] + column_names:
         logging.info(f"Order of table differs. Not nice, but columns should be accessed explicitely")
 
     placeholders = ', '.join(['?'] * len(column_names))
     columns = ', '.join(column_names)
-    # sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders}) ON CONFLICT(cali_start_time, cali_stop_time, wavelength, polly_type, telescope) DO UPDATE SET data = excluded.data"
     sql = f"INSERT OR REPLACE INTO {table_name} ({columns}) VALUES ({placeholders})"
 
     try:
