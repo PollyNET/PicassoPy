@@ -1898,7 +1898,7 @@ class PicassoProc:
         parameter : str
             can be LC (Lidar-calibration-constant), DC (Depol-calibration-constant) or WVC (WaterVapor-calibration-constant)
         method : str
-            'raman', 'klett', 'profile' or 'regression'
+            'raman', 'klett', 'D90', 'transfer', 'profile' or 'regression'
         db_path : str
             location of the sqlite db-file
 
@@ -1913,27 +1913,11 @@ class PicassoProc:
             db_path = base_dir.joinpath(self.device, self.polly_config_dict['calibrationDB'])
             logging.info(f"read db_path from polly_config_dict {db_path}")
         
-        if parameter == 'LC':
-            table_name = 'lidar_calibration_constant'
-            column_names = [
-                'cali_start_time', 'cali_stop_time', 'liconst', 'uncertainty_liconst', 'used_for_processing', 
-                'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
-            data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text', 'text']
-            unique=', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope, cali_method)'
-        elif parameter == 'DC':
-            table_name = 'depol_calibration_constant'
-            column_names = [
-                'cali_start_time', 'cali_stop_time', 'depol_const', 'uncertainty_depol_const', 'used_for_processing', 
-                'wavelength', 'telescope', 'nc_zip_file', 'polly_type']
-            data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text']
-            unique=', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope)'
-        elif parameter == 'WVC':
-            table_name = 'wv_calibration_constant'
-            column_names = [
-                'cali_start_time', 'cali_stop_time', 'wv_const', 'uncertainty_wv_const', 'used_for_processing', 
-                'wavelength', 'nc_zip_file', 'polly_type', 'cali_method', 'telescope']
-            data_types = ['text', 'text', 'real', 'real', 'integer', 'text', 'text', 'text', 'text', 'text']
-            unique=', UNIQUE(cali_start_time, cali_stop_time, wavelength, polly_type, telescope, cali_method)'
+
+        table_name = sql_db.DB_SCHEME[parameter]['table_name']
+        column_names = sql_db.DB_SCHEME[parameter]['column_names']
+        data_types = sql_db.DB_SCHEME[parameter]['data_types']
+        unique = sql_db.DB_SCHEME[parameter]['unique']
         assert len(column_names) == len(data_types), 'column names do not match data types'
 
         logging.info(f'writing to sqlite-db: {db_path}')
