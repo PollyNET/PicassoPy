@@ -1816,10 +1816,10 @@ class PicassoProc:
 
             Keys
             ----
-            attBsc_{wv}\_{t}\_{tel} : ndarray
-                High resolution (time, height) attenuated backscatter at channel {wv}\_{t}\_{tel}.
-            attBsc_{wv}\_{t}\_OC : ndarray
-                High resolution (time, height) overlap corrected attenuated backscatter at channel {wv}\_{t}\_FR.
+            attBsc_{wv}_{t}_{tel} : ndarray
+                High resolution (time, height) attenuated backscatter at channel {wv}_{t}_{tel}.
+            attBsc_{wv}_{t}_OC : ndarray
+                High resolution (time, height) overlap corrected attenuated backscatter at channel {wv}_{t}_FR.
         """
 
         # for now try with mutable state in data_cube
@@ -1862,7 +1862,7 @@ class PicassoProc:
             Keys
             ----
             wvmr_{wv}_{tel} : ndarray
-                High resolution (time, height) water vapor mixing ratio fro channel {wv}\_{tel}.
+                High resolution (time, height) water vapor mixing ratio fro channel {wv}_{tel}.
         """
 
         logging.info("2D water vapor mixing ratio retrieval ...")
@@ -1879,15 +1879,15 @@ class PicassoProc:
 
             Keys
             ----
-            quasiBscV1_{wv}\_{t}\_{tel} : ndarray
+            quasiBscV1_{wv}_{t}_{tel} : ndarray
                 Quasi version 1 particle backscatter at channel `{wv}_{t}_{tel}`.
-            quasiExtV1_{wv}\_{t}\_{tel} : ndarray
+            quasiExtV1_{wv}_{t}_{tel} : ndarray
                 Quasi version 1 particle extinction at channel `{wv}_{t}_{tel}`.
-            quasiVdrV1_{wv}\_{t}\_{tel} : ndarray
+            quasiVdrV1_{wv}_{t}_{tel} : ndarray
                 Quasi version 1 volume depolarization ratio at channel `{wv}_{t}_{tel}`. (usally `wv =532`).
-            quasiPdrV1_{wv}\_{t}\_{tel} : ndarray
+            quasiPdrV1_{wv}_{t_{tel} : ndarray
                 Quasi version 1 particle depolarization ratio at channel `{wv}_{t}_{tel}`. (usally `wv =532`).
-            quasiAEV1_{wv1}\_{wv2} : ndarray
+            quasiAEV1_{wv1}_{wv2} : ndarray
                 Quasi version 1 Angstroem exponent between two wavelengets `wv1` and `wv2`.
             tcMaskV1 : ndarray
                 Classification mask version 1 (time x height).
@@ -1932,15 +1932,15 @@ class PicassoProc:
 
             Keys
             ----
-            quasiBscV2_{wv}\_{t}\_{tel} : ndarray
+            quasiBscV2_{wv}_{t}_{tel} : ndarray
                 Quasi version 2 particle backscatter at channel `{wv}_{t}_{tel}`.
-            quasiExtV2_{wv}\_{t}\_{tel} : ndarray
+            quasiExtV2_{wv}_{t}_{tel} : ndarray
                 Quasi version 2 particle extinction at channel `{wv}_{t}_{tel}`.
-            quasiVdrV2_{wv}\_{t}\_{tel} : ndarray
+            quasiVdrV2_{wv}_{t}_{tel} : ndarray
                 Quasi version 2 volume depolarization ratio at channel `{wv}_{t}_{tel}`. (usally `wv =532`).
-            quasiPdrV2_{wv}\_{t}\_{tel} : ndarray
+            quasiPdrV2_{wv}_{t}_{tel} : ndarray
                 Quasi version 2 particle depolarization ratio at channel `{wv}_{t}_{tel}`. (usally `wv =532`).
-            quasiAEV2_{wv1}\_{wv2} : ndarray
+            quasiAEV2_{wv1}_{wv2} : ndarray
                 Quasi version 2 Angstroem exponent between two wavelengets `wv1` and `wv2`.
             tcMaskV2 : ndarray
                 Classification mask version 2 (time x height).

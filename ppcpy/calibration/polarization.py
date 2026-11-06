@@ -982,7 +982,7 @@ def calibrateOuterFOV(data_cube, collect_debug:bool=False, collect_vars_plot:boo
     config_dict = data_cube.polly_config_dict.copy()
     height = np.array(data_cube.retrievals_highres['height'])/1000
 
-    print('starting with clFreeGrps', data_cube.clFreeGrps)
+    logging.info(f'transfer calibration in  {data_cube.clFreeGrps}')
     results = []
     debug = []
     for i, cldFree in enumerate(data_cube.clFreeGrps):
@@ -1018,22 +1018,22 @@ def calibrateOuterFOV(data_cube, collect_debug:bool=False, collect_vars_plot:boo
         height_mask = (height > 0.8) & (height < 6)
         #print('vdr_inner', vdr_inner[height_mask])
         if np.all(~np.isfinite(vdr_inner[height_mask])):
-            print('only nan for vdr_inner')
+            logging.debug('only nan for vdr_inner')
             continue
         # the eta estimate seems more roubust for high voldepol in the inner fov
         # the lower vdr_inner, the stronger the effect of a wrong Hr
-        print("percentile 10, 20 ", np.nanpercentile(vdr_inner[height_mask], [10, 20]))
+        #print("percentile 10, 20 ", np.nanpercentile(vdr_inner[height_mask], [10, 20]))
         vdr_inner_min = np.nanpercentile(vdr_inner[height_mask], [10])*2
         
         vdr_mask = vdr_inner[height_mask] > vdr_inner_min
         eta_lt0_mask = eta_outer[height_mask] > 0
-        print("height_mask", np.sum(height_mask), len(height_mask))
-        print("vdr_mask", np.sum(vdr_mask), len(vdr_mask))
+        #print("height_mask", np.sum(height_mask), len(height_mask))
+        #print("vdr_mask", np.sum(vdr_mask), len(vdr_mask))
         
         # check if enough high vdr_inner values are there, if so Hr and eta are optimized else only eta
         if np.sum((vdr_mask) & (eta_lt0_mask)) > 50:
             eta_outer_guess = np.nanmedian(eta_outer[height_mask][(vdr_mask) & (eta_lt0_mask)])
-            print('eta_outer first guess', eta_outer_guess)
+            logging.info(f'eta_outer first guess {eta_outer_guess}')
             hr_bounds = (-0.9998, -0.96) # translates to a T_R 10000, 48
             error_eta = 0.2
             Hr_fixed = False
@@ -1084,17 +1084,17 @@ def calibrateOuterFOV(data_cube, collect_debug:bool=False, collect_vars_plot:boo
         median_ratio = 10.0 ** np.median(log_residuals)
         bias_factor = 10**np.abs(np.mean(log_residuals))
 
-        print("\nOptimization result")
-        print(f"success              = {result.success}")
-        print(f"message              = {result.message}")
-        print(f"Hr                   = {hr_opt:.10f}   in T_R {(1-hr_opt)/(1+hr_opt):.5f}")
-        print(f"eta                  = {eta_opt:.10f}")
-        print(f"log10 RMSE           = {rmse_log:.6f} linear {10**rmse_log:.6}")
-        print(f"median outer/inner   = {median_ratio:.5f}")
-        print(f"cost                 = {result.cost:.6g}")
-        print(f"function evaluations = {result.nfev}")
-        print('active mask?', result.active_mask)
-        print('bias factor', bias_factor)
+        # print("\nOptimization result")
+        # print(f"success              = {result.success}")
+        # print(f"message              = {result.message}")
+        # print(f"Hr                   = {hr_opt:.10f}   in T_R {(1-hr_opt)/(1+hr_opt):.5f}")
+        # print(f"eta                  = {eta_opt:.10f}")
+        # print(f"log10 RMSE           = {rmse_log:.6f} linear {10**rmse_log:.6}")
+        # print(f"median outer/inner   = {median_ratio:.5f}")
+        # print(f"cost                 = {result.cost:.6g}")
+        # print(f"function evaluations = {result.nfev}")
+        # print('active mask?', result.active_mask)
+        # print('bias factor', bias_factor)
 
         good_fit = (
             result.success
@@ -1105,15 +1105,12 @@ def calibrateOuterFOV(data_cube, collect_debug:bool=False, collect_vars_plot:boo
             and bias_factor < 1.03
             and 10**rmse_log < 1.10
         )
-        print('   >>> good fit?', good_fit)
+        #print('   >>> good fit?', good_fit)
 
         opt = result.x
         #fit_opt = fit_for_Hr(hr_opt)
     
-        print("\nOptimization result")
-        print(f"success   = {result.success}")
-        print(f"message   = {result.message}")
-        print("HR_opt", hr_opt, (1-hr_opt)/(1+hr_opt))
+        logging.info(f"\nOptimization result: success {result.success} message {result.message}\nHR_opt, {hr_opt}, {(1-hr_opt)/(1+hr_opt)}")
 
         results.append({
             'eta': eta_opt, 'eta_std': eta_opt*error_eta,
