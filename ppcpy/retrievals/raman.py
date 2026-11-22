@@ -191,7 +191,7 @@ def run_cldFreeGrps(data_cube, signal:str='TCor', heightFullOverlap:list=None, n
                 )
 
                 # Checking SNR treshold
-                if SNRRef < config_dict[f'{keyminSNR}{wv}'] and SNRRef_r < config_dict[f'{keyminSNR}{wv_r}']:
+                if SNRRef < config_dict[f'{keyminSNR}{wv}'] or SNRRef_r < config_dict[f'{keyminSNR}{wv_r}']:
                     logging.warning(f"Signal is too noisy at the reference height, skipping Raman retrival for this channel.")
                     opt_profiles[i][f'{wv}_{t}_{tel}'] = prof
                     continue
