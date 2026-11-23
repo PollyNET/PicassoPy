@@ -125,8 +125,9 @@ def pollyChannelTags(chTagsIn:list, **channel_attributes) -> list:
                 #ch_label = 'near-range 387 nm'
                 ch_label = '387_total_NR'
                 chTagsOut_ls.append(ch_label)
-            #elif chCode == 257:
-            elif chCode == 265:
+            # elif chCode == 257:
+            # elif chCode == 265:
+            elif chCode in [257, 265]:
                 ch_label = '407_total_FR'
                 chTagsOut_ls.append(ch_label)
             elif chCode in [517, 525, 32773, 32777, 32781]:
@@ -365,8 +366,9 @@ def pollyChannelFlags(channel_dict_length:int, **channel_attributes) -> list:
         elif chCode == 130:
             ## near-range 387 nm
             flag_387_total_NR[iCh] = True
-        #elif chCode == 257:
-        elif chCode == 265:
+        # elif chCode == 257:
+        # elif chCode == 265:
+        elif chCode in [257, 265]:
             ## far-range 407 nm
             flag_407_total_FR[iCh] = True
         elif chCode in [517, 525, 32773, 32777, 32781]:
