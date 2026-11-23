@@ -29,8 +29,12 @@
 
 
     "max_height_bin": 4000,
+
+    "first_range_gate_indx": [251, 251, 251, 251, 251, 251, 251, 251, 251, 251, 251, 251, 251],
     "first_range_gate_indx": [253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253],
+    "first_range_gate_height": 3.75,
     "first_range_gate_height": [3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75],
+    
     "dtCorModeLabel": ["Polynomial coefficients stores in netcdf file", "nonparalyzable correction", "User defined polynomial cofficients"],
     "dtCorMode": 3,
     "dt": [[0.0, 1.000006239, 0.001236241546, 1.006471355E-5, 1.627652902E-8, 3.863266766E-10],
@@ -46,8 +50,11 @@
     [0.0, 1.000010631, 0.001344581668, 1.253022035E-5, 1.345278336E-8, 6.346477245E-10],
     [0.0, 1.000016778, 0.0009449173147, 1.685579521E-5, -8.154674887E-9, 1.236523311E-9],
     [0, 1, 0, 0, 0, 0]],
+
+    "bgCorRangeIndx": [10, 240],
     "bgCorRangeIndxLow": [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
     "bgCorRangeIndxHigh": [240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240, 240],
+
     "mask_SNRmin": [1.6, 1, 1, 0.01, 0.2, 1, 1, 0.2, 1, 1, 1, 1, 1],
     "init_depAng": 332,
     "maskDepCalAng": ["none", "none", "p", "p", "p", "p", "p", "p", "p", "p", "none", "none", "n", "n", "n", "n", "n", "n", "n", "n", "none"],
@@ -80,9 +87,11 @@
     "is607nm":   [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
     "is1064nm":  [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
     "isDFOV":    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    "channelTag": ["FR-total-355 nm", "FR-cross-355 nm", "FR-387 nm", "FR-407 nm", "FR-total-532 nm", "FR-cross-532 nm", "FR-607 nm", "FR-total-1064 nm", "NR-total-532 nm", "NR-607 nm", "NR-total-355 nm", "NR-387 nm", "DFOV"],
+
+    "channelTag": ["FR-total-355 nm", "FR-cross-355 nm", "FR-387 nm", "FR-407 nm", "FR-total-532 nm", "FR-cross-532 nm", "FR-607 nm", "FR-total-1064 nm", "NR-total-532 nm", "NR-607 nm", "NR-total-355 nm", "NR-387 nm", "none"],
     "channelTag": ["355_total_FR", "355_cross_FR", "387_total_FR", "407_total_FR", "532_total_FR", "532_cross_FR", "607_total_FR", "1064_total_FR", "532_total_NR", "607_total_NR", "355_total_NR", "387_total_NR", "532_cross_DFOV"],
 
+    
     "minPC_fog": 60,
     "TR": [0.93, 666, 1, 1, 1, 500, 1, 1, 1, 1, 1, 1, 1],
     "overlapCalMode": 1,
